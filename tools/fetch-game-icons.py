@@ -1,0 +1,60 @@
+"""Fetch official game icons for the Spine Stage game cards.
+
+Each game gets one representative icon (app-store art / official index icon)
+saved to public/thumbs/_game/<key>.png. The viewer falls back to the letter
+badge whenever a game has no icon, so this is purely cosmetic.
+"""
+import io
+import os
+
+import requests
+from PIL import Image
+
+UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+HEADERS = {"User-Agent": UA}
+
+OUT = "/srv/spine-viewer/public/thumbs/_game"
+SIZE = 128
+
+GAMES = [
+    ("azurlane",        "https://play-lh.googleusercontent.com/xm_fZgRuFC6npGnzKgBbw1V2VuZo4Pc67LLcrecmihkaDK-LFa_yKi6x4zmg-Nb-tvqy1ppLgjEdmgZMV00vg9E=w240-h480-rw"),
+    ("nikke",           "https://play-lh.googleusercontent.com/JK5mejs0bVT_9613gCxNfCjRw_m3JiQ4wC8B8Kt471yu7ThFQazVkCLTfPZ81hnenft7ilaE-qSwVGpQT6sEFcY=s512-rw"),
+    ("arkrecode",       "https://res-r.hrbksd.com/image/index_icon/1787120162025.webp"),
+    ("bd2",             "https://play-lh.googleusercontent.com/frPGVrz_hwSOyNm3y9RoVkfxD5I5ibKv0C5RD9Ub1188PJtv3BXa7KkfSyzr_-9SeNk50AVt3P2XvS_jtzTa=w240-h480-rw"),
+    ("alliancesages",   "https://res-r.hrbksd.com/image/index_icon/1771930071921.webp"),
+    ("lostsword",       "https://play-lh.googleusercontent.com/_OS6EQ01n93vfCiMRVgOb6RSsYiyacTI-2z_ebCzHNlLHdQX4Ln12dC1qGLjb_nrLc2L7Yr62osZDvFdIIv0JA=w240-h480-rw"),
+    # Depose Girls (放置少女) isn't on Google Play. This is the official
+    # favicon served from the game's own CDN (https://snh5-cdn1.ttagj.com).
+    ("deposegirls",     "https://snh5-cdn1.ttagj.com/platform/dmm-release/favicon.ico"),
+    # Project QT's Nutaku CDN isn't reachable from here, so this is a banner
+    # served from the game's own asset CDN (cloudfront, see tools/projectqt).
+    ("projectqt",       "https://d2mfyxc2xcodjl.cloudfront.net/share/bab6fc2c35fbb080514fc48cae681727beb68dc6.png"),
+    # Shoujou Kaisen's icon comes out of the APK instead of the web:
+    # res/drawable-xxhdpi-v11/licon.png in com.onemt.and.shoujokaisen.apk
+    # (see tools/shoujoukaisen/README.md). Left out of GAMES on purpose.
+]
+
+
+def main():
+    os.makedirs(OUT, exist_ok=True)
+    for key, url in GAMES:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=60)
+            r.raise_for_status()
+            img = Image.open(io.BytesIO(r.content))
+            img = img.convert("RGBA")
+            # trim to a square first so app-store banners don't crop oddly
+            w, h = img.size
+            s = min(w, h)
+            img = img.crop(((w - s) // 2, (h - s) // 2, (w - s) // 2 + s, (h - s) // 2 + s))
+            img = img.resize((SIZE, SIZE), Image.LANCZOS)
+            dest = os.path.join(OUT, key + ".png")
+            img.save(dest, "PNG")
+            print(f"  OK  {key:16} {w}x{h} -> {SIZE}x{SIZE}  ({os.path.getsize(dest)//1024} KB)")
+        except Exception as e:
+            print(f"  FAIL {key:16} {str(e)[:70]}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,20 @@
+const { chromium } = require("playwright-core");
+const CHROME = "/root/.cache/ms-playwright/chromium-1234/chrome-linux/chrome";
+(async () => {
+  const b = await chromium.launch({ executablePath: CHROME, args: ["--no-sandbox","--use-gl=swiftshader","--enable-unsafe-swiftshader"] });
+  const p = await b.newPage();
+  const reqs = [];
+  p.on("response", r => { if (r.url().includes("/assets/")) reqs.push(r.status()+" "+r.url().replace("http://localhost:3000","")); });
+  p.on("pageerror", e => console.log("PAGEERROR:", e.message));
+  await p.goto("http://localhost:3000/", { waitUntil: "networkidle" });
+  await p.click('.game[data-key="echocalypse"]');
+  await p.waitForSelector("#search:not([hidden])", { timeout: 20000 });
+  await p.fill("#search", "210000");
+  await p.waitForSelector('.model[data-id="echocalypse/knight_spine/210000"]', { timeout: 20000 });
+  await p.click('.model[data-id="echocalypse/knight_spine/210000"]');
+  await p.waitForTimeout(12000);
+  console.log("=== request /assets/ ===");
+  reqs.forEach(r => console.log("  ", r));
+  await p.screenshot({ path: "/tmp/ec-test.png" });
+  await b.close();
+})().catch(e => { console.error("FATAL", e.message); process.exit(1); });

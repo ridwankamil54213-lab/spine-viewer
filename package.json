@@ -1,0 +1,23 @@
+{
+  "name": "spine-stage",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spine2D skeleton viewer — assets served from this server, rendered with pixi-spine.",
+  "main": "src/server.js",
+  "scripts": {
+    "build": "esbuild src/viewer.js --bundle --format=iife --outfile=public/dist/viewer.js --target=es2020 --sourcemap",
+    "watch": "npm run build -- --watch",
+    "start": "node src/server.js",
+    "dev": "npm run build && node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "multer": "^2.3.0",
+    "pixi-spine": "^4.0.6",
+    "pixi.js": "^7.4.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "playwright-core": "^1.62.1"
+  }
+}

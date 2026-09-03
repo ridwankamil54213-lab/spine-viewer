@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Generated bundle (built via `npm run build`)
+public/dist/
+
+# Cached thumbnails (large, fetched at runtime)
+public/thumbs/
+public/exports/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Logs / temp
+*.log
+*.tmp
+.DS_Store

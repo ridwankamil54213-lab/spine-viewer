@@ -1,0 +1,2372 @@
+{
+ "RhythmHitAnim": {
+  "char": "Minigame",
+  "costume": "Slap Slap Pop",
+  "costumeId": "minigame1",
+  "rarity": null
+ },
+ "char000101": {
+  "char": "Lathel",
+  "costume": "Herb Tracker",
+  "costumeId": "000101",
+  "rarity": 5
+ },
+ "char000102": {
+  "char": "Lathel",
+  "costume": "Lonely Survivor",
+  "costumeId": "000102",
+  "rarity": 5
+ },
+ "char000103": {
+  "char": "Lathel",
+  "costume": "Homunculus",
+  "costumeId": "000103",
+  "rarity": 5
+ },
+ "char000104": {
+  "char": "Lathel",
+  "costume": "Dark Knight",
+  "costumeId": "000104",
+  "rarity": 5
+ },
+ "char000105": {
+  "char": "Lathel",
+  "costume": "Promise of Vengeance",
+  "costumeId": "000105",
+  "rarity": 5
+ },
+ "char000106": {
+  "char": "Lathel",
+  "costume": "Pool Party",
+  "costumeId": "000106",
+  "rarity": 5
+ },
+ "char000201": {
+  "char": "Justia",
+  "costume": "Knight of Blood",
+  "costumeId": "000201",
+  "rarity": 5
+ },
+ "char000202": {
+  "char": "Justia",
+  "costume": "White Reaper",
+  "costumeId": "000202",
+  "rarity": 5
+ },
+ "char000203": {
+  "char": "Justia",
+  "costume": "Blood Glutton",
+  "costumeId": "000203",
+  "rarity": 5
+ },
+ "char000204": {
+  "char": "Justia",
+  "costume": "Kendo Club",
+  "costumeId": "000204",
+  "rarity": 5
+ },
+ "char000206": {
+  "char": "Justia",
+  "costume": "Pool Party",
+  "costumeId": "000206",
+  "rarity": 5
+ },
+ "char000296": {
+  "char": "Justia",
+  "costume": "Hot Summer Dream",
+  "costumeId": "000296",
+  "rarity": null
+ },
+ "char000301": {
+  "char": "Scheherazade",
+  "costume": "The Lapis Witch",
+  "costumeId": "000301",
+  "rarity": 5
+ },
+ "char000303": {
+  "char": "Scheherazade",
+  "costume": "The Magic School Professor",
+  "costumeId": "000303",
+  "rarity": 5
+ },
+ "char000304": {
+  "char": "Scheherazade",
+  "costume": "Code Name S",
+  "costumeId": "000304",
+  "rarity": 5
+ },
+ "char000306": {
+  "char": "Scheherazade",
+  "costume": "Pool Party",
+  "costumeId": "000306",
+  "rarity": 5
+ },
+ "char000396": {
+  "char": "Scheherazade",
+  "costume": "Deliberate Ace",
+  "costumeId": "000396",
+  "rarity": null
+ },
+ "char000401": {
+  "char": "Gray",
+  "costume": "The Sharpshooter of the Mist",
+  "costumeId": "000401",
+  "rarity": 5
+ },
+ "char000402": {
+  "char": "Gray",
+  "costume": "B-Rank Manager",
+  "costumeId": "000402",
+  "rarity": 5
+ },
+ "char000403": {
+  "char": "Gray",
+  "costume": "Vanguard",
+  "costumeId": "000403",
+  "rarity": 5
+ },
+ "char000406": {
+  "char": "Gray",
+  "costume": "Pool Party",
+  "costumeId": "000406",
+  "rarity": 5
+ },
+ "char000501": {
+  "char": "Rou",
+  "costume": "White Cat",
+  "costumeId": "000501",
+  "rarity": 5
+ },
+ "char000502": {
+  "char": "Rou",
+  "costume": "Red Riding Hood",
+  "costumeId": "000502",
+  "rarity": 5
+ },
+ "char000502_c": {
+  "char": "Rou",
+  "costume": "Red Riding Hood (Censored)",
+  "costumeId": "000502_c",
+  "rarity": 5
+ },
+ "char000504": {
+  "char": "Rou",
+  "costume": "Nature's Claw",
+  "costumeId": "000504",
+  "rarity": 5
+ },
+ "char000506": {
+  "char": "Rou",
+  "costume": "Stray Cat",
+  "costumeId": "000506",
+  "rarity": 5
+ },
+ "char000601": {
+  "char": "Olstein",
+  "costume": "The Fiend Scholar",
+  "costumeId": "000601",
+  "rarity": 5
+ },
+ "char000604": {
+  "char": "Olstein",
+  "costume": "Sage of Blue Clouds",
+  "costumeId": "000604",
+  "rarity": 5
+ },
+ "char000701": {
+  "char": "Eclipse",
+  "costume": "Dimension Witch",
+  "costumeId": "000701",
+  "rarity": 5
+ },
+ "char000706": {
+  "char": "Eclipse",
+  "costume": "Nightmare Bunny",
+  "costumeId": "000706",
+  "rarity": 5
+ },
+ "char000707": {
+  "char": "Eclipse",
+  "costume": "Beach Vacation",
+  "costumeId": "000707",
+  "rarity": 5
+ },
+ "char000708": {
+  "char": "Eclipse",
+  "costume": "Dream Bride",
+  "costumeId": "000708",
+  "rarity": 5
+ },
+ "char000801": {
+  "char": "Rubia",
+  "costume": "Thorn of the Desert",
+  "costumeId": "000801",
+  "rarity": 5
+ },
+ "char000804": {
+  "char": "Rubia",
+  "costume": "The Empress of the Ocean",
+  "costumeId": "000804",
+  "rarity": 5
+ },
+ "char000806": {
+  "char": "Rubia",
+  "costume": "Maid Name C",
+  "costumeId": "000806",
+  "rarity": 5
+ },
+ "char000807": {
+  "char": "Rubia",
+  "costume": "Maid Bikini",
+  "costumeId": "000807",
+  "rarity": 5
+ },
+ "char001001": {
+  "char": "Sylvia",
+  "costume": "Desert Flower",
+  "costumeId": "001001",
+  "rarity": 5
+ },
+ "char001002": {
+  "char": "Sylvia",
+  "costume": "The Sword Queen",
+  "costumeId": "001002",
+  "rarity": 5
+ },
+ "char001004": {
+  "char": "Sylvia",
+  "costume": "Admiral",
+  "costumeId": "001004",
+  "rarity": 5
+ },
+ "char001006": {
+  "char": "Sylvia",
+  "costume": "Bikini Agent",
+  "costumeId": "001006",
+  "rarity": 5
+ },
+ "char001092": {
+  "char": "Sylvia",
+  "costume": "Crimson Lotus",
+  "costumeId": "001092",
+  "rarity": null
+ },
+ "char001101": {
+  "char": "Teresse",
+  "costume": "Angel of Destruction",
+  "costumeId": "001101",
+  "rarity": 5
+ },
+ "char001106": {
+  "char": "Teresse",
+  "costume": "Medical Club",
+  "costumeId": "001106",
+  "rarity": 5
+ },
+ "char001107": {
+  "char": "Teresse",
+  "costume": "Beachside Angel",
+  "costumeId": "001107",
+  "rarity": 5
+ },
+ "char001197": {
+  "char": "Teresse",
+  "costume": "Milky Bikini",
+  "costumeId": "001197",
+  "rarity": null
+ },
+ "char001201": {
+  "char": "Liatris",
+  "costume": "Rodev's Star",
+  "costumeId": "001201",
+  "rarity": 5
+ },
+ "char001206": {
+  "char": "Liatris",
+  "costume": "Neon Stalker",
+  "costumeId": "001206",
+  "rarity": 5
+ },
+ "char001207": {
+  "char": "Liatris",
+  "costume": "Maid Name R",
+  "costumeId": "001207",
+  "rarity": 5
+ },
+ "char002401": {
+  "char": "Diana",
+  "costume": "Adventurer of the Unknown",
+  "costumeId": "002401",
+  "rarity": 5
+ },
+ "char002403": {
+  "char": "Diana",
+  "costume": "Magical Innovator",
+  "costumeId": "002403",
+  "rarity": 5
+ },
+ "char002406": {
+  "char": "Diana",
+  "costume": "Anti-dystopia",
+  "costumeId": "002406",
+  "rarity": 5
+ },
+ "char003001": {
+  "char": "Layla",
+  "costume": "Anvil of Creation",
+  "costumeId": "003001",
+  "rarity": 4
+ },
+ "char003101": {
+  "char": "Elpis",
+  "costume": "Hand of Salvation",
+  "costumeId": "003101",
+  "rarity": 4
+ },
+ "char003201": {
+  "char": "Loen",
+  "costume": "Last Hope",
+  "costumeId": "003201",
+  "rarity": 5
+ },
+ "char003202": {
+  "char": "Loen",
+  "costume": "Track and Field Team",
+  "costumeId": "003202",
+  "rarity": 5
+ },
+ "char003203": {
+  "char": "Loen",
+  "costume": "Celebrity Bunny",
+  "costumeId": "003203",
+  "rarity": 5
+ },
+ "char003301": {
+  "char": "Nebris",
+  "costume": "Labyrinth Gatekeeper",
+  "costumeId": "003301",
+  "rarity": 5
+ },
+ "char003302": {
+  "char": "Nebris",
+  "costume": "Laid-back Lifeguard",
+  "costumeId": "003302",
+  "rarity": 5
+ },
+ "char003303": {
+  "char": "Nebris",
+  "costume": "New Hire",
+  "costumeId": "003303",
+  "rarity": 5
+ },
+ "char003392": {
+  "char": "Nebris",
+  "costume": "Lucky Bikini",
+  "costumeId": "003392",
+  "rarity": null
+ },
+ "char003401": {
+  "char": "Morpeah",
+  "costume": "Beach Vacation",
+  "costumeId": "003401",
+  "rarity": 5
+ },
+ "char003402": {
+  "char": "Morpeah",
+  "costume": "Daydream Bunny",
+  "costumeId": "003402",
+  "rarity": 5
+ },
+ "char003403": {
+  "char": "Morpeah",
+  "costume": "Apostle",
+  "costumeId": "003403",
+  "rarity": 5
+ },
+ "char003501": {
+  "char": "Sacred Justia",
+  "costume": "Reclaimed Destiny",
+  "costumeId": "003501",
+  "rarity": 5
+ },
+ "char003601": {
+  "char": "Olivier",
+  "costume": "Faithful Wings",
+  "costumeId": "003601",
+  "rarity": 5
+ },
+ "char003602": {
+  "char": "Olivier",
+  "costume": "Apostle",
+  "costumeId": "003602",
+  "rarity": 5
+ },
+ "char003603": {
+  "char": "Olivier",
+  "costume": "Fallen Wings",
+  "costumeId": "003603",
+  "rarity": 5
+ },
+ "char003604": {
+  "char": "Olivier",
+  "costume": "Retired Legend",
+  "costumeId": "003604",
+  "rarity": 5
+ },
+ "char003701": {
+  "char": "Blade",
+  "costume": "Apostle",
+  "costumeId": "003701",
+  "rarity": 5
+ },
+ "char003702": {
+  "char": "Blade",
+  "costume": "Onsen Swordfighter",
+  "costumeId": "003702",
+  "rarity": 5
+ },
+ "char003703": {
+  "char": "Blade",
+  "costume": "Young Lady",
+  "costumeId": "003703",
+  "rarity": 5
+ },
+ "char003793": {
+  "char": "Blade",
+  "costume": "Tender Dream",
+  "costumeId": "003793",
+  "rarity": null
+ },
+ "char003801": {
+  "char": "Liberta",
+  "costume": "Dark Saintess",
+  "costumeId": "003801",
+  "rarity": 5
+ },
+ "char003802": {
+  "char": "Liberta",
+  "costume": "Onsen Manager",
+  "costumeId": "003802",
+  "rarity": 5
+ },
+ "char003803": {
+  "char": "Liberta",
+  "costume": "Miracle Rose",
+  "costumeId": "003803",
+  "rarity": 5
+ },
+ "char003892": {
+  "char": "Liberta",
+  "costume": "Hedonist",
+  "costumeId": "003892",
+  "rarity": null
+ },
+ "char003901": {
+  "char": "Sonya",
+  "costume": "Shadowed Dream",
+  "costumeId": "003901",
+  "rarity": 5
+ },
+ "char003902": {
+  "char": "Sonya",
+  "costume": "Little Pumpkin Girl",
+  "costumeId": "003902",
+  "rarity": 5
+ },
+ "char004001": {
+  "char": "Darian",
+  "costume": "Prophetic Dream",
+  "costumeId": "004001",
+  "rarity": 5
+ },
+ "char004002": {
+  "char": "Darian",
+  "costume": "Bittersweet Bunny",
+  "costumeId": "004002",
+  "rarity": 5
+ },
+ "char004091": {
+  "char": "Darian",
+  "costume": "Herald of Enlightenment",
+  "costumeId": "004091",
+  "rarity": null
+ },
+ "char004101": {
+  "char": "Tyr",
+  "costume": "Starlight Guardian",
+  "costumeId": "004101",
+  "rarity": 5
+ },
+ "char004102": {
+  "char": "Tyr",
+  "costume": "Innocent Bunny",
+  "costumeId": "004102",
+  "rarity": 5
+ },
+ "char004201": {
+  "char": "Palette",
+  "costume": "Shattered Dream",
+  "costumeId": "004201",
+  "rarity": 5
+ },
+ "char004202": {
+  "char": "Palette",
+  "costume": "Miracle Violet",
+  "costumeId": "004202",
+  "rarity": 5
+ },
+ "char004301": {
+  "char": "Nekyndalia",
+  "costume": "Deadeye",
+  "costumeId": "004301",
+  "rarity": null
+ },
+ "char020001": {
+  "char": "Eris",
+  "costume": "Esteemed Adventurer",
+  "costumeId": "020001",
+  "rarity": 5
+ },
+ "char020002": {
+  "char": "Eris",
+  "costume": "Your Very Own Cat",
+  "costumeId": "020002",
+  "rarity": 5
+ },
+ "char020101": {
+  "char": "Roxy",
+  "costume": "Respected Master",
+  "costumeId": "020101",
+  "rarity": 5
+ },
+ "char020102": {
+  "char": "Roxy",
+  "costume": "Emerging Desire",
+  "costumeId": "020102",
+  "rarity": 5
+ },
+ "char020201": {
+  "char": "Yomi",
+  "costume": "Gentle Destroyer",
+  "costumeId": "020201",
+  "rarity": 5
+ },
+ "char020301": {
+  "char": "Yozakura",
+  "costume": "Fist of Conviction",
+  "costumeId": "020301",
+  "rarity": 5
+ },
+ "char020401": {
+  "char": "Yumi",
+  "costume": "Dancing Snowflake",
+  "costumeId": "020401",
+  "rarity": 5
+ },
+ "char020501": {
+  "char": "Hikage",
+  "costume": "Kind Ruthlessness",
+  "costumeId": "020501",
+  "rarity": 5
+ },
+ "char020601": {
+  "char": "Goblin Slayer",
+  "costume": "Orcbolg",
+  "costumeId": "020601",
+  "rarity": 5
+ },
+ "char020701": {
+  "char": "Priestess",
+  "costume": "Earth Mother Believer",
+  "costumeId": "020701",
+  "rarity": 5
+ },
+ "char020801": {
+  "char": "High Elf Archer",
+  "costume": "Daughter of Starwind",
+  "costumeId": "020801",
+  "rarity": 5
+ },
+ "char020901": {
+  "char": "Sword Maiden",
+  "costume": "Supreme God Archbishop",
+  "costumeId": "020901",
+  "rarity": 5
+ },
+ "char021001": {
+  "char": "Ikaruga",
+  "costume": "Noble Flame",
+  "costumeId": "021001",
+  "rarity": 5
+ },
+ "char060301": {
+  "char": "Alec",
+  "costume": "The Destruction",
+  "costumeId": "060301",
+  "rarity": 5
+ },
+ "char060302": {
+  "char": "Alec",
+  "costume": "Sword Breaker",
+  "costumeId": "060302",
+  "rarity": 5
+ },
+ "char060401": {
+  "char": "Celia",
+  "costume": "The Curse",
+  "costumeId": "101601",
+  "rarity": 5
+ },
+ "char060402": {
+  "char": "Celia",
+  "costume": "Descendant of the Great Witch",
+  "costumeId": "060402",
+  "rarity": 5
+ },
+ "char060403": {
+  "char": "Celia",
+  "costume": "Masquerade Bunny",
+  "costumeId": "060403",
+  "rarity": 5
+ },
+ "char060501": {
+  "char": "Anastasia",
+  "costume": "Gentle Maid",
+  "costumeId": "060501",
+  "rarity": 5
+ },
+ "char060502": {
+  "char": "Anastasia",
+  "costume": "Fire Graffiti",
+  "costumeId": "060502",
+  "rarity": 5
+ },
+ "char060601": {
+  "char": "Lecliss",
+  "costume": "Killer Doll",
+  "costumeId": "060601",
+  "rarity": 5
+ },
+ "char060602": {
+  "char": "Lecliss",
+  "costume": "Android Queen",
+  "costumeId": "060602",
+  "rarity": 5
+ },
+ "char060701": {
+  "char": "Rafina",
+  "costume": "Steel Engine",
+  "costumeId": "060701",
+  "rarity": 5
+ },
+ "char060702": {
+  "char": "Rafina",
+  "costume": "Code Name A",
+  "costumeId": "060702",
+  "rarity": 5
+ },
+ "char060706": {
+  "char": "Rafina",
+  "costume": "Game Club",
+  "costumeId": "060706",
+  "rarity": 5
+ },
+ "char060801": {
+  "char": "Elise",
+  "costume": "Lovely Lady",
+  "costumeId": "060801",
+  "rarity": 5
+ },
+ "char060802": {
+  "char": "Elise",
+  "costume": "Code Name O",
+  "costumeId": "060802",
+  "rarity": 5
+ },
+ "char060804": {
+  "char": "Elise",
+  "costume": "Naive Lady",
+  "costumeId": "060804",
+  "rarity": null
+ },
+ "char061001": {
+  "char": "Helena",
+  "costume": "Top Idol",
+  "costumeId": "061001",
+  "rarity": 5
+ },
+ "char061002": {
+  "char": "Helena",
+  "costume": "B-Rank Idol",
+  "costumeId": "061002",
+  "rarity": 5
+ },
+ "char061003": {
+  "char": "Helena",
+  "costume": "Sunny Inn Hand",
+  "costumeId": "061003",
+  "rarity": null
+ },
+ "char061092": {
+  "char": "Helena",
+  "costume": "Rising Star",
+  "costumeId": "061092",
+  "rarity": null
+ },
+ "char061092_A": {
+  "char": "Helena",
+  "costume": "Rising Star",
+  "costumeId": "061092",
+  "rarity": null
+ },
+ "char061101": {
+  "char": "Eleaneer",
+  "costume": "Piercing Magic Bow",
+  "costumeId": "061101",
+  "rarity": 5
+ },
+ "char061102": {
+  "char": "Eleaneer",
+  "costume": "B-Rank Idol",
+  "costumeId": "061102",
+  "rarity": 5
+ },
+ "char061103": {
+  "char": "Eleaneer",
+  "costume": "Shadow Bunny",
+  "costumeId": "061103",
+  "rarity": 5
+ },
+ "char061302": {
+  "char": "Dalvi",
+  "costume": "Bright Moon",
+  "costumeId": "061302",
+  "rarity": 5
+ },
+ "char061305": {
+  "char": "Dalvi",
+  "costume": "Summer Vacation",
+  "costumeId": "061305",
+  "rarity": 5
+ },
+ "char061306": {
+  "char": "Dalvi",
+  "costume": "Tricky Lover",
+  "costumeId": "061306",
+  "rarity": null
+ },
+ "char061392": {
+  "char": "Dalvi",
+  "costume": "Butterfly Dream",
+  "costumeId": "061392",
+  "rarity": null
+ },
+ "char061402": {
+  "char": "Zenith",
+  "costume": "Robin Hood",
+  "costumeId": "061402",
+  "rarity": 5
+ },
+ "char061404": {
+  "char": "Zenith",
+  "costume": "Poolside Guardian",
+  "costumeId": "061404",
+  "rarity": 5
+ },
+ "char061492": {
+  "char": "Zenith",
+  "costume": "Stranger Bunny",
+  "costumeId": "061492",
+  "rarity": null
+ },
+ "char062001": {
+  "char": "Andrew",
+  "costume": "Loyal Butler",
+  "costumeId": "062001",
+  "rarity": 4
+ },
+ "char062002": {
+  "char": "Andrew",
+  "costume": "Specialist",
+  "costumeId": "062002",
+  "rarity": 4
+ },
+ "char063001": {
+  "char": "Ingrid",
+  "costume": "Kardis' Bullet",
+  "costumeId": "063001",
+  "rarity": 3
+ },
+ "char063301": {
+  "char": "Cynthia",
+  "costume": "Warmth within the Severe Cold",
+  "costumeId": "063301",
+  "rarity": 3
+ },
+ "char063401": {
+  "char": "Julie",
+  "costume": "Healer",
+  "costumeId": "063401",
+  "rarity": 3
+ },
+ "char065102": {
+  "char": "Yuri",
+  "costume": "Whitebolt",
+  "costumeId": "065102",
+  "rarity": 5
+ },
+ "char065103": {
+  "char": "Yuri",
+  "costume": "Comeback Idol",
+  "costumeId": "065103",
+  "rarity": 5
+ },
+ "char065193": {
+  "char": "Yuri",
+  "costume": "Forever Mascot",
+  "costumeId": "065193",
+  "rarity": null
+ },
+ "char065802": {
+  "char": "Nartas",
+  "costume": "Anonymous Sage",
+  "costumeId": "065802",
+  "rarity": 5
+ },
+ "char066401": {
+  "char": "Angelica",
+  "costume": "The Fallen",
+  "costumeId": "066401",
+  "rarity": 5
+ },
+ "char066402": {
+  "char": "Angelica",
+  "costume": "Pool Party",
+  "costumeId": "066402",
+  "rarity": 5
+ },
+ "char066403": {
+  "char": "Angelica",
+  "costume": "Neon Savior",
+  "costumeId": "066403",
+  "rarity": 5
+ },
+ "char066801": {
+  "char": "Refithea",
+  "costume": "The Gluttonous",
+  "costumeId": "066801",
+  "rarity": 5
+ },
+ "char066802": {
+  "char": "Refithea",
+  "costume": "Pure White Blessing",
+  "costumeId": "066802",
+  "rarity": 5
+ },
+ "char066802_c": {
+  "char": "Refithea",
+  "costume": "Pure White Blessing (Censored)",
+  "costumeId": "066802_c",
+  "rarity": 5
+ },
+ "char066803": {
+  "char": "Refithea",
+  "costume": "Poolside Fairy",
+  "costumeId": "066803",
+  "rarity": 5
+ },
+ "char066902": {
+  "char": "Glacia",
+  "costume": "Alice",
+  "costumeId": "066902",
+  "rarity": 5
+ },
+ "char066906": {
+  "char": "Glacia",
+  "costume": "Disciplinary Committee",
+  "costumeId": "066906",
+  "rarity": 5
+ },
+ "char066907": {
+  "char": "Glacia",
+  "costume": "Heavenly Guardian Successor",
+  "costumeId": "066907",
+  "rarity": null
+ },
+ "char067002": {
+  "char": "Ventana",
+  "costume": "Snow White",
+  "costumeId": "067002",
+  "rarity": 5
+ },
+ "char067003": {
+  "char": "Ventana",
+  "costume": "Comeback Idol",
+  "costumeId": "067003",
+  "rarity": 5
+ },
+ "char067004": {
+  "char": "Ventana",
+  "costume": "Onsen Practitioner",
+  "costumeId": "067004",
+  "rarity": 5
+ },
+ "char067101": {
+  "char": "Granhildr",
+  "costume": "The Void",
+  "costumeId": "067101",
+  "rarity": 5
+ },
+ "char067102": {
+  "char": "Granhildr",
+  "costume": "Comeback Idol",
+  "costumeId": "067102",
+  "rarity": 5
+ },
+ "char067103": {
+  "char": "Granhildr",
+  "costume": "Boo Ghost",
+  "costumeId": "067103",
+  "rarity": 5
+ },
+ "char067104": {
+  "char": "Granhildr",
+  "costume": "Combat Medic",
+  "costumeId": "067104",
+  "rarity": null
+ },
+ "char067201": {
+  "char": "Venaka",
+  "costume": "DJ",
+  "costumeId": "067201",
+  "rarity": 5
+ },
+ "char067202": {
+  "char": "Venaka",
+  "costume": "Wind Dancer",
+  "costumeId": "067202",
+  "rarity": 5
+ },
+ "char067301": {
+  "char": "Levia",
+  "costume": "Track and Field Captain",
+  "costumeId": "067301",
+  "rarity": 5
+ },
+ "char067302": {
+  "char": "Levia",
+  "costume": "Night of Jealousy",
+  "costumeId": "067302",
+  "rarity": 5
+ },
+ "char067303": {
+  "char": "Levia",
+  "costume": "Overheat",
+  "costumeId": "067303",
+  "rarity": 5
+ },
+ "char067401": {
+  "char": "Michaela",
+  "costume": "Beachside Justice",
+  "costumeId": "067401",
+  "rarity": 5
+ },
+ "char067402": {
+  "char": "Michaela",
+  "costume": "Queen of Signatures",
+  "costumeId": "067402",
+  "rarity": 5
+ },
+ "char067403": {
+  "char": "Michaela",
+  "costume": "Acting Archbishop",
+  "costumeId": "067403",
+  "rarity": 5
+ },
+ "char067491": {
+  "char": "Michaela",
+  "costume": "True Liberation",
+  "costumeId": "067491",
+  "rarity": null
+ },
+ "char067502": {
+  "char": "Luvencia",
+  "costume": "Deal Snatcher",
+  "costumeId": "067502",
+  "rarity": 5
+ },
+ "char067503": {
+  "char": "Luvencia",
+  "costume": "Wild Dog",
+  "costumeId": "067503",
+  "rarity": 5
+ },
+ "char067504": {
+  "char": "Luvencia",
+  "costume": "Ocean Vanguard",
+  "costumeId": "067504",
+  "rarity": null
+ },
+ "char067601": {
+  "char": "Wilhelmina",
+  "costume": "Iron Monarch",
+  "costumeId": "067601",
+  "rarity": 0
+ },
+ "char067603": {
+  "char": "Wilhelmina",
+  "costume": "Water Park Queen",
+  "costumeId": "067603",
+  "rarity": 0
+ },
+ "char067604": {
+  "char": "Wilhelmina",
+  "costume": "Frozen Queen",
+  "costumeId": "067604",
+  "rarity": 0
+ },
+ "char067701": {
+  "char": "Granadair",
+  "costume": "Shrine Maiden of Purification",
+  "costumeId": "067701",
+  "rarity": 0
+ },
+ "char067702": {
+  "char": "Granadair",
+  "costume": "Queen of Gluttis",
+  "costumeId": "067702",
+  "rarity": 0
+ },
+ "char067801": {
+  "char": "Mamonir",
+  "costume": "Night of Death",
+  "costumeId": "067801",
+  "rarity": 5
+ },
+ "char067803": {
+  "char": "Mamonir",
+  "costume": "Miracle Marine",
+  "costumeId": "067803",
+  "rarity": 5
+ },
+ "char067901": {
+  "char": "Aquila",
+  "costume": "Savage Warrior",
+  "costumeId": "067901",
+  "rarity": null
+ },
+ "char100101": {
+  "char": "Gynt",
+  "costume": "Lugo Hunter",
+  "costumeId": "100101",
+  "rarity": 3
+ },
+ "char100201": {
+  "char": "Fred",
+  "costume": "Lugo Defense Force",
+  "costumeId": "100201",
+  "rarity": 3
+ },
+ "char100301": {
+  "char": "Lisianne",
+  "costume": "Wandering Priest",
+  "costumeId": "100301",
+  "rarity": 4
+ },
+ "char100401": {
+  "char": "Remnunt",
+  "costume": "Combat Doctor",
+  "costumeId": "100401",
+  "rarity": 3
+ },
+ "char100501": {
+  "char": "Wiggle",
+  "costume": "Bomb Fanatic",
+  "costumeId": "100501",
+  "rarity": 3
+ },
+ "char100502": {
+  "char": "Wiggle",
+  "costume": "Bomb in the Hoodie",
+  "costumeId": "100502",
+  "rarity": 3
+ },
+ "char100601": {
+  "char": "Lucrezia",
+  "costume": "Seductive Wings",
+  "costumeId": "100601",
+  "rarity": 4
+ },
+ "char100801": {
+  "char": "Bernie",
+  "costume": "Righteous Raider Girl",
+  "costumeId": "100801",
+  "rarity": 4
+ },
+ "char10101_c": {
+  "char": "Seir",
+  "costume": "Demon's Daughter",
+  "costumeId": "101101",
+  "rarity": 5
+ },
+ "char10102_c": {
+  "char": "Seir",
+  "costume": "B-Rank Idol",
+  "costumeId": "101102",
+  "rarity": 5
+ },
+ "char101101": {
+  "char": "Seir",
+  "costume": "Demon's Daughter",
+  "costumeId": "101101",
+  "rarity": 5
+ },
+ "char101101_c": {
+  "char": "Seir",
+  "costume": "Demon's Daughter (Censored)",
+  "costumeId": "101101_c",
+  "rarity": null
+ },
+ "char101102": {
+  "char": "Seir",
+  "costume": "B-Rank Idol",
+  "costumeId": "101102",
+  "rarity": 5
+ },
+ "char101102_c": {
+  "char": "Seir",
+  "costume": "B-Rank Idol (Censored)",
+  "costumeId": "101102_c",
+  "rarity": null
+ },
+ "char101103": {
+  "char": "Seir",
+  "costume": "New Hire",
+  "costumeId": "101103",
+  "rarity": 5
+ },
+ "char101201": {
+  "char": "Jayden",
+  "costume": "Beautiful Girl Devotee",
+  "costumeId": "101201",
+  "rarity": 4
+ },
+ "char101202": {
+  "char": "Jayden",
+  "costume": "Manga Research Club",
+  "costumeId": "101202",
+  "rarity": 4
+ },
+ "char101301": {
+  "char": "Emma",
+  "costume": "Haggard Delinquent",
+  "costumeId": "101301",
+  "rarity": 3
+ },
+ "char101302": {
+  "char": "Emma",
+  "costume": "School Queen",
+  "costumeId": "101302",
+  "rarity": 3
+ },
+ "char101401": {
+  "char": "Samay",
+  "costume": "Kind Liberator",
+  "costumeId": "101401",
+  "rarity": 4
+ },
+ "char101402": {
+  "char": "Samay",
+  "costume": "Kind Student",
+  "costumeId": "101402",
+  "rarity": 4
+ },
+ "char101501": {
+  "char": "Kry",
+  "costume": "Liberated Marauder",
+  "costumeId": "101501",
+  "rarity": 4
+ },
+ "char101502": {
+  "char": "Kry",
+  "costume": "Violent Student",
+  "costumeId": "101502",
+  "rarity": 4
+ },
+ "char101601": {
+  "char": "Celia",
+  "costume": "The Curse",
+  "costumeId": "101601",
+  "rarity": 5
+ },
+ "char103201": {
+  "char": "Carlson",
+  "costume": "The Mercenary Knight",
+  "costumeId": "103201",
+  "rarity": 3
+ },
+ "char103301": {
+  "char": "Lydia",
+  "costume": "Apprentice Spearman",
+  "costumeId": "103301",
+  "rarity": 3
+ },
+ "char103401": {
+  "char": "Rigenette",
+  "costume": "Little Hunter",
+  "costumeId": "103401",
+  "rarity": 3
+ },
+ "char103501": {
+  "char": "Beatrice",
+  "costume": "The Mighty Warrior of the Tribe",
+  "costumeId": "103501",
+  "rarity": 3
+ },
+ "char103601": {
+  "char": "Maria",
+  "costume": "Archmage",
+  "costumeId": "103601",
+  "rarity": 3
+ },
+ "char103701": {
+  "char": "Arines",
+  "costume": "Priest of Vitality",
+  "costumeId": "103701",
+  "rarity": 3
+ },
+ "cutscene_char000101": {
+  "char": "Lathel",
+  "costume": "Herb Tracker",
+  "costumeId": "000101",
+  "rarity": 5
+ },
+ "cutscene_char000103": {
+  "char": "Lathel",
+  "costume": "Homunculus",
+  "costumeId": "000103",
+  "rarity": 5
+ },
+ "cutscene_char000201": {
+  "char": "Justia",
+  "costume": "Knight of Blood",
+  "costumeId": "000201",
+  "rarity": 5
+ },
+ "cutscene_char000202": {
+  "char": "Justia",
+  "costume": "White Reaper",
+  "costumeId": "000202",
+  "rarity": 5
+ },
+ "cutscene_char000203": {
+  "char": "Justia",
+  "costume": "Blood Glutton",
+  "costumeId": "000203",
+  "rarity": 5
+ },
+ "cutscene_char000204": {
+  "char": "Justia",
+  "costume": "Kendo Club",
+  "costumeId": "000204",
+  "rarity": 5
+ },
+ "cutscene_char000206": {
+  "char": "Justia",
+  "costume": "Pool Party",
+  "costumeId": "000206",
+  "rarity": 5
+ },
+ "cutscene_char000296": {
+  "char": "Justia",
+  "costume": "Hot Summer Dream",
+  "costumeId": "000296",
+  "rarity": null
+ },
+ "cutscene_char000301": {
+  "char": "Scheherazade",
+  "costume": "The Lapis Witch",
+  "costumeId": "000301",
+  "rarity": 5
+ },
+ "cutscene_char000303": {
+  "char": "Scheherazade",
+  "costume": "The Magic School Professor",
+  "costumeId": "000303",
+  "rarity": 5
+ },
+ "cutscene_char000304": {
+  "char": "Scheherazade",
+  "costume": "Code Name S",
+  "costumeId": "000304",
+  "rarity": 5
+ },
+ "cutscene_char000306": {
+  "char": "Scheherazade",
+  "costume": "Pool Party",
+  "costumeId": "000306",
+  "rarity": 5
+ },
+ "cutscene_char000396": {
+  "char": "Scheherazade",
+  "costume": "Deliberate Ace",
+  "costumeId": "000396",
+  "rarity": null
+ },
+ "cutscene_char000401": {
+  "char": "Gray",
+  "costume": "The Sharpshooter of the Mist",
+  "costumeId": "000401",
+  "rarity": 5
+ },
+ "cutscene_char000501": {
+  "char": "Rou",
+  "costume": "White Cat",
+  "costumeId": "000501",
+  "rarity": 5
+ },
+ "cutscene_char000502": {
+  "char": "Rou",
+  "costume": "Red Riding Hood",
+  "costumeId": "000502",
+  "rarity": 5
+ },
+ "cutscene_char000504": {
+  "char": "Rou",
+  "costume": "Nature's Claw",
+  "costumeId": "000504",
+  "rarity": 5
+ },
+ "cutscene_char000506": {
+  "char": "Rou",
+  "costume": "Stray Cat",
+  "costumeId": "000506",
+  "rarity": 5
+ },
+ "cutscene_char000604": {
+  "char": "Olstein",
+  "costume": "Sage of Blue Clouds",
+  "costumeId": "000604",
+  "rarity": 5
+ },
+ "cutscene_char000701": {
+  "char": "Eclipse",
+  "costume": "Dimension Witch",
+  "costumeId": "000701",
+  "rarity": 5
+ },
+ "cutscene_char000706": {
+  "char": "Eclipse",
+  "costume": "Nightmare Bunny",
+  "costumeId": "000706",
+  "rarity": 5
+ },
+ "cutscene_char000707": {
+  "char": "Eclipse",
+  "costume": "Beach Vacation",
+  "costumeId": "000707",
+  "rarity": 5
+ },
+ "cutscene_char000708": {
+  "char": "Eclipse",
+  "costume": "Dream Bride",
+  "costumeId": "000708",
+  "rarity": 5
+ },
+ "cutscene_char000801": {
+  "char": "Rubia",
+  "costume": "Thorn of the Desert",
+  "costumeId": "000801",
+  "rarity": 5
+ },
+ "cutscene_char000804": {
+  "char": "Rubia",
+  "costume": "The Empress of the Ocean",
+  "costumeId": "000804",
+  "rarity": 5
+ },
+ "cutscene_char000806": {
+  "char": "Rubia",
+  "costume": "Maid Name C",
+  "costumeId": "000806",
+  "rarity": 5
+ },
+ "cutscene_char000807": {
+  "char": "Rubia",
+  "costume": "Maid Bikini",
+  "costumeId": "000807",
+  "rarity": 5
+ },
+ "cutscene_char001001": {
+  "char": "Sylvia",
+  "costume": "Desert Flower",
+  "costumeId": "001001",
+  "rarity": 5
+ },
+ "cutscene_char001002": {
+  "char": "Sylvia",
+  "costume": "The Sword Queen",
+  "costumeId": "001002",
+  "rarity": 5
+ },
+ "cutscene_char001004": {
+  "char": "Sylvia",
+  "costume": "Admiral",
+  "costumeId": "001004",
+  "rarity": 5
+ },
+ "cutscene_char001006": {
+  "char": "Sylvia",
+  "costume": "Bikini Agent",
+  "costumeId": "001006",
+  "rarity": 5
+ },
+ "cutscene_char001092": {
+  "char": "Sylvia",
+  "costume": "Crimson Lotus",
+  "costumeId": "001092",
+  "rarity": null
+ },
+ "cutscene_char001101": {
+  "char": "Teresse",
+  "costume": "Angel of Destruction",
+  "costumeId": "001101",
+  "rarity": 5
+ },
+ "cutscene_char001106": {
+  "char": "Teresse",
+  "costume": "Medical Club",
+  "costumeId": "001106",
+  "rarity": 5
+ },
+ "cutscene_char001107": {
+  "char": "Teresse",
+  "costume": "Beachside Angel",
+  "costumeId": "001107",
+  "rarity": 5
+ },
+ "cutscene_char001197": {
+  "char": "Teresse",
+  "costume": "Milky Bikini",
+  "costumeId": "001197",
+  "rarity": null
+ },
+ "cutscene_char001201": {
+  "char": "Liatris",
+  "costume": "Rodev's Star",
+  "costumeId": "001201",
+  "rarity": 5
+ },
+ "cutscene_char001206": {
+  "char": "Liatris",
+  "costume": "Neon Stalker",
+  "costumeId": "001206",
+  "rarity": 5
+ },
+ "cutscene_char001207": {
+  "char": "Liatris",
+  "costume": "Maid Name R",
+  "costumeId": "001207",
+  "rarity": 5
+ },
+ "cutscene_char002401": {
+  "char": "Diana",
+  "costume": "Adventurer of the Unknown",
+  "costumeId": "002401",
+  "rarity": 5
+ },
+ "cutscene_char002403": {
+  "char": "Diana",
+  "costume": "Magical Innovator",
+  "costumeId": "002403",
+  "rarity": 5
+ },
+ "cutscene_char002406": {
+  "char": "Diana",
+  "costume": "Anti-dystopia",
+  "costumeId": "002406",
+  "rarity": 5
+ },
+ "cutscene_char003101": {
+  "char": "Elpis",
+  "costume": "Hand of Salvation",
+  "costumeId": "003101",
+  "rarity": 4
+ },
+ "cutscene_char003201": {
+  "char": "Loen",
+  "costume": "Last Hope",
+  "costumeId": "003201",
+  "rarity": 5
+ },
+ "cutscene_char003202": {
+  "char": "Loen",
+  "costume": "Track and Field Team",
+  "costumeId": "003202",
+  "rarity": 5
+ },
+ "cutscene_char003203": {
+  "char": "Loen",
+  "costume": "Celebrity Bunny",
+  "costumeId": "003203",
+  "rarity": 5
+ },
+ "cutscene_char003301": {
+  "char": "Nebris",
+  "costume": "Labyrinth Gatekeeper",
+  "costumeId": "003301",
+  "rarity": 5
+ },
+ "cutscene_char003302": {
+  "char": "Nebris",
+  "costume": "Laid-back Lifeguard",
+  "costumeId": "003302",
+  "rarity": 5
+ },
+ "cutscene_char003303": {
+  "char": "Nebris",
+  "costume": "New Hire",
+  "costumeId": "003303",
+  "rarity": 5
+ },
+ "cutscene_char003392": {
+  "char": "Nebris",
+  "costume": "Lucky Bikini",
+  "costumeId": "003392",
+  "rarity": null
+ },
+ "cutscene_char003401": {
+  "char": "Morpeah",
+  "costume": "Beach Vacation",
+  "costumeId": "003401",
+  "rarity": 5
+ },
+ "cutscene_char003402": {
+  "char": "Morpeah",
+  "costume": "Daydream Bunny",
+  "costumeId": "003402",
+  "rarity": 5
+ },
+ "cutscene_char003403": {
+  "char": "Morpeah",
+  "costume": "Apostle",
+  "costumeId": "003403",
+  "rarity": 5
+ },
+ "cutscene_char003501": {
+  "char": "Sacred Justia",
+  "costume": "Reclaimed Destiny",
+  "costumeId": "003501",
+  "rarity": 5
+ },
+ "cutscene_char003601": {
+  "char": "Olivier",
+  "costume": "Faithful Wings",
+  "costumeId": "003601",
+  "rarity": 5
+ },
+ "cutscene_char003602": {
+  "char": "Olivier",
+  "costume": "Apostle",
+  "costumeId": "003602",
+  "rarity": 5
+ },
+ "cutscene_char003603": {
+  "char": "Olivier",
+  "costume": "Fallen Wings",
+  "costumeId": "003603",
+  "rarity": 5
+ },
+ "cutscene_char003604": {
+  "char": "Olivier",
+  "costume": "Retired Legend",
+  "costumeId": "003604",
+  "rarity": 5
+ },
+ "cutscene_char003701": {
+  "char": "Blade",
+  "costume": "Apostle",
+  "costumeId": "003701",
+  "rarity": 5
+ },
+ "cutscene_char003702": {
+  "char": "Blade",
+  "costume": "Onsen Swordfighter",
+  "costumeId": "003702",
+  "rarity": 5
+ },
+ "cutscene_char003703": {
+  "char": "Blade",
+  "costume": "Young Lady",
+  "costumeId": "003703",
+  "rarity": 5
+ },
+ "cutscene_char003793": {
+  "char": "Blade",
+  "costume": "Tender Dream",
+  "costumeId": "003793",
+  "rarity": null
+ },
+ "cutscene_char003801": {
+  "char": "Liberta",
+  "costume": "Dark Saintess",
+  "costumeId": "003801",
+  "rarity": 5
+ },
+ "cutscene_char003802": {
+  "char": "Liberta",
+  "costume": "Onsen Manager",
+  "costumeId": "003802",
+  "rarity": 5
+ },
+ "cutscene_char003803": {
+  "char": "Liberta",
+  "costume": "Miracle Rose",
+  "costumeId": "003803",
+  "rarity": 5
+ },
+ "cutscene_char003892": {
+  "char": "Liberta",
+  "costume": "Hedonist",
+  "costumeId": "003892",
+  "rarity": null
+ },
+ "cutscene_char003901": {
+  "char": "Sonya",
+  "costume": "Shadowed Dream",
+  "costumeId": "003901",
+  "rarity": 5
+ },
+ "cutscene_char003902": {
+  "char": "Sonya",
+  "costume": "Little Pumpkin Girl",
+  "costumeId": "003902",
+  "rarity": 5
+ },
+ "cutscene_char004001": {
+  "char": "Darian",
+  "costume": "Prophetic Dream",
+  "costumeId": "004001",
+  "rarity": 5
+ },
+ "cutscene_char004002": {
+  "char": "Darian",
+  "costume": "Bittersweet Bunny",
+  "costumeId": "004002",
+  "rarity": 5
+ },
+ "cutscene_char004091": {
+  "char": "Darian",
+  "costume": "Herald of Enlightenment",
+  "costumeId": "004091",
+  "rarity": null
+ },
+ "cutscene_char004101": {
+  "char": "Tyr",
+  "costume": "Starlight Guardian",
+  "costumeId": "004101",
+  "rarity": 5
+ },
+ "cutscene_char004102": {
+  "char": "Tyr",
+  "costume": "Innocent Bunny",
+  "costumeId": "004102",
+  "rarity": 5
+ },
+ "cutscene_char004201": {
+  "char": "Palette",
+  "costume": "Shattered Dream",
+  "costumeId": "004201",
+  "rarity": 5
+ },
+ "cutscene_char004202": {
+  "char": "Palette",
+  "costume": "Miracle Violet",
+  "costumeId": "004202",
+  "rarity": 5
+ },
+ "cutscene_char004301": {
+  "char": "Nekyndalia",
+  "costume": "Deadeye",
+  "costumeId": "004301",
+  "rarity": null
+ },
+ "cutscene_char020001": {
+  "char": "Eris",
+  "costume": "Esteemed Adventurer",
+  "costumeId": "020001",
+  "rarity": 5
+ },
+ "cutscene_char020002": {
+  "char": "Eris",
+  "costume": "Your Very Own Cat",
+  "costumeId": "020002",
+  "rarity": 5
+ },
+ "cutscene_char020101": {
+  "char": "Roxy",
+  "costume": "Respected Master",
+  "costumeId": "020101",
+  "rarity": 5
+ },
+ "cutscene_char020102": {
+  "char": "Roxy",
+  "costume": "Emerging Desire",
+  "costumeId": "020102",
+  "rarity": 5
+ },
+ "cutscene_char020201": {
+  "char": "Yomi",
+  "costume": "Gentle Destroyer",
+  "costumeId": "020201",
+  "rarity": 5
+ },
+ "cutscene_char020301": {
+  "char": "Yozakura",
+  "costume": "Fist of Conviction",
+  "costumeId": "020301",
+  "rarity": 5
+ },
+ "cutscene_char020401": {
+  "char": "Yumi",
+  "costume": "Dancing Snowflake",
+  "costumeId": "020401",
+  "rarity": 5
+ },
+ "cutscene_char020501": {
+  "char": "Hikage",
+  "costume": "Kind Ruthlessness",
+  "costumeId": "020501",
+  "rarity": 5
+ },
+ "cutscene_char020601": {
+  "char": "Goblin Slayer",
+  "costume": "Orcbolg",
+  "costumeId": "020601",
+  "rarity": 5
+ },
+ "cutscene_char020701": {
+  "char": "Priestess",
+  "costume": "Earth Mother Believer",
+  "costumeId": "020701",
+  "rarity": 5
+ },
+ "cutscene_char020801": {
+  "char": "High Elf Archer",
+  "costume": "Daughter of Starwind",
+  "costumeId": "020801",
+  "rarity": 5
+ },
+ "cutscene_char020901": {
+  "char": "Sword Maiden",
+  "costume": "Supreme God Archbishop",
+  "costumeId": "020901",
+  "rarity": 5
+ },
+ "cutscene_char021001": {
+  "char": "Ikaruga",
+  "costume": "Noble Flame",
+  "costumeId": "021001",
+  "rarity": 5
+ },
+ "cutscene_char060401": {
+  "char": "Celia",
+  "costume": "The Curse",
+  "costumeId": "101601",
+  "rarity": 5
+ },
+ "cutscene_char060402": {
+  "char": "Celia",
+  "costume": "Descendant of the Great Witch",
+  "costumeId": "060402",
+  "rarity": 5
+ },
+ "cutscene_char060403": {
+  "char": "Celia",
+  "costume": "Masquerade Bunny",
+  "costumeId": "060403",
+  "rarity": 5
+ },
+ "cutscene_char060501": {
+  "char": "Anastasia",
+  "costume": "Gentle Maid",
+  "costumeId": "060501",
+  "rarity": 5
+ },
+ "cutscene_char060502": {
+  "char": "Anastasia",
+  "costume": "Fire Graffiti",
+  "costumeId": "060502",
+  "rarity": 5
+ },
+ "cutscene_char060601": {
+  "char": "Lecliss",
+  "costume": "Killer Doll",
+  "costumeId": "060601",
+  "rarity": 5
+ },
+ "cutscene_char060602": {
+  "char": "Lecliss",
+  "costume": "Android Queen",
+  "costumeId": "060602",
+  "rarity": 5
+ },
+ "cutscene_char060701": {
+  "char": "Rafina",
+  "costume": "Steel Engine",
+  "costumeId": "060701",
+  "rarity": 5
+ },
+ "cutscene_char060702": {
+  "char": "Rafina",
+  "costume": "Code Name A",
+  "costumeId": "060702",
+  "rarity": 5
+ },
+ "cutscene_char060706": {
+  "char": "Rafina",
+  "costume": "Game Club",
+  "costumeId": "060706",
+  "rarity": 5
+ },
+ "cutscene_char060801": {
+  "char": "Elise",
+  "costume": "Lovely Lady",
+  "costumeId": "060801",
+  "rarity": 5
+ },
+ "cutscene_char060802": {
+  "char": "Elise",
+  "costume": "Code Name O",
+  "costumeId": "060802",
+  "rarity": 5
+ },
+ "cutscene_char060804": {
+  "char": "Elise",
+  "costume": "Naive Lady",
+  "costumeId": "060804",
+  "rarity": null
+ },
+ "cutscene_char061001": {
+  "char": "Helena",
+  "costume": "Top Idol",
+  "costumeId": "061001",
+  "rarity": 5
+ },
+ "cutscene_char061002": {
+  "char": "Helena",
+  "costume": "B-Rank Idol",
+  "costumeId": "061002",
+  "rarity": 5
+ },
+ "cutscene_char061003": {
+  "char": "Helena",
+  "costume": "Sunny Inn Hand",
+  "costumeId": "061003",
+  "rarity": null
+ },
+ "cutscene_char061092_A": {
+  "char": "Helena",
+  "costume": "Rising Star",
+  "costumeId": "061092",
+  "rarity": null
+ },
+ "cutscene_char061101": {
+  "char": "Eleaneer",
+  "costume": "Piercing Magic Bow",
+  "costumeId": "061101",
+  "rarity": 5
+ },
+ "cutscene_char061102": {
+  "char": "Eleaneer",
+  "costume": "B-Rank Idol",
+  "costumeId": "061102",
+  "rarity": 5
+ },
+ "cutscene_char061103": {
+  "char": "Eleaneer",
+  "costume": "Shadow Bunny",
+  "costumeId": "061103",
+  "rarity": 5
+ },
+ "cutscene_char061302": {
+  "char": "Dalvi",
+  "costume": "Bright Moon",
+  "costumeId": "061302",
+  "rarity": 5
+ },
+ "cutscene_char061305": {
+  "char": "Dalvi",
+  "costume": "Summer Vacation",
+  "costumeId": "061305",
+  "rarity": 5
+ },
+ "cutscene_char061306": {
+  "char": "Dalvi",
+  "costume": "Tricky Lover",
+  "costumeId": "061306",
+  "rarity": null
+ },
+ "cutscene_char061392": {
+  "char": "Dalvi",
+  "costume": "Butterfly Dream",
+  "costumeId": "061392",
+  "rarity": null
+ },
+ "cutscene_char061402": {
+  "char": "Zenith",
+  "costume": "Robin Hood",
+  "costumeId": "061402",
+  "rarity": 5
+ },
+ "cutscene_char061404": {
+  "char": "Zenith",
+  "costume": "Poolside Guardian",
+  "costumeId": "061404",
+  "rarity": 5
+ },
+ "cutscene_char061492": {
+  "char": "Zenith",
+  "costume": "Stranger Bunny",
+  "costumeId": "061492",
+  "rarity": null
+ },
+ "cutscene_char065102": {
+  "char": "Yuri",
+  "costume": "Whitebolt",
+  "costumeId": "065102",
+  "rarity": 5
+ },
+ "cutscene_char065103": {
+  "char": "Yuri",
+  "costume": "Comeback Idol",
+  "costumeId": "065103",
+  "rarity": 5
+ },
+ "cutscene_char065193": {
+  "char": "Yuri",
+  "costume": "Forever Mascot",
+  "costumeId": "065193",
+  "rarity": null
+ },
+ "cutscene_char065802": {
+  "char": "Nartas",
+  "costume": "Anonymous Sage",
+  "costumeId": "065802",
+  "rarity": 5
+ },
+ "cutscene_char066401": {
+  "char": "Angelica",
+  "costume": "The Fallen",
+  "costumeId": "066401",
+  "rarity": 5
+ },
+ "cutscene_char066402": {
+  "char": "Angelica",
+  "costume": "Pool Party",
+  "costumeId": "066402",
+  "rarity": 5
+ },
+ "cutscene_char066403": {
+  "char": "Angelica",
+  "costume": "Neon Savior",
+  "costumeId": "066403",
+  "rarity": 5
+ },
+ "cutscene_char066801": {
+  "char": "Refithea",
+  "costume": "The Gluttonous",
+  "costumeId": "066801",
+  "rarity": 5
+ },
+ "cutscene_char066802": {
+  "char": "Refithea",
+  "costume": "Pure White Blessing",
+  "costumeId": "066802",
+  "rarity": 5
+ },
+ "cutscene_char066803": {
+  "char": "Refithea",
+  "costume": "Poolside Fairy",
+  "costumeId": "066803",
+  "rarity": 5
+ },
+ "cutscene_char066902": {
+  "char": "Glacia",
+  "costume": "Alice",
+  "costumeId": "066902",
+  "rarity": 5
+ },
+ "cutscene_char066906": {
+  "char": "Glacia",
+  "costume": "Disciplinary Committee",
+  "costumeId": "066906",
+  "rarity": 5
+ },
+ "cutscene_char066907": {
+  "char": "Glacia",
+  "costume": "Heavenly Guardian Successor",
+  "costumeId": "066907",
+  "rarity": null
+ },
+ "cutscene_char067002": {
+  "char": "Ventana",
+  "costume": "Snow White",
+  "costumeId": "067002",
+  "rarity": 5
+ },
+ "cutscene_char067003": {
+  "char": "Ventana",
+  "costume": "Comeback Idol",
+  "costumeId": "067003",
+  "rarity": 5
+ },
+ "cutscene_char067004": {
+  "char": "Ventana",
+  "costume": "Onsen Practitioner",
+  "costumeId": "067004",
+  "rarity": 5
+ },
+ "cutscene_char067101": {
+  "char": "Granhildr",
+  "costume": "The Void",
+  "costumeId": "067101",
+  "rarity": 5
+ },
+ "cutscene_char067102": {
+  "char": "Granhildr",
+  "costume": "Comeback Idol",
+  "costumeId": "067102",
+  "rarity": 5
+ },
+ "cutscene_char067103": {
+  "char": "Granhildr",
+  "costume": "Boo Ghost",
+  "costumeId": "067103",
+  "rarity": 5
+ },
+ "cutscene_char067104": {
+  "char": "Granhildr",
+  "costume": "Combat Medic",
+  "costumeId": "067104",
+  "rarity": null
+ },
+ "cutscene_char067201": {
+  "char": "Venaka",
+  "costume": "DJ",
+  "costumeId": "067201",
+  "rarity": 5
+ },
+ "cutscene_char067202": {
+  "char": "Venaka",
+  "costume": "Wind Dancer",
+  "costumeId": "067202",
+  "rarity": 5
+ },
+ "cutscene_char067301": {
+  "char": "Levia",
+  "costume": "Track and Field Captain",
+  "costumeId": "067301",
+  "rarity": 5
+ },
+ "cutscene_char067302": {
+  "char": "Levia",
+  "costume": "Night of Jealousy",
+  "costumeId": "067302",
+  "rarity": 5
+ },
+ "cutscene_char067303": {
+  "char": "Levia",
+  "costume": "Overheat",
+  "costumeId": "067303",
+  "rarity": 5
+ },
+ "cutscene_char067401": {
+  "char": "Michaela",
+  "costume": "Beachside Justice",
+  "costumeId": "067401",
+  "rarity": 5
+ },
+ "cutscene_char067402": {
+  "char": "Michaela",
+  "costume": "Queen of Signatures",
+  "costumeId": "067402",
+  "rarity": 5
+ },
+ "cutscene_char067403": {
+  "char": "Michaela",
+  "costume": "Acting Archbishop",
+  "costumeId": "067403",
+  "rarity": 5
+ },
+ "cutscene_char067491": {
+  "char": "Michaela",
+  "costume": "True Liberation",
+  "costumeId": "067491",
+  "rarity": null
+ },
+ "cutscene_char067502": {
+  "char": "Luvencia",
+  "costume": "Deal Snatcher",
+  "costumeId": "067502",
+  "rarity": 5
+ },
+ "cutscene_char067503": {
+  "char": "Luvencia",
+  "costume": "Wild Dog",
+  "costumeId": "067503",
+  "rarity": 5
+ },
+ "cutscene_char067504": {
+  "char": "Luvencia",
+  "costume": "Ocean Vanguard",
+  "costumeId": "067504",
+  "rarity": null
+ },
+ "cutscene_char067601": {
+  "char": "Wilhelmina",
+  "costume": "Iron Monarch",
+  "costumeId": "067601",
+  "rarity": 0
+ },
+ "cutscene_char067603": {
+  "char": "Wilhelmina",
+  "costume": "Water Park Queen",
+  "costumeId": "067603",
+  "rarity": 0
+ },
+ "cutscene_char067604": {
+  "char": "Wilhelmina",
+  "costume": "Frozen Queen",
+  "costumeId": "067604",
+  "rarity": 0
+ },
+ "cutscene_char067701": {
+  "char": "Granadair",
+  "costume": "Shrine Maiden of Purification",
+  "costumeId": "067701",
+  "rarity": 0
+ },
+ "cutscene_char067702": {
+  "char": "Granadair",
+  "costume": "Queen of Gluttis",
+  "costumeId": "067702",
+  "rarity": 0
+ },
+ "cutscene_char067801": {
+  "char": "Mamonir",
+  "costume": "Night of Death",
+  "costumeId": "067801",
+  "rarity": 5
+ },
+ "cutscene_char067803": {
+  "char": "Mamonir",
+  "costume": "Miracle Marine",
+  "costumeId": "067803",
+  "rarity": 5
+ },
+ "cutscene_char067901": {
+  "char": "Aquila",
+  "costume": "Savage Warrior",
+  "costumeId": "067901",
+  "rarity": null
+ },
+ "cutscene_char100501": {
+  "char": "Wiggle",
+  "costume": "Bomb Fanatic",
+  "costumeId": "100501",
+  "rarity": 3
+ },
+ "cutscene_char101101": {
+  "char": "Seir",
+  "costume": "Demon's Daughter",
+  "costumeId": "101101",
+  "rarity": 5
+ },
+ "cutscene_char101102": {
+  "char": "Seir",
+  "costume": "B-Rank Idol",
+  "costumeId": "101102",
+  "rarity": 5
+ },
+ "cutscene_char101103": {
+  "char": "Seir",
+  "costume": "New Hire",
+  "costumeId": "101103",
+  "rarity": 5
+ },
+ "cutscene_char103201": {
+  "char": "Carlson",
+  "costume": "The Mercenary Knight",
+  "costumeId": "103201",
+  "rarity": 3
+ },
+ "cutscene_char103301": {
+  "char": "Lydia",
+  "costume": "Apprentice Spearman",
+  "costumeId": "103301",
+  "rarity": 3
+ },
+ "cutscene_char103401": {
+  "char": "Rigenette",
+  "costume": "Little Hunter",
+  "costumeId": "103401",
+  "rarity": 3
+ },
+ "cutscene_char103501": {
+  "char": "Beatrice",
+  "costume": "The Mighty Warrior of the Tribe",
+  "costumeId": "103501",
+  "rarity": 3
+ },
+ "illust_talk9016": {
+  "char": "Marianne Dumain (Npc)",
+  "costume": null,
+  "costumeId": "9016",
+  "rarity": null
+ },
+ "illust_talk9018": {
+  "char": "Eda (Npc)",
+  "costume": null,
+  "costumeId": "9018",
+  "rarity": null
+ },
+ "npc000001": {
+  "char": "Roche (Npc)",
+  "costume": null,
+  "costumeId": "000001",
+  "rarity": null
+ },
+ "npc000004": {
+  "char": "Ailee (Npc)",
+  "costume": null,
+  "costumeId": "000004",
+  "rarity": null
+ },
+ "npc000005": {
+  "char": "Eleanor (Npc)",
+  "costume": null,
+  "costumeId": "400056",
+  "rarity": null
+ },
+ "npc200551": {
+  "char": "Determined Researcher (Npc)",
+  "costume": null,
+  "costumeId": "200551",
+  "rarity": null
+ },
+ "npc300103": {
+  "char": "Garinoth (Npc)",
+  "costume": null,
+  "costumeId": "300103",
+  "rarity": null
+ },
+ "npc300104": {
+  "char": "Asmode (Npc)",
+  "costume": null,
+  "costumeId": "300104",
+  "rarity": null
+ },
+ "npc300501": {
+  "char": "Loen",
+  "costume": "Last Hope",
+  "costumeId": "003201",
+  "rarity": null
+ },
+ "npc300601": {
+  "char": "Guild Receptionist Liza (Npc)",
+  "costume": null,
+  "costumeId": "300601",
+  "rarity": null
+ },
+ "npc300701": {
+  "char": "Veila (Npc)",
+  "costume": null,
+  "costumeId": "300701",
+  "rarity": null
+ },
+ "npc400001": {
+  "char": "Young Liberta (Npc)",
+  "costume": null,
+  "costumeId": "400001",
+  "rarity": null
+ },
+ "npc400017": {
+  "char": "Young Hansen (Npc)",
+  "costume": null,
+  "costumeId": "400017",
+  "rarity": null
+ },
+ "npc400018": {
+  "char": "Hansen (Npc)",
+  "costume": null,
+  "costumeId": "400018",
+  "rarity": null
+ },
+ "npc400034": {
+  "char": "Greta (Npc)",
+  "costume": null,
+  "costumeId": "400034",
+  "rarity": null
+ },
+ "npc400042": {
+  "char": "Night World Lathel (Npc)",
+  "costume": null,
+  "costumeId": "400042",
+  "rarity": null
+ },
+ "npc400049": {
+  "char": "King of Rotein Gray (Npc)",
+  "costume": null,
+  "costumeId": "400049",
+  "rarity": null
+ },
+ "npc400050": {
+  "char": "Spatti (Npc)",
+  "costume": null,
+  "costumeId": "400050",
+  "rarity": null
+ },
+ "npc400064": {
+  "char": "Casual Valze (Npc)",
+  "costume": null,
+  "costumeId": "400064",
+  "rarity": null
+ },
+ "npc400070": {
+  "char": "Nekyndalia (Npc)",
+  "costume": null,
+  "costumeId": "400070",
+  "rarity": null
+ },
+ "npc400098": {
+  "char": "Casino Rudina (Npc)",
+  "costume": null,
+  "costumeId": "400098",
+  "rarity": null
+ },
+ "npc400100": {
+  "char": "Rudina (Npc)",
+  "costume": null,
+  "costumeId": "400100",
+  "rarity": null
+ },
+ "npc400123": {
+  "char": "Valze (Npc)",
+  "costume": null,
+  "costumeId": "400123",
+  "rarity": null
+ },
+ "npc400135": {
+  "char": "Young Justia (Npc)",
+  "costume": null,
+  "costumeId": "400135",
+  "rarity": null
+ },
+ "npc_ellin": {
+  "char": "Ellin (Npc)",
+  "costume": null,
+  "costumeId": "ellin",
+  "rarity": null
+ }
+}

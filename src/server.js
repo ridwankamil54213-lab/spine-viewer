@@ -1,0 +1,1465 @@
+"use strict";
+
+const path = require("path");
+const fs = require("fs");
+const fsp = require("fs/promises");
+const express = require("express");
+const multer = require("multer");
+const { spawn, spawnSync } = require("child_process");
+const { SkeletonBinary, AtlasAttachmentLoader } = require("@pixi-spine/runtime-4.1");
+const { TextureAtlas } = require("@pixi-spine/base");
+const { detectFromBinary, detectFromJson, pickRuntime } = require("./spine-version.cjs");
+
+/** Same API surface across runtimes, so pick by detected version. */
+const RUNTIMES = {
+	"3.8": () => require("@pixi-spine/runtime-3.8"),
+	"4.0": () => require("@pixi-spine/runtime-4.0"),
+	"4.1": () => require("@pixi-spine/runtime-4.1"),
+};
+
+const ROOT = path.resolve(__dirname, "..");
+const ASSETS = path.join(ROOT, "assets");
+const THUMBS = path.join(ROOT, "public", "thumbs");
+const DATA = path.join(ROOT, "data");
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB) || 64;
+
+const SKEL_EXT = [".json", ".skel"];
+const ATLAS_EXT = [".atlas", ".atlas.txt"];
+const ATLAS_PAGE_EXT = [".png", ".webp", ".jpg", ".jpeg"];
+
+const isSkel = (f) => SKEL_EXT.some((e) => f.toLowerCase().endsWith(e));
+const isAtlas = (f) => ATLAS_EXT.some((e) => f.toLowerCase().endsWith(e));
+const isPage = (f) => ATLAS_PAGE_EXT.some((e) => f.toLowerCase().endsWith(e));
+
+/** Reads a Spine .json skeleton: animations, skins, version, bounds. Safe on .skel (binary). */
+/**
+ * Reads a Spine binary .skel using the SAME parser the browser viewer uses
+ * (@pixi-spine SkeletonBinary), so server-side metadata can never disagree with
+ * what actually renders. Textures are stubbed out — we only want the metadata.
+ */
+function probeSkelBinary(file, atlasFile) {
+	const atlasText = fs.readFileSync(atlasFile, "utf8");
+	// Stub page: satisfies the atlas without loading a single pixel.
+	const atlas = new TextureAtlas(atlasText, (line, cb) => {
+		cb({ width: 2048, height: 2048, valid: true, scaleMode: 1, setSize() {}, dispose() {} });
+	});
+
+	const raw = new Uint8Array(fs.readFileSync(file));
+
+	// data.version from a runtime that can't parse the file is garbage read
+	// from the wrong offset (a 3.8.99 skeleton through the 4.1 runtime yields
+	// "jCsuDWsJ3kO2LTEQ+VY..."), so detect from the bytes and pick the matching
+	// runtime instead of trusting whatever the parser hands back.
+	const version = detectFromBinary(raw);
+	const key = pickRuntime(version);
+	const order = [key, "4.1", "4.0", "3.8"];
+
+	let data = null;
+	let lastErr = null;
+	for (const rt of order) {
+		try {
+			const mod = RUNTIMES[rt]();
+			const parser = new mod.SkeletonBinary(new mod.AtlasAttachmentLoader(atlas));
+			const d = parser.readSkeletonData(raw);
+			if (d?.bones?.length) { data = d; break; }
+		} catch (err) {
+			lastErr = err;
+		}
+	}
+	if (!data) throw lastErr || new Error("Skeleton tidak bisa diurai.");
+
+	return {
+		spine: version?.raw || null,
+		runtime: key,
+		width: data.width,
+		height: data.height,
+		bones: data.bones?.length ?? 0,
+		slots: data.slots?.length ?? 0,
+		animations: (data.animations || []).map((a) => a.name),
+		skins: (data.skins || []).map((s) => s.name).filter(Boolean),
+	};
+}
+
+function inspectSkeleton(file, atlasFile) {
+	try {
+		const buf = fs.readFileSync(file);
+		if (buf.length < 8) return null;
+		if (buf[0] === 0x7b) {
+			// starts with '{' -> JSON skeleton
+			const data = JSON.parse(buf.toString("utf8"));
+			const skel = data.skeleton || {};
+			return {
+				spine: skel.spine || null,
+				width: skel.width ?? null,
+				height: skel.height ?? null,
+				bones: (data.bones || []).length,
+				slots: (data.slots || []).length,
+				animations: Object.keys(data.animations || {}),
+				skins: (data.skins || []).map((s) => s.name).filter(Boolean),
+			};
+		}
+		if (!atlasFile) return null;
+		// Spine 2.x binaries can't be read by any bundled runtime (3.8/4.0/4.1).
+		// Probing them would report "no bones" and mark the model broken, when
+		// it's actually fine — it just needs the 2.1.27 viewer. Detect the
+		// version first and skip the probe for 2.x.
+		const head = new Uint8Array(buf.slice(0, 512));
+		const v = detectFromBinary(head);
+		if (v && v.major < 3) {
+			return {
+				spine: v.raw,
+				runtime: "2.1.27",
+				width: null,
+				height: null,
+				bones: null,
+				slots: null,
+				animations: [],
+				skins: [],
+				// Flag rather than fail: the client switches renderers on this.
+				needsLegacyViewer: true,
+			};
+		}
+		return probeSkelBinary(file, atlasFile);
+	} catch {
+		return null;
+	}
+}
+
+/** Counts atlas pages by reading the header block before the first region name. */
+function countAtlasPages(file) {
+	try {
+		const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);
+		let pages = 0;
+		for (const line of lines) {
+			const s = line.trim();
+			if (!s) continue;
+			// Indented lines belong to the current page/region block.
+			if (/^\s/.test(line)) continue;
+			// A bare image filename is a page declaration. Pages can appear
+			// again after region blocks (multi-page atlases), so keep scanning
+			// the whole file instead of stopping at the first region.
+			if (isPage(s) && /^[^:]+$/.test(s)) {
+				pages++;
+				continue;
+			}
+			// Any other non-indented line is either page metadata
+			// (size/format/...) or the start of region definitions.
+			if (/:/.test(s)) continue; // "size: 4096,4096" etc.
+
+		}
+		return pages;
+	} catch {
+		return 0;
+	}
+}
+
+function dirBytes(dir) {
+	let total = 0;
+	const walk = (d) => {
+		for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+			const p = path.join(d, e.name);
+			if (e.isDirectory()) walk(p);
+			else if (e.isFile()) total += fs.statSync(p).size;
+		}
+	};
+	walk(dir);
+	return total;
+}
+
+/**
+ * Maps a top-level asset folder to the game it belongs to.
+ * `label` is what the sidebar shows; `key` is the stable filter value.
+ * Add a new entry here whenever a new asset root gets symlinked in.
+ */
+const GAME_ROOTS = [
+	{ match: "nikke", key: "nikke", label: "Nikke: Goddess of Victory" },
+	{ match: "lostsword", key: "lostsword", label: "Lost Sword" },
+	// Longest prefix first: resolveGame matches with startsWith, so the more
+	// specific "azurlane-chibi" must come before "azurlane" or every chibi
+	// model gets absorbed into the main Azur Lane bucket.
+	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
+	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
+	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
+	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
+	// "alliancesages" or every CG scene is swallowed by the character bucket.
+	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
+	// premultiplied, so "Auto" has to assume PMA instead of falling back to
+	// straight alpha (which shows as dark fringes around every sprite).
+	{
+		match: "alliancesages-cg",
+		key: "alliancesages-cg",
+		label: "Alliance Sages — CG",
+		pmaDefault: true,
+	},
+	{
+		match: "alliancesages",
+		key: "alliancesages",
+		label: "Alliance Sages",
+		pmaDefault: true,
+	},
+	// Brown Dust 2. Re-laid-out 2026-09-02 into one root (assets/bd2 -> a
+	// symlink farm under /srv/spine-assets/bd2) mirroring
+	// Jelosus2/BD2-L2D-Viewer: char/<costume>/ with cutscene/ and censored/
+	// nested inside, so the character and its variants form a family.
+	// Built by tools/relayout-bd2.py — rerun it after adding assets.
+	{ match: "bd2", key: "bd2", label: "Brown Dust 2" },
+	// Depose Girls (放置少女). Its atlases carry no `pma:` line. Sampling the
+	// bundles showed spine-unity's `pmaVertexColors: true` (40/40, zero
+	// false), i.e. the textures ARE premultiplied — but the user has the
+	// default turned OFF, so "Auto" treats them as straight alpha. Use the
+	// per-model PMA override in the viewer to switch a model back on.
+	{
+		match: "deposegirls",
+		key: "deposegirls",
+		label: "Depose Girls",
+		pmaDefault: false,
+	},
+	// Shoujou Kaisen (少女廻戦). Spine 3.8.97, so pixi-spine reads these
+	// directly — no conversion and no legacy viewer (unlike Project QT).
+	// Extraction notes: tools/shoujoukaisen/README.md (junk header prefix,
+	// textures sometimes in a separate `_texture.asset` bundle).
+	{
+		match: "shoujoukaisen",
+		key: "shoujoukaisen",
+		label: "Shoujou Kaisen",
+		spineRuntime: null,
+		pmaDefault: false,
+	},
+	// Project QT. Ships Spine 2.1.27 skeletons.
+	//
+	// These CANNOT be rendered by pixi-spine: its weighted-mesh path
+	// desynchronises on the 5-11 bones-per-vertex these models use, throwing
+	// vertices thousands of units away. Converting the data to 3.8 was proven
+	// byte-faithful (triangles, UVs and weighted vertices all identical) yet
+	// still scrambles, so the data was never the problem — the 3.8 runtime is.
+	//
+	// The original .skel renders correctly in a native 2.1.27 viewer (verified
+	// on many models), so this game keeps its ORIGINAL files and the client
+	// routes it to vendor/spine2127 instead of pixi-spine.
+	//
+	// Re-tested 2026-09-01: the 3.8 conversion was loaded through pixi-spine
+	// again and STILL scramble as of this check, even though its numbers look
+	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
+	// this back to pixi-spine on numeric evidence alone.
+	{
+		match: "projectqt",
+		key: "projectqt",
+		label: "Project QT",
+		spineRuntime: "2.1.27",
+		pmaDefault: false,
+	},
+	// Cat Shinobi (ねこ親方 / com.cookapps.catshinobi). Unity Addressables
+	// build; 526 skeletons all at Spine 4.1.24, so pixi-spine reads them
+	// directly — no conversion, no legacy runtime (unlike Project QT).
+	//
+	// Extracted from split_UnityDataAssetPack.apk by
+	// tools/extract-catshinobi.py (run it with /srv/venv-spine). Skeletons
+	// live in one 461 MB Addressables bundle and name themselves
+	// Char_* / Char_SD_* (chibi) / Char_LD_* / cat_battle_mode_* /
+	// monster_LD_*. Atlases carry no `pma:` line and the bundle's
+	// pmaVertexColors flag is mixed (711 false / 218 true) with no per-model
+	// reference to resolve it, so the default is a visual call. User picked
+	// straight alpha: "Auto" now resolves to OFF. Flip pmaDefault below to
+	// switch the whole game — it is the single source of truth.
+	{
+		match: "catshinobi",
+		key: "catshinobi",
+		label: "Cat Shinobi",
+		spineRuntime: null,
+		pmaDefault: false,
+	},
+	// Poker Fate (com.pokerfate.play). Unity Addressables, 139 character
+	// skeletons at Spine 4.1.24 (137) / 4.1.23 (2) — pixi-spine reads them
+	// directly, no legacy runtime.
+	//
+	// Extracted by tools/extract-unity-spine.py from the rolespine bundles
+	// (assets/aa/Android/gameresrolespine_assets_rolespine/*.bundle), which
+	// are named <charId>_<variant>_<md5>.bundle.
+	//
+	// pmaDefault: true — UNLIKE Cat Shinobi this needs no judgement call:
+	// all 139/139 atlases carry an explicit `pma: true` line, so the viewer
+	// would resolve it from the atlas anyway. Set here for clarity.
+	{
+		match: "pokerfate",
+		key: "pokerfate",
+		label: "Poker Fate",
+		spineRuntime: null,
+		pmaDefault: true,
+	},
+	// Echocalypse (com.yoozoo.jgame.us, published by YOOZOO). NOT a Unity
+	// bundle game: Spine models ship as plain files, one folder per model
+	// (.skel + .atlas + .png), so extraction is a plain unzip.
+	//
+	// SOURCES — the APK is only the base layer. Most characters come from the
+	// downloaded/hot-updated data, applied in this order (later wins):
+	//     base.apk                       assets/res/common/knight_spine
+	//     files/obb/res/common/knight_spine
+	//     files/upgrade/res/common/knight_spine
+	// See tools/merge-echocalypse-knight.py. The APK alone yielded 13 knight
+	// models; merging all three gives 318 folders / 605 skeletons.
+	//
+	// Only knight_spine is wired up (characters = what people want). The other
+	// families (effect/pet/back/unite_token/secretary/buff) are merged by
+	// tools/merge-echocalypse.py into /srv/spine-assets/echocalypse-merged
+	// if wanted later; the no-longer-wired all-family tree is kept at
+	// /srv/spine-assets/echocalypse-all-old.
+	//
+	// TEXTURES ARE ENCRYPTED with the game's "UF" format:
+	//     UF header -> XOR (33-byte table) -> CCZ! -> zlib -> PVR/ETC2A8 -> PNG
+	// Decrypted with tools/decryptUF.py (needs `pip install texture2ddecoder`).
+	// The decryptor un-premultiplies to straight alpha on export.
+	//
+	// Spine 3.8.99 / 3.8.86: pixi-spine reads these directly.
+	// pmaDefault: false — the exported PNGs are straight alpha.
+	{
+		match: "echocalypse",
+		key: "echocalypse",
+		label: "Echocalypse",
+		spineRuntime: null,
+		pmaDefault: false,
+	},
+	// TenkaFuma (com.pinkcore.tkfm.erolabs). Unity IL2CPP + Addressables, but
+	// the APK carries almost nothing: the real art is 7.3 GB of bundles under
+	// /sdcard/Android/data/<pkg>/files/data/ (1,794 bundles). Only cb*/cg*/
+	// cf*/scg*/ln* hold skeletons; sound* (788) is audio.
+	//
+	// Extracted by tools/extract-tenkafuma.py.
+	//
+	// GOTCHA: every bundle here starts with ONE stray byte before the real
+	// "UnityFS" magic, and UnityPy then returns ZERO objects WITHOUT raising.
+	// Load with that byte stripped (the script tries skip=1 then skip=0 and
+	// sanity-checks the object count).
+	//
+	// pmaDefault: true — the atlases carry no `pma:` line, so this is a visual
+	// call. Verified side by side: with PMA off the models show a clear dark
+	// seam around hair and foliage; with PMA on the edges are clean. Set here
+	// so the whole game renders correctly by default.
+	{ match: "tenkafuma", key: "tenkafuma", label: "TenkaFuma", spineRuntime: null, pmaDefault: true },
+	// Bundled sample models. They live directly under assets/ and are not from
+	// any game — grouping them keeps "Lainnya" from meaning "demo".
+	{ match: "spineboy", key: "demo", label: "Demo" },
+	{ match: "raptor", key: "demo", label: "Demo" },
+	{ match: "coin", key: "demo", label: "Demo" },
+];
+
+function resolveGame(rootRel, id) {
+	const top = (rootRel || id.split("/")[0] || "").toLowerCase();
+	for (const g of GAME_ROOTS) {
+		if (top.startsWith(g.match)) {
+			return {
+				game: g.key,
+				gameLabel: g.label,
+				pmaDefault: !!g.pmaDefault,
+				spineRuntime: g.spineRuntime || null,
+			};
+		}
+	}
+	// Unrecognised roots (uploads, demo models) get a tidy label of their own.
+	const raw = rootRel || id.split("/")[0] || "";
+	return {
+		game: raw.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "lainnya",
+		gameLabel: raw.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Lainnya",
+	};
+}
+
+/**
+ * Groups a model with its sibling variants. Nikke ships each character as a
+ * folder that is itself a model AND holds variants underneath it:
+ *
+ *   nikke/c010          <- the model
+ *   nikke/c010/aim      <- variant
+ *   nikke/c010/cover    <- variant
+ *
+ * A family is a root id plus every id nested directly beneath it. Returns
+ * `{ root, label, members }` where `label` is "Utama" for the root itself and
+ * the folder name ("Aim", "Cover") for each variant — 0 label collisions in
+ * the current asset set, so labels are safe to use as option text.
+ */
+function attachFamilies(models) {
+	const ids = new Set(models.map((m) => m.id));
+
+	// Longest id that is a prefix of `id` — that's the variant's parent.
+	const rootOf = (id) => {
+		const parts = id.split("/");
+		for (let i = parts.length - 1; i > 0; i--) {
+			const p = parts.slice(0, i).join("/");
+			if (ids.has(p)) return p;
+		}
+		return id;
+	};
+
+	const groups = new Map();
+	for (const m of models) groups.set(rootOf(m.id), []);
+	for (const m of models) groups.get(rootOf(m.id)).push(m.id);
+
+	const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+	// The BD2 relayout nests cutscene/ and censored/ inside the character
+	// folder, so variant labels are English words — render them in Indonesian
+	// to match the rest of the UI.
+	const VARIANT_LABELS = { cutscene: "Cutscene", censored: "Tersensor" };
+
+	// Echocalypse groups variants inside ONE folder rather than in nested
+	// subfolders: folder 200000 holds 200000.skel (main) and 200000_bg.skel
+	// (the character's background plate). The generic rootOf() below looks
+	// for a parent FOLDER id, so it would find none and every variant would
+	// render as a separate top-level model. Group these by folder first.
+	//
+	// Root = the skeleton whose stem equals the folder name; everything else
+	// is a variant named by its suffix (_bg -> "Background").
+	const ecGroups = new Map();
+	for (const m of models) {
+		if ((m.game || "") !== "echocalypse") continue;
+		const seg = m.id.split("#");
+		const folder = (seg[0].split("/")[1] || "").toLowerCase();
+		const stem = (seg[1] || "").toLowerCase();
+		if (!folder) continue;
+		if (!ecGroups.has(folder)) ecGroups.set(folder, []);
+		ecGroups.get(folder).push({ id: m.id, stem, isRoot: stem === folder });
+	}
+	const EC_LABELS = { bg: "Background" };
+	for (const [, members] of ecGroups) {
+		if (members.length < 2) continue;
+		const root =
+			(members.find((x) => x.isRoot) || members[0]).id;
+		const labelFor = (x) => {
+			if (x.id === root) return "Utama";
+			const rootStem = root.split("#")[1] || "";
+			const suffix = x.stem.startsWith(rootStem)
+				? x.stem.slice(rootStem.length).replace(/^[-_]+/, "")
+				: x.stem;
+			return EC_LABELS[suffix] || title(suffix) || title(x.stem);
+		};
+		for (const x of members) {
+			const m = models.find((mm) => mm.id === x.id);
+			if (!m) continue;
+			m.family = {
+				root,
+				label: labelFor(x),
+				members: members
+					.map((y) => ({ id: y.id, label: labelFor(y) }))
+					.sort((a, b) =>
+						a.label === "Utama" ? -1 : b.label === "Utama" ? 1 : a.label.localeCompare(b.label)
+					),
+			};
+		}
+	}
+
+
+	for (const m of models) {
+		// Already grouped by the Echocalypse rule above — the generic
+		// folder-prefix rule would overwrite it with null.
+		if (m.family) continue;
+		const root = rootOf(m.id);
+		const members = groups.get(root) || [m.id];
+		if (members.length < 2) {
+			m.family = null;
+			continue;
+		}
+		// "Utama" for the root; a known variant folder gets its translated
+		// name, anything else is title-cased as before.
+		const labelFor = (id) => {
+			if (id === root) return "Utama";
+			const seg = id.slice(root.length + 1);
+			return VARIANT_LABELS[seg.toLowerCase()] || title(seg);
+		};
+
+		m.family = {
+			root,
+			label: labelFor(m.id),
+			members: members
+				.map((id) => ({ id, label: labelFor(id) }))
+				// "Utama" first, then the rest alphabetically — stable ordering
+				// means the dropdown doesn't reshuffle between variants.
+				.sort((a, b) => (a.label === "Utama" ? -1 : b.label === "Utama" ? 1 : a.label.localeCompare(b.label))),
+		};
+	}
+	return models;
+}
+
+/**
+ * Pair each skeleton with the atlas it belongs to.
+ *
+ * A folder can hold several models (Azur Lane ships bailongB / bailongM /
+ * bailongT, each with its own skeleton + atlas). Exact stem matches win;
+ * anything left over falls back to the remaining atlases so a lone skeleton
+ * still gets paired rather than dropped.
+ */
+function pairSkeletonAtlas(skels, atlases) {
+	const stem = (f) => f.replace(/\.(skel|json|atlas)$/i, "");
+	const pool = atlases.slice();
+	const out = [];
+
+	for (const sk of skels) {
+		const key = stem(sk);
+		let i = pool.findIndex((a) => stem(a) === key);
+		if (i === -1) i = 0; // fallback: take whatever is left
+		// More skeletons than atlases: pair the remainder with the first atlas
+		// rather than emitting an undefined path (crashed path.join).
+		if (pool.length === 0) {
+			if (!atlases.length) break;
+			out.push({ skel: sk, atlas: atlases[0] });
+			continue;
+		}
+		out.push({ skel: sk, atlas: pool[i] });
+		pool.splice(i, 1);
+	}
+	return out;
+}
+
+function scanModels() {
+	if (!fs.existsSync(ASSETS)) return [];
+	const models = [];
+
+	// Walk the asset tree so nested layouts (e.g. spine/char/<id>/) are all found.
+	// `rootRel` is the top-level asset folder (nikke, bd2-char, …) — it's stripped
+	// from generated names, otherwise every Nikke model reads "Nikke › C010 › Aim".
+	const walk = (dir, depth, rootRel = null) => {
+		if (depth > 8) return;
+		let entries = [];
+		try {
+			entries = fs.readdirSync(dir, { withFileTypes: true });
+		} catch {
+			return;
+		}
+
+		// Symlinked asset folders (e.g. assets/bd2-char -> /…/spine/char) show up
+		// as symlinks, not directories, so resolve them explicitly or they're skipped.
+		const dirs = [];
+		const files = [];
+		for (const e of entries) {
+			if (e.name === ".git") continue;
+			let isDir = e.isDirectory();
+			if (!isDir && e.isSymbolicLink()) {
+				try {
+					isDir = fs.statSync(path.join(dir, e.name)).isDirectory();
+				} catch {
+					continue; // broken symlink
+				}
+			}
+			if (isDir) dirs.push(e.name);
+			else if (e.isFile() || e.isSymbolicLink()) files.push(e.name);
+		}
+
+		const skel = files.filter(isSkel);
+		const atlas = files.filter(isAtlas);
+
+		if (skel.length && atlas.length) {
+			const rel = path.relative(ASSETS, dir).split(path.sep).join("/");
+			// IDs must stay URL-safe and unique across the whole tree.
+			const id = rel.replace(/[^\w.\-/]+/g, "-");
+			// Strip the top-level root so nested variants stay readable:
+			// nikke/c010/aim -> "C010 › Aim", not "Nikke › C010 › Aim".
+			const inner =
+				rootRel && (rel === rootRel || rel.startsWith(rootRel + "/"))
+					? rel.slice(rootRel.length).replace(/^\//, "")
+					: rel;
+			const parts = inner ? inner.split("/").filter(Boolean) : [path.basename(dir)];
+			const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+			const { game, gameLabel, pmaDefault, spineRuntime } = resolveGame(rootRel, id);
+			// Sub-category is what sits between the game root and the model. For
+			// nikke/c010/aim that's "c010" — a character, not a category, so it's
+			// exposed as `subgroup` and kept OUT of the game filter.
+			const subParts = parts.slice(0, -1);
+
+			// A folder can hold SEVERAL models (Azur Lane ships bailongB /
+			// bailongM / bailongT in one folder). Pair each skeleton with the
+			// atlas of the same stem; only then fall back to a sibling atlas.
+			// Pairing "skel[0] with atlas[0]" silently hid most of them.
+			const pairs = pairSkeletonAtlas(skel, atlas);
+			const multi = pairs.length > 1;
+
+			for (const { skel: sk, atlas: at } of pairs) {
+				const stem = sk.replace(/\.(skel|json)$/i, "");
+				const meta = inspectSkeleton(path.join(dir, sk), path.join(dir, at));
+				// With several models in one folder the id and name must differ
+				// per model, otherwise they collide into a single entry.
+				const modelId = multi ? `${id}#${stem}` : id;
+				const modelName = multi
+					? [...parts, stem].map(title).join(" › ")
+					: parts.map(title).join(" › ");
+				models.push({
+					id: modelId,
+					game,
+					gameLabel,
+					pmaDefault,
+					// Which renderer the browser must use. Non-null only for
+					// Project QT (2.1.27), which pixi-spine cannot draw.
+					spineRuntime,
+					subgroup: subParts.join(" › "),
+					name: modelName,
+					group: rel.split("/").slice(0, -1).join(" / ") || "",
+					skeletonFile: sk,
+					atlasFile: at,
+					files: files.sort(),
+					bytes: dirBytes(dir),
+					atlasPages: countAtlasPages(path.join(dir, at)),
+					spine: meta?.spine ?? null,
+					runtime: meta?.runtime ?? null,
+					size: meta ? { width: meta.width, height: meta.height } : null,
+					bones: meta?.bones ?? null,
+					slots: meta?.slots ?? null,
+					animations: meta?.animations ?? [],
+					skins: meta?.skins ?? [],
+					// Spine 2.x: readable only by the vendored 2.1.27 viewer,
+					// so the client must not hand it to pixi-spine.
+					needsLegacyViewer: !!meta?.needsLegacyViewer,
+					needsProbe: !meta,
+				});
+			}
+			// Keep descending: a folder can be a model *and* hold variants
+			// (Nikke ships c010/ plus c010/aim/ and c010/cover/). Skipping the
+			// recursion would hide every one of those.
+		}
+
+		for (const name of dirs) {
+			const child = path.join(dir, name);
+			walk(child, depth + 1, rootRel || (dir === ASSETS ? name : rootRel));
+		}
+	};
+
+	walk(ASSETS, 0, null);
+	const sorted = models.sort((a, b) => a.name.localeCompare(b.name));
+	return attachCharacters(attachFamilies(sorted));
+}
+
+const app = express();
+app.disable("x-powered-by");
+
+// --- security headers (viewer loads only same-origin assets) ---
+app.use((req, res, next) => {
+	res.setHeader("X-Content-Type-Options", "nosniff");
+	res.setHeader("Referrer-Policy", "same-origin");
+	next();
+});
+
+app.use(express.json({ limit: "2mb" }));
+
+/* Parsing 500+ .skel files on every request would be slow, so cache the scan
+ * and invalidate it whenever anything under assets/ changes. */
+let cache = { models: null, mtime: 0, signature: "" };
+
+function treeSignature() {
+	// Cheap fingerprint: newest mtime across the tree. Enough to catch
+	// uploads/deletes without hashing gigabytes of textures.
+	let newest = 0;
+	const walk = (d, depth) => {
+		if (depth > 8) return;
+		let entries;
+		try {
+			entries = fs.readdirSync(d, { withFileTypes: true });
+		} catch {
+			return;
+		}
+		for (const e of entries) {
+			if (e.name === ".git") continue;
+			const p = path.join(d, e.name);
+			try {
+				if (e.isDirectory()) walk(p, depth + 1);
+				else if (e.isSymbolicLink()) {
+					// follow symlinked asset folders
+					const st = fs.statSync(p);
+					if (st.isDirectory()) walk(p, depth + 1);
+					else newest = Math.max(newest, st.mtimeMs);
+				} else if (e.isFile()) newest = Math.max(newest, fs.statSync(p).mtimeMs);
+			} catch {
+				/* skip unreadable entries */
+			}
+		}
+	};
+	walk(ASSETS, 0);
+	return String(newest);
+}
+
+function getModels({ force = false } = {}) {
+	const sig = treeSignature();
+	if (!force && cache.models && cache.signature === sig) return cache.models;
+	cache = { models: scanModels(), mtime: Date.now(), signature: sig };
+	return cache.models;
+}
+
+// --- API ---
+app.get("/api/models", (req, res) => {
+	try {
+		res.json({ models: getModels({ force: req.query.refresh === "1" }) });
+	} catch (err) {
+		res.status(500).json({ error: "Gagal memindai folder aset: " + err.message });
+	}
+});
+
+// --- thumbnails ----------------------------------------------------------
+/* Built offline by tools/fetch-thumbs.js. The manifest maps model id -> file
+ * name; it's read once and cached because it only changes when the fetcher
+ * runs again. Missing entries simply render the initial-letter fallback. */
+let thumbCache = { map: null, mtime: 0 };
+
+function thumbManifest() {
+	// Merge every per-game manifest in public/thumbs/<game>/_manifest.json.
+	// Keys are already fully-qualified model ids, so a flat merge is safe and
+	// adding a new game needs no code change here.
+	const combined = {};
+	let newest = 0;
+	try {
+		for (const game of fs.readdirSync(THUMBS)) {
+			const file = path.join(THUMBS, game, "_manifest.json");
+			let st;
+			try {
+				st = fs.statSync(file);
+			} catch {
+				continue; // game dir without a manifest
+			}
+			if (thumbCache.map && thumbCache.mtime === st.mtimeMs) {
+				Object.assign(combined, thumbCache.map);
+				continue;
+			}
+			try {
+				const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+				for (const [k, v] of Object.entries(raw)) {
+					// Older manifests (Nikke) store a bare filename; newer ones
+					// may already be game-prefixed. Normalise to "<game>/<file>"
+					// so /thumbs/ can serve either without duplication.
+					const rel = typeof v === "string" && v.startsWith(game + "/")
+						? v
+						: `${game}/${v}`;
+					combined[k] = rel;
+				}
+				newest = Math.max(newest, st.mtimeMs);
+			} catch {
+				/* unreadable manifest — skip it */
+			}
+		}
+	} catch {
+		return {};
+	}
+	if (newest) thumbCache = { map: combined, mtime: newest };
+	return combined;
+}
+
+/** Keys of the game icons that actually exist, so the UI never fires a 404. */
+function gameIconMap() {
+	const dir = path.join(THUMBS, "_game");
+	try {
+		return fs
+			.readdirSync(dir)
+			.filter((f) => /\.png$/i.test(f))
+			.reduce((acc, f) => {
+				acc[f.replace(/\.png$/i, "")] = `/thumbs/_game/${encodeURIComponent(f)}`;
+				return acc;
+			}, {});
+	} catch {
+		return {};
+	}
+}
+
+app.get("/api/game-icons", (req, res) => {
+	res.json({ icons: gameIconMap() });
+});
+
+/**
+ * Character names for Nikke, merged from three sources. Order matters —
+ * the first hit wins the NAME:
+ *
+ * 1. data/nikke-l2d-nkas.json — nkas-l2d.pages.dev/characters.json, 549 entries
+ *    keyed "c010_01" (note: the base character is "c010_00", not "c010").
+ *    Chosen as authoritative by the user: it's far more complete and its
+ *    variant numbering is correct (see the conflict note below).
+ * 2. data/nikke-l2d-names.json — l2d.json from the asset repo, keyed by folder
+ *    name (c010, c010_01). Covers 257 roots source 1 misses.
+ * 3. data/nikke-characters.json — nkas.pages.dev, keyed by THUMBNAIL slug
+ *    (si_c010_00_s). Name used only as a last resort; mainly supplies
+ *    squad / rarity / class / element metadata.
+ *
+ * CONFLICT: sources 1 and 2 disagree on 65 entries because they number costume
+ * variants differently — e.g. c010_02 is "Rapi White Promise" in l2d.json but
+ * "Rapi - Classic Vacation" in nkas-l2d (which puts White Promise on c010_01).
+ * They are off by one, so one of them is simply wrong; we follow the user's
+ * call and trust nkas-l2d.
+ */
+let charCache = { data: null, mtime: 0 };
+
+/** Model id -> the thumbnail slug it would use (mirrors tools/fetch-thumbs.js). */
+function thumbSlugForId(id) {
+	const leaf = id.split("/").pop();
+	const m = /^(.*?)_(\d{1,2})$/.exec(leaf);
+	if (m) return `si_${m[1]}_${String(parseInt(m[2], 10)).padStart(2, "0")}_s`;
+	return `si_${leaf}_00_s`;
+}
+
+/**
+ * nkas-l2d keys the base character as "c010_00" while our folder is "c010".
+ * Anything already carrying a _NN suffix is used as-is.
+ */
+function nkasL2dKey(leaf) {
+	return /_(\d{1,2})$/.test(leaf) ? leaf : `${leaf}_00`;
+}
+
+function readJson(file) {
+	try {
+		return { raw: JSON.parse(fs.readFileSync(file, "utf8")), mtime: fs.statSync(file).mtimeMs };
+	} catch {
+		return { raw: null, mtime: 0 };
+	}
+}
+
+function loadCharacterData() {
+	const a = readJson(path.join(DATA, "nikke-l2d-nkas.json")); // source 1
+	const b = readJson(path.join(DATA, "nikke-l2d-names.json")); // source 2
+	const c = readJson(path.join(DATA, "nikke-characters.json")); // source 3
+	// Cache on the newest mtime — any file changing invalidates the merge.
+	const mtime = Math.max(a.mtime, b.mtime, c.mtime);
+	if (charCache.data && charCache.mtime === mtime) return charCache.data;
+
+	// "c010_01" -> "Rapi - White Promise"  (base character is "c010_00")
+	const byNkasL2d = new Map();
+	if (a.raw && !Array.isArray(a.raw)) for (const [k, v] of Object.entries(a.raw)) {
+		if (typeof v === "string" && v.trim()) byNkasL2d.set(k, v.trim());
+	}
+
+	// "c010_01" -> "Rapi White Promise" (folder name key)
+	const byFolder = new Map();
+	for (const e of b.raw || []) if (e && e.id && e.name) byFolder.set(e.id, e.name);
+
+	// "si_c010_00_s" -> full character record (metadata)
+	const bySlug = new Map();
+	for (const x of c.raw || []) if (x && x.img) bySlug.set(x.img, x);
+
+	charCache = { data: { byNkasL2d, byFolder, bySlug }, mtime };
+	return charCache.data;
+}
+
+/* Azur Lane ship + skin names, from data.nagami.moe/spine/index.json.
+ * Keyed by the asset name, which is exactly the folder under azurlane/. */
+let azCache = { map: null, mtime: 0 };
+
+function loadAzurLaneNames() {
+	const file = path.join(DATA, "azurlane-names.json");
+	try {
+		const st = fs.statSync(file);
+		if (azCache.map && azCache.mtime === st.mtimeMs) return azCache.map;
+		const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+		azCache = { map: raw, mtime: st.mtimeMs };
+		return raw;
+	} catch {
+		return {};
+	}
+}
+
+/* Brown Dust 2 character + costume names, from
+ * github.com/myssal/Brown-Dust-2-Asset — CharInfo(Dropped).json.
+ * Keyed by the spine/cutscene asset name, which is exactly the model folder
+ * under bd2-char/ and bd2-cutscenes/ (e.g. "char000101").
+ * NOTE: the upstream JSON is malformed (a missing comma after some
+ * "censored_spine" values), so it was repaired at conversion time — the
+ * on-disk file here is clean JSON. */
+let bd2Cache = { map: null, mtime: 0 };
+
+function loadBd2Names() {
+	const file = path.join(DATA, "bd2-names.json");
+	try {
+		const st = fs.statSync(file);
+		if (bd2Cache.map && bd2Cache.mtime === st.mtimeMs) return bd2Cache.map;
+		const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+		bd2Cache = { map: raw, mtime: st.mtimeMs };
+		return raw;
+	} catch {
+		return {};
+	}
+}
+
+/* Cat Shinobi character names, from the game's OWN Unity Localization string
+ * tables (tools/catshinobi-names.py). Keyed by the full model id
+ * ("catshinobi/Char_10001") because the folder ids only partially overlap the
+ * character table — the script decides which matches are trustworthy and
+ * leaves the rest out rather than guessing.
+ *
+ * Only ~60% of folders get a name. The unnamed ones keep their folder name,
+ * which is still shown and searchable in the UI.
+ *
+ * NOTE: there is no fansite dump for this game, so this file is the only
+ * source of real names. Run the extraction script to regenerate it. */
+let csCache = { map: null, mtime: 0 };
+
+function loadCatShinobiNames() {
+	const file = path.join(DATA, "catshinobi-names.json");
+	try {
+		const st = fs.statSync(file);
+		if (csCache.map && csCache.mtime === st.mtimeMs) return csCache.map;
+		const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+		csCache = { map: raw, mtime: st.mtimeMs };
+		return raw;
+	} catch {
+		return {};
+	}
+}
+
+/**
+ * Resolve a model id to its BD2 asset key.
+ *
+ * After the 2026-09-02 relayout the folders no longer carry the asset name:
+ *
+ *   bd2/char/char000101            -> "char000101"
+ *   bd2/char/char000101/cutscene   -> "char000101"   (not "cutscene")
+ *   bd2/char/char000502/censored   -> "char000502_c" (not "censored")
+ *
+ * so the nested variant folders have to be folded back onto their parent.
+ * Some ids also carry a "#<stem>" suffix (several models sharing one folder).
+ */
+function bd2AssetKey(modelId) {
+	const parts = modelId.split("/").map((p) => p.split("#")[0]);
+	const leaf = parts[parts.length - 1];
+	if (leaf === "cutscene") return parts[parts.length - 2] || leaf;
+	if (leaf === "censored") return `${parts[parts.length - 2]}_c`;
+	return leaf;
+}
+
+/** Attach name + metadata to every model we can identify. */
+function attachCharacters(models) {
+	const { byNkasL2d, byFolder, bySlug } = loadCharacterData();
+	let hits = 0;
+	if (byNkasL2d.size || byFolder.size || bySlug.size) {
+		for (const m of models) {
+			if ((m.game || "") !== "nikke") continue;
+		// variants inherit their root character's identity
+		const root = (m.family && m.family.root) || m.id;
+		const leaf = root.split("/").pop();
+		// first hit wins: nkas-l2d > l2d.json > nkas (name only)
+		const fromNkasL2d = byNkasL2d.get(nkasL2dKey(leaf));
+		const fromFolder = byFolder.get(leaf);
+		const fromSlug = bySlug.get(thumbSlugForId(root));
+		const name = fromNkasL2d || fromFolder || fromSlug?.name;
+		if (!name) continue;
+
+		m.character = {
+			name,
+			source: fromNkasL2d ? "nkas-l2d" : fromFolder ? "l2d" : "nkas",
+			// metadata only exists in source 3
+			squad: fromSlug?.squad || null,
+			rarity: fromSlug?.rarity || null,
+			class: fromSlug?.class || null,
+			element: fromSlug?.element || null,
+			manufacturer: fromSlug?.manufacturer || null,
+			url: fromSlug?.url || null,
+		};
+		// `name` is what the HUD/delete dialog show — make it the real name,
+		// keeping the id visible in parentheses so c010 is still findable.
+		m.name = `${name} (${leaf})`;
+		hits++;
+		}
+	}
+
+	// --- Azur Lane: real ship + skin names -------------------------------
+	// data.nagami.moe/spine/index.json keys by the asset name, which is the
+	// folder under azurlane/. Models whose id carries a "#<stem>" suffix
+	// (several models sharing one folder) resolve back to that folder name.
+	const az = loadAzurLaneNames();
+	let azHits = 0;
+	for (const m of models) {
+		if ((m.game || "") !== "azurlane") continue;
+		const leaf = m.id.split("/").pop().split("#")[0];
+		const rec = az[leaf];
+		if (!rec) continue;
+		const ship = (rec.shipName || "").trim();
+		const skin = (rec.skinName || "").trim();
+		if (!ship && !skin) continue;
+
+		m.character = {
+			name: ship || skin,
+			source: "nagami-moe",
+			skin: skin || null,
+			skinId: rec.id || null,
+			type: rec.type || null,
+			squad: null,
+			rarity: null,
+			class: null,
+			element: null,
+			manufacturer: null,
+			url: null,
+		};
+		// HUD/delete dialog show `name`; keep the folder id in parentheses so
+		// it stays searchable, and append the skin for multi-skin characters.
+		m.name = skin && ship ? `${ship} — ${skin} (${leaf})` : `${ship || skin} (${leaf})`;
+		azHits++;
+	}
+
+	if (azHits) console.log(`  azur lane : ${azHits} model diberi nama kapal`);
+
+	// --- Brown Dust 2: character + costume names ------------------------
+	// Keyed by asset name (char000101). Cutscene models reuse the same key
+	// with a "cutscene_" prefix, which the data file also indexes.
+	const bd2 = loadBd2Names();
+	let bd2Hits = 0;
+	for (const m of models) {
+		if ((m.game || "") !== "bd2") continue;
+		const leaf = bd2AssetKey(m.id);
+		const rec = bd2[leaf];
+		if (!rec) continue;
+		const char = (rec.char || "").trim();
+		const costume = (rec.costume || "").trim();
+		if (!char && !costume) continue;
+
+		m.character = {
+			name: char || costume,
+			source: "bd2-charinfo",
+			costume: costume || null,
+			costumeId: rec.costumeId || null,
+			rarity: rec.rarity ?? null,
+			squad: null,
+			class: null,
+			element: null,
+			manufacturer: null,
+			url: null,
+		};
+		// HUD/delete dialog show `name`; keep the real asset id in parentheses
+		// so it stays searchable, and append the costume name.
+		//
+		// The id in parentheses must come from the MODEL PATH, not the lookup
+		// key: after the relayout bd2AssetKey folds cutscene/censored onto the
+		// parent, and NPC folders (npc000001) resolve through a char* key, so
+		// rebuilding it from costumeId printed nonsense like
+		// "Roche (Npc) (char000001)" for a model whose folder is npc000001.
+		// Fall back to the model's own folder name.
+		// A variant folder (cutscene/, censored/) has no asset name of its
+		// own, so use the parent folder plus the variant name —
+		// "char000101/cutscene" -> "cutscene_char000101".
+		const parts = m.id.split("/").map((p) => p.split("#")[0]);
+		const suffix = parts[parts.length - 1];
+		const shown =
+			suffix === "cutscene"
+				? `cutscene_${parts[parts.length - 2]}`
+				: suffix === "censored"
+					? `${parts[parts.length - 2]}_c`
+					: suffix;
+		m.name = costume && char ? `${char} — ${costume} (${shown})` : `${char || costume} (${shown})`;
+		bd2Hits++;
+	}
+
+	// --- BD2 JP voices --------------------------------------------------
+	// Attached here (not in scanModels) because the audio tree lives outside
+	// assets/ and is only meaningful once the model's game is known.
+	let audioHits = 0;
+	for (const m of models) {
+		const a = audioForModel(m);
+		if (!a) continue;
+		m.audio = a;
+		audioHits++;
+	}
+
+	// --- Cat Shinobi: character names ----------------------------------
+	// Keyed by full model id, because the folder ids only partially overlap
+	// the character table. Unnamed folders keep their folder name (still
+	// shown and searchable in the UI) rather than a guessed one.
+	const csData = loadCatShinobiNames();
+	const cs = csData.models || {};
+	let csHits = 0;
+	for (const m of models) {
+		if ((m.game || "") !== "catshinobi") continue;
+		const rec = cs[m.id];
+		if (!rec) continue;
+		const name = (rec.name || "").trim();
+		const costume = (rec.costume || "").trim();
+		if (!name && !costume) continue;
+
+		m.character = {
+			name: name || costume,
+			source: "catshinobi-localization",
+			costume: costume || null,
+			ja: rec.ja || null,
+			match: rec.match || null,
+			squad: null,
+			rarity: null,
+			class: null,
+			element: null,
+			manufacturer: null,
+			url: null,
+		};
+		// HUD/delete dialog show `name`; keep the folder id in parentheses so
+		// it stays searchable, and append the costume when there is one.
+		const leaf = m.id.split("/").pop().split("#")[0];
+		m.name = costume && name ? `${name} — ${costume} (${leaf})` : `${name || costume} (${leaf})`;
+		csHits++;
+	}
+	if (csHits) console.log(`  cat shinobi: ${csHits} model diberi nama karakter`);
+
+	const total = hits + azHits + bd2Hits + csHits;
+	if (total) console.log(`  karakter  : ${total} model diberi nama`);
+	if (audioHits) console.log(`  bd2 audio : ${audioHits} model punya suara JP`);
+	if (bd2Hits) console.log(`  brown dust: ${bd2Hits} model diberi nama kostum`);
+	return models;
+}
+
+/* --- Brown Dust 2 media: JP voice lines + character icons ---------------
+ * Fetched from Jelosus2/BD2-L2D-Viewer by tools/fetch-bd2-media.py into
+ * /srv/spine-assets/bd2-media. KR voices are deliberately NOT downloaded —
+ * the user asked for JP only.
+ *
+ *   audio/<costumeId>/<n>.webm   3 BattleReady variants per costume
+ *   icons/<assetKey>.png         128x128
+ *
+ * A costume id is the 6-digit id inside the asset name (char000101 -> 000101);
+ * variant folders (cutscene/, censored/) inherit their parent's id, so the
+ * character and its variants share one voice set.
+ */
+const MEDIA = process.env.BD2_MEDIA || "/srv/spine-assets/bd2-media";
+const AUDIO_DIR = path.join(MEDIA, "audio");
+
+let bd2AudioCache = { map: null, mtime: 0 };
+
+function loadBd2Audio() {
+	// The directory layout IS the manifest: each subdirectory is a costume id.
+	try {
+		const st = fs.statSync(AUDIO_DIR);
+		if (bd2AudioCache.map && bd2AudioCache.mtime === st.mtimeMs) return bd2AudioCache.map;
+		const map = {};
+		for (const d of fs.readdirSync(AUDIO_DIR, { withFileTypes: true })) {
+			if (!d.isDirectory()) continue;
+			const files = fs
+				.readdirSync(path.join(AUDIO_DIR, d.name))
+				.filter((f) => /^\d+\.webm$/i.test(f))
+				.sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+			if (files.length) map[d.name] = files;
+		}
+		bd2AudioCache = { map, mtime: st.mtimeMs };
+		return map;
+	} catch {
+		return {};
+	}
+}
+
+/** Voice tracks available for one model, or null. */
+function audioForModel(m) {
+	if ((m.game || "") !== "bd2") return null;
+	const parts = m.id.split("/").map((p) => p.split("#")[0]);
+	const leaf = parts[parts.length - 1];
+	// cutscene/ and censored/ reuse their parent's voice set.
+	const base = leaf === "cutscene" || leaf === "censored" ? parts[parts.length - 2] : leaf;
+	const mm = /(\d{6})/.exec(base || "");
+	if (!mm) return null;
+	const files = loadBd2Audio()[mm[1]];
+	if (!files?.length) return null;
+	return { costumeId: mm[1], lang: "JP", tracks: files.map((f) => `/bd2-audio/${mm[1]}/${f}`) };
+}
+
+app.get("/api/bd2-audio", (req, res) => {
+	// Not per-model: the client already knows the model, but a single call lets
+	// it grey the button out for models with no voices.
+	const id = String(req.query.id || "");
+	if (!id) return res.json({ tracks: [] });
+	const m = getModels().find((x) => x.id === id);
+	res.json(audioForModel(m) || { tracks: [] });
+});
+
+app.get("/api/thumbnails", (req, res) => {
+	res.json({ thumbs: thumbManifest() });
+});
+
+// --- upload: .json/.skel/.atlas/.png/.webp/... into assets/<folder>/ ---
+const slug = (s) =>
+	String(s)
+		.normalize("NFKD")
+		.replace(/[^\w.\-]+/g, "-")
+		.replace(/^-+|-+$/g, "")
+		.slice(0, 64) || "model";
+
+const ALLOWED = new Set([".json", ".skel", ".atlas", ".txt", ".png", ".webp", ".jpg", ".jpeg"]);
+
+const storage = multer.diskStorage({
+	destination: async (req, file, cb) => {
+		try {
+			const folder = slug(req.body.folder || path.basename(file.originalname, path.extname(file.originalname)));
+			const dest = path.join(ASSETS, folder);
+			await fsp.mkdir(dest, { recursive: true });
+			req.uploadFolder = folder;
+			cb(null, dest);
+		} catch (err) {
+			cb(err);
+		}
+	},
+	filename: (req, file, cb) => {
+		const clean = slug(file.originalname);
+		const ext = path.extname(clean).toLowerCase();
+		if (!ALLOWED.has(ext)) return cb(new Error(`Tipe file tidak diizinkan: ${ext || "(tanpa ekstensi)"}`));
+		cb(null, clean);
+	},
+});
+
+const upload = multer({
+	storage,
+	limits: { fileSize: MAX_UPLOAD_MB * 1024 * 1024, files: 64 },
+});
+
+app.post("/api/upload", (req, res) => {
+	upload.array("files", 64)(req, res, (err) => {
+		if (err) {
+			const msg =
+				err.code === "LIMIT_FILE_SIZE"
+					? `Ukuran file melebihi batas ${MAX_UPLOAD_MB} MB.`
+					: err.message || "Unggahan gagal.";
+			return res.status(400).json({ error: msg });
+		}
+		res.json({ ok: true, folder: req.uploadFolder || null });
+	});
+});
+
+app.delete("/api/models/:id", async (req, res) => {
+	const id = path.basename(req.params.id);
+	if (!id || id === "." || id === "..") return res.status(400).json({ error: "Nama model tidak valid." });
+	const dir = path.join(ASSETS, id);
+	if (!dir.startsWith(ASSETS + path.sep)) return res.status(400).json({ error: "Nama model tidak valid." });
+	try {
+		await fsp.rm(dir, { recursive: true, force: true });
+		res.json({ ok: true });
+	} catch (err) {
+		res.status(500).json({ error: "Gagal menghapus model: " + err.message });
+	}
+});
+
+/* ------------------------------------------------------------------ *
+ * Live-wallpaper export
+ * ------------------------------------------------------------------ *
+ * The browser renders every frame deterministically (it already owns the
+ * loaded skeleton and can seek the track exactly), uploads the PNG
+ * sequence, and we stitch it with ffmpeg. Rendering offline instead of
+ * capturing a live canvas is what makes the loop seamless — frame N-1 is
+ * numerically one step from frame 0, not however long the encoder took.
+ *
+ * Verified against the ffmpeg on this box (8.0.1): its VP9 and VP8
+ * encoders do NOT support alpha — asking for yuva420p silently produces
+ * yuv420p and the transparency is gone. GIF is the only transparent
+ * option here, so the alpha path is routed to GIF and the opaque path to
+ * WebM. Calling that out rather than shipping a silently-broken "alpha
+ * WebM" toggle.
+ */
+const EXPORT_TMP = path.join(DATA, "exports");
+const EXPORT_DIR = path.join(ROOT, "public", "exports");
+const EXPORT_MAX_MB = Number(process.env.EXPORT_MAX_MB) || 96;
+const EXPORT_MAX_FRAMES = Number(process.env.EXPORT_MAX_FRAMES) || 600;
+
+const ALLOWED_BG = new Set(["transparent", "black", "white", "#1a1620"]);
+
+/**
+ * Resolve the ffmpeg binary. `spawn("ffmpeg", …)` assumes it is on PATH, which
+ * was true on the box this was built on but is NOT guaranteed — this host has
+ * no system ffmpeg at all, and /api/export/capabilities silently reported
+ * `false` for every format because of it. Fall back to the copy Playwright
+ * downloads (it ships libvpx-vp9, libvpx, gif and libx264), and allow an
+ * explicit override via FFMPEG_PATH.
+ */
+function ffmpegBin() {
+	const candidates = [
+		process.env.FFMPEG_PATH,
+		"ffmpeg",
+		"/usr/bin/ffmpeg",
+		"/usr/local/bin/ffmpeg",
+		"/root/.cache/ms-playwright/ffmpeg-1011/ffmpeg-linux",
+	].filter(Boolean);
+	for (const c of candidates) {
+		try {
+			const r = spawnSync(c, ["-hide_banner", "-loglevel", "error", "-version"], { encoding: "utf8" });
+			if (r.status === 0) return c;
+		} catch {
+			/* not this one */
+		}
+	}
+	return null;
+}
+
+let ffmpegBinCache;
+function ffmpeg() {
+	if (ffmpegBinCache === undefined) ffmpegBinCache = ffmpegBin();
+	return ffmpegBinCache;
+}
+
+function ffmpegHas(encoder) {
+	const bin = ffmpeg();
+	if (!bin) return false;
+	try {
+		const r = spawnSync(bin, ["-hide_banner", "-loglevel", "error", "-h", "encoder=" + encoder], {
+			encoding: "utf8",
+		});
+		return r.status === 0;
+	} catch {
+		return false;
+	}
+}
+
+/** Which output formats this machine can actually produce. */
+function exportCapabilities() {
+	return {
+		ffmpeg: ffmpegHas("libvpx-vp9"),
+		webm: ffmpegHas("libvpx-vp9"),
+		gif: ffmpegHas("gif"),
+	};
+}
+
+app.get("/api/export/capabilities", (req, res) => {
+	res.json(exportCapabilities());
+});
+
+/** Stream one frame to the job's temp dir. Frames arrive in order.
+ *  Accepts PNG (transparent exports) and JPEG (opaque exports). Frames are
+ *  written with a .png/.jpg extension that ffmpeg's image2 demuxer picks up
+ *  via a glob pattern. */
+app.post("/api/export/frame",
+	express.raw({ type: ["image/png", "image/jpeg"], limit: "24mb" }),
+	async (req, res) => {
+	const job = String(req.query.job || "");
+	const index = Number(req.query.i);
+	const count = Number(req.query.n);
+	// job is a server-generated id; reject anything that isn't, so it can
+	// never be used to walk the filesystem.
+	if (!/^[a-z0-9]{6,32}$/.test(job)) return res.status(400).json({ error: "Id ekspor tidak valid." });
+	if (!Number.isInteger(index) || index < 0) return res.status(400).json({ error: "Indeks bingkai tidak valid." });
+	if (!Number.isInteger(count) || count <= 0 || count > EXPORT_MAX_FRAMES) {
+		return res.status(400).json({ error: "Jumlah bingkai tidak valid." });
+	}
+	if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Bingkai kosong." });
+
+	// Trust the magic bytes, not the client's Content-Type.
+	const isJpeg = req.body[0] === 0xff && req.body[1] === 0xd8;
+	const isPng = req.body[0] === 0x89 && req.body[1] === 0x50;
+	if (!isJpeg && !isPng) return res.status(400).json({ error: "Format bingkai tidak dikenal." });
+
+	const dir = path.join(EXPORT_TMP, job);
+	try {
+		await fsp.mkdir(dir, { recursive: true });
+		const ext = isJpeg ? "jpg" : "png";
+		await fsp.writeFile(path.join(dir, `f${String(index).padStart(5, "0")}.${ext}`), req.body);
+		res.json({ ok: true, index, count });
+	} catch (err) {
+		res.status(500).json({ error: "Gagal menyimpan bingkai: " + err.message });
+	}
+});
+
+/** Stitch the uploaded frames into WebM or GIF and hand back a URL. */
+app.post("/api/export/finish", express.json({ limit: "1mb" }), async (req, res) => {
+	const { job, format, background, fps, width, height, name } = req.body || {};
+	if (!/^[a-z0-9]{6,32}$/.test(String(job || ""))) {
+		return res.status(400).json({ error: "Id ekspor tidak valid." });
+	}
+	const fmt = format === "gif" ? "gif" : "webm";
+	const bg = ALLOWED_BG.has(background) ? background : "black";
+	const rate = Math.min(60, Math.max(1, Number(fps) || 30));
+	const transparent = bg === "transparent";
+
+	const dir = path.join(EXPORT_TMP, String(job));
+	let frames;
+	try {
+		frames = (await fsp.readdir(dir))
+			.filter((f) => /^f\d{5}\.(png|jpg)$/.test(f))
+			.sort();
+	} catch {
+		return res.status(400).json({ error: "Bingkai tidak ditemukan — ekspor dibatalkan." });
+	}
+	if (!frames.length) return res.status(400).json({ error: "Tidak ada bingkai untuk digabung." });
+
+	// Catch a truncated sequence before it becomes a short, jumpy video:
+	// the client tells us how many frames it meant to send.
+	const expected = Number(req.body?.frames);
+	if (Number.isInteger(expected) && expected > 0 && frames.length < expected) {
+		fsp.rm(dir, { recursive: true, force: true }).catch(() => {});
+		return res.status(400).json({
+			error: `Bingkai tidak lengkap (${frames.length} dari ${expected}). Ekspor dibatalkan.`,
+		});
+	}
+	const pattern = /\.jpg$/.test(frames[0]) ? "f%05d.jpg" : "f%05d.png";
+
+	// Transparency only survives in GIF on this ffmpeg, so honour the
+	// request by switching format rather than silently dropping alpha.
+	const outFmt = transparent ? "gif" : fmt;
+	const caps = exportCapabilities();
+	if (outFmt === "gif" && !caps.gif) return res.status(500).json({ error: "Encoder GIF tidak tersedia." });
+	if (outFmt === "webm" && !caps.webm) return res.status(500).json({ error: "Encoder VP9 tidak tersedia." });
+
+	await fsp.mkdir(EXPORT_DIR, { recursive: true });
+	const safeName = slug(String(name || "wallpaper")).slice(0, 48) || "wallpaper";
+	const file = `${safeName}-${job}.${outFmt}`;
+	const out = path.join(EXPORT_DIR, file);
+
+	const args = ["-hide_banner", "-loglevel", "error", "-y", "-framerate", String(rate),
+		"-i", path.join(dir, pattern)];
+
+	if (outFmt === "gif") {
+		// palettegen/use keeps the alpha channel; reserve_transparent is what
+		// stops the transparent background from being remapped to a colour.
+		args.push(
+			"-filter_complex",
+			`[0:v] split [a][b]; [a] palettegen=reserve_transparent=1 [p]; [b][p] paletteuse=alpha_threshold=128`,
+			"-loop", "0", out
+		);
+	} else {
+		args.push("-c:v", "libvpx-vp9", "-pix_fmt", "yuv420p", "-crf", "30", "-b:v", "0",
+			"-auto-alt-ref", "0", "-lag-in-frames", "0", "-an", out);
+	}
+
+	try {
+		await new Promise((resolve, reject) => {
+			const bin = ffmpeg();
+			if (!bin) return reject(new Error("ffmpeg tidak ditemukan di server."));
+			const p = spawn(bin, args);
+			let err = "";
+			p.stderr.on("data", (d) => { err += d.toString(); });
+			p.on("error", reject);
+			p.on("close", (code) => (code === 0 ? resolve() : reject(new Error(err.slice(-500) || `ffmpeg keluar ${code}`))));
+		});
+		const stat = await fsp.stat(out).catch(() => null);
+		if (!stat || !stat.size) throw new Error("Berkas hasil kosong.");
+		return res.json({
+			ok: true,
+			url: `/exports/${file}`,
+			format: outFmt,
+			frames: frames.length,
+			size: stat.size,
+			alpha: transparent,
+			// Set when the requested format couldn't carry transparency.
+			formatSwitched: transparent && fmt !== outFmt,
+		});
+	} catch (err) {
+		return res.status(500).json({ error: "Gagal membuat video: " + err.message });
+	} finally {
+		fsp.rm(dir, { recursive: true, force: true }).catch(() => {});
+	}
+});
+
+/** Drop the temp frames if the user cancels halfway through. */
+app.post("/api/export/cancel", express.json({ limit: "1kb" }), async (req, res) => {
+	const job = String(req.body?.job || "");
+	if (!/^[a-z0-9]{6,32}$/.test(job)) return res.status(400).json({ error: "Id ekspor tidak valid." });
+	await fsp.rm(path.join(EXPORT_TMP, job), { recursive: true, force: true }).catch(() => {});
+	res.json({ ok: true });
+});
+
+// --- static ---
+app.use("/assets", express.static(ASSETS, { fallthrough: false }));
+app.use(
+	"/thumbs",
+	express.static(THUMBS, { fallthrough: false, maxAge: "7d", immutable: true })
+);
+app.use("/dist", express.static(path.join(ROOT, "public", "dist")));
+// Vendored Spine 2.1.27 viewer (Kurumifans/spine, Spine Runtimes License).
+// Served under /legacy-spine/ so the client can iframe it for models whose
+// skeletons no pixi-spine runtime can read.
+app.use(
+	"/legacy-spine",
+	express.static(path.join(ROOT, "vendor", "spine2127"), {
+		fallthrough: false,
+		maxAge: "7d",
+	})
+);
+app.use("/exports", express.static(EXPORT_DIR, { fallthrough: false, maxAge: "1h" }));
+// BD2 JP voice lines. Served under its own prefix so a missing directory can
+// never shadow /assets or /thumbs.
+app.use(
+	"/bd2-audio",
+	express.static(AUDIO_DIR, { fallthrough: false, maxAge: "7d", immutable: true })
+);
+app.use(express.static(path.join(ROOT, "public")));
+
+app.use((req, res) => res.status(404).json({ error: "Endpoint tidak ditemukan." }));
+
+app.listen(PORT, HOST, () => {
+	const models = scanModels();
+	console.log(`\n  Spine Stage  →  http://${HOST}:${PORT}`);
+	console.log(`  aset         :  ${ASSETS}`);
+	console.log(`  model        :  ${models.length} (${models.map((m) => m.id).join(", ") || "-"})\n`);
+});

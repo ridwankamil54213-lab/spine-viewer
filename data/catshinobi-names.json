@@ -1,0 +1,2234 @@
+{
+ "source": "com.cookapps.catshinobi Unity Localization string tables",
+ "locales": [
+  "en",
+  "id",
+  "ja"
+ ],
+ "characters": {
+  "1001": {
+   "en": "Akari Mayoneko",
+   "id": "Akari Mayoneko",
+   "ja": "真夜猫あかり"
+  },
+  "1002": {
+   "en": "Akari Mayoneko",
+   "id": "Akari Mayoneko",
+   "ja": "真夜猫あかり"
+  },
+  "2001": {
+   "en": "Reona Hino",
+   "id": "Reona Hino",
+   "ja": "陽野レオナ"
+  },
+  "3001": {
+   "en": "Taiga Fuyumi",
+   "id": "Taiga Fuyumi",
+   "ja": "冬海大河"
+  },
+  "4001": {
+   "en": "Ryo Nakatsukami",
+   "id": "Ryo Nakatsukami",
+   "ja": "中津神リョウ"
+  },
+  "5001": {
+   "en": "Hisui Nanagi",
+   "id": "Nanagi Hisui",
+   "ja": "七凪ヒスイ"
+  },
+  "6001": {
+   "en": "Kuroko Morimi",
+   "id": "Morimi Kuroko",
+   "ja": "森見クロコ"
+  },
+  "7001": {
+   "en": "Madoka Hino",
+   "id": "Madoka Hino",
+   "ja": "陽野マドカ"
+  },
+  "8001": {
+   "en": "Nene Sunaoka",
+   "id": "Sunaoka Nene",
+   "ja": "砂岡ネネ"
+  },
+  "8004": {
+   "en": "Nene Sunaoka",
+   "id": "Sunaoka Nene",
+   "ja": "砂岡ネネ"
+  },
+  "8005": {
+   "en": "Nene Sunaoka",
+   "id": "Sunaoka Nene",
+   "ja": "砂岡ネネ"
+  },
+  "9001": {
+   "en": "Akane Mayoneko",
+   "id": "Akane Mayoneko",
+   "ja": "真夜猫あかね"
+  },
+  "10001": {
+   "en": "Mei Kaminari",
+   "id": "Mei Kaminari",
+   "ja": "雷鳴メイ"
+  },
+  "11001": {
+   "en": "Enma Yozakura",
+   "id": "Enma Yozakura",
+   "ja": "夜桜エンマ"
+  },
+  "12001": {
+   "en": "Shy",
+   "id": "Shy",
+   "ja": "シャイ"
+  },
+  "13001": {
+   "en": "Spirit",
+   "id": "Spirit",
+   "ja": "スピリッツ"
+  },
+  "14001": {
+   "en": "Ai Tennoji",
+   "id": "Ai Tennoji",
+   "ja": "天王寺 曖"
+  },
+  "15001": {
+   "en": "Sena Kisaragi",
+   "id": "Sena Kisaragi",
+   "ja": "如月セナ"
+  },
+  "16001": {
+   "en": "“Blessed White Light” Akari Mayoneko",
+   "id": "“Blessed White Light” Akari Mayoneko",
+   "ja": "真夜猫あかり「祝言の白」"
+  },
+  "17001": {
+   "en": "Ryo Nakatsukami \"Summer Violet\"",
+   "id": "Ryo Nakatsukami \"Summer Violet\"",
+   "ja": "中津神リョウ「サマーバイオレット」"
+  },
+  "18001": {
+   "en": "July Yonaha",
+   "id": "July Yonaha",
+   "ja": "与那覇ジュリ"
+  },
+  "19001": {
+   "en": "Taiga Fuyumi \"Midnight Blue\"",
+   "id": "Taiga Fuyumi \"Midnight Blue\"",
+   "ja": "冬海大河「ミッドナイトブルー」"
+  },
+  "20001": {
+   "en": "Kuroko Morimi 「Onyx Tiger」",
+   "id": "Kuroko Morimi 「Onyx Tiger」",
+   "ja": "森見クロコ「オニックスティーガー」"
+  },
+  "21001": {
+   "en": "Chico Onikasa",
+   "id": "Chico Onikasa",
+   "ja": "鬼笠チコ"
+  },
+  "22001": {
+   "en": "Reona Hino \"Lion Rouge\"",
+   "id": "Reona Hino \"Lion Rouge\"",
+   "ja": "陽野レオナ 「リオンルージュ」"
+  },
+  "23001": {
+   "en": "Nene Sunaoka \"Twilight Ruby\"",
+   "id": "Nene Sunaoka \"Twilight Ruby\"",
+   "ja": "砂岡ネネ「トワイライト・ルビー」"
+  },
+  "24001": {
+   "en": "Ayame Hanakura",
+   "id": "Ayame Hanakura",
+   "ja": "花倉アヤメ"
+  },
+  "25001": {
+   "en": "Mei Kaminari \"Night Sapphire\"",
+   "id": "Mei Kaminari \"Night Sapphire\"",
+   "ja": "雷鳴メイ「ナイト・サファイア」"
+  },
+  "26001": {
+   "en": "Shizuku Hinawa",
+   "id": "Shizuku Hinawa",
+   "ja": "緋縄シズク"
+  },
+  "27001": {
+   "en": "Hisui Nanagi – \"Cotton Siesta\"",
+   "id": "Hisui Nanagi – \"Cotton Siesta\"",
+   "ja": "七凪ヒスイ「コットンシエスタ」"
+  },
+  "28001": {
+   "en": "Hino Madoka 'Cherry Beat'",
+   "id": "Hino Madoka 'Cherry Beat'",
+   "ja": "陽野マドカ「チェリー・ビート」"
+  },
+  "29001": {
+   "en": "Fuyumi Taiga 'Vanilla Groove'",
+   "id": "Fuyumi Taiga 'Vanilla Groove'",
+   "ja": "冬海大河「バニラ・グルーヴ」"
+  },
+  "30001": {
+   "en": "Mashiro Azuki",
+   "id": "Mashiro Azuki",
+   "ja": "蒼月マシロ"
+  },
+  "32001": {
+   "en": "Akane Mayoneko \"Soleil Marina\"",
+   "id": "Akane Mayoneko \"Soleil Marina\"",
+   "ja": "真夜猫あかね「ソレイユ・マリーナ」"
+  },
+  "33001": {
+   "en": "Sena Kisaragi「Secret Rivière」",
+   "id": "Sena Kisaragi「Secret Rivière」",
+   "ja": "如月セナ「シークレット・リヴィエール」"
+  },
+  "34001": {
+   "en": "Enma Yozakura「Moonlight Bunny」",
+   "id": "Enma Yozakura「Moonlight Bunny」",
+   "ja": "夜桜エンマ「ムーンライト・バニー」"
+  },
+  "35001": {
+   "en": "Chisa Inagae",
+   "id": "Chisa Inagae",
+   "ja": "犬長江チサ"
+  }
+ },
+ "costumes": {
+  "000": {
+   "en": "Ninja Costume",
+   "id": "Kostum Ninja",
+   "ja": "下忍・基本衣装"
+  },
+  "001": {
+   "en": "Ninja Costume",
+   "id": "Ninja Costume",
+   "ja": "中忍・基本衣装"
+  },
+  "1002": {
+   "en": "Spring Blossom",
+   "id": "Spring Blossom",
+   "ja": "スプリングブロッサム"
+  },
+  "1003": {
+   "en": "Summer・Shinobis",
+   "id": "Summer・Shinobis",
+   "ja": "サマーシノビ"
+  },
+  "1004": {
+   "en": "Night Bunny",
+   "id": "Night Bunny",
+   "ja": "ナイトバニー"
+  },
+  "1005": {
+   "en": "Gothic・Princess",
+   "id": "Gothic・Princess",
+   "ja": "ゴシックプリンセス"
+  },
+  "1006": {
+   "en": "Autumn Days",
+   "id": "Autumn Days",
+   "ja": "オータムデイズ"
+  },
+  "1007": {
+   "en": "Galaxy Maid",
+   "id": "Galaxy Maid",
+   "ja": "ギャラクシーメイド"
+  },
+  "19100": {
+   "en": "Moon Flower",
+   "id": "moonflower",
+   "ja": "ムーンフラワー"
+  },
+  "19002": {
+   "en": "Autumn Beauty",
+   "id": "Autumn Beauty",
+   "ja": "オータムビューティー"
+  },
+  "19006": {
+   "en": "Autumn Nightshade",
+   "id": "Autumn Night Shade",
+   "ja": "オータムナイトシェイド"
+  },
+  "1008": {
+   "en": "Autumn Nights",
+   "id": "Autumn Nights",
+   "ja": "オータムナイツ"
+  },
+  "1009": {
+   "en": "Merry Reonamas",
+   "id": "Merry Reonamas",
+   "ja": "メリーレオナマス"
+  },
+  "1050": {
+   "en": "SHY Collab",
+   "id": "SHY Collab",
+   "ja": "SHYコラボ"
+  },
+  "15002": {
+   "en": "Noble Frost",
+   "id": "Noble Frost",
+   "ja": "ノーブルフロスト"
+  },
+  "15010": {
+   "en": "May Marry Me",
+   "id": "May Marry Me",
+   "ja": "メイ・マリーミー"
+  },
+  "16001": {
+   "en": "Blessed White Light",
+   "id": "Blessed White Light",
+   "ja": "祝言の白"
+  },
+  "17010": {
+   "en": "June Bride",
+   "id": "June Bride",
+   "ja": "ジューンブライド"
+  },
+  "19010": {
+   "en": "June Bride",
+   "id": "June Bride",
+   "ja": "ジューンブライド"
+  },
+  "111010": {
+   "en": "June Bride",
+   "id": "June Bride",
+   "ja": "ジューンブライド"
+  },
+  "1011": {
+   "en": "Summer Haze",
+   "id": "Summer Haze",
+   "ja": "サマーヘイズ"
+  },
+  "17001": {
+   "en": "Summer Violet",
+   "id": "Summer Violet",
+   "ja": "サマーバイオレット"
+  },
+  "19001": {
+   "en": "Midnight Blue",
+   "id": "Midnight Blue",
+   "ja": "ミッドナイトブルー"
+  },
+  "20001": {
+   "en": "Onyx Tiger",
+   "id": "Onyx Tiger",
+   "ja": "オニックスティーガー"
+  },
+  "22001": {
+   "en": "Lion Rouge",
+   "id": "Lion Rouge",
+   "ja": "「リオンルージュ」"
+  },
+  "23001": {
+   "en": "Twilight Ruby",
+   "id": "Twilight Ruby",
+   "ja": "トワイライト・ルビー"
+  },
+  "25001": {
+   "en": "Night Sapphire",
+   "id": "Night Sapphire",
+   "ja": "ナイト・サファイア"
+  },
+  "27001": {
+   "en": "Cotton Siesta",
+   "id": "Cotton Siesta",
+   "ja": "コットンシエスタ"
+  },
+  "28001": {
+   "en": "Cherry Beat",
+   "id": "Cherry Beat",
+   "ja": "チェリー・ビート"
+  },
+  "2020": {
+   "en": "Backstage Partner",
+   "id": "Backstage Partner",
+   "ja": "バックステージ・パートナー"
+  },
+  "110020": {
+   "en": "Hyper Speed★Broadcast",
+   "id": "Hyper Speed★Broadcast",
+   "ja": "超最速★配信"
+  },
+  "26020": {
+   "en": "Frontline·Absolute Defense",
+   "id": "Frontline·Absolute Defense",
+   "ja": "最前列・絶対死守"
+  },
+  "120020": {
+   "en": "Frontline·Absolute Defense 'Shizuku'",
+   "id": "Frontline·Absolute Defense 'Shizuku'",
+   "ja": "最前列・絶対死守"
+  },
+  "002": {
+   "en": "KAGE HANABI Costume",
+   "id": "KAGE HANABI Costume",
+   "ja": "カゲハナビ衣装"
+  },
+  "30020": {
+   "en": "Off the Record 'Mashiro'",
+   "id": "Off the Record 'Mashiro'",
+   "ja": "オフ・ザ・レコード「マシロ」"
+  },
+  "18060": {
+   "en": "Soccerholic (Yellow)",
+   "id": "Soccerholic (Yellow)",
+   "ja": "サッカーホリック (黄)"
+  },
+  "26060": {
+   "en": "Soccerholic (Blue)",
+   "id": "Soccerholic (Blue)",
+   "ja": "サッカーホリック (青)"
+  },
+  "30060": {
+   "en": "Soccerholic (Red)",
+   "id": "Soccerholic (Red)",
+   "ja": "サッカーホリック (赤)"
+  },
+  "110100": {
+   "en": "Showdown of the Seven Calamities S6",
+   "id": "Showdown of the Seven Calamities S6",
+   "ja": "七災封印戦 S6"
+  },
+  "32001": {
+   "en": "Soleil Marina",
+   "id": "Soleil Marina",
+   "ja": "ソレイユ・マリーナ"
+  },
+  "33001": {
+   "en": "Secret Rivière",
+   "id": "Secret Rivière",
+   "ja": "シークレット・リヴィエール"
+  },
+  "35020": {
+   "en": "The Old Ways of the House「Chisa」",
+   "id": "The Old Ways of the House「Chisa」",
+   "ja": "本家のしきたり「チサ」"
+  },
+  "35001": {
+   "en": "Pure-White Abyss Costume",
+   "id": "Pure-White Abyss Costume",
+   "ja": "純白の深淵の衣装"
+  }
+ },
+ "models": {
+  "catshinobi/Char_10001": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_10003": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_10006": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_10007": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_10011": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_10020": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_11001": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_11002": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_11006": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_11007": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_11010": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_11011": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_12001": {
+   "name": "Shy",
+   "costume": null,
+   "ja": "シャイ",
+   "id_local": "Shy",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_13001": {
+   "name": "Spirit",
+   "costume": null,
+   "ja": "スピリッツ",
+   "id_local": "Spirit",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_14001": {
+   "name": "Ai Tennoji",
+   "costume": null,
+   "ja": "天王寺 曖",
+   "id_local": "Ai Tennoji",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_15001": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_15006": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_15011": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_15012": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_15013": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_15030": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_16001": {
+   "name": "“Blessed White Light” Akari Mayoneko",
+   "costume": "Blessed White Light",
+   "ja": "真夜猫あかり",
+   "id_local": "“Blessed White Light” Akari Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_17001": {
+   "name": "Ryo Nakatsukami",
+   "costume": "Summer Violet",
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami \"Summer Violet\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_18001": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_18003": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_18005": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_18006": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_18011": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_19001": {
+   "name": "Taiga Fuyumi",
+   "costume": "Midnight Blue",
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi \"Midnight Blue\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_20001": {
+   "name": "Kuroko Morimi",
+   "costume": "Onyx Tiger",
+   "ja": "森見クロコ",
+   "id_local": "Kuroko Morimi 「Onyx Tiger」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_2003": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_2004": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_2006": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_2008": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_2009": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_21001": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_21003": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_21005": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_21006": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_21010": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_21012": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_21050": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_22001": {
+   "name": "Reona Hino",
+   "costume": "Lion Rouge",
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino \"Lion Rouge\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_23001": {
+   "name": "Nene Sunaoka",
+   "costume": "Twilight Ruby",
+   "ja": "砂岡ネネ",
+   "id_local": "Nene Sunaoka \"Twilight Ruby\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_24001": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_24003": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_24006": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_24013": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_25001": {
+   "name": "Mei Kaminari",
+   "costume": "Night Sapphire",
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari \"Night Sapphire\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_26001": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_26003": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_26050": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_26070": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_27001": {
+   "name": "Hisui Nanagi –",
+   "costume": "Cotton Siesta",
+   "ja": "七凪ヒスイ",
+   "id_local": "Hisui Nanagi – \"Cotton Siesta\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_27001_signature_skill": {
+   "name": "Hisui Nanagi –",
+   "costume": "Cotton Siesta",
+   "ja": "七凪ヒスイ",
+   "id_local": "Hisui Nanagi – \"Cotton Siesta\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_28001": {
+   "name": "Hino Madoka",
+   "costume": "Cherry Beat",
+   "ja": "陽野マドカ",
+   "id_local": "Hino Madoka 'Cherry Beat'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_29001": {
+   "name": "Fuyumi Taiga",
+   "costume": "Vanilla Groove",
+   "ja": "冬海大河",
+   "id_local": "Fuyumi Taiga 'Vanilla Groove'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_30001": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_30003": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "base(30001)"
+  },
+  "catshinobi/Char_3002": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_3003": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_3004": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_3006": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_3009": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_32001": {
+   "name": "Akane Mayoneko",
+   "costume": "Soleil Marina",
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko \"Soleil Marina\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_33001": {
+   "name": "Sena Kisaragi",
+   "costume": "Secret Rivière",
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi「Secret Rivière」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_34001": {
+   "name": "Enma Yozakura",
+   "costume": "Moonlight Bunny",
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura「Moonlight Bunny」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_35001": {
+   "name": "Chisa Inagae",
+   "costume": "Pure-White Abyss Costume",
+   "ja": "犬長江チサ",
+   "id_local": "Chisa Inagae",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_4002": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_4003": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_4004": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_4006": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_4007": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_4009": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_5003": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_5004": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_5006": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_6001": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_6002": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_6003": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_6004": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_6006": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_7001": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_7002": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_7003": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_7004": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_7006": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_8001": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_8002": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_8003": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_8004": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_8005": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_8006": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_9001": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_9002": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_9003": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_9006": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_LD_10001": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_10003": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_LD_1001": {
+   "name": "Akari Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかり",
+   "id_local": "Akari Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_10011": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_LD_10020": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_LD_11001": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_11002": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_LD_11006": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_LD_11010": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_LD_11011": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_LD_12001": {
+   "name": "Shy",
+   "costume": null,
+   "ja": "シャイ",
+   "id_local": "Shy",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_13001": {
+   "name": "Spirit",
+   "costume": null,
+   "ja": "スピリッツ",
+   "id_local": "Spirit",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_14001": {
+   "name": "Ai Tennoji",
+   "costume": null,
+   "ja": "天王寺 曖",
+   "id_local": "Ai Tennoji",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_15001": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_15001_Skill": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_15011": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_LD_15012": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_LD_15013": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_LD_15030": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_LD_16001": {
+   "name": "“Blessed White Light” Akari Mayoneko",
+   "costume": "Blessed White Light",
+   "ja": "真夜猫あかり",
+   "id_local": "“Blessed White Light” Akari Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_17001": {
+   "name": "Ryo Nakatsukami",
+   "costume": "Summer Violet",
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami \"Summer Violet\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_18001": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_18005": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_LD_18011": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_LD_19001": {
+   "name": "Taiga Fuyumi",
+   "costume": "Midnight Blue",
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi \"Midnight Blue\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_20001": {
+   "name": "Kuroko Morimi",
+   "costume": "Onyx Tiger",
+   "ja": "森見クロコ",
+   "id_local": "Kuroko Morimi 「Onyx Tiger」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_2001": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_2008": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_LD_21001": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_21001_signature_skill": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_21003": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_LD_21005": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_LD_21006": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_LD_21012": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_LD_21050": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_LD_22001": {
+   "name": "Reona Hino",
+   "costume": "Lion Rouge",
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino \"Lion Rouge\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_23001": {
+   "name": "Nene Sunaoka",
+   "costume": "Twilight Ruby",
+   "ja": "砂岡ネネ",
+   "id_local": "Nene Sunaoka \"Twilight Ruby\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_24001": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_24013": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_LD_25001": {
+   "name": "Mei Kaminari",
+   "costume": "Night Sapphire",
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari \"Night Sapphire\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_26001": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_26001_signature_skill": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_26050": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_LD_26070": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_LD_27001": {
+   "name": "Hisui Nanagi –",
+   "costume": "Cotton Siesta",
+   "ja": "七凪ヒスイ",
+   "id_local": "Hisui Nanagi – \"Cotton Siesta\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_28001": {
+   "name": "Hino Madoka",
+   "costume": "Cherry Beat",
+   "ja": "陽野マドカ",
+   "id_local": "Hino Madoka 'Cherry Beat'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_29001": {
+   "name": "Fuyumi Taiga",
+   "costume": "Vanilla Groove",
+   "ja": "冬海大河",
+   "id_local": "Fuyumi Taiga 'Vanilla Groove'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_30001": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_30001_signatureskill": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_30003": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "base(30001)"
+  },
+  "catshinobi/Char_LD_3001": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_3006": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_LD_32001": {
+   "name": "Akane Mayoneko",
+   "costume": "Soleil Marina",
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko \"Soleil Marina\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_33001": {
+   "name": "Sena Kisaragi",
+   "costume": "Secret Rivière",
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi「Secret Rivière」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_34001": {
+   "name": "Enma Yozakura",
+   "costume": "Moonlight Bunny",
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura「Moonlight Bunny」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_35001": {
+   "name": "Chisa Inagae",
+   "costume": "Pure-White Abyss Costume",
+   "ja": "犬長江チサ",
+   "id_local": "Chisa Inagae",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_4001": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_4007": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_LD_6001": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_7001": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_7003": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_LD_7004": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_LD_8001": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_8005": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_9001": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_LD_9006": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_SD_10001": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_10003": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_SD_10006": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_SD_10007": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_SD_1001": {
+   "name": "Akari Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかり",
+   "id_local": "Akari Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_10011": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_SD_10020": {
+   "name": "Mei Kaminari",
+   "costume": null,
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari",
+   "match": "base(10001)"
+  },
+  "catshinobi/Char_SD_11001": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_11002": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_SD_11006": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_SD_11007": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_SD_11010": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_SD_11011": {
+   "name": "Enma Yozakura",
+   "costume": null,
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura",
+   "match": "base(11001)"
+  },
+  "catshinobi/Char_SD_12001": {
+   "name": "Shy",
+   "costume": null,
+   "ja": "シャイ",
+   "id_local": "Shy",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_13001": {
+   "name": "Spirit",
+   "costume": null,
+   "ja": "スピリッツ",
+   "id_local": "Spirit",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_14001": {
+   "name": "Ai Tennoji",
+   "costume": null,
+   "ja": "天王寺 曖",
+   "id_local": "Ai Tennoji",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_15001": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_15006": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_SD_15011": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_SD_15012": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_SD_15013": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_SD_15030": {
+   "name": "Sena Kisaragi",
+   "costume": null,
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi",
+   "match": "base(15001)"
+  },
+  "catshinobi/Char_SD_16001": {
+   "name": "“Blessed White Light” Akari Mayoneko",
+   "costume": "Blessed White Light",
+   "ja": "真夜猫あかり",
+   "id_local": "“Blessed White Light” Akari Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_17001": {
+   "name": "Ryo Nakatsukami",
+   "costume": "Summer Violet",
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami \"Summer Violet\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_18001": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_18003": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_SD_18005": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_SD_18006": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_SD_18011": {
+   "name": "July Yonaha",
+   "costume": null,
+   "ja": "与那覇ジュリ",
+   "id_local": "July Yonaha",
+   "match": "base(18001)"
+  },
+  "catshinobi/Char_SD_19001": {
+   "name": "Taiga Fuyumi",
+   "costume": "Midnight Blue",
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi \"Midnight Blue\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_20001": {
+   "name": "Kuroko Morimi",
+   "costume": "Onyx Tiger",
+   "ja": "森見クロコ",
+   "id_local": "Kuroko Morimi 「Onyx Tiger」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_2003": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_SD_2004": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_SD_2006": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_SD_2008": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_SD_2009": {
+   "name": "Reona Hino",
+   "costume": null,
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino",
+   "match": "base(2001)"
+  },
+  "catshinobi/Char_SD_21001": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_21003": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_21005": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_21006": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_21010": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_21012": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_21050": {
+   "name": "Chico Onikasa",
+   "costume": null,
+   "ja": "鬼笠チコ",
+   "id_local": "Chico Onikasa",
+   "match": "base(21001)"
+  },
+  "catshinobi/Char_SD_22001": {
+   "name": "Reona Hino",
+   "costume": "Lion Rouge",
+   "ja": "陽野レオナ",
+   "id_local": "Reona Hino \"Lion Rouge\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_23001": {
+   "name": "Nene Sunaoka",
+   "costume": "Twilight Ruby",
+   "ja": "砂岡ネネ",
+   "id_local": "Nene Sunaoka \"Twilight Ruby\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_24001": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_24003": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_SD_24006": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_SD_24013": {
+   "name": "Ayame Hanakura",
+   "costume": null,
+   "ja": "花倉アヤメ",
+   "id_local": "Ayame Hanakura",
+   "match": "base(24001)"
+  },
+  "catshinobi/Char_SD_25001": {
+   "name": "Mei Kaminari",
+   "costume": "Night Sapphire",
+   "ja": "雷鳴メイ",
+   "id_local": "Mei Kaminari \"Night Sapphire\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_26001": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_26003": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_SD_26050": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_SD_26070": {
+   "name": "Shizuku Hinawa",
+   "costume": null,
+   "ja": "緋縄シズク",
+   "id_local": "Shizuku Hinawa",
+   "match": "base(26001)"
+  },
+  "catshinobi/Char_SD_27001": {
+   "name": "Hisui Nanagi –",
+   "costume": "Cotton Siesta",
+   "ja": "七凪ヒスイ",
+   "id_local": "Hisui Nanagi – \"Cotton Siesta\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_28001": {
+   "name": "Hino Madoka",
+   "costume": "Cherry Beat",
+   "ja": "陽野マドカ",
+   "id_local": "Hino Madoka 'Cherry Beat'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_29001": {
+   "name": "Fuyumi Taiga",
+   "costume": "Vanilla Groove",
+   "ja": "冬海大河",
+   "id_local": "Fuyumi Taiga 'Vanilla Groove'",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_30001": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_30003": {
+   "name": "Mashiro Azuki",
+   "costume": null,
+   "ja": "蒼月マシロ",
+   "id_local": "Mashiro Azuki",
+   "match": "base(30001)"
+  },
+  "catshinobi/Char_SD_3002": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_SD_3003": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_SD_3004": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_SD_3006": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_SD_3009": {
+   "name": "Taiga Fuyumi",
+   "costume": null,
+   "ja": "冬海大河",
+   "id_local": "Taiga Fuyumi",
+   "match": "base(3001)"
+  },
+  "catshinobi/Char_SD_32001": {
+   "name": "Akane Mayoneko",
+   "costume": "Soleil Marina",
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko \"Soleil Marina\"",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_33001": {
+   "name": "Sena Kisaragi",
+   "costume": "Secret Rivière",
+   "ja": "如月セナ",
+   "id_local": "Sena Kisaragi「Secret Rivière」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_34001": {
+   "name": "Enma Yozakura",
+   "costume": "Moonlight Bunny",
+   "ja": "夜桜エンマ",
+   "id_local": "Enma Yozakura「Moonlight Bunny」",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_35001": {
+   "name": "Chisa Inagae",
+   "costume": "Pure-White Abyss Costume",
+   "ja": "犬長江チサ",
+   "id_local": "Chisa Inagae",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_4002": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_4003": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_4004": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_4006": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_4007": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_4009": {
+   "name": "Ryo Nakatsukami",
+   "costume": null,
+   "ja": "中津神リョウ",
+   "id_local": "Ryo Nakatsukami",
+   "match": "base(4001)"
+  },
+  "catshinobi/Char_SD_5003": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_SD_5004": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_SD_5006": {
+   "name": "Hisui Nanagi",
+   "costume": null,
+   "ja": "七凪ヒスイ",
+   "id_local": "Nanagi Hisui",
+   "match": "base(5001)"
+  },
+  "catshinobi/Char_SD_6001": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_6002": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_SD_6003": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_SD_6004": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_SD_6006": {
+   "name": "Kuroko Morimi",
+   "costume": null,
+   "ja": "森見クロコ",
+   "id_local": "Morimi Kuroko",
+   "match": "base(6001)"
+  },
+  "catshinobi/Char_SD_7001": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_7002": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_SD_7003": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_SD_7004": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_SD_7006": {
+   "name": "Madoka Hino",
+   "costume": null,
+   "ja": "陽野マドカ",
+   "id_local": "Madoka Hino",
+   "match": "base(7001)"
+  },
+  "catshinobi/Char_SD_8001": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_8002": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_SD_8003": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_SD_8004": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_8005": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_8006": {
+   "name": "Nene Sunaoka",
+   "costume": null,
+   "ja": "砂岡ネネ",
+   "id_local": "Sunaoka Nene",
+   "match": "base(8001)"
+  },
+  "catshinobi/Char_SD_9001": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "exact-char"
+  },
+  "catshinobi/Char_SD_9002": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_SD_9003": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  },
+  "catshinobi/Char_SD_9006": {
+   "name": "Akane Mayoneko",
+   "costume": null,
+   "ja": "真夜猫あかね",
+   "id_local": "Akane Mayoneko",
+   "match": "base(9001)"
+  }
+ }
+}
