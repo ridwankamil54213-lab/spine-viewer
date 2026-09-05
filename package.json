@@ -11,10 +11,13 @@
     "dev": "npm run build && node src/server.js"
   },
   "dependencies": {
+    "@esotericsoftware/spine-pixi-v7": "^4.3.13",
     "express": "^4.22.2",
     "multer": "^2.3.0",
     "pixi-spine": "^4.0.6",
-    "pixi.js": "^7.4.3"
+    "pixi.js": "^7.4.3",
+    "spine-core42": "npm:@esotericsoftware/spine-core@^4.2.120",
+    "spine-pixi-v7-42": "npm:@esotericsoftware/spine-pixi-v7@^4.2.120"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",

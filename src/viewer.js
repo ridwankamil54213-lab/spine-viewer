@@ -4,6 +4,26 @@ import { AtlasAttachmentLoader as AtlasAttachmentLoader41 } from "@pixi-spine/ru
 import * as runtime38 from "@pixi-spine/runtime-3.8";
 import * as runtime40 from "@pixi-spine/runtime-4.0";
 import * as runtime41 from "@pixi-spine/runtime-4.1";
+// Spine 4.2 needs a whole matching stack — pixi-spine's `Spine` hard-codes
+// 3.7/3.8/4.0/4.1 and throws "Cant detect version of spine model 4.2.35"
+// (then `null.Skeleton`) for anything newer. So 4.2 models are rendered by the
+// official renderer pinned to the same 4.2.120 release as the parser.
+//
+// IMPORTANT: everything 4.2 must come from THIS ONE package.
+// spine-pixi-v7-42 bundles its own nested spine-core, and its renderMeshes()
+// dispatches with `attachment instanceof RegionAttachment`. Data parsed by a
+// DIFFERENT copy of spine-core fails that check, so every slot is skipped and
+// the model draws absolutely nothing — no error, zero draw calls.
+// The package re-exports the whole core surface, so take all of it from here.
+import {
+	Spine as Spine42,
+	SpineTexture as SpineTexture42,
+	SkeletonBinary as SkeletonBinary42,
+	SkeletonJson as SkeletonJson42,
+	TextureAtlas as TextureAtlas42,
+	AtlasAttachmentLoader as AtlasAttachmentLoader42,
+} from "spine-pixi-v7-42";
+import * as runtime42 from "spine-pixi-v7-42";
 import { loadTextures } from "@pixi/assets";
 import { detectSpineVersion, pickRuntime } from "./spine-version.js";
 
@@ -457,7 +477,55 @@ const RUNTIME_LOADERS = {
 	"3.8": () => markRuntime(runtime38, "3.8"),
 	"4.0": () => markRuntime(runtime40, "4.0"),
 	"4.1": () => markRuntime(runtime41, "4.1"),
+	// Genuine Spine 4.2. Stellar Affinity ships 4.2.35; neither 4.1 nor 4.3
+	// can read that layout (see the import note above).
+	"4.2": () => markRuntime(runtime42, "4.2"),
 };
+
+// `runtime42` is the namespace we fall back to for version tagging, but the
+// PARSERS must be the exact classes the renderer compares against with
+// `instanceof` — see the import note. Override them per-key here.
+const PARSER_OVERRIDES = {
+	"4.2": { SkeletonBinary: SkeletonBinary42, SkeletonJson: SkeletonJson42 },
+};
+
+/**
+ * Attachment loader matching a given runtime.
+ *
+ * The loader and the parser MUST come from the same Spine version: a 4.1
+ * AtlasAttachmentLoader handed to a 4.2 SkeletonBinary produces attachments
+ * the 4.2 data model doesn't recognise. The 3.8 path already proves the
+ * pattern works — its data classes feed pixi-spine's renderer fine.
+ */
+const ATTACHMENT_LOADERS = {
+	"3.7": (atlas) => new runtime38.AtlasAttachmentLoader(atlas),
+	"3.8": (atlas) => new runtime38.AtlasAttachmentLoader(atlas),
+	"4.0": (atlas) => new runtime40.AtlasAttachmentLoader(atlas),
+	"4.1": (atlas) => new AtlasAttachmentLoader41(atlas),
+	"4.2": (atlas) => new AtlasAttachmentLoader42(atlas),
+};
+
+/** Build the attachment loader for a runtime key, defaulting to 4.1. */
+function makeAttachmentLoader(key, atlas) {
+	const make = ATTACHMENT_LOADERS[key] || ATTACHMENT_LOADERS["4.1"];
+	return make(atlas);
+}
+
+/**
+ * Instantiate the renderer for a runtime key.
+ *
+ * Everything except 4.2 uses pixi-spine's Spine, whose createSkeleton()
+ * only knows 3.7/3.8/4.0/4.1. A 4.2 model handed to it logs "Cant detect
+ * version of spine model 4.2.35" and then dies on `null.Skeleton`, so 4.2
+ * gets the official renderer instead.
+ *
+ * Both expose { skeleton, state, autoUpdate, update(dt), destroy() }, which
+ * is all the stage drives.
+ */
+function makeSpine(key, skeletonData) {
+	if (key === "4.2") return new Spine42({ skeletonData });
+	return new Spine(skeletonData);
+}
 
 /** Tag a runtime module with the version it really is, so the HUD can't lie. */
 function markRuntime(mod, version) {
@@ -476,6 +544,8 @@ const runtimeCache = new Map();
 /** Which runtime is driving the model currently on stage (for the HUD). */
 let spineRuntime = "4.1";
 let spineVersion = null;
+/** The atlas the on-stage model was parsed with (runtime-specific pages). */
+let atlas = null;
 
 async function getRuntime(key) {
 	const k = RUNTIME_LOADERS[key] ? key : "4.1";
@@ -489,7 +559,60 @@ async function getRuntime(key) {
  * string can't always be trusted (some games prefix their own header), and a
  * successful parse is the only proof that actually matters.
  */
-async function parseSkeletonData({ isBinary, rawSkeleton, attachmentLoader, scale }) {
+/**
+ * Build a TextureAtlas for a given runtime.
+ *
+ * Runtime 4.2 (official renderer) needs each page wrapped in SpineTexture:
+ * SlotMesh does `this.texture = slotTexture.texture`, i.e. it reaches into
+ * the wrapper for the Pixi texture. Hand it a bare BaseTexture and every
+ * mesh ends up with `texture === undefined`, which renders absolutely
+ * nothing and throws no error — the model just silently vanishes.
+ */
+function makeAtlas(key, atlasText, pageCache) {
+	// spine-core 4.2's TextureAtlas takes ONLY the atlas text — no page
+	// callback, no completion callback (unlike pixi-spine's, which resolves
+	// through its third argument). Passing the pixi-spine signature here made
+	// the atlas build fine but never settle: the load hung forever with zero
+	// errors. So 4.2 gets its pages assigned afterwards, per page.
+	if (key === "4.2") {
+		const ta = new TextureAtlas42(atlasText);
+		for (const page of ta.pages) {
+			const bt = pageCache.get(page.name);
+			if (!bt) throw new Error(`Halaman atlas “${page.name}” tidak tersedia.`);
+			// The official renderer reads `region.texture.texture` — i.e. the
+			// Pixi texture inside the SpineTexture wrapper. A bare BaseTexture
+			// leaves every mesh with `texture === undefined`, which draws
+			// absolutely nothing and throws no error.
+			page.setTexture(SpineTexture42.from(bt));
+		}
+		return Promise.resolve(ta);
+	}
+
+	return new Promise((resolve, reject) => {
+		const ta = new TextureAtlas(atlasText, (line, callback) => {
+			const pageName = String(line).trim();
+			const bt = pageCache.get(pageName);
+			if (!bt) {
+				reject(new Error(`Halaman atlas “${pageName}” tidak tersedia.`));
+				return;
+			}
+			callback(bt);
+		}, resolve);
+		if (!ta) reject(new Error("Atlas tidak bisa diurai."));
+	});
+}
+
+async function parseSkeletonData({ isBinary, rawSkeleton, atlasText, pageCache, atlas: presetAtlas, scale }) {
+	// Compare-panel callers pass a ready-made atlas with stubbed pages; the
+	// stage passes raw atlasText + a cache of real page textures and lets us
+	// build the atlas per runtime attempt.
+	if (presetAtlas) {
+		return parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor: () => presetAtlas });
+	}
+	return parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor: (key) => makeAtlas(key, atlasText, pageCache) });
+}
+
+async function parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor }) {
 	// Detection needs byte indexing. For binaries the caller may hand us an
 	// ArrayBuffer (fetch default) rather than a Uint8Array view, and indexing
 	// an ArrayBuffer yields undefined — detection then silently returns null
@@ -513,8 +636,22 @@ async function parseSkeletonData({ isBinary, rawSkeleton, attachmentLoader, scal
 	for (const key of order) {
 		try {
 			const mod = await getRuntime(key);
-			const { SkeletonBinary, SkeletonJson } = mod;
+			let { SkeletonBinary, SkeletonJson } = mod;
+			// Use the renderer's OWN parser classes when it has them, so the
+			// attachments they produce pass its `instanceof` checks.
+			const override = PARSER_OVERRIDES[key];
+			if (override) {
+				SkeletonBinary = override.SkeletonBinary;
+				SkeletonJson = override.SkeletonJson;
+			}
 			if (isBinary && !SkeletonBinary) continue;
+
+			// The attachment loader must come from the SAME runtime as the
+			// parser. A 4.1 loader + a 4.2 SkeletonBinary yields attachments
+			// the 4.2 data model rejects, so rebuild both on every attempt.
+			// The atlas is rebuilt too: 4.2 needs SpineTexture-wrapped pages.
+			const atlas = await makeFor(key);
+			const attachmentLoader = makeAttachmentLoader(key, atlas);
 
 			const parser = isBinary
 				? new SkeletonBinary(attachmentLoader)
@@ -529,7 +666,7 @@ async function parseSkeletonData({ isBinary, rawSkeleton, attachmentLoader, scal
 			// Report the runtime that actually loaded. RUNTIME_LOADERS maps
 			// "3.7" onto the 3.8 package, so echoing `key` would claim "3.7".
 			const actual = mod.__spineRuntimeVersion || key;
-			return { data, runtime: actual, version: detected?.raw || null };
+			return { data, atlas, runtime: actual, version: detected?.raw || null };
 		} catch (err) {
 			lastErr = err;
 		}
@@ -774,34 +911,30 @@ async function loadModel(model) {
 			})
 		);
 
-		const atlas = await new Promise((resolve, reject) => {
-			const ta = new TextureAtlas(atlasText, (line, callback) => {
-				const pageName = String(line).trim();
-				const bt = pageCache.get(pageName);
-				if (!bt) {
-					callback(null);
-					reject(new Error(`Halaman atlas “${pageName}” tidak tersedia.`));
-					return;
-				}
-				callback(bt);
-			}, resolve);
-			if (!ta) reject(new Error("Atlas tidak bisa diurai."));
-		});
-
-		const attachmentLoader = new AtlasAttachmentLoader41(atlas);
+		// The loader and ATLAS are built inside parseSkeletonData, per runtime
+		// attempt. Runtime 4.2 needs its own TextureAtlas whose pages are
+		// wrapped in SpineTexture — the official renderer reads
+		// `region.texture.texture` (the Pixi texture inside the wrapper) and
+		// silently draws nothing when handed a bare BaseTexture.
 		const parsed = await parseSkeletonData({
 			isBinary,
 			rawSkeleton,
-			attachmentLoader,
+			atlasText,
+			pageCache,
 			scale: model.scale ?? 1,
 		});
 		const skeletonData = parsed.data;
 		spineRuntime = parsed.runtime;
 		spineVersion = parsed.version;
+		// Keep the atlas the model actually rendered with — applyPMA() reads
+		// its page flags, and the HUD reports them.
+		atlas = parsed.atlas;
 
 		if (!skeletonData?.bones?.length) throw new Error("Data skeleton tidak berisi tulang.");
 
-		const next = new Spine(skeletonData);
+		// 4.2 renders through the official runtime; everything else through
+		// pixi-spine. Both are driven identically from here on.
+		const next = makeSpine(spineRuntime, skeletonData);
 		next.autoUpdate = false;
 
 		if (spine) {
@@ -1626,7 +1759,7 @@ async function skeletonDataOf(model) {
 	const { data } = await parseSkeletonData({
 		isBinary,
 		rawSkeleton: raw,
-		attachmentLoader: new AtlasAttachmentLoader41(atlas),
+		atlas,
 		scale: model.scale ?? 1,
 	});
 	return data;

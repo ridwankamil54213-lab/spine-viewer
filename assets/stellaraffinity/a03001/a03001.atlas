@@ -1,0 +1,9 @@
+a03001.png
+size:512,512
+filter:Linear,Linear
+pma:true
+shadow
+bounds:299,227,180,108
+rotate:90
+ship
+bounds:2,209,295,198

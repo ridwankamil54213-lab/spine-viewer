@@ -1,0 +1,225 @@
+h00401.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+arm_r
+	bounds: 32, 1985, 34, 53
+arm_r_u
+	bounds: 298, 1553, 80, 73
+	offsets: 0, 0, 80, 74
+bangs_1
+	bounds: 568, 1566, 149, 202
+	offsets: 0, 0, 157, 202
+bangs_2
+	bounds: 925, 1834, 41, 106
+	offsets: 0, 2, 41, 108
+bangs_3
+	bounds: 811, 1589, 119, 113
+	offsets: 0, 0, 119, 120
+	rotate: 270
+blush_1
+	bounds: 1417, 1565, 88, 28
+blush_2
+	bounds: 156, 1542, 93, 60
+	offsets: 0, 1, 93, 61
+body
+	bounds: 1272, 1718, 259, 328
+	offsets: 0, 10, 259, 338
+	rotate: 180
+breast_l
+	bounds: 1718, 1643, 110, 99
+breast_r
+	bounds: 1085, 1552, 93, 92
+	offsets: 1, 5, 94, 104
+coat_b
+	bounds: 89, 1501, 385, 545
+	offsets: 0, 34, 385, 579
+	rotate: 180
+coat_collar_l
+	bounds: 1085, 1543, 165, 209
+	offsets: 1, 0, 166, 209
+coat_l
+	bounds: 937, 1513, 147, 533
+	rotate: 180
+coat_r
+	bounds: 2, 1441, 128, 605
+coat_sleeve_l_d_b
+	bounds: 643, 1780, 70, 134
+coat_sleeve_l_d_f
+	bounds: 1376, 1592, 105, 139
+coat_sleeve_l_u
+	bounds: 1271, 1628, 115, 165
+coat_sleeves_r_b
+	bounds: 1287, 1551, 71, 89
+coat_sleeves_r_u
+	bounds: 488, 1554, 80, 130
+	offsets: 0, 0, 81, 130
+cowlick
+	bounds: 801, 1551, 83, 72
+	offsets: 1, 3, 84, 75
+eyeball_l
+	bounds: 1443, 2025, 22, 21
+eyeball_r
+	bounds: 2026, 2003, 19, 22
+eyebrow_l
+	bounds: 16, 2037, 47, 9
+	offsets: 2, 0, 52, 11
+eyebrow_r
+	bounds: 223, 2038, 26, 8
+	offsets: 1, 1, 28, 9
+eyelash_l_d
+	bounds: 581, 2034, 10, 12
+	offsets: 1, 0, 11, 13
+eyelash_l_u
+	bounds: 1283, 2030, 48, 16
+	offsets: 2, 1, 50, 18
+eyelash_l_u_2
+	bounds: 1885, 2028, 46, 18
+eyelash_r_d
+	bounds: 67, 2031, 13, 15
+	offsets: 0, 2, 13, 17
+eyelash_r_u
+	bounds: 403, 1992, 41, 22
+	offsets: 0, 0, 43, 22
+eyelash_r_u_2
+	bounds: 1285, 1899, 49, 15
+eyelid_l_d
+	bounds: 1031, 1980, 30, 17
+eyelid_l_u_1
+	bounds: 1772, 2022, 49, 24
+	offsets: 0, 0, 49, 35
+eyelid_r_d
+	bounds: 355, 2031, 25, 15
+	offsets: 0, 0, 26, 15
+eyelid_r_u_1
+	bounds: 1895, 2002, 38, 25
+	offsets: 0, 5, 38, 30
+eyewhite_l
+	bounds: 2010, 2027, 35, 19
+eyewhite_r
+	bounds: 25, 1964, 30, 19
+	offsets: 0, 2, 30, 21
+face
+	bounds: 1916, 1906, 117, 140
+face_shadow
+	bounds: 908, 1557, 84, 47
+feet_l
+	bounds: 901, 1961, 42, 85
+fingers_r_1
+	bounds: 598, 1998, 45, 48
+fingers_r_2
+	bounds: 1875, 1915, 42, 47
+	offsets: 0, 0, 49, 47
+fingers_r_3
+	bounds: 1704, 1982, 77, 64
+	offsets: 0, 0, 79, 66
+glasses
+	bounds: 751, 2012, 114, 34
+glasses_light
+	bounds: 702, 1556, 94, 35
+hair_1
+	bounds: 76, 1917, 73, 129
+hair_2
+	bounds: 68, 1678, 56, 117
+	offsets: 0, 4, 56, 121
+hair_b_2
+	bounds: 404, 1685, 252, 361
+	offsets: 0, 6, 252, 367
+hair_back
+	bounds: 1742, 1798, 248, 173
+	offsets: 0, 4, 248, 177
+	rotate: 90
+hand_l
+	bounds: 56, 1771, 63, 119
+	offsets: 1, 0, 64, 127
+hand_r
+	bounds: 372, 1999, 67, 47
+headset
+	bounds: 1660, 1576, 156, 175
+	offsets: 9, 0, 166, 175
+	rotate: 90
+idcard
+	bounds: 1495, 1896, 43, 59
+leg_l_d
+	bounds: 1570, 1589, 95, 187
+leg_l_u
+	bounds: 1638, 1732, 116, 314
+	offsets: 6, 0, 122, 314
+leg_r
+	bounds: 1472, 1420, 170, 626
+	offsets: 9, 27, 266, 923
+	rotate: 180
+leg_strap
+	bounds: 1885, 1585, 89, 110
+	offsets: 0, 1, 89, 113
+mouth_1
+	bounds: 456, 2035, 14, 11
+	offsets: 1, 0, 16, 11
+mouth_2
+	bounds: 200, 2034, 21, 12
+	offsets: 1, 0, 22, 12
+mouth_3
+	bounds: 179, 2033, 19, 13
+mouth_4
+	bounds: 96, 2033, 16, 13
+	offsets: 0, 0, 17, 13
+mouth_5
+	bounds: 151, 2028, 26, 18
+neck
+	bounds: 1469, 1948, 88, 98
+	offsets: 0, 1, 88, 99
+nipple_l
+	bounds: 1012, 1999, 47, 47
+nipple_r
+	bounds: 867, 2010, 26, 36
+	offsets: 0, 0, 27, 39
+nose
+	bounds: 441, 2032, 13, 14
+shirt_2
+	bounds: 651, 1680, 297, 366
+	offsets: 9, 9, 306, 375
+	rotate: 180
+shirt_b
+	bounds: 1063, 1741, 221, 305
+	rotate: 180
+shirt_collar_l_1
+	bounds: 180, 1544, 126, 88
+	offsets: 0, 0, 131, 89
+shirt_collar_r_1
+	bounds: 464, 1544, 102, 97
+shirt_l
+	bounds: 1750, 1677, 134, 237
+	offsets: 1, 0, 145, 237
+	rotate: 270
+shirt_sleeve_l_f
+	bounds: 1825, 1539, 79, 98
+shirt_sleeve_r_u
+	bounds: 1913, 1759, 107, 148
+shirt_sleeves_l_d
+	bounds: 718, 1593, 113, 117
+	offsets: 0, 0, 128, 117
+shirt_sleeves_r_b
+	bounds: 1220, 2010, 63, 36
+shirt_sleeves_r_d
+	bounds: 1975, 1638, 71, 120
+	offsets: 0, 0, 75, 121
+shirtsleeve_l_b
+	bounds: 1454, 1598, 59, 58
+slipper_l_b
+	bounds: 2, 1576, 62, 65
+	offsets: 0, 0, 62, 76
+slipper_l_f
+	bounds: 1286, 1808, 70, 76
+strap_d
+	bounds: 41, 1812, 55, 234
+	offsets: 13, 0, 68, 234
+strap_u
+	bounds: 1586, 1532, 88, 99
+	offsets: 0, 31, 88, 130
+tablet
+	bounds: 1084, 1625, 202, 178
+underwear_1
+	bounds: 1614, 1523, 184, 66
+	offsets: 1, 4, 187, 73
+underwear_2
+	bounds: 1955, 1548, 91, 81

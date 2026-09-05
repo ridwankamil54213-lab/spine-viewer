@@ -15,6 +15,14 @@ const RUNTIMES = {
 	"3.8": () => require("@pixi-spine/runtime-3.8"),
 	"4.0": () => require("@pixi-spine/runtime-4.0"),
 	"4.1": () => require("@pixi-spine/runtime-4.1"),
+	// Genuine Spine 4.2. The 4.1 runtime predates the format, and the 4.3
+	// runtime reads a `referenceScale` float in the header that 4.2 files do
+	// not contain — both desync and return garbage strings.
+	//
+	// Take it from spine-pixi-v7-42, not a standalone spine-core: the renderer
+	// bundles its own core and dispatches attachments with `instanceof`, so
+	// using a separate copy makes every model render as nothing at all.
+	"4.2": () => require("spine-pixi-v7-42"),
 };
 
 const ROOT = path.resolve(__dirname, "..");
@@ -54,16 +62,21 @@ function probeSkelBinary(file, atlasFile) {
 	// runtime instead of trusting whatever the parser hands back.
 	const version = detectFromBinary(raw);
 	const key = pickRuntime(version);
-	const order = [key, "4.1", "4.0", "3.8"];
+	// Detection from the bytes picks the matching runtime; the fallback order
+	// then walks progressively OLDER runtimes. 4.2 is included because
+	// Stellar Affinity ships 4.2.35, which no @pixi-spine runtime can read.
+	const order = [key, "4.2", "4.1", "4.0", "3.8"];
 
 	let data = null;
 	let lastErr = null;
+	let usedKey = null;
 	for (const rt of order) {
+		if (!RUNTIMES[rt]) continue;
 		try {
 			const mod = RUNTIMES[rt]();
 			const parser = new mod.SkeletonBinary(new mod.AtlasAttachmentLoader(atlas));
 			const d = parser.readSkeletonData(raw);
-			if (d?.bones?.length) { data = d; break; }
+			if (d?.bones?.length) { data = d; usedKey = rt; break; }
 		} catch (err) {
 			lastErr = err;
 		}
@@ -72,7 +85,10 @@ function probeSkelBinary(file, atlasFile) {
 
 	return {
 		spine: version?.raw || null,
-		runtime: key,
+		// Report the runtime that actually parsed the file, not the one the
+		// version string asked for — a mismatch here silently mislabels the
+		// model in the UI.
+		runtime: usedKey || key,
 		width: data.width,
 		height: data.height,
 		bones: data.bones?.length ?? 0,
@@ -320,6 +336,42 @@ const GAME_ROOTS = [
 		spineRuntime: null,
 		pmaDefault: false,
 	},
+	// Haze Reverb (com.tingzhou.cwcxtw.qooapp). Unity + IL2CPP + YooAsset.
+	//
+	// The APK is only a shell (954 files); all art is downloaded to
+	// /sdcard/Android/data/<pkg>/files/yoo/ResPackage/CacheFiles/<2hex>/<hash>/
+	// as `__data` (UnityFS) + `__info` — 12 GB across 4,004 bundles.
+	//
+	// Extracted by tools/extract-hazereverb.py, after
+	//   tools/hazereverb-find.sh  (grep binary `.skel` -> 300/4,004 bundles)
+	//   tools/hazereverb-pull.sh  (pull those to /srv/spine-assets/hazereverb-raw)
+	//
+	// DIFFERENCES FROM TENKAFUMA — do not copy that script's assumptions:
+	//   - Bundles are clean UnityFS. No stray byte before the magic, so the
+	//     extractor tries skip=0 first (skip=1 is only a fallback).
+	//   - No separate `_alpha` textures. Verified with
+	//     tools/hazereverb-probe.py: each page already carries its own alpha
+	//     (e.g. lihui_aertaiya_dz is 54.9% fully transparent), so NO mask
+	//     compositing is needed here.
+	//
+	// Asset naming:
+	//   dongzuo_juese_<name>.skel  characters (动作角色)
+	//   lihui_<name>_dz.skel       illustrations / CG (立绘)
+	// One bundle can hold several skeletons, so skeletons are paired to
+	// atlases by exact stem — a prefix match would swap
+	// `dongzuo_juese_aertaiya` with `dongzuo_juese_aertaiya_a` and scramble
+	// every region (the same trap TenkaFuma hit).
+	//
+	// Spine 3.8.99 — pixi-spine reads these directly.
+	// pmaDefault: false — atlases carry no `pma:` line and the PNGs are
+	// straight alpha.
+	{
+		match: "hazereverb",
+		key: "hazereverb",
+		label: "Haze Reverb",
+		spineRuntime: null,
+		pmaDefault: false,
+	},
 	// TenkaFuma (com.pinkcore.tkfm.erolabs). Unity IL2CPP + Addressables, but
 	// the APK carries almost nothing: the real art is 7.3 GB of bundles under
 	// /sdcard/Android/data/<pkg>/files/data/ (1,794 bundles). Only cb*/cg*/
@@ -332,11 +384,45 @@ const GAME_ROOTS = [
 	// Load with that byte stripped (the script tries skip=1 then skip=0 and
 	// sanity-checks the object count).
 	//
-	// pmaDefault: true — the atlases carry no `pma:` line, so this is a visual
-	// call. Verified side by side: with PMA off the models show a clear dark
-	// seam around hair and foliage; with PMA on the edges are clean. Set here
-	// so the whole game renders correctly by default.
-	{ match: "tenkafuma", key: "tenkafuma", label: "TenkaFuma", spineRuntime: null, pmaDefault: true },
+	// pmaDefault: false — the atlases carry no `pma:` line, and this is a
+	// visual call.
+	//
+	// It was `true` for a while, but that was compensating for a BUG, not a
+	// blending preference: the extractor used to export only the colour
+	// texture and drop its `_alpha` twin, so every page had no alpha at all
+	// and PMA-on was the least-bad way to hide the garbage.
+	//
+	// extract-tenkafuma.py now composites <page> + <page>_alpha into a real
+	// RGBA PNG, so the textures carry genuine straight alpha and PMA is no
+	// longer needed. User's call: PMA off.
+	{ match: "tenkafuma", key: "tenkafuma", label: "TenkaFuma", spineRuntime: null, pmaDefault: false },
+
+	// Stellar Affinity (com.himefun.stellaraffinity.erolabs, Erolabs).
+	// Unity Addressables pulled live from the device's own data dir:
+	//   /sdcard/Android/data/<pkg>/files/Android/Data/data/*_skeletondata.ab
+	// 97 skeleton bundles (~158 MB), extracted by tools/extract-stellar-affinity.py
+	// into assets/stellaraffinity/<model>/{<model>.skel,.atlas,N pages}.
+	//
+	// Spine 4.2.35 — NEWER than any @pixi-spine runtime ships (they stop at
+	// 4.1). Loaded through @esotericsoftware/spine-pixi-v7 instead; see
+	// SPINE_42_RUNTIME in spine-version.js.
+	//
+	// pmaDefault: true — every one of the 97 atlases declares `pma:true`.
+	//
+	// Multi-page is the norm, not the exception: c00001_01 declares 5 pages
+	// (2048²x2 + 1024²x3). Save every declared page.
+	//
+	// 20 models (a01*, some a05*) ship half-resolution pages — the atlas
+	// declares 512² while the texture is 256². That is a clean 2x integer
+	// ratio, so the viewer's upscale path handles it. Do NOT "fix" it by
+	// stretching.
+	{
+		match: "stellaraffinity",
+		key: "stellaraffinity",
+		label: "Stellar Affinity",
+		spineRuntime: "4.2",
+		pmaDefault: true,
+	},
 	// Bundled sample models. They live directly under assets/ and are not from
 	// any game — grouping them keeps "Lainnya" from meaning "demo".
 	{ match: "spineboy", key: "demo", label: "Demo" },

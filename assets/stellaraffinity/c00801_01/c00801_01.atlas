@@ -1,0 +1,352 @@
+c00801_01.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+background/bg2
+	bounds: 2, 2, 1500, 2040
+
+c00801_01_2.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+girl/anal_01
+	bounds: 1930, 1704, 113, 105
+	offsets: 0, 0, 114, 111
+girl/anal_07
+	bounds: 1352, 1904, 166, 142
+	offsets: 0, 6, 166, 149
+girl/anal_d_06
+	bounds: 1178, 1478, 195, 124
+	offsets: 1, 2, 199, 126
+girl/anal_u_06
+	bounds: 245, 977, 196, 92
+	offsets: 2, 0, 198, 92
+girl/analcum_07
+	bounds: 1775, 1109, 149, 142
+	offsets: 0, 0, 160, 142
+girl/arm_r_d
+	bounds: 1693, 1083, 123, 185
+girl/arm_u_r
+	bounds: 1819, 912, 227, 415
+	offsets: 0, 3, 249, 419
+girl/blush_04
+	bounds: 1036, 1955, 181, 91
+	offsets: 6, 6, 192, 105
+girl/body_d
+	bounds: 845, 949, 534, 517
+	rotate: 180
+girl/body_u
+	bounds: 1360, 1232, 494, 686
+	offsets: 0, 130, 544, 816
+	rotate: 90
+girl/braid_d_l
+	bounds: 464, 582, 325, 227
+girl/braid_d_r
+	bounds: 1240, 1980, 110, 66
+	offsets: 0, 0, 115, 68
+girl/braid_shadow
+	bounds: 284, 1396, 131, 172
+	offsets: 26, 0, 157, 172
+girl/braid_u_r
+	bounds: 101, 588, 198, 412
+	rotate: 270
+girl/breast
+	bounds: 772, 684, 273, 288
+	offsets: 0, 2, 273, 290
+girl/butt
+	bounds: 2, 1525, 769, 521
+girl/butt_blush
+	bounds: 1222, 679, 316, 378
+	offsets: 51, 13, 384, 393
+	rotate: 270
+girl/cape_l
+	bounds: 749, 1393, 653, 951
+	rotate: 270
+girl/cunt
+	bounds: 431, 809, 412, 333
+	offsets: 0, 0, 412, 336
+girl/ear_l
+	bounds: 1210, 555, 186, 213
+	offsets: 0, 0, 186, 215
+	rotate: 90
+girl/ear_r
+	bounds: 771, 533, 225, 190
+girl/eye_l_03_04_06
+	bounds: 1124, 2015, 26, 31
+girl/eye_l__01_02_05_07
+	bounds: 57, 2018, 26, 28
+	offsets: 0, 0, 27, 28
+girl/eye_r_03_04_06
+	bounds: 736, 2014, 34, 32
+	offsets: 1, 0, 35, 32
+girl/eye_r__01_02_05_07
+	bounds: 334, 2006, 48, 40
+girl/eyebrow_01_02_07
+	bounds: 771, 1813, 154, 58
+	offsets: 1, 0, 155, 58
+girl/eyebrow_03_04_06
+	bounds: 1892, 1681, 154, 56
+	offsets: 0, 2, 155, 59
+girl/eyebrow_05
+	bounds: 2, 1539, 120, 49
+girl/eyelash_l_01_02_05_07
+	bounds: 1525, 1942, 60, 40
+girl/eyelash_l_03_04_06
+	bounds: 1511, 1907, 54, 44
+	offsets: 0, 0, 55, 44
+girl/eyelash_r_01_02_05_07
+	bounds: 771, 1831, 98, 49
+	offsets: 0, 0, 99, 49
+girl/eyelash_r_03_04_06
+	bounds: 1056, 1926, 97, 53
+	offsets: 0, 0, 100, 53
+girl/eyelid_d_l
+	bounds: 382, 2008, 45, 38
+	offsets: 1, 3, 49, 42
+girl/eyelid_d_r
+	bounds: 1946, 1979, 99, 67
+	offsets: 2, 2, 101, 70
+girl/eyelid_u_l
+	bounds: 1512, 1975, 60, 71
+girl/eyelid_u_r
+	bounds: 1361, 1843, 99, 78
+	offsets: 5, 17, 105, 96
+girl/eyewhite_l
+	bounds: 427, 2017, 43, 29
+	offsets: 0, 0, 44, 29
+girl/eyewhite_r
+	bounds: 272, 2009, 66, 37
+girl/hair_1
+	bounds: 1951, 1809, 95, 166
+	offsets: 0, 0, 95, 167
+girl/hair_2
+	bounds: 1175, 1922, 62, 124
+girl/hair_3
+	bounds: 965, 603, 313, 314
+	rotate: 180
+girl/hair_d
+	bounds: 755, 1847, 199, 315
+	rotate: 90
+girl/hand_l
+	bounds: 704, 1184, 169, 207
+girl/hand_r
+	bounds: 1809, 650, 174, 261
+	offsets: 1, 2, 176, 264
+girl/hand_r_01
+	bounds: 1642, 502, 148, 231
+	rotate: 90
+girl/hat_d
+	bounds: 2, 496, 195, 246
+	offsets: 0, 0, 199, 246
+	rotate: 270
+girl/head
+	bounds: 1702, 1728, 265, 318
+	offsets: 0, 0, 275, 318
+girl/leg_l
+	bounds: 1375, 834, 432, 462
+	rotate: 180
+girl/leg_r
+	bounds: 2, 693, 411, 447
+	offsets: 0, 1, 411, 448
+	rotate: 90
+girl/mouth_01
+	bounds: 2, 1997, 57, 49
+	offsets: 1, 11, 60, 61
+girl/mouth_03
+	bounds: 704, 1986, 37, 60
+	offsets: 2, 0, 39, 60
+girl/mouth_05
+	bounds: 997, 2032, 42, 14
+girl/plush
+	bounds: 1403, 525, 307, 377
+	offsets: 0, 0, 460, 377
+	rotate: 270
+girl/saliva_03
+	bounds: 1189, 2011, 15, 35
+girl/tail
+	bounds: 2, 1067, 464, 700
+	rotate: 270
+girl/tongue_01
+	bounds: 1650, 2002, 39, 44
+girl/tongue_03
+	bounds: 1150, 2001, 38, 45
+
+c00801_01_3.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+man/dick_01
+	bounds: 1657, 1500, 179, 502
+	offsets: 1, 0, 180, 502
+man/dick_06
+	bounds: 1561, 1357, 142, 327
+	offsets: 50, 1, 194, 329
+	rotate: 90
+man/dick_07
+	bounds: 1237, 1434, 178, 323
+	offsets: 0, 0, 178, 379
+	rotate: 90
+man/mahand_l_02
+	bounds: 2, 1422, 530, 580
+	offsets: 1, 1, 532, 585
+man/mahand_l_02_tail
+	bounds: 534, 1470, 532, 530
+	rotate: 90
+man/manfinger_r_03
+	bounds: 936, 1838, 115, 164
+man/manhand_d_r_03
+	bounds: 1833, 1810, 113, 192
+	offsets: 0, 0, 114, 192
+	rotate: 180
+man/manhand_l_03
+	bounds: 1550, 1930, 111, 72
+man/manhand_l_04
+	bounds: 1053, 1838, 101, 164
+	offsets: 2, 0, 103, 164
+man/manhand_l_05
+	bounds: 534, 1332, 239, 305
+	rotate: 180
+man/manhand_l_06
+	bounds: 1347, 1608, 313, 394
+man/manhand_r_02
+	bounds: 1019, 1426, 340, 576
+man/manhand_u_r_03
+	bounds: 775, 1304, 199, 328
+	offsets: 0, 0, 200, 328
+	rotate: 270
+man/tailplug
+	bounds: 1938, 1926, 76, 64
+	rotate: 270
+
+c00801_01_4.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+mosaic/mosaic_01
+	bounds: 2, 2, 221, 618
+	offsets: 2, 1, 227, 619
+mosaic/mosaic_02
+	bounds: 223, 198, 219, 422
+	offsets: 0, 392, 219, 814
+mosaic/mosaic_03
+	bounds: 444, 352, 159, 268
+	offsets: 2, 3, 163, 272
+
+c00801_01_5.png
+	size: 2048, 2048
+	filter: Linear, Linear
+	pma: true
+vfx/cum_01
+	bounds: 948, 1866, 78, 114
+vfx/cum_02
+	bounds: 18, 1966, 127, 80
+vfx/cum_03
+	bounds: 1903, 1948, 34, 98
+vfx/cum_04
+	bounds: 675, 1986, 76, 60
+vfx/cum_05
+	bounds: 1038, 1919, 103, 173
+	rotate: 270
+vfx/cum_06
+	bounds: 1608, 1807, 135, 69
+	offsets: 1, 0, 136, 69
+vfx/cum_07
+	bounds: 1778, 1867, 140, 179
+vfx/cum_08
+	bounds: 1093, 1711, 281, 335
+	rotate: 180
+vfx/cum_09
+	bounds: 1316, 1677, 209, 369
+	offsets: 0, 0, 210, 369
+vfx/cum_10
+	bounds: 1472, 1860, 86, 245
+	rotate: 90
+vfx/cum_11
+	bounds: 888, 1980, 67, 40
+vfx/cum_12
+	bounds: 1401, 1953, 112, 93
+vfx/cum_13
+	bounds: 1341, 1988, 39, 58
+vfx/cum_14
+	bounds: 1366, 1995, 27, 51
+vfx/cum_15
+	bounds: 176, 2013, 16, 33
+vfx/cum_16
+	bounds: 194, 2019, 16, 27
+vfx/cum_17
+	bounds: 110, 1971, 65, 75
+	offsets: 3, 0, 69, 76
+vfx/cum_18
+	bounds: 2007, 1969, 28, 77
+vfx/cum_19
+	bounds: 212, 2021, 13, 25
+vfx/cum_20
+	bounds: 1934, 1983, 26, 63
+	offsets: 1, 0, 27, 63
+vfx/cum_21
+	bounds: 621, 1981, 22, 65
+vfx/cum_22
+	bounds: 2, 1981, 16, 65
+vfx/smoke_1
+	bounds: 435, 2008, 37, 38
+vfx/smoke_2
+	bounds: 483, 1974, 71, 72
+vfx/smoke_3
+	bounds: 1515, 1944, 101, 102
+vfx/smoke_4
+	bounds: 556, 1981, 63, 65
+vfx/smoke_5
+	bounds: 1618, 1944, 100, 102
+vfx/sweat_01
+	bounds: 18, 2026, 12, 20
+vfx/sweat_02
+	bounds: 226, 2025, 10, 21
+vfx/sweat_03
+	bounds: 146, 2028, 6, 18
+vfx/sweat_04
+	bounds: 749, 2009, 19, 37
+vfx/sweat_05
+	bounds: 32, 2027, 11, 19
+vfx/sweat_06
+	bounds: 238, 2031, 10, 15
+vfx/sweat_07
+	bounds: 409, 2019, 11, 27
+vfx/sweat_08
+	bounds: 1289, 2003, 24, 43
+vfx/sweat_09
+	bounds: 1012, 2001, 24, 45
+vfx/sweat_10
+	bounds: 1777, 1979, 67, 108
+	rotate: 90
+vfx/sweat_11
+	bounds: 1904, 1802, 71, 147
+	offsets: 0, 0, 72, 156
+vfx/sweat_12
+	bounds: 1703, 1789, 87, 257
+	offsets: 1, 0, 88, 258
+vfx/sweat_13
+	bounds: 1064, 1852, 98, 108
+	offsets: 1, 0, 99, 110
+vfx/sweat_14
+	bounds: 1871, 1920, 126, 140
+	offsets: 0, 1, 126, 141
+	rotate: 270
+vfx/sweat_15
+	bounds: 1975, 1823, 71, 138
+	offsets: 0, 0, 76, 140
+vfx/sweat_16
+	bounds: 2, 1920, 76, 62
+	offsets: 0, 0, 79, 62
+vfx/sweat_17
+	bounds: 713, 1886, 160, 236
+	rotate: 90
+vfx/water_01
+	bounds: 2, 1400, 622, 646
+vfx/water_02
+	bounds: 1933, 1762, 95, 129
+vfx/water_03
+	bounds: 569, 1848, 142, 198
+vfx/water_04
+	bounds: 593, 1440, 606, 564
+	offsets: 0, 1, 606, 565
+	rotate: 270
