@@ -8,6 +8,11 @@ public/dist/
 public/thumbs/
 public/exports/
 
+# ...but the game icons are small, hand-curated art that cannot be regenerated
+# by fetching, so they are tracked. Only this subdirectory is un-ignored.
+!public/thumbs/_game/
+!public/thumbs/_game/**
+
 # Python bytecode
 __pycache__/
 *.py[cod]

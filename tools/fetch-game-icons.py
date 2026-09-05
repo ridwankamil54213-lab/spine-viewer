@@ -33,6 +33,13 @@ GAMES = [
     # Shoujou Kaisen's icon comes out of the APK instead of the web:
     # res/drawable-xxhdpi-v11/licon.png in com.onemt.and.shoujokaisen.apk
     # (see tools/shoujoukaisen/README.md). Left out of GAMES on purpose.
+    #
+    # Stellar Affinity and Haze Reverb are also APK-only, and neither has a
+    # plain res/ icon at all — both are Unity/IL2CPP builds that keep the
+    # launcher art inside resources.arsc under an obfuscated name
+    # (res/oj.png and res/dK.png respectively). Find it with:
+    #     from pyaxmlparser import APK; APK(path).get_app_icon()
+    # then unzip that entry. Left out of GAMES on purpose.
 ]
 
 
