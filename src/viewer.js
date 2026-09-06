@@ -1019,6 +1019,7 @@ async function loadModel(model) {
 			let current = null;
 			let pending = null;   // {x, y, w, h}
 			let rotated = false;
+			let seenRotate = false;   // format lama: `rotate:` muncul sebelum xy/size
 			const flush = () => {
 				if (current !== pageName || !pending) return false;
 				const { x, y, w, h } = pending;
@@ -1033,15 +1034,52 @@ async function loadModel(model) {
 					current = s;
 					pending = null;
 					rotated = false;
+					seenRotate = false;
 					continue;
 				}
 				const b = s.match(/^bounds:\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
 				if (b) {
+					// Flush the PREVIOUS region before buffering this one. Skipping
+					// this meant only the last region of a page was ever tested: a
+					// page whose final region happens to fit reported no overflow
+					// even when 16 of its 24 regions sat outside the file, so the
+					// rescue path below never ran (DotAbyss AIBoss2018101_1).
+					if (flush()) return true;
+					// `rotate:` belongs to ONE region, so clear it on every new
+					// `bounds:`. Leaving it set leaked the first region's rotation
+					// onto every later one — an unrotated region then measured
+					// transposed and looked like it overflowed a healthy page,
+					// which blurred those pages by rescaling them for nothing.
+					rotated = false;
+					seenRotate = false;
 					const [, x, y, w, h] = b.map(Number);
 					pending = { x, y, w, h };
 					continue;
 				}
-				if (/^rotate:\s*(90|270|true)/i.test(s)) rotated = true;
+				// Legacy atlas format: `xy:` + `size:` instead of `bounds:`, and
+				// `rotate:` comes BEFORE them. Roughly 74% of this collection
+				// (10.9k of 14.7k atlases) uses it, so without this branch the
+				// overflow test silently saw zero regions on most games.
+				const xy = s.match(/^xy:\s*(\d+)\s*,\s*(\d+)\s*$/i);
+				if (xy) {
+					if (flush()) return true;
+					rotated = seenRotate;
+					seenRotate = false;
+					pending = { x: Number(xy[1]), y: Number(xy[2]), w: 0, h: 0 };
+					continue;
+				}
+				// Only the region's `size:` completes a legacy block; the page's
+				// own `size:` sits directly under the page name, before any `xy:`.
+				const sz = s.match(/^size:\s*(\d+)\s*,\s*(\d+)\s*$/i);
+				if (sz && pending && pending.w === 0 && pending.h === 0) {
+					pending.w = Number(sz[1]);
+					pending.h = Number(sz[2]);
+					continue;
+				}
+				if (/^rotate:\s*(90|270|true)/i.test(s)) {
+					rotated = true;
+					seenRotate = true;
+				}
 			}
 			return flush();
 		};
@@ -1097,10 +1135,11 @@ async function loadModel(model) {
 					// pages sit at 0.83-2.95 and stay skipped).
 					const ratio = Math.max(rx, ry);
 					const aspectGap = Math.abs(Math.log(rx / ry));
+					const over = overflowsPage(pageName, bt);
 					if (ratio > 1.01 && ratio <= 8) {
 						if (aspectGap < 0.02) {
 							bt = upscaleBaseTexture(bt, ratio);
-						} else if (aspectGap < 0.45 && overflowsPage(pageName, bt)) {
+						} else if (aspectGap < 0.45 && over) {
 							bt = upscaleBaseTexture(bt, rx, ry);
 						}
 					}
