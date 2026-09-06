@@ -1,206 +1,276 @@
 #!/usr/bin/env python3
-"""Rebuild the Brown Dust 2 asset tree into one symlink farm.
+"""Relayout Brown Dust 2 assets into a per-character tree.
 
-Target layout (mirrors Jelosus2/BD2-L2D-Viewer's src/assets/spines/):
+Structure produced (three levels):
 
-    /srv/spine-assets/bd2/
-      char/char000101/            <- model (Utama)
-      char/char000101/cutscene/   <- variant "Cutscene"
-      char/char000502/            <- model
-      char/char000502/censored/   <- variant "Censored"
-      npc/npc000001/              <- model
-      illust/illust_dating/illust_dating1/
-      misc/colosseumskip/
-      avatar/body/avatarbodyaccessory_1006/
+    <Karakter>/<Costume>/<Jenis>/
 
-Nothing is moved or copied: every leaf is a symlink to the original file, so
-disk usage is unchanged and the original dump stays authoritative.
+e.g. Justia/Blood_Glutton/Karakter/char000203.skel
+     Justia/Blood_Glutton/Skill Cutscene/cutscene_char000203.skel
+     Justia/Blood_Glutton/Interaction/illust_dating3.skel
 
-This is IDEMPOTENT — rerunning it rebuilds the tree from the current source.
+The character/costume pair comes from the Zormolo/Brown-Dust-2-Assets
+repo, which is the only source that maps an opaque asset id (char000203)
+onto a character AND a costume. The character/costume NAMES shown in the
+UI still come from data/bd2-names.json, which already covers 395 assets.
+
+WHY FILES ARE COPIED INTO THE COSTUME FOLDER
+--------------------------------------------
+The viewer only builds a "family" (main model + variant dropdown) when the
+parent folder is itself a model -- see rootOf() in src/server.js, which
+requires `ids.has(parent)`. If the layout were
+`Justia/Blood_Glutton/Karakter/...`, then `Justia` and `Justia/Blood_Glutton`
+would hold no .skel of their own, no parent id would resolve, and every
+model would render as an unrelated top-level entry.
+
+So the character model is placed directly in the costume folder, making
+that folder the family root; each variant type becomes a subfolder under
+it. Same trick the existing Nikke layout relies on (c010/ holds c010_00.skel
+and also c010/aim/).
+
+Symlinks are used rather than copies: the collection is several GB and the
+source tree stays authoritative.
+
+Usage:
+    python3 tools/relayout-bd2.py            # write into assets/bd2-char/
+    python3 tools/relayout-bd2.py --dry-run  # print the plan only
 """
+import argparse
+import json
 import os
 import re
-import shutil
 import sys
+from collections import defaultdict
+from pathlib import Path
 
-SRC = "/srv/spine-assets/bd2-assets/spine"
-DST = "/srv/spine-assets/bd2"
+REPO = Path(__file__).resolve().parent.parent
+REF = Path("/srv/bd2ref/assets/spine")
+OWN = Path("/srv/spine-assets/bd2")
+NAMES = REPO / "data" / "bd2-names.json"
+DEST = REPO / "assets" / "bd2-char"
 
-CHAR = os.path.join(SRC, "char")
-CUT = os.path.join(SRC, "cutscenes")
-NPC = os.path.join(SRC, "npc")
-ILLUST = os.path.join(SRC, "illust")
-MISC = os.path.join(SRC, "misc")
-AVATAR = os.path.join(SRC, "avatar")
+# Categories in the reference repo, most specific first. An asset id can
+# appear in more than one; the first match wins.
+CATEGORIES = [
+    "character",
+    "skill_cutscene",
+    "interaction",
+    "light_novel_talk",
+    "npc",
+    "miscellaneous",
+    "special_animation",
+]
 
-MODEL_EXT = (".skel", ".json", ".atlas", ".png", ".webp", ".jpg", ".jpeg", ".txt")
+# How each category is labelled in the viewer's variant dropdown.
+JENIS = {
+    "character": "Karakter",
+    "skill_cutscene": "Skill Cutscene",
+    "interaction": "Interaction",
+    "light_novel_talk": "Light Novel Talk",
+    "npc": "NPC",
+    "miscellaneous": "Lainnya",
+    "special_animation": "Special Animation",
+    "censored": "Tersensor",
+}
 
-stats = {"models": 0, "links": 0, "skipped": 0, "missing": [], "empty": []}
 
-
-def reset(dst):
-    if os.path.isdir(dst) and not os.path.islink(dst):
-        shutil.rmtree(dst)
-    elif os.path.exists(dst):
-        os.remove(dst)
-
-
-def walk_group(src_dir, dst_dir, label):
-    """Recursively mirror a group whose nesting depth varies; any directory
-    holding a skeleton+atlas pair becomes a model."""
-    found = 0
-    for root, dirs, files in os.walk(src_dir):
-        dirs.sort()
-        lower = [f.lower() for f in files]
-        has_skel = any(f.endswith((".skel", ".json")) for f in lower)
-        has_atlas = any(f.endswith((".atlas", ".txt")) for f in lower)
-        if not (has_skel and has_atlas):
+def build_reference_map():
+    """asset id -> (category, character, costume) from the reference repo."""
+    ref = {}
+    for cat in CATEGORIES:
+        d = REF / cat
+        if not d.exists():
             continue
-        rel = os.path.relpath(root, src_dir)
-        target = os.path.join(dst_dir, rel) if rel != "." else dst_dir
-        if link_tree(root, target, f"{label}/{rel}"):
-            found += 1
-    return found
+        for skel in d.rglob("*.skel"):
+            parts = skel.relative_to(d).parts
+            ch = parts[0] if len(parts) >= 2 else None
+            co = parts[1] if len(parts) >= 3 else None
+            # First (most specific) category wins.
+            if skel.stem not in ref:
+                ref[skel.stem] = (cat, ch, co)
+    return ref
 
 
-def ensure(path):
-    os.makedirs(path, exist_ok=True)
+def model_dirs():
+    """Every directory under the BD2 tree that holds a .skel, with its files."""
+    out = []
+    for skel in sorted(OWN.rglob("*.skel")):
+        out.append(skel.parent)
+    return out
 
 
-def link_tree(src_dir, dst_dir, label):
-    """Symlink every asset file in src_dir (non-recursive) into dst_dir.
-    Returns True if at least one skeleton+atlas pair was linked."""
-    try:
-        names = sorted(os.listdir(src_dir))
-    except OSError as e:
-        stats["missing"].append(f"{label}: {e}")
-        return False
+def asset_key(d: Path):
+    """Asset id for a model folder, folding cutscene/censored onto the parent.
 
-    files = [
-        n for n in names
-        if n.lower().endswith(MODEL_EXT)
-        and os.path.isfile(os.path.join(src_dir, n))
-    ]
-    if not files:
-        # A folder holding only bg/ textures has no skeleton — it was never a
-        # model, so count it as empty rather than broken.
-        stats["empty"].append(label)
-        return False
+    Mirrors bd2AssetKey() in src/server.js so the relayout and the name
+    lookup agree on what an asset is called.
+    """
+    name = d.name
+    if name in ("cutscene", "censored"):
+        return d.parent.name
+    return name
 
-    ensure(dst_dir)
-    for n in files:
-        s = os.path.join(src_dir, n)
-        d = os.path.join(dst_dir, n)
-        if os.path.lexists(d):
-            os.remove(d)
-        os.symlink(s, d)
-        stats["links"] += 1
 
-    has_skel = any(n.lower().endswith((".skel", ".json")) for n in files)
-    has_atlas = any(n.lower().endswith((".atlas", ".txt")) for n in files)
-    if not (has_skel and has_atlas):
-        stats["missing"].append(f"{label}: incomplete (skel={has_skel} atlas={has_atlas})")
-        return False
-    return True
+def variant_of(d: Path):
+    """Which variant a folder holds, or None for the main model.
+
+    A nested `cutscene`/`censored` folder holds the SAME asset as its
+    parent but a different variant. Without this, char000101/ and
+    char000101/cutscene/ both resolved to the character slot and the
+    second one silently overwrote the first.
+    """
+    name = d.name.lower()
+    if name == "cutscene":
+        return "skill_cutscene"
+    if name == "censored":
+        return "censored"
+    return None
+
+
+# Label for the extra variants that live in nested folders, and for the
+# "_c" (censored) asset suffix some standalone folders carry.
+VARIANT_LABEL = {
+    "censored": "Tersensor",
+}
+
+
+def slug(s: str) -> str:
+    """Filesystem-safe folder name."""
+    return re.sub(r"[^\w.\-]+", "-", s).strip("-")
 
 
 def main():
-    reset(DST)
-    ensure(DST)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--dest", default=str(DEST))
+    args = ap.parse_args()
 
-    chars = sorted(os.listdir(CHAR)) if os.path.isdir(CHAR) else []
-    cuts = sorted(os.listdir(CUT)) if os.path.isdir(CUT) else []
+    dest = Path(args.dest)
+    ref = build_reference_map()
+    names = json.loads(NAMES.read_text()) if NAMES.exists() else {}
 
-    # ---- characters -----------------------------------------------------
-    # Censored variants (char000502_c) become "censored/" under their base.
-    censored = {c[:-2]: c for c in chars if c.endswith("_c")}
-    plain = [c for c in chars if not c.endswith("_c")]
+    dirs = model_dirs()
+    print(f"folder model ditemukan : {len(dirs)}")
+    print(f"kamus referensi        : {len(ref)} id")
+    print(f"kamus nama             : {len(names)} entri")
 
-    for c in plain:
-        dst = os.path.join(DST, "char", c)
-        if link_tree(os.path.join(CHAR, c), dst, f"char/{c}"):
-            stats["models"] += 1
-        base = os.path.basename(c)
-        if base in censored:
-            src_c = os.path.join(CHAR, censored[base])
-            if os.path.isdir(os.path.join(CHAR, censored[base], )):
-                pass
-            if link_tree(src_c, os.path.join(dst, "censored"), f"char/{c}/censored"):
-                stats["models"] += 1
-
-    # ---- cutscenes nested under their character -------------------------
-    # cutscene_char000101 -> char/char000101/cutscene
-    # Some source folders hold only bg/ textures and no skeleton — they were
-    # never renderable models, so skip them instead of crying about them.
-    orphan_cut = []
-    empties = []
-    for cut in cuts:
-        m = re.search(r"char(\d{6})", cut)
-        parent = "char" + m.group(1) if m else None
-        if parent and parent in plain:
-            dst = os.path.join(DST, "char", parent, "cutscene")
-            if link_tree(os.path.join(CUT, cut), dst, f"cutscene->{parent}"):
-                stats["models"] += 1
-            else:
-                empties.append(f"{cut} (induk {parent})")
-        else:
-            orphan_cut.append(cut)
-
-    # Orphans keep their own folder under cutscene/ so nothing is lost.
-    for cut in orphan_cut:
-        dst = os.path.join(DST, "cutscene", cut)
-        if link_tree(os.path.join(CUT, cut), dst, f"cutscene-orphan/{cut}"):
-            stats["models"] += 1
-
-    # ---- npc ------------------------------------------------------------
-    for n in sorted(os.listdir(NPC)) if os.path.isdir(NPC) else []:
-        if not os.path.isdir(os.path.join(NPC, n)):
+    planned = []
+    unmapped = []
+    seen = set()          # (char, costume, jenis) -> guard against collisions
+    for d in dirs:
+        key = asset_key(d)
+        hit = ref.get(key)
+        if not hit:
+            # Retry with the skeleton stem -- a folder can hold several
+            # models (multi-stem), and the stem is the true asset id.
+            stems = {s.stem for s in d.glob("*.skel")}
+            for st in sorted(stems):
+                if st in ref:
+                    hit = ref[st]
+                    key = st
+                    break
+        # A bare *_c folder is the censored twin of the asset without the
+        # suffix. It has no entry of its own in the reference repo.
+        nested = variant_of(d)
+        if not hit and nested and key.endswith("_c"):
+            hit = ref.get(key[:-2])
+            if hit:
+                cat, ch, co = hit
+                hit = ("censored", ch, co)
+        if not hit:
+            unmapped.append((key, str(d.relative_to(OWN))))
             continue
-        if link_tree(os.path.join(NPC, n), os.path.join(DST, "npc", n), f"npc/{n}"):
-            stats["models"] += 1
+        cat, ch, co = hit
+        # A nested cutscene/censored folder overrides the category with its
+        # own variant, so it lands beside the main model instead of on top
+        # of it.
+        if nested:
+            cat = nested
+        if not ch:
+            unmapped.append((key, str(d.relative_to(OWN))))
+            continue
+        jenis = JENIS.get(cat, cat)
+        slot = (ch, co or "", jenis)
+        if slot in seen:
+            # Two source folders claim one destination (a leftover duplicate
+            # tree such as avatar/ vs illust/avatar/). Keep the first.
+            continue
+        seen.add(slot)
+        planned.append({
+            "src": d,
+            "key": key,
+            "cat": cat,
+            "char": ch,
+            "costume": co,
+        })
 
-    # ---- illust --------------------------------------------------------
-    # Nesting depth varies: illust_dating/illust_dating1 is one level, but
-    # illust/avatar/body/avatarbodyaccessory_1006 is two. Walk recursively and
-    # treat any directory holding a skeleton+atlas pair as a model.
-    if os.path.isdir(ILLUST):
-        for group in sorted(os.listdir(ILLUST)):
-            gsrc = os.path.join(ILLUST, group)
-            if not os.path.isdir(gsrc):
+    print(f"terpetakan             : {len(planned)}")
+    print(f"tak terpetakan         : {len(unmapped)}")
+
+    if args.dry_run:
+        print("\n=== contoh rencana ===")
+        for p in planned[:15]:
+            co = p["costume"] or "-"
+            j = "" if p["cat"] == "character" else "/" + JENIS.get(p["cat"], p["cat"])
+            print(f"  {p['char']}/{co}{j}  <- {p['src'].relative_to(OWN)}")
+        print("\n=== tak terpetakan ===")
+        for k, rel in unmapped:
+            print(f"  {k}  ({rel})")
+        return 0
+
+    dest.mkdir(parents=True, exist_ok=True)
+    made = 0
+    skipped = 0
+    for p in planned:
+        co = p["costume"]
+        parts = [slug(p["char"])]
+        if co:
+            parts.append(slug(co))
+        cat = p["cat"]
+        # The MAIN model (character) goes DIRECTLY in the costume folder, not
+        # in a "Karakter" subfolder of it. rootOf() in src/server.js only
+        # groups a variant under a parent when that parent is itself a model
+        # (`ids.has(parent)`), so the costume folder must hold a .skel for
+        # the cutscene/interaction variants to attach to it. Putting the main
+        # model in <costume>/Karakter/ would leave <costume>/ empty, no parent
+        # id would resolve, and every variant would render as an unrelated
+        # top-level entry.
+        if cat != "character":
+            parts.append(slug(JENIS.get(cat, cat)))
+        target = dest.joinpath(*parts)
+        # Skip junk folders: a directory literally named "*.atlas" holds no
+        # skeleton of its own and would produce an empty model entry.
+        if not any(f.suffix.lower() == ".skel" for f in p["src"].iterdir() if f.is_file()):
+            continue
+        try:
+            target.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            print(f"  GAGAL mkdir {target}: {e}")
+            skipped += 1
+            continue
+        for f in sorted(p["src"].iterdir()):
+            if not f.is_file():
                 continue
-            stats["models"] += walk_group(gsrc, os.path.join(DST, "illust", group), f"illust/{group}")
-
-    # ---- misc -----------------------------------------------------------
-    if os.path.isdir(MISC):
-        for leaf in sorted(os.listdir(MISC)):
-            lsrc = os.path.join(MISC, leaf)
-            if not os.path.isdir(lsrc):
+            link = target / f.name
+            if link.exists() or link.is_symlink():
                 continue
-            if link_tree(lsrc, os.path.join(DST, "misc", leaf), f"misc/{leaf}"):
-                stats["models"] += 1
+            try:
+                link.symlink_to(f)
+                made += 1
+            except OSError as e:
+                print(f"  GAGAL link {link}: {e}")
+                skipped += 1
 
-    # ---- avatar (nested: body/avatarbodyaccessory_1006) -----------------
-    if os.path.isdir(AVATAR):
-        for group in sorted(os.listdir(AVATAR)):
-            gsrc = os.path.join(AVATAR, group)
-            if not os.path.isdir(gsrc):
-                continue
-            for leaf in sorted(os.listdir(gsrc)):
-                lsrc = os.path.join(gsrc, leaf)
-                if not os.path.isdir(lsrc):
-                    continue
-                if link_tree(lsrc, os.path.join(DST, "avatar", group, leaf), f"avatar/{group}/{leaf}"):
-                    stats["models"] += 1
+    print(f"\nsymlink dibuat : {made}")
+    print(f"dilewati       : {skipped}")
 
-    print(f"model   : {stats['models']}")
-    print(f"symlink : {stats['links']}")
-    print(f"masalah : {len(stats['missing'])}")
-    for m in stats["missing"][:20]:
-        print("   ", m)
-    print(f"kosong  : {len(stats['empty'])} (folder tanpa skeleton, dilewati)")
-    for m in stats["empty"][:10]:
-        print("   ", m)
-    return 0 if stats["models"] else 1
+    # Record what could not be mapped so it can be revisited later.
+    report = REPO / "data" / "bd2-unmapped.json"
+    report.write_text(json.dumps(
+        [{"key": k, "path": r} for k, r in sorted(unmapped)], indent=1, ensure_ascii=False
+    ))
+    print(f"laporan        : {report.relative_to(REPO)} ({len(unmapped)} entri)")
+    return 0
 
 
 if __name__ == "__main__":

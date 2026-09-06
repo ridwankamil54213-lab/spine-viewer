@@ -1,0 +1,278 @@
+[
+ {
+  "key": "Interaction",
+  "path": "misc/interaction"
+ },
+ {
+  "key": "RhythmHitAnim",
+  "path": "misc/rhythmhitanim"
+ },
+ {
+  "key": "avatarbodyaccessory_1006",
+  "path": "avatar/body/avatarbodyaccessory_1006"
+ },
+ {
+  "key": "avatarbodyaccessory_1006",
+  "path": "illust/avatar/body/avatarbodyaccessory_1006"
+ },
+ {
+  "key": "avatarbodyaccessory_1007",
+  "path": "avatar/body/avatarbodyaccessory_1007"
+ },
+ {
+  "key": "avatarbodyaccessory_1007",
+  "path": "illust/avatar/body/avatarbodyaccessory_1007"
+ },
+ {
+  "key": "char101601",
+  "path": "char/char101601"
+ },
+ {
+  "key": "colosseumskip",
+  "path": "misc/colosseumskip"
+ },
+ {
+  "key": "cutscene_char061303",
+  "path": "cutscene/cutscene_char061303"
+ },
+ {
+  "key": "event_bt",
+  "path": "misc/event_bt"
+ },
+ {
+  "key": "illust_dating16_c",
+  "path": "illust/illust_dating/illust_dating16_c"
+ },
+ {
+  "key": "illust_pack20",
+  "path": "misc/illust_pack20"
+ },
+ {
+  "key": "illust_special1",
+  "path": "illust/illust_special/illust_special1"
+ },
+ {
+  "key": "illust_special10",
+  "path": "illust/illust_special/illust_special10"
+ },
+ {
+  "key": "illust_special11",
+  "path": "illust/illust_special/illust_special11"
+ },
+ {
+  "key": "illust_special12",
+  "path": "illust/illust_special/illust_special12"
+ },
+ {
+  "key": "illust_special12.atlas",
+  "path": "illust/illust_special/illust_special12.atlas"
+ },
+ {
+  "key": "illust_special13",
+  "path": "illust/illust_special/illust_special13"
+ },
+ {
+  "key": "illust_special14",
+  "path": "illust/illust_special/illust_special14"
+ },
+ {
+  "key": "illust_special15",
+  "path": "illust/illust_special/illust_special15"
+ },
+ {
+  "key": "illust_special16",
+  "path": "illust/illust_special/illust_special16"
+ },
+ {
+  "key": "illust_special17",
+  "path": "illust/illust_special/illust_special17"
+ },
+ {
+  "key": "illust_special18",
+  "path": "illust/illust_special/illust_special18"
+ },
+ {
+  "key": "illust_special19",
+  "path": "illust/illust_special/illust_special19"
+ },
+ {
+  "key": "illust_special2",
+  "path": "illust/illust_special/illust_special2"
+ },
+ {
+  "key": "illust_special20_1",
+  "path": "illust/illust_special/illust_special20"
+ },
+ {
+  "key": "illust_special20_1",
+  "path": "illust/illust_special/illust_special20"
+ },
+ {
+  "key": "illust_special20_1",
+  "path": "illust/illust_special/illust_special20_1"
+ },
+ {
+  "key": "illust_special20_2",
+  "path": "illust/illust_special/illust_special20_2"
+ },
+ {
+  "key": "illust_special21",
+  "path": "illust/illust_special/illust_special21"
+ },
+ {
+  "key": "illust_special22",
+  "path": "illust/illust_special/illust_special22"
+ },
+ {
+  "key": "illust_special23",
+  "path": "illust/illust_special/illust_special23"
+ },
+ {
+  "key": "illust_special24",
+  "path": "illust/illust_special/illust_special24"
+ },
+ {
+  "key": "illust_special25",
+  "path": "illust/illust_special/illust_special25"
+ },
+ {
+  "key": "illust_special4",
+  "path": "illust/illust_special/illust_special4"
+ },
+ {
+  "key": "illust_special5",
+  "path": "illust/illust_special/illust_special5"
+ },
+ {
+  "key": "illust_special52",
+  "path": "illust/illust_special/illust_special52"
+ },
+ {
+  "key": "illust_special6",
+  "path": "illust/illust_special/illust_special6"
+ },
+ {
+  "key": "illust_special7_1",
+  "path": "illust/illust_special/illust_special7_1"
+ },
+ {
+  "key": "illust_special7_2",
+  "path": "illust/illust_special/illust_special7_2"
+ },
+ {
+  "key": "illust_special7_3",
+  "path": "illust/illust_special/illust_special7_3"
+ },
+ {
+  "key": "illust_special7_4",
+  "path": "illust/illust_special/illust_special7_4"
+ },
+ {
+  "key": "illust_special7_5",
+  "path": "illust/illust_special/illust_special7_5"
+ },
+ {
+  "key": "illust_special8",
+  "path": "illust/illust_special/illust_special8"
+ },
+ {
+  "key": "illust_special9",
+  "path": "illust/illust_special/illust_special9"
+ },
+ {
+  "key": "npc300702",
+  "path": "npc/npc300702"
+ },
+ {
+  "key": "npc400002",
+  "path": "npc/npc400002"
+ },
+ {
+  "key": "npc400011",
+  "path": "npc/npc400011"
+ },
+ {
+  "key": "pvpskip",
+  "path": "misc/pvpskip"
+ },
+ {
+  "key": "specialillust116",
+  "path": "illust/illust_special/specialillust116"
+ },
+ {
+  "key": "specialillust117",
+  "path": "illust/illust_special/specialillust117"
+ },
+ {
+  "key": "specialillust130",
+  "path": "illust/illust_special/specialillust130"
+ },
+ {
+  "key": "specialillust131",
+  "path": "illust/illust_special/specialillust131"
+ },
+ {
+  "key": "specialillust135",
+  "path": "illust/illust_special/specialillust135"
+ },
+ {
+  "key": "specialillust140",
+  "path": "illust/illust_special/specialillust140"
+ },
+ {
+  "key": "specialillust143",
+  "path": "illust/illust_special/specialillust143"
+ },
+ {
+  "key": "specialillust144",
+  "path": "illust/illust_special/specialillust144"
+ },
+ {
+  "key": "specialillust171",
+  "path": "illust/illust_special/specialillust171"
+ },
+ {
+  "key": "specialillust175",
+  "path": "illust/illust_special/specialillust175"
+ },
+ {
+  "key": "specialillust181",
+  "path": "illust/illust_special/specialillust181"
+ },
+ {
+  "key": "specialillust194",
+  "path": "illust/illust_special/specialillust194"
+ },
+ {
+  "key": "specialillust195",
+  "path": "illust/illust_special/specialillust195"
+ },
+ {
+  "key": "specialillust216",
+  "path": "illust/illust_special/specialillust216"
+ },
+ {
+  "key": "specialillust51",
+  "path": "illust/illust_special/specialillust51"
+ },
+ {
+  "key": "specialillust60",
+  "path": "illust/illust_special/specialillust60"
+ },
+ {
+  "key": "specialillust64",
+  "path": "illust/illust_special/specialillust64"
+ },
+ {
+  "key": "specialillust65",
+  "path": "illust/illust_special/specialillust65"
+ },
+ {
+  "key": "specialillust80",
+  "path": "illust/illust_special/specialillust80"
+ },
+ {
+  "key": "storypack2_2",
+  "path": "misc/storypack2_2"
+ }
+]

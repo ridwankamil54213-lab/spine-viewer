@@ -611,8 +611,19 @@ function attachFamilies(models) {
 		// name, anything else is title-cased as before.
 		const labelFor = (id) => {
 			if (id === root) return "Utama";
-			const seg = id.slice(root.length + 1);
-			return VARIANT_LABELS[seg.toLowerCase()] || title(seg);
+			// A folder holding several models carries a "#<stem>" suffix
+			// (Skill-Cutscene#cutscene_char004091). The stem distinguishes
+			// siblings in the library but reads as noise in the dropdown, so
+			// show only what sets them apart: the "_1" / "_c" tail of the
+			// stem. Twins then read "Skill Cutscene" and "Skill Cutscene C".
+			const seg = id.slice(root.length + 1).split("#")[0];
+			const stem = id.split("#")[1] || "";
+			// Only a SHORT tail is a variant marker ("_1", "_c"); a long one
+			// is part of the asset id itself (cutscene_char004091), and
+			// printing it produced "Skill Cutscene CHAR004091".
+			const tail = stem.match(/_([a-z0-9]{1,2})$/i);
+			const label = tail ? `${seg} ${tail[1].toUpperCase()}` : seg;
+			return VARIANT_LABELS[label.toLowerCase()] || title(label);
 		};
 
 		m.family = {
@@ -1137,7 +1148,16 @@ function loadCatShinobiNames() {
  * so the nested variant folders have to be folded back onto their parent.
  * Some ids also carry a "#<stem>" suffix (several models sharing one folder).
  */
-function bd2AssetKey(modelId) {
+function bd2AssetKey(modelId, skeletonFile) {
+	// After the per-character relayout the folders are named after the
+	// CHARACTER and COSTUME ("Justia/Blood_Glutton/Skill-Cutscene"), not
+	// after the asset, so the folder name no longer resolves against
+	// bd2-names.json. The skeleton's own filename still carries the real
+	// asset id ("cutscene_char000203.skel"), so prefer it when present.
+	if (skeletonFile) {
+		const stem = skeletonFile.replace(/\.(skel|json)$/i, "");
+		if (stem) return stem;
+	}
 	const parts = modelId.split("/").map((p) => p.split("#")[0]);
 	const leaf = parts[parts.length - 1];
 	if (leaf === "cutscene") return parts[parts.length - 2] || leaf;
@@ -1223,7 +1243,7 @@ function attachCharacters(models) {
 	let bd2Hits = 0;
 	for (const m of models) {
 		if ((m.game || "") !== "bd2") continue;
-		const leaf = bd2AssetKey(m.id);
+		const leaf = bd2AssetKey(m.id, m.skeletonFile);
 		const rec = bd2[leaf];
 		if (!rec) continue;
 		const char = (rec.char || "").trim();
@@ -1251,18 +1271,37 @@ function attachCharacters(models) {
 		// rebuilding it from costumeId printed nonsense like
 		// "Roche (Npc) (char000001)" for a model whose folder is npc000001.
 		// Fall back to the model's own folder name.
-		// A variant folder (cutscene/, censored/) has no asset name of its
-		// own, so use the parent folder plus the variant name —
-		// "char000101/cutscene" -> "cutscene_char000101".
-		const parts = m.id.split("/").map((p) => p.split("#")[0]);
-		const suffix = parts[parts.length - 1];
-		const shown =
-			suffix === "cutscene"
-				? `cutscene_${parts[parts.length - 2]}`
-				: suffix === "censored"
-					? `${parts[parts.length - 2]}_c`
-					: suffix;
-		m.name = costume && char ? `${char} — ${costume} (${shown})` : `${char || costume} (${shown})`;
+		// The per-character relayout already names every folder after the
+		// character and costume ("Anastasia/Fire_Graffiti"), so the generated
+		// name would just repeat the path -- "Anastasia — Fire Graffiti
+		// (Fire_Graffiti)". Keep the readable path for that tree and only
+		// substitute real names on the original id-based layout.
+		// A variant folder (Skill-Cutscene) has no asset name of its own, so
+		// show the character name it resolved to instead of its folder.
+		const inCharTree = m.id.startsWith("bd2-char/");
+		if (inCharTree) {
+			const segs = m.id.split("/").map((p) => p.split("#")[0]);
+			const leaf = segs[segs.length - 1];
+			const isVariant = leaf.startsWith("Skill-") || leaf.startsWith("Light-")
+				|| leaf === "Interaction" || leaf === "NPC" || leaf === "Tersensor";
+			const pretty = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+			m.name = isVariant
+				? `${char} — ${costume ? costume + " · " : ""}${pretty(leaf)}`
+				: segs.slice(1).map(pretty).join(" › ");
+		} else {
+			// A variant folder (cutscene/, censored/) has no asset name of its
+			// own, so use the parent folder plus the variant name —
+			// "char000101/cutscene" -> "cutscene_char000101".
+			const parts = m.id.split("/").map((p) => p.split("#")[0]);
+			const suffix = parts[parts.length - 1];
+			const shown =
+				suffix === "cutscene"
+					? `cutscene_${parts[parts.length - 2]}`
+					: suffix === "censored"
+						? `${parts[parts.length - 2]}_c`
+						: suffix;
+			m.name = costume && char ? `${char} — ${costume} (${shown})` : `${char || costume} (${shown})`;
+		}
 		bd2Hits++;
 	}
 
