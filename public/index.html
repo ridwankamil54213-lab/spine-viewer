@@ -75,6 +75,7 @@
 	<!-- ================= STAGE ================= -->
 	<section class="stage">
 		<div id="canvas-wrap" class="canvas-wrap">
+			<div id="stage-bg" class="stage-bg" data-bg="dark" aria-hidden="true"></div>
 			<div id="grid" class="grid" aria-hidden="true"></div>
 
 			<div id="empty" class="empty">
@@ -267,6 +268,18 @@
 
 				<button id="flip-btn" class="btn btn-toggle" data-on="false" title="Balik horizontal">Balik</button>
 				<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
+				<div class="bg-group" role="group" aria-label="Warna latar">
+					<button id="bg-btn" class="btn btn-toggle" data-on="false" title="Ganti warna latar (L)">Latar</button>
+					<select id="bg-select" class="btn btn-select" aria-label="Pilih warna latar"
+						title="Warna latar — berguna untuk memeriksa tepi dan PMA">
+						<option value="dark">Gelap</option>
+						<option value="grey">Abu-abu</option>
+						<option value="light">Terang</option>
+						<option value="checker">Papan catur</option>
+						<option value="magenta">Magenta</option>
+						<option value="green">Hijau</option>
+					</select>
+				</div>
 				<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
 				<button id="fullscreen-btn" class="btn btn-toggle" data-on="false" aria-label="Layar penuh" title="Layar penuh (F)">
 					<svg viewBox="0 0 24 24" class="icon"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
@@ -356,6 +369,12 @@
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+<!-- Cubism 4 core runtime. Must load BEFORE the viewer bundle: pixi-live2d-display
+     resolves `Live2DCubismCore` from the global scope and its startUpWithRetry()
+     gives up with "Failed to start up Cubism 4 framework" if it is not there yet.
+     This is the official Live2D binary, not the npm package (which ships the
+     Cubism 3 core and lacks the Memory API). -->
+<script src="/vendor/live2dcubismcore.min.js"></script>
 <script src="/dist/viewer.js"></script>
 </body>
 </html>

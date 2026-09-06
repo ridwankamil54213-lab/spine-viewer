@@ -172,17 +172,11 @@ function countAtlasPages(file) {
 }
 
 function dirBytes(dir) {
-	let total = 0;
-	const walk = (d) => {
-		for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-			const p = path.join(d, e.name);
-			if (e.isDirectory()) walk(p);
-			else if (e.isFile()) total += fs.statSync(p).size;
-		}
-	};
-	walk(dir);
-	return total;
+	// Sizes come from the single scanTree() walk; this is only a lookup.
+	return dirBytesCache.get(dir) || 0;
 }
+/** Folder size cache, cleared whenever the asset tree changes. */
+const dirBytesCache = new Map();
 
 /**
  * Maps a top-level asset folder to the game it belongs to.
@@ -397,6 +391,33 @@ const GAME_ROOTS = [
 	// longer needed. User's call: PMA off.
 	{ match: "tenkafuma", key: "tenkafuma", label: "TenkaFuma", spineRuntime: null, pmaDefault: false },
 
+	// Dragon Travelers / 龙魂旅人 (com.gametree.lhlr.gp, GameTree).
+	// Pulled from the device at:
+	//   /sdcard/Android/data/com.gametree.lhlr.gp/files/res_update/model/*.b
+	//
+	// GOTCHA (cost me a while): these bundles carry a NESTED fake header —
+	// the string "UnityFS" appears TWO or THREE times, and the real one is
+	// the LAST occurrence. Stripping only up to the second signature leaves
+	// a bogus header behind and UnityPy fails with the misleading
+	// "Position cannot be negative", which looks like encryption but is not.
+	// Use raw.rfind(b"UnityFS"), not find(..., 1).
+	//
+	// There is NO UnityCN encryption here — once the fake header is stripped
+	// correctly, all 53 bundles parse. (UnityPy's brute_force_key returns
+	// None for this game; the "assetbundle_decrypt_key" hints are red flags
+	// from the truncated header, not real encryption.)
+	//
+	// Skeleton (.skel/.atlas, as TextAsset) and page (.png, as Texture2D)
+	// live in SEPARATE bundles, so extraction must join them by name.
+	// Spine 4.1.23. Extracted by /root/dt/extract_lhlr.py.
+	{
+		match: "dragontravelers",
+		key: "dragontravelers",
+		label: "Dragon Travelers",
+		spineRuntime: "4.1",
+		pmaDefault: false,
+	},
+
 	// Stellar Affinity (com.himefun.stellaraffinity.erolabs, Erolabs).
 	// Unity Addressables pulled live from the device's own data dir:
 	//   /sdcard/Android/data/<pkg>/files/Android/Data/data/*_skeletondata.ab
@@ -423,6 +444,43 @@ const GAME_ROOTS = [
 		spineRuntime: "4.2",
 		pmaDefault: true,
 	},
+	// DotAbyss (jp.co.fanzagames.dotabyss_x_a). Unity IL2CPP + Addressables,
+	// but the bundles are NOT under files/aa/ like most Addressables titles —
+	// they are UnityWebRequest cache entries:
+	//   /sdcard/Android/data/<pkg>/files/UnityCache/Shared/<hash>/<hash>/__data
+	// 668 of those (~187 MB). Filenames carry no extension, so find them by
+	// their UnityFS magic.
+	//
+	// Extracted with the upstream tool at
+	//   github.com/tengwan7/DataTable -> DotAbyss/{UnityCatalogReader,ExtractSpine}.py
+	// UnityCatalogReader turns the binary catalog into assets.json (71k keys),
+	// which ExtractSpine uses to name output folders.
+	//
+	// Spine 4.1.23 — the LAST format @pixi-spine supports, so no extra runtime
+	// is needed here (unlike Stellar Affinity's 4.2).
+	//
+	// pmaDefault: true — all 66 atlases declare `pma:true`.
+	//
+	// Quirk: some skeletons keep their .skel in a different bundle from their
+	// .atlas, so a single pass leaves folders half-empty. 11 models still have
+	// no texture at all (the game never downloaded those units), and are
+	// skipped rather than imported broken.
+	{
+		match: "dotabyss",
+		key: "dotabyss",
+		label: "DotAbyss",
+		spineRuntime: "4.1",
+		pmaDefault: true,
+	},
+	// DotAbyss Live2D Cubism models, extracted from the game's Addressables
+	// bundles (see /root/dotabyss/LIVE2D-FINDINGS.md). Cubism 4 models are
+	// rendered by pixi-live2d-display, not pixi-spine, so `format: "live2d"`
+	// is set by the scanner and the viewer routes them separately.
+	{
+		match: "dotabyss-l2d",
+		key: "dotabyss-l2d",
+		label: "DotAbyss Live2D",
+	},
 	// Bundled sample models. They live directly under assets/ and are not from
 	// any game — grouping them keeps "Lainnya" from meaning "demo".
 	{ match: "spineboy", key: "demo", label: "Demo" },
@@ -432,15 +490,21 @@ const GAME_ROOTS = [
 
 function resolveGame(rootRel, id) {
 	const top = (rootRel || id.split("/")[0] || "").toLowerCase();
+	// Longest match wins. "dotabyss-l2d" would otherwise fall into "dotabyss",
+	// and "alliancesages-cg" into "alliancesages", because both are prefixes
+	// of the more specific root.
+	let best = null;
 	for (const g of GAME_ROOTS) {
-		if (top.startsWith(g.match)) {
-			return {
-				game: g.key,
-				gameLabel: g.label,
-				pmaDefault: !!g.pmaDefault,
-				spineRuntime: g.spineRuntime || null,
-			};
-		}
+		if (!top.startsWith(g.match)) continue;
+		if (!best || g.match.length > best.match.length) best = g;
+	}
+	if (best) {
+		return {
+			game: best.key,
+			gameLabel: best.label,
+			pmaDefault: !!best.pmaDefault,
+			spineRuntime: best.spineRuntime || null,
+		};
 	}
 	// Unrecognised roots (uploads, demo models) get a tidy label of their own.
 	const raw = rootRel || id.split("/")[0] || "";
@@ -631,6 +695,64 @@ function scanModels() {
 		const skel = files.filter(isSkel);
 		const atlas = files.filter(isAtlas);
 
+		// Live2D Cubism: a .moc3 plus its textures, with no .skel/.atlas.
+		// The game ships no .model3.json, so we synthesise the settings in the
+		// browser from the folder contents.
+		const moc3 = files.filter((f) => f.toLowerCase().endsWith(".moc3"));
+		if (moc3.length) {
+			const textures = files.filter((f) => /\.(png|jpe?g|webp)$/i.test(f));
+			// Synthesised .motion3.json files live in a motions/ subfolder,
+			// which the flat `files` list above does not see — read it
+			// directly or every Cubism model reports zero animations.
+			let motions = [];
+			const mdir = path.join(dir, "motions");
+			try {
+				if (fs.statSync(mdir).isDirectory()) {
+					motions = fs
+						.readdirSync(mdir)
+						.filter((f) => f.toLowerCase().endsWith(".motion3.json"))
+						.sort();
+				}
+			} catch {
+				motions = [];
+			}
+			const rel = path.relative(ASSETS, dir).split(path.sep).join("/");
+			const id = rel.replace(/[^\w.\-/]+/g, "-");
+			const inner =
+				rootRel && (rel === rootRel || rel.startsWith(rootRel + "/"))
+					? rel.slice(rootRel.length).replace(/^\//, "")
+					: rel;
+			const parts = inner ? inner.split("/").filter(Boolean) : [path.basename(dir)];
+			const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+			const { game, gameLabel } = resolveGame(rootRel, id);
+			// Sort so texture_00 precedes texture_01; the browser re-orders
+			// them against the moc3's real indices anyway.
+			models.push({
+				id,
+				game,
+				gameLabel,
+				format: "live2d",
+				subgroup: parts.slice(0, -1).join(" › "),
+				name: parts.map(title).join(" › "),
+				group: rel.split("/").slice(0, -1).join(" / ") || "",
+				skeletonFile: moc3[0],
+				textureFiles: textures.sort(),
+				// Names only; the loader prefixes the motions/ folder.
+				motionFiles: motions.map((f) => f.split("/").pop()),
+				files: files.sort(),
+				bytes: dirBytes(dir),
+				// One entry per synthesised motion so the dropdown is useful.
+				animations: motions.length
+					? motions.map((f) => f.split("/").pop().replace(/\.motion3\.json$/, ""))
+					: ["idle"],
+				skins: [],
+				spine: null,
+				runtime: "cubism4",
+				bones: null,
+				slots: null,
+			});
+		}
+
 		if (skel.length && atlas.length) {
 			const rel = path.relative(ASSETS, dir).split(path.sep).join("/");
 			// IDs must stay URL-safe and unique across the whole tree.
@@ -726,41 +848,65 @@ app.use(express.json({ limit: "2mb" }));
  * and invalidate it whenever anything under assets/ changes. */
 let cache = { models: null, mtime: 0, signature: "" };
 
-function treeSignature() {
-	// Cheap fingerprint: newest mtime across the tree. Enough to catch
-	// uploads/deletes without hashing gigabytes of textures.
+/**
+ * One pass over assets/ that produces both the change signature and the size
+ * of every folder.
+ *
+ * This used to be two walks — treeSignature() stat()ing ~14.9k files, then
+ * dirBytes() re-stat()ing each model folder — which cost ~1m45s per rescan
+ * once the 193 Cubism models (1.2 GB) were added. Doing both in a single pass
+ * makes the same work rougly twice as cheap and, more importantly, keeps it
+ * from growing again.
+ */
+function scanTree() {
 	let newest = 0;
+	const sizes = new Map();
 	const walk = (d, depth) => {
-		if (depth > 8) return;
+		if (depth > 8) return 0;
 		let entries;
 		try {
 			entries = fs.readdirSync(d, { withFileTypes: true });
 		} catch {
-			return;
+			return 0;
 		}
+		let total = 0;
 		for (const e of entries) {
 			if (e.name === ".git") continue;
 			const p = path.join(d, e.name);
 			try {
-				if (e.isDirectory()) walk(p, depth + 1);
-				else if (e.isSymbolicLink()) {
+				if (e.isDirectory()) {
+					total += walk(p, depth + 1);
+				} else if (e.isSymbolicLink()) {
 					// follow symlinked asset folders
 					const st = fs.statSync(p);
-					if (st.isDirectory()) walk(p, depth + 1);
-					else newest = Math.max(newest, st.mtimeMs);
-				} else if (e.isFile()) newest = Math.max(newest, fs.statSync(p).mtimeMs);
+					if (st.isDirectory()) total += walk(p, depth + 1);
+					else {
+						total += st.size;
+						newest = Math.max(newest, st.mtimeMs);
+					}
+				} else {
+					const st = fs.statSync(p);
+					total += st.size;
+					newest = Math.max(newest, st.mtimeMs);
+				}
 			} catch {
 				/* skip unreadable entries */
 			}
 		}
+		sizes.set(d, total);
+		return total;
 	};
 	walk(ASSETS, 0);
-	return String(newest);
+	return { signature: String(newest), sizes };
 }
 
 function getModels({ force = false } = {}) {
-	const sig = treeSignature();
+	const { signature: sig, sizes } = scanTree();
 	if (!force && cache.models && cache.signature === sig) return cache.models;
+	// The tree changed, so cached folder sizes are stale too. scanModels()
+	// reads dirBytes(), so publish the fresh sizes before it runs.
+	dirBytesCache.clear();
+	for (const [k, v] of sizes) dirBytesCache.set(k, v);
 	cache = { models: scanModels(), mtime: Date.now(), signature: sig };
 	return cache.models;
 }

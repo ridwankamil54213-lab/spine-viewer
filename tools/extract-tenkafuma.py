@@ -141,6 +141,34 @@ def load_bundle(path):
     return None
 
 
+def apply_alpha_mask(dest, fnm, stem_pg, tex_meta, stats):
+    """Composite <stem>_alpha into the saved page's alpha channel.
+
+    The colour texture carries no alpha (its alpha channel is flat 255) and
+    the "_alpha" twin carries a greyscale mask in RGB (R == G == B). Without
+    this, transparent regions render as garbage — red/black/white blocks.
+    """
+    twin = tex_meta.get(stem_pg + "_alpha") or tex_meta.get(stem_pg + "2_alpha")
+    if not twin:
+        # Some pages genuinely have no mask (fully opaque art).
+        stats["png-tanpa-mask"] += 1
+        return
+    try:
+        from PIL import Image
+        rgb = Image.open(os.path.join(dest, fnm)).convert("RGBA")
+        msk = twin[1].read().image.convert("RGBA")
+        if msk.size != rgb.size:
+            msk = msk.resize(rgb.size)
+        # The mask lives in R (== G == B); its own alpha channel is flat 255.
+        mask = msk.split()[0]
+        out = rgb.copy()
+        out.putalpha(mask)
+        out.save(os.path.join(dest, fnm))
+        stats["png-digabung-alpha"] += 1
+    except Exception:
+        stats["png-gagal-gabung"] += 1
+
+
 def main():
     if not os.path.isdir(DATA):
         print("ERROR: direktori tidak ada:", DATA)
@@ -272,6 +300,15 @@ def main():
                 for pg in atlas_pages(texts[a]):
                     want[safe(pg).lower()] = safe(pg)
 
+            # TenkaFuma stores colour and alpha in SEPARATE Texture2Ds:
+            #     <page>        -> RGB only, alpha channel is flat 255
+            #     <page>_alpha  -> a greyscale mask in RGB (R == G == B), alpha flat 255
+            # Exporting the colour texture alone leaves every transparent area
+            # filled with garbage pixels, which renders as red/black/white blocks
+            # over the model (the "broken face" report).
+            #
+            # Fix: after writing a page, look for its "_alpha" twin and composite
+            # the mask into the saved PNG's alpha channel.
             for key, pg in want.items():
                 stem_pg = pg.rsplit(".", 1)[0] if "." in pg else pg
                 entry = tex_meta.get(pg) or tex_meta.get(stem_pg)
@@ -287,6 +324,7 @@ def main():
                 try:
                     entry[1].read().image.save(os.path.join(dest, fnm))
                     stats["png"] += 1
+                    apply_alpha_mask(dest, fnm, stem_pg, tex_meta, stats)
                 except Exception:
                     pass
             stats["model"] += 1

@@ -25,7 +25,11 @@ import {
 } from "spine-pixi-v7-42";
 import * as runtime42 from "spine-pixi-v7-42";
 import { loadTextures } from "@pixi/assets";
-import { detectSpineVersion, pickRuntime } from "./spine-version.js";
+import {
+	detectSpineVersion,
+	pickRuntime,
+} from "./spine-version.js";
+import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion } from "./live2d.js";
 
 /* Pixi v7's loadTextures decodes via createImageBitmap(blob) with no options, so
  * the browser premultiplies alpha at decode time; alphaMode=UNPACK would then
@@ -275,6 +279,9 @@ const el = {
 	error: $("#error"),
 	loading: $("#loading"),
 	grid: $("#grid"),
+	stageBg: $("#stage-bg"),
+	bgBtn: $("#bg-btn"),
+	bgSelect: $("#bg-select"),
 	toast: $("#toast"),
 	drop: $("#drop"),
 	file: $("#file"),
@@ -304,6 +311,10 @@ let spine = null;
 let current = null;
 let animName = null;
 let duration = 0;
+/** Tears down the previous Cubism model (Live2DModel needs its own cleanup). */
+let live2dDispose = null;
+/** Cached centring offset for the current Cubism model (see fitModel). */
+let live2dCentre = null;
 
 const state = {
 	playing: true,
@@ -315,6 +326,7 @@ const state = {
 	panY: 0,
 	showBones: false,
 	showGrid: true,
+	bg: "dark",
 	scrubbing: false,
 	trackTime: 0,
 };
@@ -351,6 +363,8 @@ function drawBones() {
  * ------------------------------------------------------------------ */
 app.ticker.add(() => {
 	if (!spine) return;
+	// Cubism models have no AnimationState; the plugin updates them itself.
+	if (!spine.state) return;
 	const track = spine.state.tracks[0];
 	if (!track) return;
 
@@ -379,7 +393,7 @@ app.ticker.add(() => {
 });
 
 function updateScrubUI() {
-	const track = spine?.state.tracks[0];
+	const track = spine?.state?.tracks?.[0];
 	if (!track) return;
 	const t = Math.min(track.trackTime, duration);
 	if (!state.scrubbing) state.trackTime = t;
@@ -394,9 +408,48 @@ function fitModel() {
 	if (!spine) return;
 	const w = el.canvasWrap.clientWidth;
 	const h = el.canvasWrap.clientHeight;
-	const data = spine.skeleton.data;
-	const bw = data.width || data.height || 512;
-	const bh = data.height || data.width || 512;
+	// Cubism models expose width/height directly and have no SkeletonData.
+	// Their declared size is the canvas the artist worked on, which can be far
+	// larger than the artwork itself, and their anchor is (0,0) rather than
+	// Spine's (0.5,0.5). Fitting on the declared box therefore zooms out too
+	// far and pushes the character off-centre, so measure what is actually
+	// drawn and centre that instead.
+	if (spine.skeleton && spine.skeleton.data) {
+		const data = spine.skeleton.data;
+		const bw = data.width || data.height || 512;
+		const bh = data.height || data.width || 512;
+		state.zoom = Math.min((w * 0.82) / bw, (h * 0.82) / bh);
+		state.panX = 0;
+		state.panY = 0;
+		applyTransform();
+		return;
+	}
+
+	// getBounds() is in world space, so it already includes this model's
+	// position — feeding its centre back through position.set() would double
+	// the offset. Reset to the origin first and read the bounds from there.
+	//
+	// The measured centre is also cached per model: bounds change as the pose
+	// and driven parameters change, so recomputing them on every "Pas" click
+	// walks the model away from where it was centred on load.
+	let b = null;
+	if (live2dCentre) {
+		spine.position.set(live2dCentre.x, live2dCentre.y);
+	} else {
+		try {
+			spine.position.set(0, 0);
+			b = typeof spine.getLocalBounds === "function" ? spine.getLocalBounds() : spine.getBounds?.();
+		} catch {
+			b = null;
+		}
+		if (b) {
+			live2dCentre = { x: -(b.x + b.width / 2), y: -(b.y + b.height / 2) };
+			spine.position.set(live2dCentre.x, live2dCentre.y);
+		}
+	}
+	// Fall back to the declared size when the artwork bounds are unavailable.
+	const bw = b?.width || spine.width || 512;
+	const bh = b?.height || spine.height || 512;
 	state.zoom = Math.min((w * 0.82) / bw, (h * 0.82) / bh);
 	state.panX = 0;
 	state.panY = 0;
@@ -431,10 +484,10 @@ function zoomBy(factor, cx, cy) {
  * canvas at the declared size and uploads that, so Spine's region coordinates
  * (which are absolute, in declared-page pixels) resolve correctly.
  */
-function upscaleBaseTexture(bt, factor) {
+function upscaleBaseTexture(bt, factorX, factorY = factorX) {
 	try {
-		const w = Math.round(bt.width * factor);
-		const h = Math.round(bt.height * factor);
+		const w = Math.round(bt.width * factorX);
+		const h = Math.round(bt.height * factorY);
 		const cv = document.createElement("canvas");
 		cv.width = w;
 		cv.height = h;
@@ -781,6 +834,80 @@ function teardownLegacyViewer() {
 	}
 }
 
+/**
+ * Renders a Live2D Cubism model in place of a Spine skeleton.
+ *
+ * Cubism models have no bones, slots, skins or Spine animations, so most of
+ * the Spine UI is meaningless here: we show the model, expose a single "idle"
+ * animation entry, and leave the rest of the inspector hidden.
+ */
+async function loadLive2DModel(model) {
+	// The id may carry a "#<stem>" suffix (B/M/T variants sharing a folder).
+	// That suffix is not part of the path on disk.
+	const dirPath = String(model.id || "").split("#")[0];
+	const base =
+		"/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
+
+	const mocFile = model.skeletonFile;
+	const textureFiles = model.textureFiles || [];
+	if (!textureFiles.length) {
+		throw new Error("Model Live2D tidak punya berkas tekstur.");
+	}
+
+	const { model: live2d, dispose } = await loadLive2D({
+		base,
+		mocFile,
+		textureFiles,
+		motionFiles: model.motionFiles || [],
+	});
+
+	// Drop any previous model before putting this one on the stage.
+	if (spine) {
+		stageRoot.removeChild(spine);
+		spine.destroy(true);
+		spine = null;
+	}
+	live2dDispose?.();
+	live2dDispose = dispose;
+	// New model, so its centring offset must be measured afresh.
+	live2dCentre = null;
+
+	spine = live2d;
+	stageRoot.addChildAt(live2d, 0);
+	bonesGfx.visible = false;
+	stageRoot.addChild(bonesGfx);
+
+	current = model;
+	atlas = null;
+	atlasSaysPMA = false;
+	current.atlasPagesFlags = [];
+
+	// Cubism has no Spine tracks; each motion is an independent clip.
+	const anims = model.animations && model.animations.length ? model.animations : ["(diam)"];
+	fillSelect(el.animSelect, anims, anims[0]);
+	animName = anims[0];
+	duration = 0;
+	el.timeDur.textContent = "0.00s";
+
+	// No Spine skins or slots to inspect.
+	fillSelect(el.skinSelect, [], null);
+	if (insp.open) {
+		renderSkinOptions();
+		renderSlots();
+	}
+
+	renderVariants(model);
+	renderAudio(model);
+
+	tl.anim = null;
+	if (!el.timeline.hidden) renderTimeline();
+
+	fitModel();
+	el.empty.hidden = true;
+	setActive(model.id);
+	renderHud();
+}
+
 async function loadModel(model) {
 	showError(null);
 	el.loading.hidden = false;
@@ -790,6 +917,12 @@ async function loadModel(model) {
 		// Any previous Spine 2.x model left an iframe over the stage; clear it
 		// before deciding how to render this one.
 		teardownLegacyViewer();
+
+		// Live2D Cubism models (.moc3) take a completely different path —
+		// they have no .skel/.atlas, and are rendered by the Cubism runtime.
+		if (isLive2D(model)) {
+			return await loadLive2DModel(model);
+		}
 
 		// Spine 2.x skeletons (Project QT) can't be read by any pixi-spine
 		// runtime — the 3.8 weighted-mesh path desynchronises on their
@@ -865,6 +998,53 @@ async function loadModel(model) {
 			const s = line.trim();
 			if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) pageNames.push(s);
 		}
+
+		// Per page: does any region actually fall outside the file?
+		//
+		// Needed because "declared size differs from the file" is too weak a
+		// signal on its own — hundreds of pages differ by a percent or two
+		// from rounding and render perfectly. Only a region that escapes the
+		// loaded texture makes PIXI throw, so that is the real condition.
+		//
+		// Two parser traps:
+		//  - `rotate:` comes AFTER `bounds:` in a region block (name / bounds /
+		//    offsets / rotate). Reading rotation at the bounds line always
+		//    yields false, so each block has to be buffered and evaluated when
+		//    the NEXT region starts.
+		//  - a rotated region stores its ORIGINAL w,h in `bounds:`; the packed
+		//    rectangle in the page is the transpose. Without the swap every
+		//    rotate:90 region looks like it overflows.
+		const overflowsPage = (pageName, bt) => {
+			if (!bt) return false;
+			let current = null;
+			let pending = null;   // {x, y, w, h}
+			let rotated = false;
+			const flush = () => {
+				if (current !== pageName || !pending) return false;
+				const { x, y, w, h } = pending;
+				const pw = rotated ? h : w;
+				const ph = rotated ? w : h;
+				return x + pw > bt.width || y + ph > bt.height;
+			};
+			for (const line of atlasText.split(/\r?\n/)) {
+				const s = line.trim();
+				if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) {
+					if (flush()) return true;
+					current = s;
+					pending = null;
+					rotated = false;
+					continue;
+				}
+				const b = s.match(/^bounds:\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+				if (b) {
+					const [, x, y, w, h] = b.map(Number);
+					pending = { x, y, w, h };
+					continue;
+				}
+				if (/^rotate:\s*(90|270|true)/i.test(s)) rotated = true;
+			}
+			return flush();
+		};
 		const pageCache = new Map();
 		await Promise.all(
 			pageNames.map(async (pageName) => {
@@ -887,7 +1067,7 @@ async function loadModel(model) {
 					const rx = declared[0] / bt.width;
 					const ry = declared[1] / bt.height;
 					// Scale up whenever the file is smaller than what the atlas
-					// declares. Take the LARGER axis ratio so every declared
+					// Take the LARGER axis ratio so every declared
 					// region fits: some pages ship at a different aspect (a
 					// 1920x1080 file for a 4096x4096 atlas), and scaling by
 					// one axis alone leaves regions outside the texture.
@@ -897,9 +1077,32 @@ async function loadModel(model) {
 					// means the wrong file was extracted, not a half-res page —
 					// scaling that just scatters every region and renders the
 					// model as scrambled shards, which is worse than failing.
+					//
+					// Not every downscale is proportional, though. DotAbyss
+					// ships pages squashed by Unity's per-axis texture
+					// downscaling (a 732x532 atlas whose page is 512x512), so
+					// rx and ry differ on purpose. Stretching such a page to
+					// the declared size is the correct inverse — verified
+					// against the raw bundle: the crops come back as clean
+					// body parts, where a uniform 1.43x scale leaves them
+					// visibly off.
+					//
+					// Gated on overflow because the gap alone is far too loose:
+					// hundreds of pages across every game differ by a few
+					// percent from rounding and still render fine, and
+					// rescaling those only softens them for nothing. Only
+					// pages whose regions genuinely fall outside the file need
+					// rescuing. gap < 0.45 then separates a squashed page from
+					// an outright wrong texture (DotAbyss's broken SpineSD
+					// pages sit at 0.83-2.95 and stay skipped).
 					const ratio = Math.max(rx, ry);
-					if (ratio > 1.01 && ratio <= 8 && Math.abs(rx - ry) < 0.02) {
-						bt = upscaleBaseTexture(bt, ratio);
+					const aspectGap = Math.abs(Math.log(rx / ry));
+					if (ratio > 1.01 && ratio <= 8) {
+						if (aspectGap < 0.02) {
+							bt = upscaleBaseTexture(bt, ratio);
+						} else if (aspectGap < 0.45 && overflowsPage(pageName, bt)) {
+							bt = upscaleBaseTexture(bt, rx, ry);
+						}
 					}
 				}
 
@@ -945,6 +1148,11 @@ async function loadModel(model) {
 		stageRoot.addChildAt(spine, 0);
 		bonesGfx.visible = state.showBones;
 		stageRoot.addChild(bonesGfx); // keep overlay on top
+
+		// A Spine model must not inherit a Cubism centring offset.
+		live2dCentre = null;
+		live2dDispose?.();
+		live2dDispose = null;
 
 		current = model;
 
@@ -1475,7 +1683,7 @@ function tlSeek(time) {
 	if (!spine || !tl.duration) return;
 	const t = Math.max(0, Math.min(tl.duration, time));
 	state.trackTime = t;
-	const track = spine.state.tracks[0];
+	const track = spine.state?.tracks?.[0];
 	if (track) track.trackTime = t;
 	spine.update(0);
 	updateScrubUI();
@@ -1951,12 +2159,40 @@ function setPlaying(v) {
 /* ------------------------------------------------------------------ *
  * HUD
  * ------------------------------------------------------------------ */
+/** Part count for a Cubism coreModel, or null when unavailable. */
+function modelPartCount(core) {
+	if (core && typeof core.getPartCount === "function") {
+		try {
+			return core.getPartCount();
+		} catch {
+			return null;
+		}
+	}
+	return null;
+}
+
 function renderHud() {
 	if (!current || !spine) {
 		el.hud.hidden = true;
 		return;
 	}
 	el.hud.hidden = false;
+	// Cubism models have no Spine skeleton; show what they do expose.
+	if (isLive2D(current)) {
+		const core = spine.internalModel?.coreModel;
+		const d = core && typeof core.getDrawableCount === "function" ? core.getDrawableCount() : null;
+		const p = modelPartCount(core);
+		const tex = (current.textureFiles || []).length;
+		$("#hud-model").textContent = current.name;
+		$("#hud-stats").innerHTML =
+			(d != null ? `<span><b>${d}</b> drawable</span>` : "") +
+			(p != null ? `<span><b>${p}</b> part</span>` : "") +
+			`<span><b>${tex}</b> tekstur</span>` +
+			`<span><b>Live2D Cubism 4</b></span>` +
+			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
+		$("#title-model").textContent = current.name;
+		return;
+	}
 	const slots = spine.skeleton.slots.length;
 	const bones = spine.skeleton.bones.length;
 	const anims = spine.skeleton.data.animations.length;
@@ -2421,6 +2657,13 @@ function stepAnimation(dir) {
 }
 
 el.animSelect.addEventListener("change", () => {
+	// Cubism motions are played by the Cubism motion manager, not by a Spine
+	// AnimationState. Cubism models must never reach setAnimation() — they
+	// have no spine.state, so it would throw.
+	if (isLive2D(current)) {
+		playLive2DMotion(spine, el.animSelect.value);
+		return;
+	}
 	setAnimation(el.animSelect.value, true);
 	renderTimeline();
 });
@@ -2436,7 +2679,7 @@ window.addEventListener("pointerup", () => (state.scrubbing = false));
 el.scrub.addEventListener("input", () => {
 	if (!duration || !spine) return;
 	state.trackTime = (parseFloat(el.scrub.value) / 1000) * duration;
-	const track = spine.state.tracks[0];
+	const track = spine.state?.tracks?.[0];
 	if (track) track.trackTime = state.trackTime;
 	el.timeCur.textContent = state.trackTime.toFixed(2) + "s";
 	spine.update(0);
@@ -2457,6 +2700,39 @@ el.bonesBtn.addEventListener("click", () => {
 	bonesGfx.visible = state.showBones;
 	el.bonesBtn.dataset.on = String(state.showBones);
 	drawBones();
+});
+
+// --- stage backdrop -------------------------------------------------------
+// Cycling the backdrop is how you actually see edge problems: a dark or light
+// halo around the art (a PMA mistake) disappears against the default dark grid
+// and is obvious against mid-grey or the checkerboard.
+const BG_ORDER = ["dark", "grey", "light", "checker", "magenta", "green"];
+const BG_LABEL = { dark: "Gelap", grey: "Abu-abu", light: "Terang", checker: "Papan catur", magenta: "Magenta", green: "Hijau" };
+
+function setStageBg(name, { persist = true } = {}) {
+	state.bg = name;
+	el.stageBg.dataset.bg = name;
+	el.bgSelect.value = name;
+	// "Latar" reads as on whenever we're off the default, so the toggle still
+	// means something even though there are six choices.
+	el.bgBtn.dataset.on = String(name !== "dark");
+	if (!persist) return;
+	try {
+		localStorage.setItem("stageBg", name);
+	} catch {
+		/* private mode — preference just won't stick */
+	}
+}
+
+el.bgBtn.addEventListener("click", () => {
+	// Cycle through the options; the select is there for direct jumps.
+	const next = BG_ORDER[(BG_ORDER.indexOf(state.bg) + 1) % BG_ORDER.length];
+	setStageBg(next);
+	toast(`Latar: ${BG_LABEL[next]}`);
+});
+el.bgSelect.addEventListener("change", () => {
+	setStageBg(el.bgSelect.value);
+	toast(`Latar: ${BG_LABEL[el.bgSelect.value] || el.bgSelect.value}`);
 });
 
 el.pmaSelect.addEventListener("change", () => {
@@ -2804,7 +3080,7 @@ async function runExport() {
 	// Freeze the live view so the user's playback state can't interfere and
 	// we can restore it exactly when we're done.
 	const wasPlaying = state.playing;
-	const wasTrackTime = spine.state.tracks[0]?.trackTime ?? 0;
+	const wasTrackTime = spine.state?.tracks?.[0]?.trackTime ?? 0;
 	setPlaying(false);
 
 	// Stop the render ticker for the duration. Every await below yields to
@@ -2856,7 +3132,7 @@ async function runExport() {
 
 			// Seek deterministically, then apply the pose.
 			const t = (i / frames) * duration;
-			const track = spine.state.tracks[0];
+			const track = spine.state?.tracks?.[0];
 			if (track) track.trackTime = t;
 			spine.update(0);
 
@@ -3064,6 +3340,10 @@ window.addEventListener("keydown", (e) => {
 		case "G":
 			el.gridBtn.click();
 			break;
+		case "l":
+		case "L":
+			el.bgBtn.click();
+			break;
 		case "f":
 		case "F":
 			e.preventDefault();
@@ -3270,6 +3550,15 @@ initTimeline();
 initInspector();
 initFullscreen();
 initExport();
+
+// Restore the saved backdrop, if any. setStageBg() would also persist it, so
+// only call it when we actually have a stored value.
+try {
+	const savedBg = localStorage.getItem("stageBg");
+	if (savedBg && BG_ORDER.includes(savedBg)) setStageBg(savedBg, { persist: false });
+} catch {
+	/* private mode — keep the default */
+}
 
 app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
 refresh();

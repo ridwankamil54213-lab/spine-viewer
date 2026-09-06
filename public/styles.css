@@ -775,6 +775,30 @@ body {
 .btn-icon { padding: 8px; width: 36px; height: 36px; }
 .btn-icon .icon { width: 17px; height: 17px; fill: currentColor; }
 
+/* background switcher: toggle + colour picker kept together so the toolbar
+ * still reads as one row of view controls */
+.bg-group { display: inline-flex; align-items: center; gap: 0; }
+.bg-group .btn { border-radius: 0; margin-left: -1px; }
+.bg-group .btn:first-child { border-radius: var(--r) 0 0 var(--r); margin-left: 0; }
+.bg-group .btn:last-child { border-radius: 0 var(--r) var(--r) 0; }
+.btn-select {
+	padding: 8px 9px;
+	font-size: 11.5px;
+	background: var(--ink-750);
+	/* native select arrow is invisible on a dark bar, so draw our own */
+	appearance: none;
+	-webkit-appearance: none;
+	padding-right: 22px;
+	background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+		linear-gradient(135deg, currentColor 50%, transparent 50%);
+	background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%;
+	background-size: 5px 5px, 5px 5px;
+	background-repeat: no-repeat;
+	opacity: 0.75;
+}
+.btn-select:hover { opacity: 1; }
+.btn-select:focus-visible { opacity: 1; outline: 2px solid var(--spark); outline-offset: 1px; }
+
 /* the play button is the one place we spend colour */
 .btn-play {
 	width: 42px;
@@ -846,9 +870,41 @@ input:focus-visible {
 	touch-action: none;
 }
 .canvas-wrap.is-dragging { cursor: grabbing; }
-.canvas-wrap canvas { display: block; }
+/* The canvas must be positioned for the z-index layering below to work: an
+ * unpositioned (static) canvas ignores z-index and the backdrop would paint
+ * over the model. */
+.canvas-wrap canvas { display: block; position: relative; z-index: 1; }
 
-/* grid veil — sits above the ink, below the canvas content */
+/* Stage backdrop — sits under the grid veil and the canvas content.
+ * Distinct backgrounds are the quickest way to judge edge quality and whether
+ * premultiplied alpha is being handled correctly: a dark or light haloing
+ * fringe is invisible against the default dark grid and obvious against
+ * mid-grey or the checkerboard. */
+.stage-bg {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	/* Behind the canvas (z-index 1), above the wrap's own background. */
+	z-index: 0;
+	background: var(--stage-bg-color, #14161c);
+}
+.stage-bg[data-bg="light"] { --stage-bg-color: #f2f3f6; }
+.stage-bg[data-bg="grey"] { --stage-bg-color: #808080; }
+.stage-bg[data-bg="checker"] {
+	/* High-contrast checkerboard: a subtle one hides the very semi-transparent
+	 * edges this mode exists to reveal. */
+	--stage-bg-color: #ffffff;
+	background-image:
+		linear-gradient(45deg, #b0b0b0 25%, transparent 25%, transparent 75%, #b0b0b0 75%),
+		linear-gradient(45deg, #b0b0b0 25%, transparent 25%, transparent 75%, #b0b0b0 75%);
+	background-size: 24px 24px;
+	background-position: 0 0, 12px 12px;
+}
+/* Magenta/green let you spot semi-transparent edges that grey hides. */
+.stage-bg[data-bg="magenta"] { --stage-bg-color: #ff00ff; }
+.stage-bg[data-bg="green"] { --stage-bg-color: #00ff00; }
+
+/* grid veil — sits above the backdrop, below the canvas content */
 .grid {
 	position: absolute;
 	inset: 0;

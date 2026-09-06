@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>L2D Cubism — smoke test</title>
+<style>
+  body { margin:0; background:#14161c; color:#e8eaf0; font:14px system-ui; }
+  #stage { width:100vw; height:80vh; display:block; }
+  #log { padding:12px; font:12px ui-monospace,monospace; white-space:pre-wrap; height:20vh; overflow:auto; background:#0c0e12; }
+  .ok { color:#6ee7a8; } .err { color:#ff7b72; }
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas>
+<div id="log">booting…\n</div>
+
+<!-- Cubism 4 core runtime: official Live2D binary, copied into /vendor so the
+     page works without reaching out to a CDN. It must load synchronously and
+     set window.Live2DCubismCore BEFORE the bundle runs, otherwise the plugin's
+     startUpWithRetry() gives up ("Failed to start up Cubism 4 framework"). -->
+<script src="/vendor/live2dcubismcore.min.js"></script>
+<script>
+  // The npm build of the core is UMD-ish; make sure the global is set under
+  // every name the plugin looks for.
+  if (window.Live2DCubismCore && !window.Live2DCubismCore$) {
+    window.Live2DCubismCore$ = window.Live2DCubismCore;
+  }
+  window.__coreReady = !!window.Live2DCubismCore;
+</script>
+<script src="/dist/l2d.js"></script>
+</body>
+</html>
