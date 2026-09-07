@@ -1484,6 +1484,49 @@ function audioForModel(m) {
 	return { costumeId: mm[1], lang: "JP", tracks: files.map((f) => `/bd2-audio/${mm[1]}/${f}`) };
 }
 
+/*
+ * OrisRies audio.
+ *
+ * Unlike BD2 there is no per-costume folder: the game ships a flat set of
+ * BGM (bgm001..bgm042) and SFX (se-prefixed) tracks, extracted from the
+ * AudioClip objects inside the bgm and se bundles by
+ * tools/extract-orisries-audio.py. They are FSB5 (FMOD) containers holding
+ * Vorbis, rebuilt to .ogg there — ffmpeg cannot read FSB5.
+ *
+ * Nothing in the asset names ties a track to a specific model, so the
+ * viewer exposes them as a game-level soundtrack instead of per-model
+ * voices: /api/orisries-audio lists everything, grouped by kind.
+ */
+const OR_AUDIO_DIR = "/srv/spine-assets/orisries/audio";
+
+let orAudioCache = { list: null, mtime: 0 };
+
+function loadOrisriesAudio() {
+	try {
+		const st = fs.statSync(OR_AUDIO_DIR);
+		if (orAudioCache.list && orAudioCache.mtime === st.mtimeMs) return orAudioCache.list;
+		const list = [];
+		for (const f of fs.readdirSync(OR_AUDIO_DIR)) {
+			if (!/\.(ogg|mp3|wav)$/i.test(f)) continue;
+			list.push({ file: f, kind: /^bgm/i.test(f) ? "bgm" : "sfx" });
+		}
+		list.sort((a, b) => a.file.localeCompare(b.file, "en", { numeric: true }));
+		orAudioCache = { list, mtime: st.mtimeMs };
+		return list;
+	} catch {
+		return [];
+	}
+}
+
+app.get("/api/orisries-audio", (_req, res) => {
+	const all = loadOrisriesAudio();
+	res.json({
+		tracks: all.map((t) => ({ ...t, url: `/orisries-audio/${t.file}` })),
+		bgm: all.filter((t) => t.kind === "bgm").map((t) => `/orisries-audio/${t.file}`),
+		sfx: all.filter((t) => t.kind === "sfx").map((t) => `/orisries-audio/${t.file}`),
+	});
+});
+
 app.get("/api/bd2-audio", (req, res) => {
 	// Not per-model: the client already knows the model, but a single call lets
 	// it grey the button out for models with no voices.
@@ -1796,6 +1839,11 @@ app.use("/exports", express.static(EXPORT_DIR, { fallthrough: false, maxAge: "1h
 app.use(
 	"/bd2-audio",
 	express.static(AUDIO_DIR, { fallthrough: false, maxAge: "7d", immutable: true })
+);
+// OrisRies soundtrack: flat .ogg files, served with the same caching rules.
+app.use(
+	"/orisries-audio",
+	express.static(OR_AUDIO_DIR, { fallthrough: false, maxAge: "7d", immutable: true })
 );
 app.use(express.static(path.join(ROOT, "public")));
 
