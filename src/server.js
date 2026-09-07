@@ -1593,6 +1593,68 @@ app.get("/api/bd2-audio", (req, res) => {
 	res.json(audioForModel(m) || { tracks: [] });
 });
 
+/*
+ * Asset updater.
+ *
+ * Ark Re:Code is the only game wired up so far: it is unencrypted, its
+ * router tells us the live catalog, and the bundles are public. The work
+ * is done by tools/update-arkrecode.py — spawned here so the scan/catalog
+ * state lives in one place and the UI just shows the result.
+ *
+ * Only --check runs synchronously (a few seconds: fetch catalog, diff).
+ * Downloads run in the background and are polled through the same
+ * job handle as /api/update/arkrecode/status.
+ */
+const UPDATERS = {
+	arkrecode: {
+		script: path.join(ROOT, "tools", "update-arkrecode.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+};
+
+let updateJob = null; // { game, running, result, log }
+
+function runUpdater(game, args) {
+	const cfg = UPDATERS[game];
+	if (!cfg) return null;
+	return new Promise((resolve) => {
+		const child = spawn(cfg.py, [cfg.script, ...args], { cwd: ROOT });
+		let out = "";
+		child.stdout.on("data", (d) => (out += d));
+		child.stderr.on("data", (d) => (out += d));
+		child.on("close", () => {
+			try {
+				resolve(JSON.parse(out.slice(out.indexOf("{"))));
+			} catch {
+				resolve({ error: "Gagal membaca hasil pembaruan.", raw: out.slice(-800) });
+			}
+		});
+	});
+}
+
+app.get("/api/update/arkrecode", async (req, res) => {
+	const mode = req.query.mode === "apply" ? "apply" : "check";
+	// A check is quick; a download is not, so it goes to the background.
+	if (mode === "check") {
+		res.json(await runUpdater("arkrecode", ["--check"]));
+		return;
+	}
+	if (updateJob?.running) {
+		res.json({ started: false, reason: "Pembaruan masih berjalan." });
+		return;
+	}
+	updateJob = { game: "arkrecode", running: true, result: null };
+	res.json({ started: true });
+	updateJob.result = await runUpdater("arkrecode", ["--apply"]);
+	updateJob.running = false;
+});
+
+app.get("/api/update/arkrecode/status", (_req, res) => {
+	res.json(
+		updateJob || { running: false, result: null }
+	);
+});
+
 app.get("/api/thumbnails", (req, res) => {
 	res.json({ thumbs: thumbManifest() });
 });

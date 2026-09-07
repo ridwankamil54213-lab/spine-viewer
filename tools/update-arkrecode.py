@@ -31,6 +31,12 @@ import urllib3
 urllib3.disable_warnings()
 
 API_URL = "https://game-arkre-nu.ecchi.xxx//Router/RouterHandler.ashx"
+# The router hands back PatchDomain as a PLACEHOLDER ("http://PatchDomain/...")
+# inside the catalog, and its own PathDomain host refuses bundles with 403.
+# The host that actually serves them is this one, with the platform segment
+# from the catalog left as-is ("Android", not "WebGL" — WebGL is a different,
+# smaller bundle set).
+CDN_BASE = "https://erdpu.gzxhcjz.com/GamePatch"
 HEADERS = {
 	"User-Agent": "UnityPlayer/2022.3.28f1 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
 	"X-Unity-Version": "2022.3.28f1",
@@ -45,6 +51,32 @@ STATE_FILE = os.path.join(STATE_DIR, "state.json")
 # Only asset types the viewer can actually use.
 WANT = re.compile(r"\.(skel|atlas|png|json)$", re.I)
 SKIP = re.compile(r"(^|/)(catalog_|\.hash$|/Android/(settings|link))", re.I)
+
+
+def bundle_urls(catalog_path: str) -> dict:
+	"""Map nama berkas -> URL bundle yang bisa diunduh.
+
+	m_InternalIds holds BOTH asset paths ("Assets/Game/CG/A0001/A0001.png")
+	and bundle URLs written against a placeholder host:
+
+	    http://PatchDomain/Android/<group>_assets_<name>_<hash>.bundle
+
+	Only those URL entries are downloadable; the plain asset paths are not.
+	The placeholder host is replaced with the real CDN that serves them.
+	"""
+	with open(catalog_path, encoding="utf-8-sig") as f:
+		data = json.load(f)
+	out = {}
+	for i in data.get("m_InternalIds", []):
+		if not isinstance(i, str) or not i.startswith("http"):
+			continue
+		name = i.rsplit("/", 1)[-1]
+		if not name.endswith(".bundle"):
+			continue
+		# http://PatchDomain/Android/x.bundle -> <CDN_BASE>/Android/x.bundle
+		m = re.match(r"https?://PatchDomain(/.*)$", i)
+		out[name] = CDN_BASE + m.group(1) if m else i
+	return out
 
 
 def http_json_put(url: str, payload: dict, timeout: int = 25):
@@ -138,21 +170,22 @@ def check() -> dict:
 
 
 def apply_update(limit: int = 0, workers: int = 8) -> dict:
-	"""Unduh berkas baru yang belum ada di disk."""
+	"""Unduh berkas baru yang belum ada di disk.
+
+	Not every catalog bundle is served: skeleton bundles under
+	`assets/game/cg/<id>_<hash>.bundle` return 403 while their `img_`
+	siblings under `.../<id>/img_<hash>.bundle` are fine, and a random
+	sample of 12 catalog bundles came back 11x200/1x403. So failures are
+	counted and reported per file rather than aborting the run.
+	"""
 	info = check()
 	os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-	# Bangun ulang daftar URL untuk yang diinginkan.
-	with open(os.path.join(CATALOG_DIR, info["catalog"] + ".json"), encoding="utf-8-sig") as f:
-		data = json.load(f)
-	urls = {}
-	for i in data.get("m_InternalIds", []):
-		if not isinstance(i, str):
-			continue
-		name = i.rsplit("/", 1)[-1]
-		if WANT.search(name) and not SKIP.search(name):
-			urls[name] = i if i.startswith("http") else info["domain"] + "/" + i.lstrip("/")
+	# Bangun ulang daftar URL bundle dari catalog.
+	catalog_path = os.path.join(CATALOG_DIR, info["catalog"] + ".json")
+	urls = bundle_urls(catalog_path)
 
+	# Berkas yang sudah ada tidak diunduh ulang.
 	todo = [n for n in urls if not os.path.exists(os.path.join(DOWNLOAD_DIR, n))]
 	if limit:
 		todo = todo[:limit]

@@ -2589,6 +2589,91 @@ function syncPanes() {
 		el.libHeading.textContent = "Pustaka";
 		el.libSub.textContent = `${models.length} model · ${gameBuckets().length} game`;
 	}
+
+	syncUpdater(inGame ? browse.game : null);
+}
+
+/* --- Asset updater ----------------------------------------------------
+ * Only games with a fetch script on the server get the buttons. Ark
+ * Re:Code is the first: its router publishes the live catalog and the
+ * bundles are public, so no key or device is needed.
+ */
+const UPDATABLE = { arkrecode: "/api/update/arkrecode" };
+
+function syncUpdater(game) {
+	const box = document.getElementById("updater");
+	if (!box) return;
+	const base = game && UPDATABLE[game];
+	box.hidden = !base;
+	if (!base) return;
+	updaterBase = base;
+	const status = document.getElementById("update-status");
+	const apply = document.getElementById("update-apply");
+	status.textContent = "Periksa pembaruan untuk game ini.";
+	apply.hidden = true;
+	apply.disabled = false;
+	apply.textContent = "Unduh yang baru";
+}
+
+let updaterBase = null;
+
+async function checkUpdate() {
+	const status = document.getElementById("update-status");
+	const apply = document.getElementById("update-apply");
+	const check = document.getElementById("update-check");
+	if (!updaterBase) return;
+	check.disabled = true;
+	status.textContent = "Memeriksa…";
+	try {
+		const info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
+		if (info.error) throw new Error(info.error);
+		if (!info.changed && info.previous) {
+			status.textContent = `Sudah versi terbaru (${info.catalog}).`;
+			apply.hidden = true;
+		} else {
+			const n = info.wanted ?? info.added ?? 0;
+			status.textContent = `Versi ${info.catalog}: ${n} berkas baru.`;
+			apply.hidden = false;
+			apply.dataset.catalog = info.catalog;
+		}
+	} catch (err) {
+		status.textContent = `Gagal memeriksa: ${err.message}`;
+		apply.hidden = true;
+	}
+	check.disabled = false;
+}
+
+async function applyUpdate() {
+	const status = document.getElementById("update-status");
+	const apply = document.getElementById("update-apply");
+	if (!updaterBase) return;
+	apply.disabled = true;
+	status.textContent = "Mengunduh… (ini bisa beberapa menit)";
+	try {
+		const started = await fetch(`${updaterBase}?mode=apply`).then((r) => r.json());
+		if (!started.started) {
+			status.textContent = started.reason || "Tidak bisa memulai unduhan.";
+			apply.disabled = false;
+			return;
+		}
+		// Poll until the background job finishes.
+		for (let i = 0; i < 600; i++) {
+			await new Promise((r) => setTimeout(r, 3000));
+			const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
+			if (st.running) continue;
+			const res = st.result || {};
+			status.textContent = res.error
+				? `Gagal: ${res.error}`
+				: `Selesai: ${res.downloaded ?? 0} berkas diunduh` +
+					(res.failed ? `, ${res.failed} gagal` : "") + ".";
+			apply.disabled = false;
+			return;
+		}
+		status.textContent = "Masih berjalan — cek lagi nanti.";
+	} catch (err) {
+		status.textContent = `Gagal mengunduh: ${err.message}`;
+	}
+	apply.disabled = false;
 }
 
 function renderLibrary() {
@@ -3438,6 +3523,10 @@ window.addEventListener("keydown", (e) => {
 // upload
 el.uploadBtn.addEventListener("click", () => el.file.click());
 el.file.addEventListener("change", () => doUpload(el.file.files));
+
+// asset updater
+document.getElementById("update-check")?.addEventListener("click", checkUpdate);
+document.getElementById("update-apply")?.addEventListener("click", applyUpdate);
 
 ["dragenter", "dragover"].forEach((ev) =>
 	el.drop.addEventListener(ev, (e) => {

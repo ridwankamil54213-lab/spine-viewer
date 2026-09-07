@@ -69,6 +69,16 @@
 			<input id="folder" class="field" type="text" placeholder="Nama folder (opsional)" />
 			<button id="upload-btn" class="btn btn-ghost">Pilih berkas…</button>
 			<input id="file" type="file" multiple accept=".json,.skel,.atlas,.txt,.png,.webp,.jpg,.jpeg" hidden />
+
+			<!-- Update aset dari CDN resmi game. Ark Re:Code satu-satunya yang
+			     terpasang: tidak dienkripsi dan bundlenya publik. Tombol ini
+			     hanya muncul untuk game yang punya pembaru. -->
+			<section id="updater" hidden>
+				<h3>Perbarui aset</h3>
+				<p class="hint" id="update-status">Periksa pembaruan untuk game ini.</p>
+				<button id="update-check" class="btn btn-ghost">Cek pembaruan</button>
+				<button id="update-apply" class="btn btn-ghost" hidden>Unduh yang baru</button>
+			</section>
 		</section>
 	</aside>
 
