@@ -531,6 +531,12 @@ function attachFamilies(models) {
 	const ids = new Set(models.map((m) => m.id));
 
 	// Longest id that is a prefix of `id` — that's the variant's parent.
+	//
+	// NOTE ON COSTUME-LESS BD2 VARIANTS: the relayout writes a character's
+	// Light Novel Talk as `<Char>/Light-Novel-Talk` when the reference repo
+	// has no costume for it. `<Char>` holds no .skel of its own, so it can
+	// never be a family root here — those models stay standalone. That is
+	// fine: they already sit in the character's `subgroup` in the sidebar.
 	const rootOf = (id) => {
 		const parts = id.split("/");
 		for (let i = parts.length - 1; i > 0; i--) {
@@ -622,6 +628,17 @@ function attachFamilies(models) {
 			// is part of the asset id itself (cutscene_char004091), and
 			// printing it produced "Skill Cutscene CHAR004091".
 			const tail = stem.match(/_([a-z0-9]{1,2})$/i);
+			if (tail) {
+				// A "_c" tail is the CENSORED twin of the same cutscene, not a
+				// numbered sequel — label it as such instead of "… C".
+				if (tail[1].toLowerCase() === "c") {
+					return VARIANT_LABELS.censored;
+				}
+				// "_1" is a second take of the same cutscene.
+				if (/^\d+$/.test(tail[1])) {
+					return `${title(seg)} ${Number(tail[1]) + 1}`;
+				}
+			}
 			const label = tail ? `${seg} ${tail[1].toUpperCase()}` : seg;
 			return VARIANT_LABELS[label.toLowerCase()] || title(label);
 		};
@@ -649,10 +666,23 @@ function attachFamilies(models) {
  */
 function pairSkeletonAtlas(skels, atlases) {
 	const stem = (f) => f.replace(/\.(skel|json|atlas)$/i, "");
+	const isBinary = (f) => /\.skel$/i.test(f);
+	// A folder can ship the same skeleton twice: a binary .skel and a
+	// text .json export of it (BD2's char066402 does exactly this). Both
+	// parse fine, so the folder turned into two models with identical ids —
+	// one of them with no animations at all, which is what the sidebar
+	// showed. Prefer the binary when both describe the same stem: it is
+	// the authoritative export and carries the full animation list.
+	const skelList = skels.filter((s) => {
+		if (isBinary(s)) return true;         // keep every .skel
+		// Drop a .json only when a .skel with the same stem exists.
+		return !skels.some((o) => o !== s && isBinary(o) && stem(o) === stem(s));
+	});
+
 	const pool = atlases.slice();
 	const out = [];
 
-	for (const sk of skels) {
+	for (const sk of skelList) {
 		const key = stem(sk);
 		let i = pool.findIndex((a) => stem(a) === key);
 		if (i === -1) i = 0; // fallback: take whatever is left
@@ -776,6 +806,25 @@ function scanModels() {
 					: rel;
 			const parts = inner ? inner.split("/").filter(Boolean) : [path.basename(dir)];
 			const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+			// BD2's story/event "special animations" are named after their
+			// asset id alone (illust_special18, specialillust143) because the
+			// reference repo carries no character data for them. Reading
+			// "Illust › Illust Special › Illust Special18" in the sidebar is
+			// noise, so collapse the redundant pair of path segments into one
+			// "Special Animation N" label.
+			const isBd2Special =
+				parts.length >= 2 &&
+				parts[parts.length - 2] === "illust_special" &&
+				/^(illust_special|specialillust)/i.test(parts[parts.length - 1]);
+			const labelParts = isBd2Special
+				? parts
+						.slice(0, -2)
+						.concat([
+							"Special Animation " +
+								(parts[parts.length - 1].match(/(\d+)/)?.[1] ||
+									parts[parts.length - 1]),
+						])
+				: parts;
 			const { game, gameLabel, pmaDefault, spineRuntime } = resolveGame(rootRel, id);
 			// Sub-category is what sits between the game root and the model. For
 			// nikke/c010/aim that's "c010" — a character, not a category, so it's
@@ -796,8 +845,8 @@ function scanModels() {
 				// per model, otherwise they collide into a single entry.
 				const modelId = multi ? `${id}#${stem}` : id;
 				const modelName = multi
-					? [...parts, stem].map(title).join(" › ")
-					: parts.map(title).join(" › ");
+					? [...labelParts, stem].map(title).join(" › ")
+					: labelParts.map(title).join(" › ");
 				models.push({
 					id: modelId,
 					game,
