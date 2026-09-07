@@ -32,11 +32,21 @@ urllib3.disable_warnings()
 
 API_URL = "https://game-arkre-nu.ecchi.xxx//Router/RouterHandler.ashx"
 # The router hands back PatchDomain as a PLACEHOLDER ("http://PatchDomain/...")
-# inside the catalog, and its own PathDomain host refuses bundles with 403.
-# The host that actually serves them is this one, with the platform segment
-# from the catalog left as-is ("Android", not "WebGL" — WebGL is a different,
-# smaller bundle set).
-CDN_BASE = "https://erdpu.gzxhcjz.com/GamePatch"
+# inside the catalog, so every bundle URL needs its host substituted.
+#
+# Two hosts serve the same tree, and they do NOT have the same coverage:
+#   patch-arkre-nu...  (the router's own PathDomain) -> served 25/25 sampled
+#                      bundles, including every CG skeleton
+#   erdpu.gzxhcjz.com                               -> 23/25; it 403s on
+#                      several skeleton bundles (a0001, a0022, ...)
+# Earlier I concluded the router's host "never serves bundles" — that was
+# wrong: it was fine, I had only tried it before learning that bundle names
+# keep their slashed asset path. It is the better default, with the other
+# host kept as a fallback for the handful it misses.
+CDN_HOSTS = [
+	"https://patch-arkre-nu.ecchi.xxx/GamePatch",
+	"https://erdpu.gzxhcjz.com/GamePatch",
+]
 HEADERS = {
 	"User-Agent": "UnityPlayer/2022.3.28f1 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
 	"X-Unity-Version": "2022.3.28f1",
@@ -73,9 +83,9 @@ def bundle_urls(catalog_path: str) -> dict:
 		name = i.rsplit("/", 1)[-1]
 		if not name.endswith(".bundle"):
 			continue
-		# http://PatchDomain/Android/x.bundle -> <CDN_BASE>/Android/x.bundle
+		# http://PatchDomain/Android/x.bundle -> /Android/x.bundle (relpath)
 		m = re.match(r"https?://PatchDomain(/.*)$", i)
-		out[name] = CDN_BASE + m.group(1) if m else i
+		out[name] = m.group(1) if m else i
 	return out
 
 
@@ -172,11 +182,9 @@ def check() -> dict:
 def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	"""Unduh berkas baru yang belum ada di disk.
 
-	Not every catalog bundle is served: skeleton bundles under
-	`assets/game/cg/<id>_<hash>.bundle` return 403 while their `img_`
-	siblings under `.../<id>/img_<hash>.bundle` are fine, and a random
-	sample of 12 catalog bundles came back 11x200/1x403. So failures are
-	counted and reported per file rather than aborting the run.
+	Each bundle is tried against every host in CDN_HOSTS in order, because
+	neither host has complete coverage on its own. Residual failures are
+	counted per file rather than aborting the run.
 	"""
 	info = check()
 	os.makedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -194,13 +202,18 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	errors = []
 
 	def get(name):
-		try:
-			raw = http_get(urls[name])
-			with open(os.path.join(DOWNLOAD_DIR, name), "wb") as f:
-				f.write(raw)
-			return None
-		except Exception as exc:
-			return f"{name}: {exc}"
+		rel = urls[name]
+		# Coba tiap host bergiliran: coverage-nya tidak sama persis.
+		last = ""
+		for host in CDN_HOSTS:
+			try:
+				raw = http_get(host + rel)
+				with open(os.path.join(DOWNLOAD_DIR, name), "wb") as f:
+					f.write(raw)
+				return None
+			except Exception as exc:
+				last = f"{name}: {exc}"
+		return last
 
 	with ThreadPoolExecutor(max_workers=workers) as ex:
 		for err in ex.map(get, todo):
