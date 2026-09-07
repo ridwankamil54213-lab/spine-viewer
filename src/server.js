@@ -106,6 +106,22 @@ function inspectSkeleton(file, atlasFile) {
 			// starts with '{' -> JSON skeleton
 			const data = JSON.parse(buf.toString("utf8"));
 			const skel = data.skeleton || {};
+			const ver = String(skel.spine || "");
+			const major = parseInt(ver.split(".")[0], 10);
+			// The 2.x skip above only guarded BINARY skeletons. A Spine 2.1.27
+			// skeleton exported to .json (every Epic Seven SCSP v2 model) fell
+			// through to here, reported bones/animations fine, but never got
+			// needsLegacyViewer — so the client handed it to pixi-spine, which
+			// cannot draw 2.x, and the model rendered as nothing.
+			const legacy = Number.isFinite(major) && major > 0 && major < 3;
+			// Spine 2.x stores `skins` as an OBJECT keyed by skin name
+			// ({"default": {...}}); 3.x/4.x use an array of {name, ...}
+			// records. `(data.skins || []).map(...)` threw on the object
+			// form, and the surrounding try/catch swallowed it — the whole
+			// inspect returned null, so every E7 model looked empty.
+			const skinNames = Array.isArray(data.skins)
+				? (data.skins || []).map((s) => s?.name).filter(Boolean)
+				: Object.keys(data.skins || {});
 			return {
 				spine: skel.spine || null,
 				width: skel.width ?? null,
@@ -113,7 +129,9 @@ function inspectSkeleton(file, atlasFile) {
 				bones: (data.bones || []).length,
 				slots: (data.slots || []).length,
 				animations: Object.keys(data.animations || {}),
-				skins: (data.skins || []).map((s) => s.name).filter(Boolean),
+				skins: skinNames,
+				runtime: legacy ? "2.1.27" : null,
+				needsLegacyViewer: legacy,
 			};
 		}
 		if (!atlasFile) return null;
@@ -253,6 +271,44 @@ const GAME_ROOTS = [
 	// again and STILL scramble as of this check, even though its numbers look
 	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
 	// this back to pixi-spine on numeric evidence alone.
+	// Epic Seven (com.stove.epic7.google).
+	//
+	// Assets live in a single ~7 GB XOR-encrypted data.pack under
+	//   /sdcard/Android/data/<pkg>/files/data.pack
+	// with its file table in data.indices/*.pigz (gzip). Both are handled by
+	// CeciliaBot/EpicSevenAssetRipper, whose DataPack class we drive headless
+	// from tools/extract-epic7.py — its GUI is PyQt6 and the pack is far too
+	// big to click through.
+	//
+	// Models ship as .scsp (binary skeleton) + .sct (ASTC/ETC2/RGBA texture)
+	// + .atlas, converted by Kutinana/E7SpineAssetConverter to .json/.png.
+	// Two gaps in that tool we patch in our extractor:
+	//   * fix_atlas.py only strips the `pma:` line, but its README promises
+	//     rewriting the .sct reference on line 1 — without that the atlas
+	//     points at a .sct file we never write and no texture is found.
+	//   * only scsp2json.py accepts a directory; sct2png/fix_atlas are
+	//     per-file, so we loop over them ourselves.
+	//
+	// TWO GENERATIONS IN ONE GAME. E7 kept shipping both: 1169 models are
+	// SCSP v2 (Spine 2.1.27) and 104 are SCSP v3 (Spine 3.8.99). They need
+	// different renderers (legacy viewer vs pixi-spine), and spineRuntime is
+	// resolved per game root, so tools/split-epic7.py moves the v3 models
+	// into their own tree. The longer "epic7-v3" match has to come first.
+	{
+		match: "epic7-v3",
+		key: "epic7",
+		label: "Epic Seven",
+		pmaDefault: false,
+	},
+	// Spine 2.1.27 — the same vintage as Project QT, so it needs the legacy
+	// runtime (pixi-spine cannot draw it).
+	{
+		match: "epic7",
+		key: "epic7",
+		label: "Epic Seven",
+		spineRuntime: "2.1.27",
+		pmaDefault: false,
+	},
 	{
 		match: "projectqt",
 		key: "projectqt",
