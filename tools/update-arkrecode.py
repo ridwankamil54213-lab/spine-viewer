@@ -21,6 +21,8 @@ import argparse
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 import time
 import urllib.request
@@ -57,10 +59,29 @@ STATE_DIR = "/srv/spine-assets/arkrecode"
 CATALOG_DIR = os.path.join(STATE_DIR, "catalogs")
 DOWNLOAD_DIR = os.path.join(STATE_DIR, "downloads")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
+# Where the viewer actually reads models: assets/arkrecode -> /srv/spine-assets/ark_out
+ASSET_DIR = os.environ.get("ARK_OUT", "/srv/spine-assets/ark_out")
+EXTRACTOR = "/srv/spine-viewer/tools/extract-unity-spine.py"
+PYTHON = os.environ.get("PY", "/srv/venv-spine/bin/python")
 
 # Only asset types the viewer can actually use.
 WANT = re.compile(r"\.(skel|atlas|png|json)$", re.I)
 SKIP = re.compile(r"(^|/)(catalog_|\.hash$|/Android/(settings|link))", re.I)
+
+# Hanya pola model yang sudah ada di pohon aset viewer. Isi ark_out terdiri
+# dari A####, CG_H####, H####, M#### dan B#### (313 H, 130 A, 71 M, 44 CG,
+# 21 B). Tanpa filter ini updater mengunduh ribuan bundle UI/prefab/audio
+# yang tidak pernah menjadi model — 20 bundle pertama saja semuanya UI.
+# Hanya bundle CG: itulah yang menjadi model Spine utuh. Nama bundle
+# menyisipkan path asetnya, jadi pola ini bisa dicocokkan langsung:
+#   .../game/cg/a0001_<hash>.bundle        (skeleton)
+#   .../game/cg/a0001/img_<hash>.bundle    (tekstur)
+# Filter longgar berdasar id saja kemasukan banner (bn_logo_h002), prefab
+# dan efek yang bukan model.
+MODEL_BUNDLE = re.compile(
+	r"/game/cg/[a-z]{1,2}\d{2,4}(?:_\d+)?(?:/img)?_[0-9a-f]{32}\.bundle$",
+	re.I,
+)
 
 
 def bundle_urls(catalog_path: str) -> dict:
@@ -72,7 +93,10 @@ def bundle_urls(catalog_path: str) -> dict:
 	    http://PatchDomain/Android/<group>_assets_<name>_<hash>.bundle
 
 	Only those URL entries are downloadable; the plain asset paths are not.
-	The placeholder host is replaced with the real CDN that serves them.
+	The placeholder host is replaced with the real CDN that serves them, e.g.:
+
+	  defaultduplicategroup_assets_assets/game/cg/a0001_1dc84...bundle
+	  defaultduplicategroup_assets_assets/game/cg/a0001/img_7fd66...bundle
 	"""
 	with open(catalog_path, encoding="utf-8-sig") as f:
 		data = json.load(f)
@@ -80,9 +104,9 @@ def bundle_urls(catalog_path: str) -> dict:
 	for i in data.get("m_InternalIds", []):
 		if not isinstance(i, str) or not i.startswith("http"):
 			continue
-		name = i.rsplit("/", 1)[-1]
-		if not name.endswith(".bundle"):
+		if not MODEL_BUNDLE.search(i):
 			continue
+		name = i.rsplit("/", 1)[-1]
 		# http://PatchDomain/Android/x.bundle -> /Android/x.bundle (relpath)
 		m = re.match(r"https?://PatchDomain(/.*)$", i)
 		out[name] = m.group(1) if m else i
@@ -229,10 +253,62 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
 	save_state(state)
 
+	# Tahap 3: ekstrak Spine dari bundle yang baru diunduh langsung ke
+	# pohon aset viewer. Tanpa ini berkas hanya menumpuk di downloads/
+	# dan tidak pernah muncul di antarmuka.
+	extracted = 0
+	extract_error = None
+	extract_log = ""
+	seen_new = []
+	extract_dup = 0
+	if done and os.path.isdir(DOWNLOAD_DIR):
+		tmp_out = os.path.join(STATE_DIR, "extract_tmp")
+		os.makedirs(tmp_out, exist_ok=True)
+		env = dict(os.environ, BUNDLE_DIR=DOWNLOAD_DIR, OUT=tmp_out)
+		proc = None
+		try:
+			proc = subprocess.run(
+				[PYTHON, EXTRACTOR],
+				env=env, cwd="/srv/spine-viewer",
+				capture_output=True, text=True, timeout=7200, check=False,
+			)
+			extract_log = (proc.stdout or "")[-600:] + (proc.stderr or "")[-600:]
+		except Exception as exc:
+			extract_error = str(exc)
+			extract_log = ""
+		# Pindahkan model baru ke pohon aset tanpa menimpa yang sudah ada.
+		os.makedirs(ASSET_DIR, exist_ok=True)
+		already = set(os.listdir(ASSET_DIR))
+		seen_new = []
+		for name in os.listdir(tmp_out):
+			src = os.path.join(tmp_out, name)
+			dst = os.path.join(ASSET_DIR, name)
+			if not os.path.isdir(src):
+				continue
+			if os.path.exists(dst):
+				continue  # model sudah ada, biarkan
+			shutil.move(src, dst)
+			extracted += 1
+			if len(seen_new) < 10:
+				seen_new.append(name)
+		# Berapa hasil ekstrak yang ternyata sudah ada — berguna untuk
+		# membedakan "tidak ada model baru" dari "ekstrak gagal".
+		extract_total = sum(
+			1 for n in os.listdir(tmp_out) if os.path.isdir(os.path.join(tmp_out, n))
+		)
+		extract_dup = extract_total - extracted
+		shutil.rmtree(tmp_out, ignore_errors=True)
+
 	return {
 		"catalog": info["catalog"],
 		"downloaded": done,
 		"failed": failed,
+		"extracted": extracted,
+		"new_models": seen_new,
+		"already_had": extract_dup,
+		"asset_dir": ASSET_DIR,
+		"extract_error": extract_error,
+		"extract_log": extract_log,
 		"errors": errors,
 		"dir": DOWNLOAD_DIR,
 	}

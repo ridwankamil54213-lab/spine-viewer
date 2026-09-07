@@ -2665,7 +2665,9 @@ async function applyUpdate() {
 			status.textContent = res.error
 				? `Gagal: ${res.error}`
 				: `Selesai: ${res.downloaded ?? 0} berkas diunduh` +
-					(res.failed ? `, ${res.failed} gagal` : "") + ".";
+					(res.failed ? `, ${res.failed} gagal` : "") +
+					(res.extracted ? ` · ${res.extracted} model ditambahkan` : "") +
+					". Muat ulang untuk melihatnya.";
 			apply.disabled = false;
 			return;
 		}
