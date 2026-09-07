@@ -148,6 +148,10 @@ def check() -> dict:
         "changed": state.get("version") != info["version"],
         "models_total": len(names),
         "models_have": len(have),
+        # Entri model/ yang belum punya folder. Sebagian di antaranya BUKAN
+        # Spine (Live2D Cubism .model3, atau Material/Animator saja) dan
+        # akan dilaporkan "no skel+atlas" saat diekstrak — jadi angka ini
+        # adalah batas atas, bukan janji sebanyak itu model baru.
         "new": len(baru),
         "samples": baru[:10],
         "base": info["base"],
@@ -209,7 +213,13 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     extract_error = None
     seen_new = []
     errors_ext = []
-    if done and os.path.isdir(DOWNLOAD_DIR):
+    # Ekstrak selama ADA berkas di folder unduhan, bukan hanya ketika ada
+    # yang baru terunduh. Kalau disyaratkan `done > 0`, menjalankan ulang
+    # setelah unduhan selesai (atau setelah --apply --limit) melewati
+    # ekstraksi sepenuhnya dan berkas hanya menumpuk di downloads/.
+    if os.path.isdir(DOWNLOAD_DIR) and any(
+        f.endswith(".asset") for f in os.listdir(DOWNLOAD_DIR)
+    ):
         try:
             sk = load_extractor()
         except Exception as exc:

@@ -261,7 +261,13 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	extract_log = ""
 	seen_new = []
 	extract_dup = 0
-	if done and os.path.isdir(DOWNLOAD_DIR):
+	# Ekstrak selama ADA berkas di folder unduhan, bukan hanya ketika ada
+	# yang baru terunduh — kalau disyaratkan `done > 0`, menjalankan ulang
+	# setelah unduhan selesai melewati ekstraksi sepenuhnya.
+	downloads = []
+	if os.path.isdir(DOWNLOAD_DIR):
+		downloads = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".bundle")]
+	if downloads:
 		tmp_out = os.path.join(STATE_DIR, "extract_tmp")
 		os.makedirs(tmp_out, exist_ok=True)
 		env = dict(os.environ, BUNDLE_DIR=DOWNLOAD_DIR, OUT=tmp_out)
