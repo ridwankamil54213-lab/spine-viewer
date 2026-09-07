@@ -437,6 +437,30 @@ const GAME_ROOTS = [
 	// declares 512² while the texture is 256². That is a clean 2x integer
 	// ratio, so the viewer's upscale path handles it. Do NOT "fix" it by
 	// stretching.
+
+	// OrisRies / 萬源聖魔錄 (com.erolabs.orisries).
+	// Unity + Addressables. The APK's own assets/aa/Android bundles are plain
+	// UnityFS, but the ~2.8 GB of hot-update bundles under
+	//   /sdcard/Android/data/<pkg>/files/data/
+	// are AES-encrypted: key b"wiki is transfer", CBC, with the 16-byte IV
+	// appended and its length as a trailing LE u32. Decrypted by
+	// tools/decrypt-orisries.py (scheme from live2dhub.com/t/topic/3323).
+	// Spine models live in `spinechar_*` bundles as TextAsset .skel/.atlas
+	// plus Texture2D pages; extracted by tools/extract-unity-spine.py.
+	// NOTE: 20/230 models ship textures padded to power-of-two (atlas declares
+	// 2048x1828, PNG is 2048x2048). The viewer reads the atlas, so pages
+	// resolve correctly despite the padding.
+	//
+	// pmaDefault: true. Only 13/230 atlases spell out `pma:true`; the other
+	// 217 carry no pma: line at all, so the flag alone can't decide it.
+	// Rendered both ways in tools/verify/probe_orisries_pma.cjs: with PMA off
+	// the sprites grow dark fringes on every edge, with PMA on they are clean.
+	{
+		match: "orisries",
+		key: "orisries",
+		label: "OrisRies",
+		pmaDefault: true,
+	},
 	{
 		match: "stellaraffinity",
 		key: "stellaraffinity",

@@ -35,6 +35,14 @@ import sys
 
 import UnityPy
 
+# Some bundles carry no serialised Unity version, and UnityPy then refuses to
+# parse them ("No valid Unity version found"). OrisRies (萬源聖魔錄) hits this
+# on every UI/worldmap bundle; the game ships 2022.3.32f1, so pin that as the
+# fallback instead of skipping them.
+UnityPy.config.FALLBACK_UNITY_VERSION = os.environ.get(
+	"UNITY_VERSION", "2022.3.32f1"
+)
+
 # Overridable so the same verified rules serve other Unity Addressables
 # games (paths passed by wrapper scripts or env vars).
 BUNDLE_DIR = os.environ.get(
