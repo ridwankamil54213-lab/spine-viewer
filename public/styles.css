@@ -1355,3 +1355,32 @@ input:focus-visible {
 	letter-spacing: 0.02em;
 	pointer-events: none;
 }
+
+/* Tombol pembaruan aset di kepala pustaka, sejajar dengan jumlah model. */
+.btn-update {
+	position: relative;
+	flex: 0 0 auto;
+	color: var(--muted, #9a94ad);
+}
+.btn-update:hover { color: var(--text, #e9e6f2); }
+.btn-update.is-checking .icon { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Titik merah: penanda ada versi baru yang belum diunduh. */
+.update-dot {
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: #e5484d;
+	border: 2px solid var(--panel, #16141f);
+	box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.6);
+	animation: dot-pulse 2s infinite;
+}
+@keyframes dot-pulse {
+	0%   { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0.55); }
+	70%  { box-shadow: 0 0 0 6px rgba(229, 72, 77, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(229, 72, 77, 0); }
+}

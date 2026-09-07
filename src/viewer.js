@@ -2600,82 +2600,132 @@ function syncPanes() {
  */
 const UPDATABLE = { arkrecode: "/api/update/arkrecode" };
 
-function syncUpdater(game) {
-	const box = document.getElementById("updater");
-	if (!box) return;
-	const base = game && UPDATABLE[game];
-	box.hidden = !base;
-	if (!base) return;
-	updaterBase = base;
-	const status = document.getElementById("update-status");
-	const apply = document.getElementById("update-apply");
-	status.textContent = "Periksa pembaruan untuk game ini.";
-	apply.hidden = true;
-	apply.disabled = false;
-	apply.textContent = "Unduh yang baru";
+let updaterBase = null;
+let updaterGame = null;
+// Has an update been found but not yet downloaded? Drives the red dot.
+let updatePending = false;
+
+function setUpdateDot(on) {
+	const dot = document.getElementById("update-dot");
+	if (dot) dot.hidden = !on;
+	const btn = document.getElementById("update-check");
+	if (btn) btn.title = on ? "Ada pembaruan — klik untuk mengunduh" : "Periksa pembaruan aset";
 }
 
-let updaterBase = null;
+/** Show the button only for games that have an updater, then auto-check. */
+function syncUpdater(game) {
+	const btn = document.getElementById("update-check");
+	if (!btn) return;
+	const base = game && UPDATABLE[game];
+	btn.hidden = !base;
+	updaterBase = base || null;
+	updaterGame = base ? game : null;
+	if (!base) {
+		updatePending = false;
+		setUpdateDot(false);
+		return;
+	}
+	// Auto-check on entering the game; the red dot appears if there is
+	// something new. Silent on failure — the button stays usable.
+	autoCheckUpdate();
+}
 
-async function checkUpdate() {
-	const status = document.getElementById("update-status");
-	const apply = document.getElementById("update-apply");
-	const check = document.getElementById("update-check");
-	if (!updaterBase) return;
-	check.disabled = true;
-	status.textContent = "Memeriksa…";
+let autoChecked = {};
+
+async function autoCheckUpdate() {
+	if (!updaterBase || !updaterGame) return;
+	// Only auto-check once per game per page load.
+	if (autoChecked[updaterGame]) {
+		setUpdateDot(updatePending);
+		return;
+	}
+	autoChecked[updaterGame] = true;
 	try {
 		const info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
-		if (info.error) throw new Error(info.error);
-		if (!info.changed && info.previous) {
-			status.textContent = `Sudah versi terbaru (${info.catalog}).`;
-			apply.hidden = true;
-		} else {
-			const n = info.wanted ?? info.added ?? 0;
-			status.textContent = `Versi ${info.catalog}: ${n} berkas baru.`;
-			apply.hidden = false;
-			apply.dataset.catalog = info.catalog;
-		}
-	} catch (err) {
-		status.textContent = `Gagal memeriksa: ${err.message}`;
-		apply.hidden = true;
+		if (info.error) return;
+		const hasNew = info.changed || !info.previous;
+		updatePending = !!hasNew;
+		setUpdateDot(updatePending);
+	} catch {
+		/* biarkan tombol tetap bisa dipakai manual */
 	}
-	check.disabled = false;
+}
+
+/** Manual check / start download from the header button. */
+async function checkUpdate() {
+	if (!updaterBase) return;
+	const btn = document.getElementById("update-check");
+	const dot = document.getElementById("update-dot");
+	btn.classList.add("is-checking");
+
+	let info;
+	try {
+		info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
+	} catch (err) {
+		btn.classList.remove("is-checking");
+		toast?.(`Gagal memeriksa pembaruan: ${err.message}`);
+		return;
+	}
+	btn.classList.remove("is-checking");
+	if (info.error) {
+		toast?.(`Gagal memeriksa: ${info.error}`);
+		return;
+	}
+
+	const hasNew = info.changed || !info.previous;
+	updatePending = hasNew;
+	setUpdateDot(updatePending);
+
+	if (!hasNew) {
+		toast?.(`Sudah versi terbaru (${info.catalog}).`);
+		return;
+	}
+	// Ada yang baru: langsung tanya dulu sebelum mengunduh (bisa ratusan MB).
+	const n = info.wanted ?? info.added ?? 0;
+	if (!confirm(`Versi ${info.catalog}: ${n} berkas baru. Unduh sekarang?`)) return;
+	applyUpdate();
 }
 
 async function applyUpdate() {
-	const status = document.getElementById("update-status");
-	const apply = document.getElementById("update-apply");
 	if (!updaterBase) return;
-	apply.disabled = true;
-	status.textContent = "Mengunduh… (ini bisa beberapa menit)";
+	const btn = document.getElementById("update-check");
+	btn.classList.add("is-checking");
+	btn.disabled = true;
+	toast?.("Mengunduh pembaruan… ini bisa beberapa menit.");
 	try {
 		const started = await fetch(`${updaterBase}?mode=apply`).then((r) => r.json());
 		if (!started.started) {
-			status.textContent = started.reason || "Tidak bisa memulai unduhan.";
-			apply.disabled = false;
+			toast?.(started.reason || "Tidak bisa memulai unduhan.");
+			btn.disabled = false;
+			btn.classList.remove("is-checking");
 			return;
 		}
-		// Poll until the background job finishes.
 		for (let i = 0; i < 600; i++) {
 			await new Promise((r) => setTimeout(r, 3000));
 			const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
 			if (st.running) continue;
 			const res = st.result || {};
-			status.textContent = res.error
-				? `Gagal: ${res.error}`
-				: `Selesai: ${res.downloaded ?? 0} berkas diunduh` +
-					(res.failed ? `, ${res.failed} gagal` : "") +
-					(res.extracted ? ` · ${res.extracted} model ditambahkan` : "") +
-					". Muat ulang untuk melihatnya.";
-			apply.disabled = false;
+			updatePending = false;
+			setUpdateDot(false);
+			toast?.(
+				res.error
+					? `Gagal: ${res.error}`
+					: `Selesai: ${res.downloaded ?? 0} berkas diunduh` +
+						(res.failed ? `, ${res.failed} gagal` : "") +
+						(res.extracted ? ` · ${res.extracted} model baru` : "") +
+						(res.already_had ? ` · ${res.already_had} sudah ada` : "") +
+						". Muat ulang untuk melihatnya."
+			);
+			btn.disabled = false;
+			btn.classList.remove("is-checking");
 			return;
 		}
-		status.textContent = "Masih berjalan — cek lagi nanti.";
+		toast?.("Masih berjalan — cek lagi nanti.");
 	} catch (err) {
-		status.textContent = `Gagal mengunduh: ${err.message}`;
+		toast?.(`Gagal mengunduh: ${err.message}`);
 	}
-	apply.disabled = false;
+	btn.disabled = false;
+	btn.classList.remove("is-checking");
 }
 
 function renderLibrary() {

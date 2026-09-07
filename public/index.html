@@ -46,6 +46,14 @@
 					<p class="lib-sub" id="lib-sub">Pilih game</p>
 				</div>
 				<span class="pill mono" id="model-count">0</span>
+				<!-- Tombol pembaruan aset, hanya untuk game yang punya
+				     pembaru (Ark Re:Code). Notif merah muncul kalau
+				     pemeriksaan otomatis menemukan versi baru. -->
+				<button id="update-check" class="btn btn-icon btn-sm btn-update" hidden
+					aria-label="Periksa pembaruan aset" title="Periksa pembaruan aset">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M17.65 6.35A8 8 0 1 0 19.73 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg>
+					<span class="update-dot" id="update-dot" hidden></span>
+				</button>
 			</div>
 
 			<input id="search" class="search" type="search" placeholder="Cari model…" autocomplete="off" />
@@ -69,16 +77,6 @@
 			<input id="folder" class="field" type="text" placeholder="Nama folder (opsional)" />
 			<button id="upload-btn" class="btn btn-ghost">Pilih berkas…</button>
 			<input id="file" type="file" multiple accept=".json,.skel,.atlas,.txt,.png,.webp,.jpg,.jpeg" hidden />
-
-			<!-- Update aset dari CDN resmi game. Ark Re:Code satu-satunya yang
-			     terpasang: tidak dienkripsi dan bundlenya publik. Tombol ini
-			     hanya muncul untuk game yang punya pembaru. -->
-			<section id="updater" hidden>
-				<h3>Perbarui aset</h3>
-				<p class="hint" id="update-status">Periksa pembaruan untuk game ini.</p>
-				<button id="update-check" class="btn btn-ghost">Cek pembaruan</button>
-				<button id="update-apply" class="btn btn-ghost" hidden>Unduh yang baru</button>
-			</section>
 		</section>
 	</aside>
 
