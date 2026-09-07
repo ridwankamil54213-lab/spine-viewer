@@ -451,15 +451,16 @@ const GAME_ROOTS = [
 	// 2048x1828, PNG is 2048x2048). The viewer reads the atlas, so pages
 	// resolve correctly despite the padding.
 	//
-	// pmaDefault: true. Only 13/230 atlases spell out `pma:true`; the other
-	// 217 carry no pma: line at all, so the flag alone can't decide it.
-	// Rendered both ways in tools/verify/probe_orisries_pma.cjs: with PMA off
-	// the sprites grow dark fringes on every edge, with PMA on they are clean.
+	// pmaDefault: false. Only 13/301 atlases spell out `pma:true`; the other
+	// ~288 carry no pma: line at all, so the flag alone can't decide it — and
+	// the majority therefore get the non-premultiplied default. The viewer
+	// still reads an explicit `pma:true` in an atlas, and the per-model PMA
+	// toggle in the UI overrides this for the 13 that declare it.
 	{
 		match: "orisries",
 		key: "orisries",
 		label: "OrisRies",
-		pmaDefault: true,
+		pmaDefault: false,
 	},
 	{
 		match: "stellaraffinity",
