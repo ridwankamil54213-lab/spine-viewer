@@ -2444,16 +2444,26 @@ function modelsInScope() {
 	// dropdown, so listing them here too just tripled the grid — 776 of Nikke's
 	// 1501 entries were duplicates of a character already in the list.
 	const roots = inGame.filter((m) => !m.family || m.family.root === m.id);
-	if (!q) return roots;
-	return roots.filter(
-		(m) =>
-			m.id.toLowerCase().includes(q) ||
-			(m.name || "").toLowerCase().includes(q) ||
-			// search must hit character names too — that's the whole point of
-			// loading them ("rapi" should find c010, "matis" finds the squad)
-			(m.character?.name || "").toLowerCase().includes(q) ||
-			(m.character?.squad || "").toLowerCase().includes(q)
-	);
+	// Models added by the updater float to the top so a fresh download is
+	// visible without hunting for it; newest first, then alphabetical.
+	const order = (list) =>
+		list.slice().sort((a, b) => {
+			const na = isNewModel(a) ? loadNewSet()[a.id] || 0 : 0;
+			const nb = isNewModel(b) ? loadNewSet()[b.id] || 0 : 0;
+			if (na || nb) {
+				if (na !== nb) return nb - na;      // baru lebih dulu
+				return a.id.localeCompare(b.id);
+			}
+			return a.id.localeCompare(b.id);
+		});
+	const hit = (m) =>
+		m.id.toLowerCase().includes(q) ||
+		(m.name || "").toLowerCase().includes(q) ||
+		// search must hit character names too — that's the whole point of
+		// loading them ("rapi" should find c010, "matis" finds the squad)
+		(m.character?.name || "").toLowerCase().includes(q) ||
+		(m.character?.squad || "").toLowerCase().includes(q);
+	return order(q ? roots.filter(hit) : roots);
 }
 
 /** How many variants are hidden from the grid for the current game. */
@@ -2499,12 +2509,15 @@ function renderModels() {
 		// can only fit the short label.
 		const details = modelSubLabel(m);
 		btn.title = modelTooltip(m);
+		const newTag = isNewModel(m)
+			? `<span class="badge-new" title="Baru ditambahkan">NEW</span>`
+			: "";
 		btn.innerHTML = `
-			${art}
-			<span class="model-text">
-				<span class="model-name">${escapeHtml(modelLabel(m))}</span>
-				<span class="model-meta">${details ? escapeHtml(details) + " · " : ""}${m.animations.length ? m.animations.length + " animasi" : "—"}</span>
-			</span>
+		${art}
+		<span class="model-text">
+			<span class="model-name">${escapeHtml(modelLabel(m))}${newTag}</span>
+			<span class="model-meta">${details ? escapeHtml(details) + " · " : ""}${m.animations.length ? m.animations.length + " animasi" : "—"}</span>
+		</span>
 		`;
 		btn.addEventListener("click", () => loadModel(m));
 		li.appendChild(btn);
@@ -2598,7 +2611,16 @@ function syncPanes() {
  * Re:Code is the first: its router publishes the live catalog and the
  * bundles are public, so no key or device is needed.
  */
-const UPDATABLE = { arkrecode: "/api/update/arkrecode" };
+const UPDATABLE = {
+	arkrecode: "/api/update/arkrecode",
+	shoujoukaisen: "/api/update/shoujoukaisen",
+};
+
+/** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
+function pendingCount(info) {
+	// Ark Re:Code melapor "wanted" (berkas), Shoujou Kaisen "new" (model).
+	return info?.new ?? info?.wanted ?? info?.added ?? 0;
+}
 
 let updaterBase = null;
 let updaterGame = null;
@@ -2610,6 +2632,45 @@ function setUpdateDot(on) {
 	if (dot) dot.hidden = !on;
 	const btn = document.getElementById("update-check");
 	if (btn) btn.title = on ? "Ada pembaruan — klik untuk mengunduh" : "Periksa pembaruan aset";
+}
+
+/* --- "NEW" badge -------------------------------------------------------
+ * Models added by the updater during this browser session. Kept in
+ * sessionStorage so the badge survives a reload but eventually fades on
+ * its own rather than flagging models forever.
+ */
+const NEW_KEY = "spine-stage:new-models";
+const NEW_TTL_MS = 7 * 24 * 60 * 60 * 1000; // seminggu
+
+function loadNewSet() {
+	try {
+		const raw = JSON.parse(sessionStorage.getItem(NEW_KEY) || "{}");
+		// { id: timestamp }
+		const cutoff = Date.now() - NEW_TTL_MS;
+		const out = {};
+		for (const [id, ts] of Object.entries(raw)) {
+			if (ts && ts > cutoff) out[id] = ts;
+		}
+		return out;
+	} catch {
+		return {};
+	}
+}
+
+function markNew(ids) {
+	if (!ids?.length) return;
+	const cur = loadNewSet();
+	const now = Date.now();
+	for (const id of ids) cur[id] = now;
+	try {
+		sessionStorage.setItem(NEW_KEY, JSON.stringify(cur));
+	} catch {
+		/* penyimpanan penuh — badge hanya hilang setelah muat ulang */
+	}
+}
+
+function isNewModel(m) {
+	return !!loadNewSet()[m.id];
 }
 
 /** Show the button only for games that have an updater, then auto-check. */
@@ -2643,8 +2704,12 @@ async function autoCheckUpdate() {
 	try {
 		const info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
 		if (info.error) return;
-		const hasNew = info.changed || !info.previous;
-		updatePending = !!hasNew;
+		// Ada yang belum diunduh kalau versinya berubah ATAU masih tersisa
+		// model/berkas baru. Shoujou Kaisen pernah melapor versi sama
+		// (0.820.48) tetapi masih punya 14 model yang belum diambil, jadi
+		// jangan hanya mengandalkan `changed`.
+		const hasNew = !!info.changed || !info.previous || pendingCount(info) > 0;
+		updatePending = hasNew;
 		setUpdateDot(updatePending);
 	} catch {
 		/* biarkan tombol tetap bisa dipakai manual */
@@ -2672,17 +2737,18 @@ async function checkUpdate() {
 		return;
 	}
 
-	const hasNew = info.changed || !info.previous;
+	const hasNew = !!info.changed || !info.previous || pendingCount(info) > 0;
 	updatePending = hasNew;
 	setUpdateDot(updatePending);
 
 	if (!hasNew) {
-		toast?.(`Sudah versi terbaru (${info.catalog}).`);
+		toast?.(`Sudah versi terbaru (${info.version ?? info.catalog}).`);
 		return;
 	}
-	// Ada yang baru: langsung tanya dulu sebelum mengunduh (bisa ratusan MB).
-	const n = info.wanted ?? info.added ?? 0;
-	if (!confirm(`Versi ${info.catalog}: ${n} berkas baru. Unduh sekarang?`)) return;
+	// Ada yang baru: tanya dulu sebelum mengunduh (bisa ratusan MB).
+	const n = pendingCount(info);
+	const what = updaterGame === "shoujoukaisen" ? "model" : "berkas";
+	if (!confirm(`Versi ${info.version ?? info.catalog}: ${n} ${what} baru. Unduh sekarang?`)) return;
 	applyUpdate();
 }
 
@@ -2707,6 +2773,12 @@ async function applyUpdate() {
 			const res = st.result || {};
 			updatePending = false;
 			setUpdateDot(false);
+			// Tandai model hasil unduhan supaya diberi badge NEW.
+			const added = res.new_models || [];
+			if (added.length) {
+				const prefix = updaterGame === "shoujoukaisen" ? "shoujoukaisen" : "arkrecode";
+				markNew(added.map((n) => `${prefix}/${n}`));
+			}
 			toast?.(
 				res.error
 					? `Gagal: ${res.error}`

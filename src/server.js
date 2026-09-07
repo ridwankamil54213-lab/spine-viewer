@@ -1610,6 +1610,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-arkrecode.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	shoujoukaisen: {
+		script: path.join(ROOT, "tools", "update-shoujoukaisen.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log }
@@ -1632,27 +1636,27 @@ function runUpdater(game, args) {
 	});
 }
 
-app.get("/api/update/arkrecode", async (req, res) => {
+app.get("/api/update/:game", async (req, res) => {
+	const game = req.params.game;
+	if (!UPDATERS[game]) return res.status(404).json({ error: `Tidak ada pembaru untuk ${game}.` });
 	const mode = req.query.mode === "apply" ? "apply" : "check";
 	// A check is quick; a download is not, so it goes to the background.
 	if (mode === "check") {
-		res.json(await runUpdater("arkrecode", ["--check"]));
+		res.json(await runUpdater(game, ["--check"]));
 		return;
 	}
 	if (updateJob?.running) {
 		res.json({ started: false, reason: "Pembaruan masih berjalan." });
 		return;
 	}
-	updateJob = { game: "arkrecode", running: true, result: null };
+	updateJob = { game, running: true, result: null };
 	res.json({ started: true });
-	updateJob.result = await runUpdater("arkrecode", ["--apply"]);
+	updateJob.result = await runUpdater(game, ["--apply"]);
 	updateJob.running = false;
 });
 
-app.get("/api/update/arkrecode/status", (_req, res) => {
-	res.json(
-		updateJob || { running: false, result: null }
-	);
+app.get("/api/update/:game/status", (_req, res) => {
+	res.json(updateJob || { running: false, result: null });
 });
 
 app.get("/api/thumbnails", (req, res) => {
