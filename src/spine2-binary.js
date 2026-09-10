@@ -215,7 +215,16 @@ export class SkeletonBinary2 {
 		if (charCount === 0) return null;
 		if (charCount === 1) return "";
 
+		// Karakter terakhir adalah penanda akhir string, bukan isi.
 		let n = charCount - 1;
+		// Panjang mustahil: string ASCII tidak mungkin lebih panjang dari
+		// sisa berkas. Tanpa batas ini, panjang yang salah membuat loop di
+		// bawah membaca melewati akhir dan menghasilkan sampah panjang.
+		if (n > this.bytes.length - this.pos) {
+			throw new Error(
+				`[spine2] panjang string ${charCount} melebihi sisa berkas ` +
+				`(${this.bytes.length - this.pos} byte) pada pos ${this.pos}`);
+		}
 		this.chars = "";
 		let b = 0;
 		let charIndex = 0;
@@ -394,14 +403,23 @@ export class SkeletonBinary2 {
 		const slotCount = this.readInt(true);
 		if (slotCount === 0) return null;
 		const skin = {};
+		// Urutan lampiran per slot, sesuai kemunculannya di berkas.
+		// Diperlukan bagian FFD: ia menyebut lampiran berdasar URUTAN, bukan
+		// nama (lihat catatan di readAnimation). Disimpan berdasar indeks
+		// slot supaya FFD bisa menemukannya lagi.
+		const order = (this.attachOrder = this.attachOrder || {});
 		for (let i = 0; i < slotCount; i++) {
 			const slotIndex = this.readInt(true);
 			const slot = {};
 			const attachCount = this.readInt(true);
+			const list = [];
 			for (let j = 0; j < attachCount; j++) {
 				const name = this.readString();
-				slot[name] = this.readAttachment(name, nonessential);
+				const att = this.readAttachment(name, nonessential);
+				slot[name] = att;
+				list.push(att);
 			}
+			order[slotIndex] = list;
 			skin[this.json.slots[slotIndex].name] = slot;
 		}
 		return skin;
@@ -655,17 +673,21 @@ export class SkeletonBinary2 {
 					const meshName = this.readString();
 					const frameCount = this.readInt(true);
 
-					let attachment = null;
-					const attachments =
-						this.json.skins[this.json.skinsName[skinIndex]]
-						?.[this.json.slots[slotIndex].name];
-					if (attachments) {
-						for (const attachmentName in attachments) {
-							if (attachments[attachmentName]?.name === meshName) {
-								attachment = attachments[attachmentName];
-							}
-						}
-					}
+					// Nama lampiran TIDAK bisa dipakai untuk mencari
+					// lampirannya: di 2.x nama lampiran sering berbeda dari
+					// kunci yang dipakai skin. Yang dipakai adalah URUTAN:
+					// FFD menulis lampiran sesuai urutan kemunculannya di
+					// skin, jadi indeks ke-N di sini = lampiran ke-N di slot
+					// itu. Terbukti pada 1001_Event_CG11: mencari berdasar
+					// nama menghasilkan found=false untuk SEMUA 17 slot,
+					// sedangkan urutannya cocok persis (Chest(L), Chest(R),
+					// Foot(L), LegCalf(L), LegCalf(R), LegThigh(L),
+					// LegThigh(R), MoniterA, MoniterB, MoniterC, Mouth,
+					// Nipple(L), ..., Semen, water, water_drop,
+					// water_ground) — dan offset string yang dihasilkan
+					// persis sama dengan posisi string di berkas mentah.
+					const order = (this.attachOrder || {})[slotIndex] || [];
+					const attachment = order[iii] || null;
 					if (!attachment) {
 						// Tidak fatal: lewati timeline-nya tapi TETAP baca
 						// bytes-nya, atau sisa berkas jadi bergeser.
@@ -748,7 +770,13 @@ export class SkeletonBinary2 {
 			animation.drawOrder = drawOrders;
 		}
 
-		// Timeline event.
+		// Format event 2.x, persis seperti yang diverifikasi pada
+		// 1001_Event_CG11 (event "PlaySound" membawa "1001_LG_fast.mp3"):
+		//   time=f32 | nameIndex=varint | int=zigzag varint | float=f32
+		//   | hasString=bool | string=hanya bila bool itu true
+		// Jika bool-nya false, string TIDAK ditulis — nilainya diambil
+		// dari definisi event. Ini beda dari 3.8, yang selalu menulis int,
+		// float, dan string.
 		const eventCount = this.readInt(true);
 		if (eventCount > 0) {
 			const events = new Array(eventCount);
@@ -758,7 +786,7 @@ export class SkeletonBinary2 {
 				const eventData = this.json.events[eventName] || {};
 				const e = {
 					name: eventName,
-					int: this.readInt(true),
+					int: this.readInt(false),
 					float: this.readFloat(),
 					string: this.readBoolean() ? this.readString() : eventData.string,
 					time,
