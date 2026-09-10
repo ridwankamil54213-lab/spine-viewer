@@ -326,6 +326,27 @@ const GAME_ROOTS = [
 		spineRuntime: "2.1.27",
 		pmaDefault: false,
 	},
+	// Cherry Tale (88kongque).
+	//
+	// Daftar bundle-nya (bundleMap.txt) berbentuk "assetID|bundleName",
+	// bukan katalog Addressables. Diunduh oleh tools/extract-cherrytale.py.
+	//
+	// 212 model, hampir semuanya skeleton BINER .skel versi 4.0.55 (143) dan
+	// 4.0.64 (68). Runtime 4.0/4.1 membaca keduanya, jadi tidak perlu
+	// konversi apa pun.
+	//
+	// Tidak perlu dekripsi untuk bundle dari CDN ini — magic UnityFS ada di
+	// offset 0 dan versinya sudah benar. (Script CherryTaleDecrypt.py yang
+	// beredar menukar tiga byte dan mengganti string versi 2018.3.5f1; itu
+	// diperlukan untuk berkas yang diambil dari perangkat, bukan dari sini.)
+	//
+	// Deteksi versi per berkas sudah cukup — jangan paksa spineRuntime.
+	{
+		match: "cherrytale",
+		key: "cherrytale",
+		label: "Cherry Tale",
+		pmaDefault: false,
+	},
 	// Star Lust (Erolabs / pinkcore).
 	//
 	// Katalog Addressables-nya berbentuk JSON (bukan biner seperti Megaha:Re),
