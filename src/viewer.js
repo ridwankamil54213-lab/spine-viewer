@@ -846,12 +846,20 @@ async function loadLegacyModel(model) {
 			"tools/convert-spine2.py untuk mengubahnya menjadi JSON.");
 		return;
 	}
-	const atlasFile = model.atlasFile || json.replace(/\.json$/i, ".atlas");
+	// Pakai atlasFile dari server. JANGAN ditebak dari nama skeleton: satu
+	// folder bisa berisi beberapa model, dan pasangannya tidak searah nama —
+	// 2001_1.json berpasangan dengan DragonPose1.atlas, bukan 2001.atlas.
+	// Menebak menghasilkan atlas 404 untuk model-model itu.
+	const atlasFileRaw = model.atlasFile || json.replace(/\.json$/i, ".atlas");
+	// Id bisa berbentuk "<dir>#<stem>": "#<stem>" hanya penanda varian di
+	// perpustakaan, bukan bagian path di disk.
+	const jsonFile = String(json).split("#")[0];
+	const atlasFile = String(atlasFileRaw).split("#")[0];
 
 	try {
 		spine21.state = await loadSpine21Model({
 			basePath: base,
-			jsonFile: encodeURIComponent(json),
+			jsonFile: encodeURIComponent(jsonFile),
 			atlasFile: encodeURIComponent(atlasFile),
 		});
 	} catch (err) {
