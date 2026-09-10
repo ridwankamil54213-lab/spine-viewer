@@ -333,8 +333,23 @@ const GAME_ROOTS = [
 		spineRuntime: "2.1.27",
 		pmaDefault: false,
 	},
-	// Project QT — hasil konversi .skel 2.1.27 menjadi JSON
-	// (tools/convert-spine2.py, memakai SpineConverter2.1.27).
+	// Project QT — .skel 2.1.27 yang sudah dikonversi ke JSON oleh
+	// tools/convert-spine2.py, dirender dengan runtime 2.1 official.
+	//
+	// Berbeda dari "Project QT" di atas (masih .skel biner) dan dari
+	// "Project QT (JSON)" (hasil konversi pihak lain, sudah 3.8.99).
+	// Yang ini formatnya MASIH 2.1.27 — hanya wadahnya yang jadi JSON —
+	// karena konverter mengubah biner menjadi JSON tanpa menaikkan versi.
+	//
+	// spineRuntime "2.1.27" mengarahkannya ke renderer kanvas 2.1
+	// (src/spine21-stage.js), bukan ke iframe penampil GWT.
+	{
+		match: "projectqt21",
+		key: "projectqt21",
+		label: "Project QT (2.1)",
+		spineRuntime: "2.1.27",
+		pmaDefault: false,
+	},
 	//
 	// Isinya model yang SAMA dengan assets/projectqt, hanya saja
 	// skeleton-nya sudah berbentuk JSON. Itu yang membuat perbedaan: berkas
@@ -2041,6 +2056,18 @@ app.use("/dist", express.static(path.join(ROOT, "public", "dist")));
 app.use(
 	"/legacy-spine",
 	express.static(path.join(ROOT, "vendor", "spine2127"), {
+		fallthrough: false,
+		maxAge: "7d",
+	})
+);
+
+// Runtime Spine 2.1 official. Dimuat sebagai tag <script> oleh
+// src/spine21-stage.js, jadi harus bisa diambil dari /vendor/spine21/.
+// Bukan modul: spine.js 2.1 mendefinisikan global `spine` dan tidak
+// mengerti import/export.
+app.use(
+	"/vendor/spine21",
+	express.static(path.join(ROOT, "vendor", "spine21"), {
 		fallthrough: false,
 		maxAge: "7d",
 	})

@@ -31,6 +31,13 @@ import {
 } from "./spine-version.js";
 import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion } from "./live2d.js";
 import { normalizeSpine2Json } from "./spine2-normalize.js";
+import {
+	loadSpine21Model,
+	drawSpine21,
+	advanceSpine21,
+	spine21TrackTime,
+	setSpine21Animation,
+} from "./spine21-stage.js";
 
 /* Pixi v7's loadTextures decodes via createImageBitmap(blob) with no options, so
  * the browser premultiplies alpha at decode time; alphaMode=UNPACK would then
@@ -346,6 +353,23 @@ const state = {
 	bg: "dark",
 	scrubbing: false,
 	trackTime: 0,
+};
+
+/**
+ * Negara renderer Spine 2.1.
+ *
+ * Terpisah dari `spine` (model pixi-spine) karena kedua jalur tidak bisa
+ * hidup di scene graph yang sama: spine.js 2.1 tidak mengerti Pixi, jadi ia
+ * digambar ke kanvas 2D sendiri — bukan ke app.stage.
+ */
+const spine21 = {
+	state: null,      // hasil loadSpine21Model
+	active: false,
+	canvas: null,
+	ctx: null,
+	rafId: 0,
+	lastTime: 0,
+	time: 0,
 };
 
 /* ------------------------------------------------------------------ *
@@ -783,23 +807,20 @@ function baseTextureFromPixiTexture(tex) {
 }
 
 /**
- * Render a Spine 2.x model in the vendored 2.1.27 viewer.
+ * Render model Spine 2.x dengan runtime 2.1 official di kanvas 2D sendiri.
  *
- * pixi-spine has no 2.x runtime, and feeding these through the 3.8 one
- * scatters the vertices (its weighted-mesh path desynchronises on the
- * 5-11 bones-per-vertex these models use). The native viewer reads them
- * correctly, so we swap the stage for an iframe pointing at it.
+ * Ini MENGGANTIKAN iframe ke penampil GWT vendored. Penampil itu punya loop
+ * dan kontrol sendiri, sehingga timeline, skin, export PNG, dan FPS meter
+ * viewer mati untuk model 2.x — padahal modelnya sendiri tidak bermasalah.
  *
- * The legacy viewer is a GWT app with its own controls, so we deliberately
- * do NOT fake our timeline/skin/export UI on top of it — those controls
- * would be lying about a renderer we don't drive.
+ * Kenapa kanvas tersendiri, bukan Pixi: spine.js 2.1 lahir sebelum Pixi dan
+ * tidak tahu PIXI.Container/texture. Ia tidak bisa masuk ke scene graph yang
+ * dipakai model 3.8/4.x. Kanvas 2D ini menempel di atas kanvas Pixi dan
+ * berbagi viewport (pan/zoom), jadi pergerakannya tetap terasa sama.
  */
 async function loadLegacyModel(model) {
 	const dirPath = String(model.id || "").split("#")[0];
-	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/");
-	// The legacy viewer fetches <skeletonUrl> and derives the atlas from the
-	// same stem, so it needs an absolute URL it can fetch cross-frame.
-	const skelUrl = new URL(`${base}/${encodeURIComponent(model.skeletonFile)}`, location.origin).href;
+	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
 
 	// Tear down any pixi-spine model currently on the stage.
 	if (spine) {
@@ -811,66 +832,169 @@ async function loadLegacyModel(model) {
 		}
 		spine = null;
 	}
+	teardownSpine21();
 	current = model;
 
 	el.loading.hidden = true;
+
+	// Cari skeleton JSON dan atlas di direktori model.
+	let json = model.skeletonFile;
+	if (!json || !json.toLowerCase().endsWith(".json")) {
+		// Model 2.x murni .skel belum dikonversi: tidak bisa dirender di sini.
+		showError(
+			"Model ini masih berbentuk .skel biner. Jalankan dulu " +
+			"tools/convert-spine2.py untuk mengubahnya menjadi JSON.");
+		return;
+	}
+	const atlasFile = model.atlasFile || json.replace(/\.json$/i, ".atlas");
+
+	try {
+		spine21.state = await loadSpine21Model({
+			basePath: base,
+			jsonFile: encodeURIComponent(json),
+			atlasFile: encodeURIComponent(atlasFile),
+		});
+	} catch (err) {
+		showError("Gagal memuat model 2.1: " + (err?.message || err));
+		return;
+	}
 	showError(null);
 
-	// Build (or reuse) the iframe that hosts the 2.1.27 viewer.
-	let frame = document.getElementById("legacy-frame");
-	if (!frame) {
-		frame = document.createElement("iframe");
-		frame.id = "legacy-frame";
-		frame.title = "Penampil Spine 2.1.27";
-		frame.setAttribute("allowtransparency", "true");
-		// The viewer is a third-party GWT app; keep it sandboxed apart from
-		// the scripts it needs to boot and fetch the model.
-		frame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups");
-		frame.style.cssText =
-			"position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;z-index:5;";
-		// Insert next to the canvas' container so it covers the stage area.
-		const host = document.getElementById("canvas-wrap") || document.querySelector(".main") || document.body;
-		host.appendChild(frame);
-	}
-	frame.src = `/legacy-spine/index.html?url=${encodeURIComponent(skelUrl)}`;
+	spine21.active = true;
+	spine21.lastTime = performance.now() / 1000;
+	ensureSpine21Canvas();
+	startSpine21Loop();
 
-	// The legacy viewer renders in its own iframe with its own loop, so the
-	// Pixi ticker (and therefore the FPS meter) says nothing about it. Flag
-	// it rather than displaying a number that would look authoritative.
-	fps.external = true;
-	fpsPaint();
-
-	// Title/HUD: show what's loaded, with a note about the legacy renderer.
-	// NOTE: $ is querySelector, so these need the # prefix.
+	// HUD: penanda bahwa model dimuat, dan renderer yang dipakai.
+	el.hud.hidden = false;
 	$("#title-model").textContent = model.name;
 	el.delBtn.hidden = false;
-	// The HUD is the signal the rest of the UI (and the tests) use to know a
-	// model is on screen, so the legacy path has to raise it too.
-	el.hud.hidden = false;
 	const hudModel = $("#hud-model");
 	if (hudModel) hudModel.textContent = model.name;
 	const hudStats = $("#hud-stats");
 	if (hudStats) {
 		hudStats.innerHTML =
 			`<span><b>Spine ${model.spine || "2.1.27"}</b></span>` +
-			`<span><b>penampil 2.1.27</b></span>`;
+			`<span><b>runtime 2.1</b></span>`;
 	}
 	$("#empty").hidden = true;
-	const note = document.getElementById("legacy-note");
-	if (note) note.hidden = false;
 
-	// The legacy viewer owns playback, so disable the controls that drive
-	// pixi-spine instead of leaving dead buttons on screen.
-	// (IDs match public/index.html — canvas host is #canvas-wrap.)
-	for (const id of ["anim-select", "skin-select", "pma-select", "play-btn", "loop-btn", "scrub", "rate-select"]) {
+	// Isi daftar animasi — sekarang NYATA, karena kitalah yang memutarnya.
+	populateSpine21UI();
+
+	// FPS meter kembali berarti: ticker kita yang menggambar.
+	fps.external = false;
+	fpsWarmup();
+}
+
+/** Isi pilihan animasi/skin dari skeleton 2.1 yang sedang aktif. */
+function populateSpine21UI() {
+	const st = spine21.state;
+	if (!st) return;
+	const anims = st.animations || [];
+	if (el.animSelect) {
+		el.animSelect.innerHTML = "";
+		for (const name of anims) {
+			const o = document.createElement("option");
+			o.value = name;
+			o.textContent = name;
+			el.animSelect.appendChild(o);
+		}
+		el.animSelect.disabled = anims.length === 0;
+		if (anims.length) el.animSelect.value = anims[0];
+	}
+	// Kendali tidak lagi dimatikan — berbeda dari jalur iframe dulu,
+	// karena sekarang viewer yang memegang putarannya.
+	for (const id of ["anim-select", "play-btn", "loop-btn", "scrub", "rate-select"]) {
 		const n = document.getElementById(id);
 		if (n) {
-			n.disabled = true;
-			n.title = "Model Spine 2.1.27 — diputar oleh penampil legacy";
+			n.disabled = false;
+			n.removeAttribute("title");
 		}
 	}
 }
 
+/** Buat (atau pakai ulang) kanvas 2D yang menampung model 2.1. */
+function ensureSpine21Canvas() {
+	const host = document.getElementById("canvas-wrap") || document.querySelector(".main") || document.body;
+	if (spine21.canvas && spine21.canvas.parentElement === host) return spine21.canvas;
+
+	// Hanya lepas KANVAS-nya, jangan panggil teardownSpine21(): itu juga
+	// mengosongkan spine21.state, sehingga loop yang menyusul langsung
+	// berhenti karena tidak ada skeleton untuk digambar.
+	if (spine21.rafId) cancelAnimationFrame(spine21.rafId);
+	spine21.rafId = 0;
+	if (spine21.canvas) spine21.canvas.remove();
+
+	const canvas = document.createElement("canvas");
+	canvas.id = "spine21-canvas";
+	canvas.style.cssText =
+		"position:absolute;inset:0;width:100%;height:100%;z-index:6;pointer-events:none;";
+	host.appendChild(canvas);
+	spine21.canvas = canvas;
+	spine21.ctx = canvas.getContext("2d");
+
+	// Ukuran awal: pakai ukuran CSS host kalau sudah diketahui. Tanpa ini
+	// kanvas tetap 300x150 (bawaan) sampai frame pertama, dan apa pun yang
+	// membaca dimension sebelum frame itu akan melihat angka yang salah.
+	const w = host.clientWidth || 1;
+	const h = host.clientHeight || 1;
+	canvas.width = w;
+	canvas.height = h;
+	return canvas;
+}
+
+/** Hentikan loop dan lepas kanvas 2.1. */
+function teardownSpine21() {
+	if (spine21.rafId) cancelAnimationFrame(spine21.rafId);
+	spine21.rafId = 0;
+	if (spine21.canvas) spine21.canvas.remove();
+	spine21.canvas = null;
+	spine21.ctx = null;
+	spine21.state = null;
+	spine21.active = false;
+}
+
+/** Loop gambar: satu rAF yang juga dipakai FPS meter. */
+function startSpine21Loop() {
+	const frame = () => {
+		if (!spine21.active || !spine21.state) return;
+		const now = performance.now() / 1000;
+		// Batasi delta: tab yang kembali dari latar bisa lapor puluhan detik,
+		// yang melompatkan animasi jauh melewati akhirnya.
+		const delta = Math.min(now - spine21.lastTime, 0.1);
+		spine21.lastTime = now;
+
+		spine21.time += state.playing ? delta * state.rate : 0;
+		advanceSpine21(spine21.state, state.playing ? delta * state.rate : 0);
+
+		const host = document.getElementById("canvas-wrap");
+		const w = host?.clientWidth || 1;
+		const h = host?.clientHeight || 1;
+		const canvas = spine21.canvas;
+		if (canvas && (canvas.width !== w || canvas.height !== h)) {
+			canvas.width = w;
+			canvas.height = h;
+		}
+		if (canvas && spine21.ctx) {
+			drawSpine21(spine21.state, {
+				ctx: spine21.ctx,
+				width: w,
+				height: h,
+				zoom: state.zoom * (state.flip ? -1 : 1),
+				panX: state.panX,
+				// Kanvas 2.1 pakai y-up, jadi pan dibalik supaya searah Pixi.
+				panY: -state.panY,
+				bgColor: state.bg === "light" ? "#f4f4f6" : "#101014",
+			});
+		}
+		if (el.timeline && !el.timeline.hidden) updateTimelinePlayhead();
+		spine21.rafId = requestAnimationFrame(frame);
+	};
+	spine21.rafId = requestAnimationFrame(frame);
+}
+
+/** Lepas kanvas 2.1 dan hidupkan kembali kendali pixi-spine. */
 /** Drop the legacy iframe and re-enable the pixi-spine controls. */
 function teardownLegacyViewer() {
 	const frame = document.getElementById("legacy-frame");
