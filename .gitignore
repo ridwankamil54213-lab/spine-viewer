@@ -54,3 +54,8 @@ public/l2d/
 # load behind a module check. Superseded by loading the core via a plain
 # <script> tag in index.html; nothing imports it.
 src/l2d-core-gate.js
+
+# Per-deployment runtime state written by PUT /api/favorites. It is the
+# server-side mirror of whatever the local browser starred, so committing it
+# would push one person's list onto everyone else.
+data/favorites.json

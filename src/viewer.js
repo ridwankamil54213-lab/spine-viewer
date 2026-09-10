@@ -205,6 +205,10 @@ const el = {
 	sidebar: $("#sidebar"),
 	sidebarToggle: $("#sidebar-toggle"),
 
+	// favorites
+	favFilter: $("#fav-filter"),
+	favCount: $("#fav-count"),
+
 	animSelect: $("#anim-select"),
 	skinSelect: $("#skin-select"),
 	variantSelect: $("#variant-select"),
@@ -257,6 +261,8 @@ const el = {
 	zoomLabel: $("#zoom-label"),
 	fullscreenBtn: $("#fullscreen-btn"),
 	exportBtn: $("#export-btn"),
+	exportPng: $("#export-png"),
+	exportPngNote: $("#export-png-note"),
 	exportModal: $("#export-modal"),
 	exportClose: $("#export-close"),
 	exportCancel: $("#export-cancel"),
@@ -274,7 +280,17 @@ const el = {
 	exportMeta: $("#export-meta"),
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
+	partsBtn: $("#parts-btn"),
 	pmaSelect: $("#pma-select"),
+
+	// FPS meter
+	fpsBtn: $("#fps-btn"),
+	fpsMeter: $("#fps-meter"),
+	fpsValue: $("#fps-value"),
+	fpsMin: $("#fps-min"),
+	fpsAvg: $("#fps-avg"),
+	fpsGraph: $("#fps-graph"),
+	fpsReset: $("#fps-reset"),
 
 	error: $("#error"),
 	loading: $("#loading"),
@@ -368,10 +384,20 @@ app.ticker.add(() => {
 	const track = spine.state.tracks[0];
 	if (!track) return;
 
+	// One clock drives everything: advance authored seconds by the ticker
+	// delta scaled by the speed control, then move the track by exactly that.
+	// Reading wall-clock time here instead would keep running while paused and
+	// ignore the rate, so pause/scrub/speed could each disagree about where
+	// the playhead is.
+	const dt = clock.tick(app.ticker.deltaMS);
+
 	if (state.scrubbing) {
+		// The user is dragging: the track follows state.trackTime, and the
+		// clock follows the track so nothing else drifts away from it.
 		track.trackTime = state.trackTime;
+		clock.syncTo(state.trackTime);
 	} else if (state.playing) {
-		track.trackTime += (app.ticker.deltaMS / 1000) * state.rate;
+		track.trackTime += dt;
 		if (track.trackTime >= duration) {
 			if (state.loop) {
 				track.trackTime = track.trackTime % duration;
@@ -380,6 +406,7 @@ app.ticker.add(() => {
 				setPlaying(false);
 			}
 		}
+		clock.syncTo(track.trackTime);
 	}
 
 	// dt = 0: we already positioned the track, this only applies + renders it.
@@ -390,6 +417,9 @@ app.ticker.add(() => {
 	// screen — building ticks for a hidden panel would be wasted work.
 	if (!el.timeline.hidden) updateTimelinePlayhead();
 	drawBones();
+	// The part overlay is posed geometry, so it has to be redrawn as the
+	// skeleton moves — a static snapshot would stop matching the model.
+	if (parts.on) drawParts();
 });
 
 function updateScrubUI() {
@@ -461,7 +491,9 @@ function applyTransform() {
 	const h = el.canvasWrap.clientHeight;
 	world.position.set(w / 2 + state.panX, h / 2 + state.panY);
 	world.scale.set(state.zoom * (state.flip ? -1 : 1), state.zoom);
-	el.zoomLabel.textContent = Math.round(state.zoom * 100) + "%";
+	// The trailing "%" is drawn by CSS (.zoom-label::after) so the number here
+	// stays tabular and the box doesn't resize between "9%" and "100%".
+	el.zoomLabel.textContent = String(Math.round(state.zoom * 100));
 	drawBones();
 }
 
@@ -788,6 +820,12 @@ async function loadLegacyModel(model) {
 	}
 	frame.src = `/legacy-spine/index.html?url=${encodeURIComponent(skelUrl)}`;
 
+	// The legacy viewer renders in its own iframe with its own loop, so the
+	// Pixi ticker (and therefore the FPS meter) says nothing about it. Flag
+	// it rather than displaying a number that would look authoritative.
+	fps.external = true;
+	fpsPaint();
+
 	// Title/HUD: show what's loaded, with a note about the legacy renderer.
 	// NOTE: $ is querySelector, so these need the # prefix.
 	$("#title-model").textContent = model.name;
@@ -823,6 +861,10 @@ async function loadLegacyModel(model) {
 function teardownLegacyViewer() {
 	const frame = document.getElementById("legacy-frame");
 	if (frame) frame.remove();
+	// Our ticker draws the stage again from here, so the FPS meter is
+	// meaningful once more.
+	fps.external = false;
+	fpsWarmup();
 	const note = document.getElementById("legacy-note");
 	if (note) note.hidden = true;
 	for (const id of ["anim-select", "skin-select", "pma-select", "play-btn", "loop-btn", "scrub", "rate-select"]) {
@@ -906,6 +948,8 @@ async function loadLive2DModel(model) {
 	el.empty.hidden = true;
 	setActive(model.id);
 	renderHud();
+	// Same as the Spine path: fresh stats for a freshly loaded model.
+	if (fps.on) fpsResetStats();
 }
 
 async function loadModel(model) {
@@ -1235,6 +1279,13 @@ async function loadModel(model) {
 		el.empty.hidden = true;
 		setActive(model.id);
 		renderHud();
+		// min/avg belong to the model on screen, so drop the old ones — the
+		// first frames after a load also include parsing and texture upload.
+		if (fps.on) fpsResetStats();
+		// A different skeleton has different named regions; the old bounds
+		// would answer hit tests with names this model doesn't have.
+		parts.bounds = null;
+		parts.hover = null;
 	} catch (err) {
 		console.error(err);
 		showError(`Gagal memuat “${model.name}”: ${err.message}`);
@@ -1268,6 +1319,9 @@ function setAnimation(name, restart = false) {
 	duration = track?.animation?.duration || 0;
 	state.trackTime = restart ? 0 : Math.min(state.trackTime, duration);
 	if (track) track.trackTime = state.trackTime;
+	// A new clip re-anchors the clock: "0.5s into this animation" is a
+	// different moment than "0.5s into the last one".
+	clock.syncTo(state.trackTime);
 	el.timeDur.textContent = duration.toFixed(2) + "s";
 	spine.update(0);
 	renderHud();
@@ -1724,6 +1778,7 @@ function tlSeek(time) {
 	state.trackTime = t;
 	const track = spine.state?.tracks?.[0];
 	if (track) track.trackTime = t;
+	clock.syncTo(t);
 	spine.update(0);
 	updateScrubUI();
 	updateTimelinePlayhead();
@@ -2260,6 +2315,392 @@ function renderHud() {
 }
 
 /* ------------------------------------------------------------------ *
+ * Animation clock
+ *
+ * Wall-clock time (`performance.now`, `setTimeout`, ticker deltaMS) is the
+ * wrong clock for anything tied to the skeleton: it keeps running while the
+ * model is paused, ignores the speed control, and desynchronises the moment
+ * a frame is slow. Everything that cares "how far into the animation are
+ * we?" reads this instead.
+ *
+ * `now` is authored seconds: it advances by the ticker delta scaled by the
+ * current rate, holds at its value while paused, and never jumps. Changing
+ * the speed mid-flight simply changes how fast it advances from here —
+ * nothing already scheduled needs rewriting.
+ *
+ * Deliberately NOT used for UI timers (toasts, resize debounce): those are
+ * wall-clock concerns and should keep running while the model is paused.
+ * ------------------------------------------------------------------ */
+
+const clock = {
+	now: 0,
+	rate: () => state.rate,
+	/** Advance the clock. Returns the delta actually applied, in seconds. */
+	tick(deltaMS) {
+		const d = (deltaMS / 1000) * (this.rate() || 0);
+		this.now += d;
+		return d;
+	},
+	/**
+	 * Re-anchor the clock to an authored position.
+	 *
+	 * Used when something other than playback moves the playhead (a scrub, a
+	 * seek, a new animation). Without this the clock would keep its own value
+	 * and anything reading it would disagree with the skeleton about where we
+	 * are — the exact desync this clock exists to prevent.
+	 */
+	syncTo(seconds) {
+		if (Number.isFinite(seconds)) this.now = seconds;
+	},
+};
+
+/* ------------------------------------------------------------------ *
+ * Part picker — click a drawn part of the model to inspect it
+ *
+ * The overlay draws each attachment's posed bounding polygon, but the HIT
+ * TEST runs against the same SkeletonBounds instance, never against the
+ * drawn graphic. That matters: the graphic is a flattened approximation
+ * redrawn every frame, while the bounds are the authoritative posed shape.
+ * Testing against what we drew would let the two drift apart and report a
+ * hit on a part that isn't under the cursor.
+ *
+ * Only bounding boxes (named regions) are pickable — that is the subset the
+ * runtime gives us a name for, and the only subset worth naming in a viewer.
+ * ------------------------------------------------------------------ */
+
+const PARTS_KEY = "spine-stage:parts";
+
+const parts = {
+	on: false,
+	bounds: null,
+	gfx: null,
+	hover: null,
+};
+
+function partGraphics() {
+	if (parts.gfx) return parts.gfx;
+	parts.gfx = new Graphics();
+	parts.gfx.visible = false;
+	parts.gfx.zIndex = 10;
+	stageRoot.addChild(parts.gfx);
+	return parts.gfx;
+}
+
+/** Draw the posed polygon for every named bounding-box attachment. */
+function drawParts() {
+	const gfx = partGraphics();
+	gfx.clear();
+	if (!parts.on || !spine) {
+		gfx.visible = false;
+		return;
+	}
+	if (!parts.bounds) {
+		try {
+			parts.bounds = new SkeletonBounds();
+		} catch {
+			return;
+		}
+	}
+	parts.bounds.update(spine.skeleton, true);
+	const polys = parts.bounds.polygons || [];
+	const boxes = parts.bounds.boundingBoxes || [];
+	if (!polys.length) {
+		gfx.visible = false;
+		return;
+	}
+	gfx.visible = true;
+
+	// Stroke width in skeleton units so it stays thin at any zoom.
+	const w = 1.5 / Math.max(state.zoom, 0.0001);
+	gfx.lineStyle(w, 0x7fd1ff, 0.85);
+	for (let i = 0; i < polys.length; i++) {
+		const v = polys[i];
+		if (!v || v.length < 6) continue;
+		const name = boxes[i]?.name || boxes[i]?.data?.name || "";
+		const hot = parts.hover && parts.hover === name;
+		gfx.lineStyle(w, hot ? 0xffb02e : 0x7fd1ff, hot ? 1 : 0.65);
+		gfx.beginFill(hot ? 0xffb02e : 0x7fd1ff, hot ? 0.16 : 0.05);
+		gfx.moveTo(v[0], v[1]);
+		for (let k = 2; k < v.length; k += 2) gfx.lineTo(v[k], v[k + 1]);
+		gfx.closePath();
+		gfx.endFill();
+	}
+}
+
+/**
+ * Which named bounding box is under this stage point, or null.
+ * `x`/`y` are in stage-local (skeleton) coordinates.
+ */
+function partAt(x, y) {
+	if (!spine || !parts.bounds) return null;
+	try {
+		const hit = parts.bounds.containsPoint(x, y);
+		if (!hit) return null;
+		return hit.name || hit.data?.name || null;
+	} catch {
+		return null;
+	}
+}
+
+function setPartsVisible(on) {
+	parts.on = on;
+	parts.hover = null;
+	el.partsBtn.dataset.on = String(on);
+	el.partsBtn.setAttribute("aria-pressed", String(on));
+	try {
+		localStorage.setItem(PARTS_KEY, on ? "1" : "0");
+	} catch {
+		/* private mode */
+	}
+	// Rebuilding the bounds is cheap and avoids a stale pose from a model
+	// that has since been swapped out.
+	parts.bounds = null;
+	drawParts();
+}
+
+function initParts() {
+	let stored = null;
+	try {
+		stored = localStorage.getItem(PARTS_KEY);
+	} catch {
+		/* private mode */
+	}
+	const on = stored === "1";
+	parts.on = on;
+	el.partsBtn.dataset.on = String(on);
+	el.partsBtn.setAttribute("aria-pressed", String(on));
+}
+
+/* ------------------------------------------------------------------ *
+ * FPS meter
+ *
+ * Measures what the Pixi ticker actually delivers — the honest number for
+ * "can this model hold 60?" — rather than anything the display claims.
+ *
+ * The big readout is averaged over a 250ms window so it is readable instead
+ * of flickering every frame, but min/avg accumulate per FRAME. A single
+ * hitch therefore stays visible in "min" even though the headline number
+ * smoothed over it, which is exactly what you want when checking whether a
+ * heavy skeleton stutters.
+ * ------------------------------------------------------------------ */
+
+const FPS_KEY = "spine-stage:fps";
+const FPS_WINDOW_MS = 250; // how often the readout is republished
+const FPS_GRAPH_POINTS = 80; // rolling samples drawn in the sparkline
+const FPS_WARMUP = 20; // frames discarded after enabling / loading
+
+const fps = {
+	on: false,
+	external: false, // true while the legacy 2.1.27 iframe owns the pixels
+	frames: 0, // frames counted in the current window
+	elapsed: 0, // ms accumulated in the current window
+	shown: 0, // last published rolling average
+	min: Infinity,
+	sum: 0,
+	count: 0,
+	warmup: 0,
+	peak: 0, // best sustained window seen -> proxy for refresh rate
+	history: [],
+	ctx: null,
+	dpr: 0,
+};
+
+/** Estimated refresh rate of the panel, so tiers scale on 120Hz displays. */
+function fpsRefreshRate() {
+	const raw = fps.peak || 60;
+	// Snap up to whatever common rate the observed peak fits: a 59.94Hz panel
+	// should read as "60", not as permanently dropping frames.
+	for (const c of [60, 75, 90, 100, 120, 144, 165, 240]) {
+		if (raw <= c * 1.08) return c;
+	}
+	return Math.round(raw);
+}
+
+/** Discard the next few frames — asset uploads and are not render cost. */
+function fpsWarmup() {
+	fps.warmup = FPS_WARMUP;
+	fps.frames = 0;
+	fps.elapsed = 0;
+}
+
+function fpsResetStats() {
+	fps.min = Infinity;
+	fps.sum = 0;
+	fps.count = 0;
+	fps.peak = 0;
+	fps.shown = 0;
+	fps.history = [];
+	// Warm up AND suppress publishing for the first window: without this the
+	// readout refills within ~250ms and the reset looks like it did nothing.
+	fps.warmup = FPS_WARMUP + Math.ceil(FPS_WINDOW_MS / 16);
+	fps.frames = 0;
+	fps.elapsed = 0;
+	fpsPaint();
+	fpsDrawGraph();
+}
+
+function fpsPaint() {
+	if (!el.fpsMeter) return;
+	// While the legacy viewer drives its own iframe, our ticker is not what
+	// draws the model, so any number here would be meaningless.
+	if (fps.external) {
+		el.fpsValue.textContent = "—";
+		el.fpsMin.textContent = "min —";
+		el.fpsAvg.textContent = "avg —";
+		el.fpsMeter.dataset.tier = "good";
+		el.fpsMeter.title = "Penampil legacy (Spine 2.1.27) berjalan di iframe sendiri — FPS tidak terukur.";
+		return;
+	}
+	el.fpsMeter.removeAttribute("title");
+	const have = Number.isFinite(fps.min) && fps.count > 0;
+	el.fpsValue.textContent = fps.shown ? String(Math.round(fps.shown)) : "—";
+	el.fpsMin.textContent = `min ${have ? Math.round(fps.min) : "—"}`;
+	el.fpsAvg.textContent = `avg ${have ? Math.round(fps.sum / fps.count) : "—"}`;
+
+	const rate = fpsRefreshRate();
+	// Colour carries the verdict: green at full rate, amber once frames are
+	// actually being missed, red under half.
+	const tier = !fps.shown ? "good" : fps.shown >= rate * 0.9 ? "good" : fps.shown >= rate * 0.5 ? "ok" : "bad";
+	el.fpsMeter.dataset.tier = tier;
+}
+
+/** Size the sparkline's backing store for the device pixel ratio, once. */
+function fpsSizeCanvas() {
+	if (!el.fpsGraph) return;
+	const dpr = Math.min(window.devicePixelRatio || 1, 2);
+	const cssW = el.fpsGraph.clientWidth || 160;
+	const cssH = el.fpsGraph.clientHeight || 34;
+	if (fps.dpr === dpr && el.fpsGraph.width === Math.round(cssW * dpr)) return;
+	fps.dpr = dpr;
+	el.fpsGraph.width = Math.round(cssW * dpr);
+	el.fpsGraph.height = Math.round(cssH * dpr);
+	if (fps.ctx) fps.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function fpsDrawGraph() {
+	if (!el.fpsGraph) return;
+	// Hidden on phones and under prefers-reduced-motion — nothing to draw.
+	if (!el.fpsGraph.offsetParent) return;
+	if (!fps.ctx) {
+		fps.ctx = el.fpsGraph.getContext("2d");
+		fpsSizeCanvas();
+		if (fps.ctx) fps.ctx.setTransform(fps.dpr, 0, 0, fps.dpr, 0, 0);
+	}
+	const ctx = fps.ctx;
+	if (!ctx) return;
+	const w = el.fpsGraph.width / (fps.dpr || 1);
+	const h = el.fpsGraph.height / (fps.dpr || 1);
+	ctx.clearRect(0, 0, w, h);
+
+	const rate = fpsRefreshRate();
+	const scale = Math.max(rate, fps.shown || 0) * 1.1;
+
+	// Reference line at the target rate: everything below it is a dropped frame.
+	const y = (v) => h - Math.min(1, v / scale) * (h - 1) - 0.5;
+	const lineY = y(rate);
+	ctx.strokeStyle = "rgba(255,255,255,0.16)";
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.moveTo(0, lineY);
+	ctx.lineTo(w, lineY);
+	ctx.stroke();
+
+	if (!fps.history.length) return;
+
+	// Bars, coloured by how far below target each sample sat.
+	const slot = w / FPS_GRAPH_POINTS;
+	const bw = Math.max(1, slot - 0.6);
+	for (let i = 0; i < fps.history.length; i++) {
+		const v = fps.history[i];
+		const top = y(v);
+		ctx.fillStyle = v >= rate * 0.9 ? "#7fd1ff" : v >= rate * 0.5 ? "#ffb02e" : "#ff6b5e";
+		ctx.fillRect(i * slot, top, bw, h - top);
+	}
+}
+
+/** Called every frame from the Pixi ticker. */
+function fpsSample(deltaMS) {
+	if (!fps.on || fps.external) return;
+	// Returning from a backgrounded tab delivers one enormous frame; counting
+	// it would pin "min" to something like 2fps for the rest of the session.
+	if (!(deltaMS > 0) || deltaMS > 500) return;
+
+	if (fps.warmup > 0) {
+		fps.warmup--;
+		fps.frames = 0;
+		fps.elapsed = 0;
+		return;
+	}
+
+	const instant = 1000 / deltaMS;
+	fps.frames++;
+	fps.elapsed += deltaMS;
+	fps.sum += instant;
+	fps.count++;
+	if (instant < fps.min) fps.min = instant;
+
+	if (fps.elapsed >= FPS_WINDOW_MS) {
+		const windowed = (fps.frames * 1000) / fps.elapsed;
+		fps.shown = windowed;
+		if (windowed > fps.peak) fps.peak = windowed;
+		fps.history.push(windowed);
+		if (fps.history.length > FPS_GRAPH_POINTS) fps.history.shift();
+		fps.frames = 0;
+		fps.elapsed = 0;
+		fpsPaint();
+		fpsDrawGraph();
+	}
+}
+
+function setFpsVisible(on) {
+	fps.on = on;
+	el.fpsMeter.hidden = !on;
+	el.fpsBtn.dataset.on = String(on);
+	el.fpsBtn.setAttribute("aria-pressed", String(on));
+	try {
+		localStorage.setItem(FPS_KEY, on ? "1" : "0");
+	} catch {
+		/* private mode — works for this session */
+	}
+	if (on) {
+		fpsResetStats();
+		fpsSizeCanvas();
+	} else {
+		fps.history = [];
+		fps.shown = 0;
+	}
+}
+
+/** Restore visibility from the last session, without re-persisting it. */
+function initFps() {
+	let stored = null;
+	try {
+		stored = localStorage.getItem(FPS_KEY);
+	} catch {
+		/* private mode */
+	}
+	const on = stored === "1";
+	fps.on = on;
+	el.fpsMeter.hidden = !on;
+	el.fpsBtn.dataset.on = String(on);
+	el.fpsBtn.setAttribute("aria-pressed", String(on));
+	if (on) fpsWarmup();
+}
+
+/* The ticker is the real clock here: it fires once per rendered frame, which
+ * is exactly the interval we are trying to measure. Registered separately
+ * from the render loop above, which bails out early when no model is loaded
+ * — the meter should still read even on an empty stage. */
+app.ticker.add(() => fpsSample(app.ticker.deltaMS));
+
+window.addEventListener("resize", () => {
+	if (!fps.on) return;
+	fps.ctx = null; // force a fresh backing store at the new size
+	fpsSizeCanvas();
+	fpsDrawGraph();
+});
+
+/* ------------------------------------------------------------------ *
  * Model list
  * ------------------------------------------------------------------ */
 let models = [];
@@ -2272,9 +2713,16 @@ let gameIcons = {};
  * paginated grid of that game's models. With 2000+ models a single scrolling
  * list is unusable, and a <select> filter hides how big each library is. */
 const PAGE_SIZE = 60;
-const browse = { view: "games", game: null, page: 1 };
+const browse = { view: "games", game: null, page: 1, favOnly: false };
 
-/** Games, biggest library first, with a short badge letter for each. */
+/**
+ * Games, A→Z by display label.
+ *
+ * Was sorted biggest-library-first, which is nice for discovery but makes a
+ * known title impossible to find by eye once there are 20+ games. Alphabetical
+ * sort uses localeCompare with numeric: true so "Epic Seven 2" doesn't land
+ * before "Epic Seven", and sensitivity: "base" so accents don't reorder.
+ */
 function gameBuckets() {
 	const seen = new Map();
 	for (const m of models) {
@@ -2282,7 +2730,12 @@ function gameBuckets() {
 		if (!seen.has(key)) seen.set(key, { key, label: m.gameLabel || "Lainnya", items: [] });
 		seen.get(key).items.push(m);
 	}
-	return [...seen.values()].sort((a, b) => b.items.length - a.items.length);
+	return [...seen.values()].sort((a, b) =>
+		(a.label || a.key).localeCompare(b.label || b.key, undefined, {
+			numeric: true,
+			sensitivity: "base",
+		})
+	);
 }
 
 /** One or two letters to stand in for a game with no logo. */
@@ -2365,9 +2818,16 @@ function initials(m) {
 function renderGames(filter = "") {
 	const q = filter.trim().toLowerCase();
 	el.gameList.innerHTML = "";
-	const buckets = gameBuckets().filter(
+	// Same "Favorit" filter applies here: only keep games that actually
+	// contain a starred model, otherwise the grid looks unchanged.
+	let buckets = gameBuckets().filter(
 		(g) => !q || g.label.toLowerCase().includes(q) || g.key.includes(q)
 	);
+	if (browse.favOnly) {
+		buckets = buckets
+			.map((g) => ({ ...g, items: g.items.filter((m) => favorites.has(m.id)) }))
+			.filter((g) => g.items.length);
+	}
 
 	if (!buckets.length) {
 		el.gameList.innerHTML = `<li class="list-empty">Tidak ada game yang cocok.</li>`;
@@ -2440,10 +2900,13 @@ function backToGames() {
 function modelsInScope() {
 	const q = el.search.value.trim().toLowerCase();
 	const inGame = browse.game ? models.filter((m) => (m.game || "lainnya") === browse.game) : models;
+	// "Favorit" filter: narrow to starred models before anything else, so it
+	// works from either the game grid or a single game's list.
+	const scoped = browse.favOnly ? inGame.filter((m) => favorites.has(m.id)) : inGame;
 	// Variants (nikke/c010/aim, /cover) are reachable from the stage's "Varian"
 	// dropdown, so listing them here too just tripled the grid — 776 of Nikke's
 	// 1501 entries were duplicates of a character already in the list.
-	const roots = inGame.filter((m) => !m.family || m.family.root === m.id);
+	const roots = scoped.filter((m) => !m.family || m.family.root === m.id);
 	// Models added by the updater float to the top so a fresh download is
 	// visible without hunting for it; newest first, then alphabetical.
 	const order = (list) =>
@@ -2520,7 +2983,25 @@ function renderModels() {
 		</span>
 		`;
 		btn.addEventListener("click", () => loadModel(m));
+
+		// Star toggle. Nested inside the card, but a separate button so
+		// clicking it doesn't also load the model.
+		const star = document.createElement("button");
+		star.className = "model-fav" + (isFavorite(m.id) ? " is-on" : "");
+		star.type = "button";
+		star.setAttribute("aria-pressed", String(isFavorite(m.id)));
+		star.setAttribute("aria-label", isFavorite(m.id) ? "Hapus dari favorit" : "Tambah ke favorit");
+		star.title = isFavorite(m.id) ? "Hapus dari favorit" : "Tambah ke favorit";
+		// Build a real <svg> element — assigning the bare <path> markup from
+		// ICON.star renders nothing, because innerHTML parses it as an unknown
+		// top-level element instead of an SVG graphic.
+		star.innerHTML = `<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">${ICON.star}</svg>`;
+		star.addEventListener("click", (ev) => {
+			ev.stopPropagation();
+			toggleFavorite(m.id);
+		});
 		li.appendChild(btn);
+		li.appendChild(star);
 		el.list.appendChild(li);
 	}
 
@@ -2842,6 +3323,7 @@ async function refresh() {
 const ICON = {
 	play: '<path d="M8 5v14l11-7z"/>',
 	pause: '<path d="M6 5h4v14H6zm8 0h4v14h-4z"/>',
+	star: '<path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>',
 };
 
 function fmtBytes(n) {
@@ -2853,6 +3335,102 @@ function fmtBytes(n) {
 
 function escapeHtml(s) {
 	return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ------------------------------------------------------------------ *
+ * Favorites
+ * ------------------------------------------------------------------ *
+ * Starred models. localStorage is the source of truth so the star
+ * survives reloads with zero backend dependency; the server copy is a
+ * best-effort mirror so the same list follows the user to another
+ * browser. If the server is unreachable the local list still works. */
+const FAV_KEY = "spine-stage:favorites";
+let favorites = new Set();
+
+function loadFavorites() {
+	try {
+		const raw = JSON.parse(localStorage.getItem(FAV_KEY) || "[]");
+		favorites = new Set(Array.isArray(raw) ? raw : []);
+	} catch {
+		favorites = new Set();
+	}
+	// Pull the server copy in the background; newer wins on merge (union is
+	// safer than replace — it can't lose stars the user just added offline).
+	fetch("/api/favorites")
+		.then((r) => (r.ok ? r.json() : null))
+		.then((d) => {
+			if (!d || !Array.isArray(d.favorites)) return;
+			let changed = false;
+			for (const id of d.favorites) {
+				if (!favorites.has(id)) {
+					favorites.add(id);
+					changed = true;
+				}
+			}
+			// Re-persist + refresh the badge: when this fetch resolves the
+			// initial syncFavCount() has already run against an empty set,
+			// so without this the counter stays stale at 0.
+			saveFavorites(false);
+			syncFavCount();
+			if (changed && typeof renderLibrary === "function") renderLibrary();
+		})
+		.catch(() => {
+			/* offline — local list stands */
+		});
+}
+
+function saveFavorites(pushToServer = true) {
+	try {
+		localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+	} catch {
+		/* quota / private mode — ignore */
+	}
+	if (!pushToServer) return;
+	fetch("/api/favorites", {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ favorites: [...favorites] }),
+	}).catch(() => {
+		/* server mirror is optional */
+	});
+}
+
+function isFavorite(id) {
+	return favorites.has(id);
+}
+
+/** Wire the favorites UI: load stored stars, then refresh the badge count. */
+function initFavorites() {
+	loadFavorites();
+	syncFavCount();
+	el.favFilter?.classList.toggle("is-on", browse.favOnly);
+	el.favFilter?.setAttribute("aria-pressed", String(browse.favOnly));
+}
+
+/** Keep the "Favorit" button's counter in sync with the current set. */
+function syncFavCount() {
+	if (el.favCount) el.favCount.textContent = String(favorites.size);
+}
+
+function toggleFavorite(id) {
+	if (favorites.has(id)) favorites.delete(id);
+	else favorites.add(id);
+	saveFavorites();
+	syncFavCount();
+	// Keep the grid in sync without a full refetch.
+	if (browse.favOnly) renderLibrary();
+	else {
+		const btn = el.list.querySelector(`.model[data-id="${CSS.escape(id)}"]`);
+		if (btn) {
+			const star = btn.parentElement.querySelector(".model-fav");
+			if (star) {
+				star.classList.toggle("is-on", favorites.has(id));
+				star.setAttribute("aria-pressed", String(favorites.has(id)));
+				star.title = favorites.has(id) ? "Hapus dari favorit" : "Tambah ke favorit";
+			}
+		}
+	}
+	toast?.(favorites.has(id) ? "Ditambahkan ke favorit" : "Dihapus dari favorit");
 }
 
 let toastTimer;
@@ -2934,6 +3512,51 @@ el.scrub.addEventListener("input", () => {
 	drawBones();
 });
 
+/**
+ * Convert a viewport point to stage-local (skeleton) coordinates.
+ *
+ * `world` carries the user's zoom/pan/flip, so the inverse has to undo all
+ * three — a flip mirrors X, which is easy to forget and produces hits that
+ * are correct on one side of the model and mirrored on the other.
+ */
+function toStagePoint(clientX, clientY) {
+	const r = el.canvasWrap.getBoundingClientRect();
+	const sx = clientX - r.left;
+	const sy = clientY - r.top;
+	const wx = (sx - world.position.x) / (world.scale.x || 1);
+	const wy = (sy - world.position.y) / (world.scale.y || 1);
+	// spine sits inside stageRoot inside world; both are untransformed
+	// relative to world except for world's own transform, so this is enough
+	// for hit testing against the skeleton's own bounds.
+	const p = { x: wx, y: wy };
+	if (spine) {
+		p.x -= spine.x;
+		p.y -= spine.y;
+	}
+	return p;
+}
+
+// Part picker: hover highlights, click reports. Only bound while the overlay
+// is on — otherwise this would add a hit test to every mouse move for nothing.
+el.canvasWrap.addEventListener("pointermove", (e) => {
+	if (!parts.on || !spine || dragging) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	const name = partAt(p.x, p.y);
+	if (name !== parts.hover) {
+		parts.hover = name;
+		el.canvasWrap.style.cursor = name ? "pointer" : "";
+		drawParts();
+	}
+});
+
+el.canvasWrap.addEventListener("pointerdown", (e) => {
+	if (!parts.on || !spine) return;
+	if (e.button !== 0) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	const name = partAt(p.x, p.y);
+	if (name) toast(`Bagian: ${name}`);
+});
+
 el.zoomIn.addEventListener("click", () => zoomBy(1.15));
 el.zoomOut.addEventListener("click", () => zoomBy(1 / 1.15));
 el.zoomReset.addEventListener("click", () => fitModel());
@@ -2949,6 +3572,13 @@ el.bonesBtn.addEventListener("click", () => {
 	el.bonesBtn.dataset.on = String(state.showBones);
 	drawBones();
 });
+
+// FPS meter toggle.
+el.fpsBtn?.addEventListener("click", () => setFpsVisible(!fps.on));
+el.fpsReset?.addEventListener("click", fpsResetStats);
+
+// Part picker toggle.
+el.partsBtn?.addEventListener("click", () => setPartsVisible(!parts.on));
 
 // --- stage backdrop -------------------------------------------------------
 // Cycling the backdrop is how you actually see edge problems: a dark or light
@@ -3016,6 +3646,9 @@ function updatePmaUI() {
 el.canvasWrap.addEventListener(
 	"wheel",
 	(e) => {
+		// Let the FPS meter handle its own wheel; zooming the stage because the
+		// cursor happened to be over the overlay is never what was meant.
+		if (e.target instanceof Element && e.target.closest(".fps-meter")) return;
 		e.preventDefault();
 		const r = el.canvasWrap.getBoundingClientRect();
 		zoomBy(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX - r.left, e.clientY - r.top);
@@ -3043,6 +3676,10 @@ const pinchCenter = () => {
 };
 
 el.canvasWrap.addEventListener("pointerdown", (e) => {
+	// Overlays inside the stage (the FPS meter, the HUD) own their own clicks.
+	// Capturing the pointer here would swallow their mouseup, so a button
+	// inside them would receive mousedown and never a click.
+	if (e.target instanceof Element && e.target.closest(".fps-meter")) return;
 	if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 1) return;
 	pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 	// Capture can throw for synthetic/expired pointers, and an escape here would
@@ -3256,6 +3893,150 @@ const EXPORT_STATE = { busy: false, cancel: false };
 
 function exportJobId() {
 	return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+}
+
+/* ------------------------------------------------------------------ *
+ * Native-resolution measurement
+ *
+ * An atlas page is a real bitmap: a region drawn at 2x its own size is
+ * blurry no matter how large the exported canvas is, and a region drawn at
+ * 0.5x has detail that no export can recover. So "how big should this PNG
+ * be?" is answered by the art itself — measure atlas pixels per skeleton
+ * unit, and render at 1:1 with the source.
+ *
+ * Taken per attachment rather than from the whole model: a rig mixes sharply
+ * drawn body parts with background/filler regions stretched far past their
+ * own resolution. A MEAN would be dragged upward by that filler and export
+ * larger than the art supports; a low PERCENTILE sits in the narrow band
+ * where the real art lives and is immune to those outliers.
+ * ------------------------------------------------------------------ */
+
+const EXPORT_SCALE_PERCENTILE = 0.35;
+const MAX_EXPORT_DIM = 8192; // glMAX_TEXTURE_SIZE guard on modest GPUs
+/* Some rigs declare canvases far larger than their art actually occupies
+ * (one here reports 3839x6715 and exports a 2000x4500 PNG mostly full of
+ * transparent padding). Cap the default at a size anyone can actually use —
+ * 2K is what most art tools expect — while still scaling small models UP to
+ * their native size rather than down. */
+const MAX_EXPORT_HEIGHT = 2160;
+
+/**
+ * The region's own width/height in atlas pixels.
+ *
+ * Needed because runtimes disagree about where this lives: spine-core puts a
+ * `rotate` flag and expects the caller to transpose, while some builds expose
+ * already-oriented `width`/`height`. UV extent is unambiguous, so measure
+ * that and use the region size only as a cross-check.
+ */
+function regionPixelSize(region, page) {
+	const w = page?.width || page?.baseTexture?.width || 0;
+	const h = page?.height || page?.baseTexture?.height || 0;
+	if (!w || !h) return null;
+	// u/v are normalised 0..1 in every Spine version.
+	const uSpan = Math.abs((region.u2 ?? 0) - (region.u ?? 0));
+	const vSpan = Math.abs((region.v2 ?? 0) - (region.v ?? 0));
+	const rotated = region.rotate === true || region.degrees === 90 || region.degrees === 270;
+	const uw = uSpan * w;
+	const uh = vSpan * h;
+	if (uw <= 0 || uh <= 0) return null;
+	// A rotated region stores its ORIGINAL size, so the packed rectangle in
+	// the page is the transpose.
+	return { w: rotated ? uh : uw, h: rotated ? uw : uh, rotated };
+}
+
+/**
+ * Source atlas pixels per skeleton unit for a drawn attachment.
+ *
+ * Compares a world-space edge against the atlas pixels that edge covers:
+ * pixels per unit = atlasPixels / worldLength. Averaged over the edges of the
+ * attachment's quad so one degenerate (zero-length) edge cannot dominate.
+ *
+ * Works across runtimes by preferring `regionUVs` (mesh) and falling back to
+ * the region's own u/v rectangle — several builds leave `attachment.uvs`
+ * empty, which silently made every measurement zero.
+ */
+function attachmentPixelScale(slot, attachment) {
+	const region = attachment?.region;
+	const page = region?.page || region?.texture;
+	if (!region || !page) return 0;
+
+	const px = regionPixelSize(region, page);
+	if (!px) return 0;
+
+	// The quad's atlas footprint: for a plain region that is just the region
+	// rectangle; for a mesh it is the bounding box of its UVs.
+	let uvW = px.w;
+	let uvH = px.h;
+	const ruv = attachment.regionUVs;
+	if (ruv && ruv.length >= 4) {
+		let minU = Infinity, minV = Infinity, maxU = -Infinity, maxV = -Infinity;
+		for (let i = 0; i + 1 < ruv.length; i += 2) {
+			if (ruv[i] < minU) minU = ruv[i];
+			if (ruv[i] > maxU) maxU = ruv[i];
+			if (ruv[i + 1] < minV) minV = ruv[i + 1];
+			if (ruv[i + 1] > maxV) maxV = ruv[i + 1];
+		}
+		const uw = (maxU - minU) * (page.width || px.w);
+		const vh = (maxV - minV) * (page.height || px.h);
+		if (uw > 0 && vh > 0) {
+			uvW = px.rotated ? vh : uw;
+			uvH = px.rotated ? uw : vh;
+		}
+	}
+	if (!(uvW > 0) || !(uvH > 0)) return 0;
+
+	// World-space extent of this attachment, in skeleton units.
+	let w = 0;
+	let h = 0;
+	try {
+		if (attachment.worldVerticesLength) {
+			const verts = new Float32Array(attachment.worldVerticesLength);
+			attachment.computeWorldVertices(slot, 0, verts.length, verts, 0, 2);
+			let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+			for (let i = 0; i + 1 < verts.length; i += 2) {
+				if (verts[i] < minX) minX = verts[i];
+				if (verts[i] > maxX) maxX = verts[i];
+				if (verts[i + 1] < minY) minY = verts[i + 1];
+				if (verts[i + 1] > maxY) maxY = verts[i + 1];
+			}
+			w = maxX - minX;
+			h = maxY - minY;
+		}
+	} catch {
+		/* fall through */
+	}
+
+	// Region attachments have no worldVerticesLength in some builds; their
+	// local size is stored on the attachment itself.
+	if (!(w > 0) && !(h > 0)) {
+		w = attachment.width || 0;
+		h = attachment.height || 0;
+	}
+	if (!(w > 0) && !(h > 0)) return 0;
+
+	// Pixels per unit on each axis; the smaller is the binding constraint —
+	// it is the axis where the art is stretched most relative to its source.
+	const sx = uvW / w;
+	const sy = uvH / h;
+	const best = Math.min(sx, sy) || Math.max(sx, sy);
+	return best > 0 && Number.isFinite(best) ? best : 0;
+}
+
+/**
+ * Representative source pixels per skeleton unit for the current pose.
+ * Returns 0 when nothing measurable was found (caller falls back).
+ */
+function sourcePixelScale(sp) {
+	const scales = [];
+	for (const slot of sp.skeleton.slots) {
+		const att = slot.getAttachment?.();
+		if (!att) continue;
+		const s = attachmentPixelScale(slot, att);
+		if (s > 0 && Number.isFinite(s)) scales.push(s);
+	}
+	if (!scales.length) return 0;
+	const sorted = scales.sort((a, b) => a - b);
+	return sorted[Math.floor((sorted.length - 1) * EXPORT_SCALE_PERCENTILE)];
 }
 
 /** Model bounds in skeleton units, from the setup pose + current animation. */
@@ -3492,6 +4273,171 @@ async function runExport() {
 	}
 }
 
+/**
+ * Tight-crop a canvas to its non-transparent pixels.
+ *
+ * Scans the alpha channel from each edge inward. Deliberately not
+ * pixel-perfect on the interior — only the bounding box matters, so we stop
+ * at the first opaque row/column from each side.
+ */
+function tightCrop(canvas) {
+	const ctx = canvas.getContext("2d");
+	const { width: w, height: h } = canvas;
+	if (!w || !h) return { x: 0, y: 0, w, h };
+	let data;
+	try {
+		data = ctx.getImageData(0, 0, w, h).data;
+	} catch {
+		return { x: 0, y: 0, w, h }; // tainted canvas — keep the whole thing
+	}
+
+	let top = 0, bottom = h - 1, left = 0, right = w - 1;
+	const rowHas = (y) => {
+		const row = y * w;
+		for (let x = 0; x < w; x++) if (data[(row + x) * 4 + 3] > 0) return true;
+		return false;
+	};
+	const colHas = (x) => {
+		for (let y = 0; y < h; y++) if (data[(y * w + x) * 4 + 3] > 0) return true;
+		return false;
+	};
+
+	while (top <= bottom && !rowHas(top)) top++;
+	if (top > bottom) return { x: 0, y: 0, w, h }; // fully empty
+	while (bottom > top && !rowHas(bottom)) bottom--;
+	while (left <= right && !colHas(left)) left++;
+	while (right > left && !colHas(right)) right--;
+
+	return { x: left, y: top, w: right - left + 1, h: bottom - top + 1 };
+}
+
+/**
+ * Render the current pose to a PNG at the art's native resolution.
+ *
+ * The size is derived from the atlas, not from a dropdown: a model whose art
+ * is 900px tall exports ~900px tall whether or not that looks big on screen.
+ * Asking for more would only upscale pixels that do not exist; asking for
+ * less throws away detail that does.
+ */
+async function exportPng({ background = "transparent" } = {}) {
+	if (!spine) {
+		toast("Pilih model dulu sebelum mengekspor.");
+		return;
+	}
+	// Freeze the pose BEFORE measuring: the dialog predicted a size from the
+	// pose it was opened on, and a moving model changes its bounds between
+	// that prediction and this render. Pausing makes the two agree, and is
+	// what the user expects from "save this frame" anyway.
+	const wasPlaying = state.playing;
+	const wasTrackTime = spine.state?.tracks?.[0]?.trackTime ?? 0;
+	setPlaying(false);
+	app.ticker.stop();
+	spine.update(0);
+
+	const holder = new Container();
+	const snapshot = new Container();
+	holder.addChild(snapshot);
+
+	let rt = null;
+	try {
+		const parent = spine.parent;
+		const x = spine.x, y = spine.y;
+		const sx = spine.scale.x, sy = spine.scale.y;
+		if (parent) parent.removeChild(spine);
+		snapshot.addChild(spine);
+		spine.position.set(0, 0);
+		spine.scale.set(1, 1);
+
+		// Measure AFTER neutralising the transform: the scale we want is atlas
+		// pixels per SKELETON unit, and the live stage's zoom would corrupt it.
+		// Same helper the dialog's preview uses, so the number it promised is
+		// exactly the number produced here.
+		const target = pngOutputSize(spine);
+		const bounds = spine.getLocalBounds ? spine.getLocalBounds() : null;
+		// pngOutputSize measured the live pose; re-measure here so the render
+		// uses the very same rectangle the size was predicted from. Reading
+		// bounds twice can straddle a sub-pixel difference in the pose and
+		// shift the output by a few pixels.
+		const bw = target?.bw || bounds?.width || spine.skeleton.data.width || 512;
+		const bh = target?.bh || bounds?.height || spine.skeleton.data.height || 512;
+		const bx = bounds?.x ?? 0;
+		const by = bounds?.y ?? 0;
+		const outW = target?.w || Math.max(2, Math.round(bw));
+		const outH = target?.h || Math.max(2, Math.round(bh));
+		const scale = Math.min(outW / Math.max(bw, 1), outH / Math.max(bh, 1));
+
+		rt = RenderTexture.create({ width: outW, height: outH });
+		holder.position.set(-bx * scale, -by * scale);
+		holder.scale.set(scale, scale);
+
+		let shot;
+		try {
+			app.renderer.render(holder, { renderTexture: rt, clear: true });
+			shot = app.renderer.extract.canvas(rt);
+		} catch {
+			shot = app.renderer.extract.canvas(holder);
+		}
+
+		// restore the stage
+		snapshot.removeChild(spine);
+		if (parent) parent.addChild(spine);
+		spine.position.set(x, y);
+		spine.scale.set(sx, sy);
+
+		const opaque = background !== "transparent";
+		const out = document.createElement("canvas");
+		out.width = outW;
+		out.height = outH;
+		const ctx = out.getContext("2d");
+		if (opaque) {
+			ctx.fillStyle =
+				background === "white" ? "#ffffff" : background === "#1a1620" ? "#1a1620" : "#000000";
+			ctx.fillRect(0, 0, outW, outH);
+		}
+		ctx.drawImage(shot, 0, 0, outW, outH);
+
+		// Crop only when transparent: an opaque export is defined by its
+		// canvas edges, and trimming those would change the framing.
+		let final = out;
+		if (!opaque) {
+			const c = tightCrop(out);
+			if (c.w > 0 && c.h > 0 && (c.w !== outW || c.h !== outH)) {
+				const trimmed = document.createElement("canvas");
+				trimmed.width = c.w;
+				trimmed.height = c.h;
+				trimmed.getContext("2d").drawImage(out, c.x, c.y, c.w, c.h, 0, 0, c.w, c.h);
+				final = trimmed;
+			}
+		}
+
+		const blob = await new Promise((res) => final.toBlob(res, "image/png"));
+		if (!blob) throw new Error("Gagal membuat PNG.");
+
+		const name = (current?.name || animName || "model").replace(/[^\w.-]+/g, "-");
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `${name}-${final.width}x${final.height}.png`;
+		a.click();
+		setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+		const kb = Math.round(blob.size / 1024);
+		toast(
+			`PNG ${final.width}×${final.height} (${kb} KB)${target?.native ? " · resolusi asli" : " · perkiraan"}`
+		);
+	} catch (err) {
+		toast("Ekspor PNG gagal: " + err.message);
+	} finally {
+		if (rt) rt.destroy(true);
+		holder.destroy({ children: true });
+		app.ticker.start();
+		const track = spine?.state?.tracks?.[0];
+		if (track) track.trackTime = wasTrackTime;
+		spine?.update(0);
+		if (wasPlaying) setPlaying(true);
+	}
+}
+
 function showExportNote(msg) {
 	if (!el.exportNote) return;
 	if (!msg) {
@@ -3503,6 +4449,44 @@ function showExportNote(msg) {
 	el.exportNote.hidden = false;
 }
 
+/** Predicted PNG size for the model on stage, or null when unmeasurable. */
+function pngTargetSize() {
+	if (!spine) return null;
+	return pngOutputSize(spine);
+}
+
+/**
+ * The PNG's output dimensions, shared by the preview and the real export so
+ * the number shown before clicking is exactly the number produced.
+ */
+function pngOutputSize(sp) {
+	const pxPerUnit = sourcePixelScale(sp);
+	const bounds = sp.getLocalBounds ? sp.getLocalBounds() : null;
+	const bw = bounds?.width || sp.skeleton.data.width || 512;
+	const bh = bounds?.height || sp.skeleton.data.height || 512;
+	if (!bw || !bh) return null;
+	// pxPerUnit is atlas pixels per skeleton unit: rendering at exactly that
+	// makes one atlas pixel land on one output pixel — the sharpest the art
+	// can be, with no upscaling.
+	// When the atlas cannot be read, target a sane height so the export is
+	// still useful rather than 1:1 with a bogus measurement.
+	const fit = pxPerUnit > 0 ? pxPerUnit : MAX_EXPORT_HEIGHT / Math.max(bh, 1);
+	let w = Math.max(2, Math.round(bw * fit));
+	let h = Math.max(2, Math.round(bh * fit));
+
+	// Shrink oversized rigs to a usable ceiling, but never magnify: a model
+	// smaller than the ceiling exports at its own native size.
+	const shrink = Math.max(h / MAX_EXPORT_HEIGHT, w / MAX_EXPORT_DIM, 1);
+	if (shrink > 1) {
+		w = Math.max(2, Math.round(w / shrink));
+		h = Math.max(2, Math.round(h / shrink));
+	}
+	// bw/bh travel with the result so the renderer frames the exact rectangle
+	// these dimensions were computed from — measuring again can land a few
+	// pixels off and quietly change the crop.
+	return { w, h, native: pxPerUnit > 0, bw, bh };
+}
+
 function openExport() {
 	if (!spine) {
 		toast("Pilih model dulu sebelum mengekspor.");
@@ -3512,6 +4496,30 @@ function openExport() {
 	showExportNote(null);
 	el.exportProgress.hidden = true;
 	el.exportResult.hidden = true;
+
+	// Predicting a size from a moving model is a promise we can't keep: the
+	// pose — and therefore the bounds — shifts before the user clicks. Pause
+	// on open so the stated size is the size produced, and so "Simpan PNG"
+	// captures the frame the user is actually looking at.
+	if (state.playing) setPlaying(false);
+	spine?.update(0);
+
+	// Tell the user what "Simpan PNG" will produce before they click it: the
+	// size comes from the art, so it is worth stating rather than surprising.
+	if (el.exportPngNote) {
+		const s = pngTargetSize();
+		if (!s) {
+			el.exportPngNote.textContent = "";
+		} else {
+			// A transparent export is tight-cropped to the drawn pixels, so
+			// the canvas size is an upper bound and the file comes out at or
+			// just under it — say so rather than promising an exact number.
+			const transparent = (el.exportBg?.value || "transparent") === "transparent";
+			el.exportPngNote.textContent =
+				`${s.w}×${s.h}px${s.native ? " · resolusi asli" : " · perkiraan"}` +
+				(transparent ? " · dipotong rapat" : "");
+		}
+	}
 }
 
 function closeExport() {
@@ -3526,6 +4534,11 @@ function initExport() {
 	el.exportBtn?.addEventListener("click", () => {
 		if (el.exportModal.hidden) openExport();
 		else closeExport();
+	});
+	el.exportPng?.addEventListener("click", () => {
+		// The "Latar" picker already means what it says for the video path, so
+		// reuse it: an opaque PNG gets that colour, transparent stays cut out.
+		exportPng({ background: el.exportBg?.value || "transparent" });
 	});
 	el.exportClose?.addEventListener("click", closeExport);
 	el.exportCancel?.addEventListener("click", closeExport);
@@ -3545,6 +4558,17 @@ function initExport() {
 		} else if (el.exportBg.value !== "transparent") {
 			showExportNote(null);
 		}
+		// The PNG line says whether the result gets tight-cropped, which
+		// depends on this choice — keep it in sync.
+		if (el.exportPngNote) {
+			const s = pngTargetSize();
+			if (s) {
+				const transparent = el.exportBg.value === "transparent";
+				el.exportPngNote.textContent =
+					`${s.w}×${s.h}px${s.native ? " · resolusi asli" : " · perkiraan"}` +
+					(transparent ? " · dipotong rapat" : "");
+			}
+		}
 	});
 }
 
@@ -3556,6 +4580,18 @@ el.search.addEventListener("input", () => {
 	else renderGames(el.search.value);
 });
 el.backBtn?.addEventListener("click", backToGames);
+
+// Favorit filter — toggles a "starred only" view of the current scope.
+el.favFilter?.addEventListener("click", () => {
+	browse.favOnly = !browse.favOnly;
+	browse.page = 1;
+	el.favFilter.classList.toggle("is-on", browse.favOnly);
+	el.favFilter.setAttribute("aria-pressed", String(browse.favOnly));
+	renderLibrary();
+	if (browse.favOnly && !favorites.size) {
+		toast?.("Belum ada favorit — klik bintang pada model.");
+	}
+});
 
 window.addEventListener("keydown", (e) => {
 	if (e.target instanceof HTMLElement && e.target.matches("input, select, textarea")) return;
@@ -3615,6 +4651,16 @@ window.addEventListener("keydown", (e) => {
 		case "I":
 			e.preventDefault();
 			el.inspectorBtn?.click();
+			break;
+		case "p":
+		case "P":
+			e.preventDefault();
+			el.fpsBtn?.click();
+			break;
+		case "r":
+		case "R":
+			e.preventDefault();
+			el.partsBtn?.click();
 			break;
 		case ",":
 			// step keyframes, but only when the timeline is open
@@ -3797,11 +4843,26 @@ el.bonesBtn.dataset.on = "false";
 el.flipBtn.dataset.on = "false";
 el.delBtn.hidden = true;
 
+/* Debug handle: lets the smoke tests (and the browser console) inspect the
+ * live viewer state without re-deriving it — harmless in production. */
+window.__spineStage = {
+	get spine() { return spine; },
+	get state() { return state; },
+	get clock() { return clock; },
+	get fps() { return fps; },
+	get parts() { return parts; },
+	sourcePixelScale: () => (spine ? sourcePixelScale(spine) : 0),
+	pngOutputSize: () => (spine ? pngOutputSize(spine) : null),
+};
+
 initSidebar();
 initTimeline();
 initInspector();
 initFullscreen();
 initExport();
+initFavorites();
+initFps();
+initParts();
 
 // Restore the saved backdrop, if any. setStageBg() would also persist it, so
 // only call it when we actually have a stored value.

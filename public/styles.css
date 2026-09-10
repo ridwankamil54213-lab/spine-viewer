@@ -260,7 +260,9 @@ body {
 .btn-back .icon { width: 16px; height: 16px; }
 
 /* --- view 1: game cards --- */
-.game-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+/* The list was cramped card-to-card, so 23 games read as one block of text.
+ * A little more air between rows makes it scannable. */
+.game-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 
 .game {
 	width: 100%;
@@ -324,28 +326,32 @@ body {
 .game-chevron { flex: 0 0 auto; width: 16px; height: 16px; fill: var(--fg-mute); }
 
 /* --- view 2: model grid --- */
-/* The sidebar is ~267px of usable width, so 2 columns need each card to fit in
- * ~130px. minmax(120px) leaves room for the 38px thumb + text; 132px was just
- * wide enough to collapse the grid back to a single column. */
+/* One column, not two.
+ *
+ * Two columns fitted 120px cells, which squeezed the label down to ~14
+ * characters beside a 38px thumbnail — most of the 16.9k ids were truncated
+ * to "azxservetii…" and became indistinguishable from each other. One card
+ * per row costs vertical space but makes every label readable in full, which
+ * is the whole point of a 16.9k-model library. */
 .model-grid {
 	list-style: none;
-	margin: 12px 0 0;
+	margin: 10px 0 0;
 	padding: 0;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-	gap: 7px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 }
 
 .model {
 	width: 100%;
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 11px;
 	text-align: left;
 	background: var(--ink-800);
 	border: 1px solid transparent;
 	border-radius: var(--r);
-	padding: 7px 8px;
+	padding: 9px 38px 9px 10px; /* right pad leaves room for the star */
 	cursor: pointer;
 	color: var(--fg);
 	font-family: var(--font-body);
@@ -356,9 +362,9 @@ body {
 /* thumbnail art */
 .model-thumb {
 	flex: 0 0 auto;
-	width: 38px;
-	height: 38px;
-	border-radius: 8px;
+	width: 44px;
+	height: 44px;
+	border-radius: 9px;
 	object-fit: contain;
 	background: rgba(255, 255, 255, 0.04);
 	display: block;
@@ -369,7 +375,7 @@ body {
 	display: grid;
 	place-items: center;
 	font-family: var(--font-mono);
-	font-size: 10.5px;
+	font-size: 11.5px;
 	font-weight: 700;
 	letter-spacing: 0.02em;
 	color: var(--fg-mute);
@@ -380,7 +386,7 @@ body {
 .model-text {
 	display: flex;
 	flex-direction: column;
-	gap: 1px;
+	gap: 2px;
 	min-width: 0;
 	flex: 1;
 }
@@ -392,8 +398,8 @@ body {
 	border-color: rgba(255, 176, 46, 0.34);
 }
 
-.model-name { font-size: 12.5px; font-weight: 500; letter-spacing: -0.01em; }
-.model-meta { font-size: 11px; color: var(--fg-mute); font-family: var(--font-mono); }
+.model-name { font-size: 13px; font-weight: 500; letter-spacing: -0.01em; }
+.model-meta { font-size: 11.5px; color: var(--fg-mute); font-family: var(--font-mono); }
 
 .list-empty { color: var(--fg-mute); font-size: 12.5px; padding: 10px 2px; grid-column: 1 / -1; }
 
@@ -827,17 +833,23 @@ body {
 	color: var(--spark-hi);
 }
 
-/* fullscreen is icon-only, so it borrows the icon button's box but keeps
-   the toggle's on-state so it can still read as "active" */
-#fullscreen-btn {
+/* fullscreen + export are icon-only, so they borrow the icon button's box but
+   keep the toggle's on-state so they can still read as "active".
+   Both need an explicit square: as plain .btn-toggle they collapsed to the
+   size of the bare <svg> (28x18), which is both ugly and under the 24px
+   minimum touch target. */
+#fullscreen-btn,
+#export-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	padding: 8px;
 	width: 36px;
 	height: 36px;
+	flex: 0 0 auto;
 }
-#fullscreen-btn .icon {
+#fullscreen-btn .icon,
+#export-btn .icon {
 	width: 17px;
 	height: 17px;
 	fill: currentColor;
@@ -995,6 +1007,91 @@ input:focus-visible {
 	color: var(--cool);
 }
 
+/* ============================== FPS METER ============================== */
+/* Overlay in the stage's top-left corner. Reads as instrumentation, not
+ * chrome: monospaced tabular figures on a dim panel, amber only when the
+ * frame rate drops low enough to actually matter. */
+.fps-meter {
+	position: absolute;
+	z-index: 4;
+	top: 14px;
+	left: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 9px 11px 8px;
+	min-width: 132px;
+	background: rgba(12, 12, 22, 0.82);
+	border: 1px solid var(--line);
+	border-radius: var(--r);
+	backdrop-filter: blur(6px);
+	box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+	user-select: none;
+	/* The stage underneath pans on drag. Without this the meter swallows the
+	 * pointerdown and its own buttons never see a mouseup — the Reset click
+	 * silently never fires. */
+	touch-action: auto;
+}
+
+.fps-main { display: flex; align-items: baseline; gap: 5px; }
+.fps-value {
+	/* 28px tabular: the number changes every frame, so proportional digits
+	 * would make the whole box jitter. */
+	font-size: 26px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	color: var(--cool);
+	font-variant-numeric: tabular-nums;
+	min-width: 46px;
+	text-align: right;
+}
+.fps-unit { font-size: 10.5px; color: var(--fg-mute); letter-spacing: 0.06em; text-transform: uppercase; }
+
+.fps-sub { display: flex; gap: 10px; font-size: 10px; color: var(--fg-mute); font-variant-numeric: tabular-nums; }
+
+.fps-graph {
+	display: block;
+	width: 160px;
+	height: 34px;
+	border-radius: 4px;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.fps-reset {
+	align-self: flex-start;
+	padding: 4px 9px;
+	min-height: 24px;
+	font-family: var(--font-body);
+	font-size: 10px;
+	color: var(--fg-mute);
+	background: transparent;
+	border: 1px solid var(--line);
+	border-radius: 4px;
+	cursor: pointer;
+}
+.fps-reset:hover { color: var(--fg); border-color: #383854; background: var(--ink-750); }
+
+/* Colour is the signal: only warn once frames are actually being dropped.
+ * Thresholds are relative to the display's refresh rate where known. */
+.fps-meter[data-tier="good"] .fps-value { color: var(--cool); }
+.fps-meter[data-tier="ok"] .fps-value { color: var(--spark); }
+.fps-meter[data-tier="bad"] .fps-value { color: var(--danger); }
+.fps-meter[data-tier="bad"] { border-color: rgba(255, 107, 94, 0.4); }
+
+/* Collapsed to a badge on phones, where the corner overlay would sit on top
+ * of the artwork. */
+@media (max-width: 720px) {
+	.fps-meter { top: 8px; left: 10px; padding: 6px 9px; min-width: 0; }
+	.fps-value { font-size: 18px; min-width: 34px; }
+	.fps-graph { display: none; }
+	.fps-sub { gap: 8px; font-size: 9.5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fps-graph { display: none; }
+}
+
 /* ============================== TRANSPORT ============================= */
 .transport {
 	border-top: 1px solid var(--line);
@@ -1006,11 +1103,42 @@ input:focus-visible {
 	flex: 0 0 auto;
 }
 
-.transport-row { display: flex; align-items: center; gap: 10px; }
+.transport-row { display: flex; align-items: center; gap: 14px; }
 .transport-row-2 { flex-wrap: wrap; }
 .spacer { flex: 1; }
 
-.scrub-wrap { flex: 1; min-width: 90px; display: flex; }
+/* --- toolbar clusters -------------------------------------------------
+ * The transport had ~20 controls in two flat rows, so everything read as
+ * one undifferentiated wall of chrome. Grouping them by job (playback,
+ * position, model, view, output) with a hairline divider between clusters
+ * makes the bar scannable without moving or removing a single control. */
+.tgroup {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	/* Clusters must be allowed to shrink and wrap internally: as rigid rows
+	 * they pushed the whole transport wider than the viewport below ~1100px,
+	 * which made the PAGE scroll sideways. */
+	min-width: 0;
+	flex-wrap: wrap;
+}
+
+/* Divider: only BETWEEN clusters, so the row doesn't start or end with a
+ * dangling rule. */
+.transport-row .tgroup + .tgroup {
+	padding-left: 14px;
+	border-left: 1px solid var(--line);
+}
+
+.tgroup-play { gap: 4px; }
+/* The scrub cluster takes the slack, and its own members shrink in priority
+ * order (scrubber first, then the rate picker) so the row stays on ONE line
+ * down to ~1100px instead of wrapping into a 87px-tall double row.
+ * The time readout never shrinks: truncated "0.0 / 2.4s" is worse than a
+ * narrower scrubber. */
+.tgroup-scrub { flex: 1 1 200px; min-width: 0; gap: 10px; }
+
+.scrub-wrap { flex: 1 1 90px; min-width: 60px; display: flex; }
 
 .scrub {
 	flex: 1;
@@ -1052,8 +1180,11 @@ input:focus-visible {
 	box-shadow: 0 0 0 3px rgba(255, 176, 46, 0.18);
 }
 
-.time { font-size: 11.5px; color: var(--fg-mute); white-space: nowrap; }
+.time { font-size: 11.5px; color: var(--fg-mute); white-space: nowrap; flex: 0 0 auto; }
 .time #time-cur { color: var(--fg); }
+/* "0.00s / 2.40s" reflows as the clip plays; tabular figures stop the whole
+ * toolbar from twitching on every frame. */
+.time #time-cur, .time #time-dur { font-variant-numeric: tabular-nums; }
 
 .rate { display: flex; }
 
@@ -1081,8 +1212,14 @@ input:focus-visible {
 	border: 1px solid var(--line);
 	border-radius: var(--r);
 	padding: 3px 5px;
+	flex: 0 0 auto;
 }
-.zoom-label { font-size: 11px; color: var(--fg-dim); min-width: 40px; text-align: center; }
+/* Tabular figures: "100%" -> "85%" would otherwise resize the box and shove
+ * the buttons beside it sideways on every zoom step. */
+.zoom-label { font-size: 11px; color: var(--fg-dim); min-width: 40px; text-align: center; font-variant-numeric: tabular-nums; }
+/* Drop the redundant "%" from the label — the two +/− buttons already say what
+ * this is, and it buys back ~14px in a crowded row. */
+.zoom-label::after { content: "%"; opacity: 0.55; }
 
 /* ================================ TOAST =============================== */
 .toast {
@@ -1107,6 +1244,28 @@ input:focus-visible {
 /* ============================== RESPONSIVE ============================ */
 
 /* --- shared: let the whole page scroll on small screens --------------- */
+/* Between 900 and 1200px the fixed 372px sidebar squeezes the stage AND the
+   transport hard enough to wrap both rows. Ease it back — the model cards
+   stay fully readable at 300px (they are single-column now). */
+@media (min-width: 901px) and (max-width: 1180px) {
+	:root { --sidebar-w: 304px; }
+}
+
+/* Row 2 gained the FPS toggle and now needs ~30px more than it has at 1280.
+   Trim the padding/gaps inside the view cluster rather than let the row wrap
+   into two lines — a wrapped toolbar is harder to scan than a tight one. */
+@media (min-width: 761px) and (max-width: 1360px) {
+	.transport-row .tgroup + .tgroup { padding-left: 9px; }
+	.transport-row-2 { gap: 9px; }
+	.transport-row-2 .tgroup { gap: 5px; }
+	.zoom-group { gap: 2px; padding: 3px 4px; }
+	.zoom-label { min-width: 32px; }
+	/* These two eat the most width in the view cluster; trimming their
+	 * horizontal padding buys back ~24px without touching hit area height. */
+	.transport-row-2 .btn-toggle { padding: 8px 9px; }
+	.bg-group .btn-select { padding: 8px 6px; padding-right: 20px; }
+}
+
 @media (max-width: 900px) {
 	body { overflow: auto; -webkit-text-size-adjust: 100%; }
 	.layout {
@@ -1265,6 +1424,24 @@ input:focus-visible {
 .export-grid .field-inline > span { flex: 0 0 54px; font-size: 12px; color: var(--fg-dim); }
 .export-grid .select { flex: 1; min-width: 0; }
 
+/* PNG row: a secondary action, kept visually quieter than "Mulai ekspor" but
+   with its predicted size stated, since that size is derived from the art and
+   would otherwise be a surprise. */
+.export-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px solid var(--line-soft);
+}
+.export-actions .btn { flex: 0 0 auto; }
+.export-actions-note {
+	font-size: 11px;
+	color: var(--fg-mute);
+	font-family: var(--font-mono);
+}
+
 .export-progress { margin-top: 16px; display: flex; align-items: center; gap: 10px; }
 .export-bar {
 	flex: 1;
@@ -1399,4 +1576,111 @@ input:focus-visible {
 	line-height: 1.5;
 	vertical-align: middle;
 	text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------------ *
+ * Favorites
+ * ------------------------------------------------------------------ */
+
+/* Star button sits on the model card's top-right corner. It's a sibling of
+ * the card (not a child) so clicking it never triggers loadModel(). */
+.model-grid li {
+	position: relative;
+}
+
+.model-fav {
+	position: absolute;
+	top: 50%;
+	right: 6px;
+	transform: translateY(-50%);
+	z-index: 3;
+	display: grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	border-radius: 50%;
+	background: rgba(10, 12, 16, 0.6);
+	backdrop-filter: blur(2px);
+	cursor: pointer;
+	/* Always visible, just dim until hovered — a star that only exists on
+	 * hover gives no hint that favourites exist, and is unreachable on
+	 * touch devices where there is no hover at all. */
+	opacity: 0.55;
+	transition: opacity 0.15s ease, background 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+}
+
+.model-grid li:hover .model-fav,
+.model-fav:focus-visible,
+.model-fav.is-on {
+	opacity: 1;
+}
+
+/* Grow on hover only — keep the vertical centering intact. */
+.model-fav:hover {
+	background: rgba(10, 12, 16, 0.85);
+	border-color: rgba(242, 204, 96, 0.5);
+	transform: translateY(-50%) scale(1.12);
+}
+
+.model-fav svg {
+	width: 15px;
+	height: 15px;
+	fill: #6e7681;
+	transition: fill 0.15s ease;
+}
+
+.model-fav.is-on svg {
+	fill: #f2cc60;
+}
+
+.model-fav:focus-visible {
+	outline: 2px solid #58a6ff;
+	outline-offset: 1px;
+}
+
+/* "Favorit" filter button in the library header. */
+.lib-filters {
+	display: flex;
+	gap: 6px;
+	margin: 8px 0 2px;
+}
+
+.btn-fav {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.btn-fav svg {
+	width: 14px;
+	height: 14px;
+	fill: currentColor;
+	opacity: 0.75;
+}
+
+.btn-fav.is-on {
+	border-color: #f2cc60;
+	color: #f2cc60;
+}
+
+.btn-fav.is-on svg {
+	fill: #f2cc60;
+	opacity: 1;
+}
+
+.fav-count {
+	min-width: 18px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: rgba(110, 118, 129, 0.28);
+	font-size: 11px;
+	line-height: 16px;
+	text-align: center;
+}
+
+.btn-fav.is-on .fav-count {
+	background: rgba(242, 204, 96, 0.2);
+	color: #f2cc60;
 }

@@ -58,6 +58,15 @@
 
 			<input id="search" class="search" type="search" placeholder="Cari model…" autocomplete="off" />
 
+			<div class="lib-filters">
+				<button id="fav-filter" class="btn btn-sm btn-fav" type="button" aria-pressed="false"
+					title="Tampilkan hanya model favorit">
+					<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+					<span>Favorit</span>
+					<span class="fav-count" id="fav-count">0</span>
+				</button>
+			</div>
+
 			<!-- view 1: games -->
 			<ul id="game-list" class="game-list"></ul>
 
@@ -108,48 +117,83 @@
 				<span id="hud-model" class="hud-model"></span>
 				<span id="hud-stats" class="hud-stats"></span>
 			</div>
+
+			<!-- FPS meter: live rate + the min/avg of the current sample window.
+			     Kept in the stage corner rather than the HUD so it stays put
+			     while the HUD's own text reflows between models. -->
+			<div id="fps-meter" class="fps-meter" hidden>
+				<div class="fps-main">
+					<span class="fps-value mono" id="fps-value">—</span>
+					<span class="fps-unit">fps</span>
+				</div>
+				<div class="fps-sub mono">
+					<span id="fps-min" title="Terendah sejak direset">min —</span>
+					<span id="fps-avg" title="Rata-rata sejak direset">avg —</span>
+				</div>
+				<canvas id="fps-graph" class="fps-graph" width="160" height="34"
+					aria-hidden="true"></canvas>
+				<button id="fps-reset" class="fps-reset" type="button" title="Reset min/avg">Reset</button>
+			</div>
 		</div>
 
 		<!-- transport -->
 		<div class="transport">
 			<div class="transport-row">
-				<button id="prev-btn" class="btn btn-icon" aria-label="Animasi sebelumnya" title="Animasi sebelumnya (←)">
-					<svg viewBox="0 0 24 24" class="icon"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-				</button>
-				<button id="play-btn" class="btn btn-icon btn-play" aria-label="Mainkan" data-playing="true">
-					<svg viewBox="0 0 24 24" class="icon"></svg>
-				</button>
-				<button id="next-btn" class="btn btn-icon" aria-label="Animasi berikutnya" title="Animasi berikutnya (→)">
-					<svg viewBox="0 0 24 24" class="icon"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
-				</button>
-
-				<div class="scrub-wrap">
-					<input id="scrub" class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Posisi waktu animasi" />
+				<div class="tgroup tgroup-play">
+					<button id="prev-btn" class="btn btn-icon" aria-label="Animasi sebelumnya" title="Animasi sebelumnya (←)">
+						<svg viewBox="0 0 24 24" class="icon"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+					</button>
+					<button id="play-btn" class="btn btn-icon btn-play" aria-label="Mainkan" data-playing="true">
+						<svg viewBox="0 0 24 24" class="icon"></svg>
+					</button>
+					<button id="next-btn" class="btn btn-icon" aria-label="Animasi berikutnya" title="Animasi berikutnya (→)">
+						<svg viewBox="0 0 24 24" class="icon"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+					</button>
 				</div>
 
-				<span class="time mono"><span id="time-cur">0.00s</span> / <span id="time-dur">0.00s</span></span>
+				<div class="tgroup tgroup-scrub">
+					<div class="scrub-wrap">
+						<input id="scrub" class="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Posisi waktu animasi" />
+					</div>
 
-				<label class="rate">
-					<span class="visually-hidden">Kecepatan putar</span>
-					<select id="rate-select" class="select select-sm">
-						<option value="0.1">0.1×</option>
-						<option value="0.25">0.25×</option>
-						<option value="0.5">0.5×</option>
-						<option value="1" selected>1×</option>
-						<option value="1.5">1.5×</option>
-						<option value="2">2×</option>
-					</select>
-				</label>
+					<span class="time mono"><span id="time-cur">0.00s</span> / <span id="time-dur">0.00s</span></span>
 
-				<button id="loop-btn" class="btn btn-toggle" data-on="true" title="Ulang terus">Ulang</button>
-				<button id="audio-btn" class="btn btn-icon" hidden
-					aria-label="Putar suara karakter" title="Putar suara karakter (JP)">
-					<svg viewBox="0 0 24 24" class="icon"><path d="M3 10v4h3l4 4V6L6 10H3zm11.5 2a3.5 3.5 0 0 0-2-3.15v6.3A3.5 3.5 0 0 0 14.5 12zM12 3.2v2.06A6.98 6.98 0 0 1 12 18.74v2.06A9 9 0 0 0 12 3.2z"/></svg>
-				</button>
-				<button id="audio-auto-btn" class="btn btn-toggle" data-on="true" hidden
-					title="Suara otomatis saat model dibuka">Auto suara</button>
-				<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
-				<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot & perbandingan (I)">Periksa</button>
+					<label class="rate">
+						<span class="visually-hidden">Kecepatan putar</span>
+						<select id="rate-select" class="select select-sm">
+							<option value="0.1">0.1×</option>
+							<option value="0.25">0.25×</option>
+							<option value="0.5">0.5×</option>
+							<option value="1" selected>1×</option>
+							<option value="1.5">1.5×</option>
+							<option value="2">2×</option>
+						</select>
+					</label>
+				</div>
+
+				<div class="tgroup">
+					<button id="loop-btn" class="btn btn-toggle" data-on="true" title="Ulang terus">Ulang</button>
+					<button id="audio-btn" class="btn btn-icon" hidden
+						aria-label="Putar suara karakter" title="Putar suara karakter (JP)">
+						<svg viewBox="0 0 24 24" class="icon"><path d="M3 10v4h3l4 4V6L6 10H3zm11.5 2a3.5 3.5 0 0 0-2-3.15v6.3A3.5 3.5 0 0 0 14.5 12zM12 3.2v2.06A6.98 6.98 0 0 1 12 18.74v2.06A9 9 0 0 0 12 3.2z"/></svg>
+					</button>
+					<button id="audio-auto-btn" class="btn btn-toggle" data-on="true" hidden
+						title="Suara otomatis saat model dibuka">Auto suara</button>
+				</div>
+
+				<div class="tgroup">
+					<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
+					<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot & perbandingan (I)">Periksa</button>
+				</div>
+
+				<div class="tgroup">
+					<button id="fullscreen-btn" class="btn btn-toggle" data-on="false" aria-label="Layar penuh" title="Layar penuh (F)">
+						<svg viewBox="0 0 24 24" class="icon"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
+					</button>
+					<button id="export-btn" class="btn btn-toggle" data-on="false" aria-label="Ekspor live wallpaper" title="Ekspor live wallpaper (E)">
+						<svg viewBox="0 0 24 24" class="icon"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4L10 13.6V3zM5 19h14v2H5z"/></svg>
+					</button>
+				</div>
 			</div>
 
 			<!-- animation timeline: keyframes of the playing animation -->
@@ -239,62 +283,61 @@
 		</div>
 
 		<div class="transport-row transport-row-2">
-				<label class="field-inline">
-					<span>Animasi</span>
-					<select id="anim-select" class="select" disabled></select>
-				</label>
-				<label class="field-inline">
-					<span>Skin</span>
-					<select id="skin-select" class="select" disabled></select>
-				</label>
-				<label class="field-inline" id="variant-wrap" hidden>
-					<span>Varian</span>
-					<select id="variant-select" class="select select-sm" title="Varian model ini (mis. Utama, Aim, Cover)"></select>
-				</label>
+				<div class="tgroup">
+					<label class="field-inline">
+						<span>Animasi</span>
+						<select id="anim-select" class="select" disabled></select>
+					</label>
+					<label class="field-inline">
+						<span>Skin</span>
+						<select id="skin-select" class="select" disabled></select>
+					</label>
+					<label class="field-inline" id="variant-wrap" hidden>
+						<span>Varian</span>
+						<select id="variant-select" class="select select-sm" title="Varian model ini (mis. Utama, Aim, Cover)"></select>
+					</label>
+					<label class="field-inline">
+						<span>PMA</span>
+						<select id="pma-select" class="select select-sm" title="Alpha pramultiplied: ikuti atlas, atau paksa aktif/nonaktif">
+							<option value="auto" selected>Otomatis</option>
+							<option value="on">Aktif</option>
+							<option value="off">Nonaktif</option>
+						</select>
+					</label>
+				</div>
 
 				<div class="spacer"></div>
 
-				<label class="field-inline">
-					<span>PMA</span>
-					<select id="pma-select" class="select select-sm" title="Alpha pramultiplied: ikuti atlas, atau paksa aktif/nonaktif">
-						<option value="auto" selected>Otomatis</option>
-						<option value="on">Aktif</option>
-						<option value="off">Nonaktif</option>
-					</select>
-				</label>
+				<div class="tgroup">
+					<div class="zoom-group">
+						<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
+						</button>
+						<span id="zoom-label" class="zoom-label mono">100</span>
+						<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+						</button>
+						<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
+					</div>
 
-				<div class="zoom-group">
-					<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
-						<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
-					</button>
-					<span id="zoom-label" class="zoom-label mono">100%</span>
-					<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
-						<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-					</button>
-					<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
+					<button id="flip-btn" class="btn btn-toggle" data-on="false" title="Balik horizontal">Balik</button>
+					<div class="bg-group" role="group" aria-label="Warna latar">
+						<button id="bg-btn" class="btn btn-toggle" data-on="false" title="Ganti warna latar (L)">Latar</button>
+						<select id="bg-select" class="btn btn-select" aria-label="Pilih warna latar"
+							title="Warna latar — berguna untuk memeriksa tepi dan PMA">
+							<option value="dark">Gelap</option>
+							<option value="grey">Abu-abu</option>
+							<option value="light">Terang</option>
+							<option value="checker">Papan catur</option>
+							<option value="magenta">Magenta</option>
+							<option value="green">Hijau</option>
+						</select>
+					</div>
+					<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
+					<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
+					<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
+					<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>
 				</div>
-
-				<button id="flip-btn" class="btn btn-toggle" data-on="false" title="Balik horizontal">Balik</button>
-				<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
-				<div class="bg-group" role="group" aria-label="Warna latar">
-					<button id="bg-btn" class="btn btn-toggle" data-on="false" title="Ganti warna latar (L)">Latar</button>
-					<select id="bg-select" class="btn btn-select" aria-label="Pilih warna latar"
-						title="Warna latar — berguna untuk memeriksa tepi dan PMA">
-						<option value="dark">Gelap</option>
-						<option value="grey">Abu-abu</option>
-						<option value="light">Terang</option>
-						<option value="checker">Papan catur</option>
-						<option value="magenta">Magenta</option>
-						<option value="green">Hijau</option>
-					</select>
-				</div>
-				<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
-				<button id="fullscreen-btn" class="btn btn-toggle" data-on="false" aria-label="Layar penuh" title="Layar penuh (F)">
-					<svg viewBox="0 0 24 24" class="icon"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg>
-				</button>
-				<button id="export-btn" class="btn btn-toggle" data-on="false" aria-label="Ekspor live wallpaper" title="Ekspor live wallpaper (E)">
-					<svg viewBox="0 0 24 24" class="icon"><path d="M12 3v10.6l3.3-3.3 1.4 1.4-5.7 5.7-5.7-5.7 1.4-1.4L10 13.6V3zM5 19h14v2H5z"/></svg>
-				</button>
 			</div>
 		</div>
 	</section>
@@ -353,6 +396,13 @@
 						<option value="60">60</option>
 					</select>
 				</label>
+			</div>
+
+			<div class="export-actions">
+				<button id="export-png" class="btn btn-ghost" title="Simpan pose ini sebagai PNG pada resolusi asli seninya">
+					Simpan PNG
+				</button>
+				<span class="export-actions-note" id="export-png-note"></span>
 			</div>
 
 			<p id="export-note" class="modal-note" hidden></p>

@@ -562,6 +562,30 @@ const GAME_ROOTS = [
 		key: "dotabyss-l2d",
 		label: "DotAbyss Live2D",
 	},
+	// Chaos Zero Nightmare (com.smilegate.chaoszero.stove.google, SmileGate).
+	//
+	// Same publisher and same asset pipeline as Epic Seven, so read the E7
+	// notes above first: skeletons ship as .scsp (SCSP v2 = Spine 2.1.27) and
+	// textures as .sct, needing the legacy runtime + E7SpineAssetConverter.
+	//
+	// STATUS: NOT EXTRACTED YET.
+	// The base APK only carries 7 UI/backdrop skeletons (assets/pre/effect:
+	// logo_yuna, lobby_bg, 20035, ui_bi_logo_*). The real character models
+	// live in assets/sdata/*, which is empty until the game finishes its
+	// in-game download. Re-check once the device has pulled the data:
+	//     adb shell du -sh /sdcard/Android/data/com.smilegate.chaoszero.stove.google
+	// (it was 12K at the time of writing — nothing downloaded yet).
+	//
+	// pmaDefault: false — E7's converter strips the `pma:` line and we keep
+	// E7's own choice rather than guessing before a single model exists.
+	// Flip it once real models can be inspected.
+	{
+		match: "chaoszero",
+		key: "chaoszero",
+		label: "Chaos Zero Nightmare",
+		spineRuntime: "2.1.27",
+		pmaDefault: false,
+	},
 	// Bundled sample models. They live directly under assets/ and are not from
 	// any game — grouping them keeps "Lainnya" from meaning "demo".
 	{ match: "spineboy", key: "demo", label: "Demo" },
@@ -1058,6 +1082,34 @@ app.get("/api/models", (req, res) => {
 		res.json({ models: getModels({ force: req.query.refresh === "1" }) });
 	} catch (err) {
 		res.status(500).json({ error: "Gagal memindai folder aset: " + err.message });
+	}
+});
+
+/* --- favorites ------------------------------------------------------- *
+ * Optional server-side mirror of the browser's starred-model list, so the
+ * same favourites follow the user across browsers/machines. localStorage
+ * stays the source of truth — this is best-effort and never blocks the UI. */
+const FAV_FILE = path.join(DATA, "favorites.json");
+
+app.get("/api/favorites", (_req, res) => {
+	try {
+		const raw = JSON.parse(fs.readFileSync(FAV_FILE, "utf8"));
+		res.json({ favorites: Array.isArray(raw.favorites) ? raw.favorites : [] });
+	} catch {
+		res.json({ favorites: [] });
+	}
+});
+
+app.put("/api/favorites", express.json({ limit: "1mb" }), (req, res) => {
+	const list = req.body && Array.isArray(req.body.favorites) ? req.body.favorites : null;
+	if (!list) return res.status(400).json({ error: "Daftar favorit tidak valid." });
+	// Cap it: this is a convenience store, not a database.
+	const clean = [...new Set(list.filter((x) => typeof x === "string"))].slice(0, 5000);
+	try {
+		fs.writeFileSync(FAV_FILE, JSON.stringify({ favorites: clean }, null, 2));
+		res.json({ ok: true, count: clean.length });
+	} catch (err) {
+		res.status(500).json({ error: "Gagal menyimpan favorit: " + err.message });
 	}
 });
 
