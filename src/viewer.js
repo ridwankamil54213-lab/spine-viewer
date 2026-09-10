@@ -30,6 +30,7 @@ import {
 	pickRuntime,
 } from "./spine-version.js";
 import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion } from "./live2d.js";
+import { normalizeSpine2Json } from "./spine2-normalize.js";
 
 /* Pixi v7's loadTextures decodes via createImageBitmap(blob) with no options, so
  * the browser premultiplies alpha at decode time; alphaMode=UNPACK would then
@@ -742,6 +743,19 @@ async function parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor }) {
 				? new SkeletonBinary(attachmentLoader)
 				: new SkeletonJson(attachmentLoader);
 			parser.scale = scale ?? 1;
+
+			// Skeleton JSON 2.x (hasil tools/convert-spine2.py, atau model
+			// Epic Seven yang memang diekspor sebagai JSON) perlu dibereskan
+			// dulu, atau runtime 3.8+ menolaknya:
+			//   - event tanpa "name"  -> "eventDataName cannot be null"
+			//   - skins berbentuk objek, padahal runtime mengharapkan larik
+			// Tanpa ini, model gagal total. Dengan ini, runtime 4.1 memuatnya
+			// baik-baik saja (terverifikasi 250/250).
+			if (!isBinary && typeof rawSkeleton === "object") {
+				normalizeSpine2Json(rawSkeleton, {
+					onWarn: (m) => console.warn("[spine2]", m),
+				});
+			}
 
 			const data = isBinary
 				? parser.readSkeletonData(new Uint8Array(rawSkeleton))

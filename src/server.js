@@ -113,7 +113,24 @@ function inspectSkeleton(file, atlasFile) {
 			// through to here, reported bones/animations fine, but never got
 			// needsLegacyViewer — so the client handed it to pixi-spine, which
 			// cannot draw 2.x, and the model rendered as nothing.
-			const legacy = Number.isFinite(major) && major > 0 && major < 3;
+			// A .json skeleton that reports 2.x is NOT the same case as a
+			// binary one. Binaries genuinely can't be parsed by any bundled
+			// runtime, so they need the iframe viewer. But JSON — including
+			// 2.1.27 JSON — is read fine by the 4.1 runtime (verified 250/250
+			// on converted Project QT models), because the JSON layout is
+			// close enough that the parser walks it without complaint.
+			//
+			// That's the whole point of tools/convert-spine2.py: turning
+			// .skel into .json is what frees these models from the iframe.
+			// Marking them legacy here would undo that and send them right
+			// back to the viewer we were trying to escape.
+			//
+			// Only two things still need normalising at load time
+			// (see src/spine2-normalize.js):
+			//   1. events with no "name" — legal in 2.x, fatal in 3.8+
+			//   2. `skins` as an object instead of an array
+			const isJson = /\.json$/i.test(String(file || ""));
+			const legacy = !isJson && Number.isFinite(major) && major > 0 && major < 3;
 			// Spine 2.x stores `skins` as an OBJECT keyed by skin name
 			// ({"default": {...}}); 3.x/4.x use an array of {name, ...}
 			// records. `(data.skins || []).map(...)` threw on the object
@@ -314,6 +331,26 @@ const GAME_ROOTS = [
 		key: "projectqt",
 		label: "Project QT",
 		spineRuntime: "2.1.27",
+		pmaDefault: false,
+	},
+	// Project QT — hasil konversi .skel 2.1.27 menjadi JSON
+	// (tools/convert-spine2.py, memakai SpineConverter2.1.27).
+	//
+	// Isinya model yang SAMA dengan assets/projectqt, hanya saja
+	// skeleton-nya sudah berbentuk JSON. Itu yang membuat perbedaan: berkas
+	// .skel biner tidak bisa dibaca runtime 3.8/4.1, sehingga model-model
+	// itu terpaksa ditampilkan lewat iframe penampil GWT — yang punya loop
+	// sendiri, jadi timeline/skin/export/FPS milik kita mati.
+	// Dalam bentuk JSON, runtime biasa bisa memuatnya dan seluruh fitur
+	// kembali aktif.
+	//
+	// Tanpa spineRuntime: biarkan deteksi dari isi berkas berjalan.
+	// Berkasnya memang masih berlabel 2.1.27, tapi struktur JSON-nya sudah
+	// bisa dimakan runtime 4.1 (terverifikasi 250/250).
+	{
+		match: "projectqt-json",
+		key: "projectqt-json",
+		label: "Project QT (JSON)",
 		pmaDefault: false,
 	},
 	// Cat Shinobi (ねこ親方 / com.cookapps.catshinobi). Unity Addressables
