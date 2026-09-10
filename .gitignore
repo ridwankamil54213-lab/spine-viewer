@@ -59,3 +59,8 @@ src/l2d-core-gate.js
 # server-side mirror of whatever the local browser starred, so committing it
 # would push one person's list onto everyone else.
 data/favorites.json
+
+# Scan cache written by the server (data/models-cache.json). It is regenerated
+# whenever assets/ changes, and it is specific to one machine's asset tree.
+data/models-cache.json
+data/models-cache.json.tmp

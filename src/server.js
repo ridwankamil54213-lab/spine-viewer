@@ -1062,8 +1062,56 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "2mb" }));
 
 /* Parsing 500+ .skel files on every request would be slow, so cache the scan
- * and invalidate it whenever anything under assets/ changes. */
+ * and invalidate it whenever anything under assets/ changes.
+ *
+ * The cache is also persisted to disk (data/models-cache.json). Without that
+ * every restart rescans all ~17k models — about 2 minutes of 100% CPU before
+ * the server answers its first request. The signature is still checked on
+ * boot, so a persisted cache is only used when the tree actually matches. */
 let cache = { models: null, mtime: 0, signature: "" };
+
+const CACHE_FILE = path.join(DATA, "models-cache.json");
+
+/**
+ * Load a persisted scan cache. Returns null when unusable — missing,
+ * unreadable, or written by a build whose scan output looked different.
+ *
+ * The signature is what guards correctness: it is derived from the newest
+ * mtime under assets/, so a cache is only reused when nothing changed since
+ * it was written. A wrong-but-plausible cache would silently hide models,
+ * so anything unexpected is discarded rather than trusted.
+ */
+function loadPersistedCache() {
+	try {
+		const raw = JSON.parse(fs.readFileSync(CACHE_FILE, "utf8"));
+		if (!raw || !Array.isArray(raw.models) || !raw.models.length) return null;
+		if (typeof raw.signature !== "string" || !raw.signature) return null;
+		return { models: raw.models, signature: raw.signature, mtime: raw.mtime || 0 };
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Persist the scan cache. Best-effort: a failure here only costs a slower
+ * next boot, never correctness, so it must never break the request path.
+ */
+function savePersistedCache(sig, models) {
+	try {
+		fs.mkdirSync(DATA, { recursive: true });
+		const tmp = CACHE_FILE + ".tmp";
+		// Write to a temp file then rename: a crash mid-write would otherwise
+		// leave a truncated cache that fails to parse on every boot after it.
+		fs.writeFileSync(tmp, JSON.stringify({
+			signature: sig,
+			mtime: Date.now(),
+			models,
+		}));
+		fs.renameSync(tmp, CACHE_FILE);
+	} catch (err) {
+		console.warn("[cache] gagal menyimpan cache model:", err.message);
+	}
+}
 
 /**
  * One pass over assets/ that produces both the change signature and the size
@@ -1119,12 +1167,34 @@ function scanTree() {
 
 function getModels({ force = false } = {}) {
 	const { signature: sig, sizes } = scanTree();
+
+	// Memory cache first — it is free and always current within a run.
 	if (!force && cache.models && cache.signature === sig) return cache.models;
+
+	// Then the persisted cache. This is what turns a ~2 minute cold boot into
+	// an instant one. The signature came from the same scanTree() walk, so a
+	// hit here means assets/ really has not changed since the last save.
+	if (!force && !cache.models) {
+		const persisted = loadPersistedCache();
+		if (persisted && persisted.signature === sig) {
+			// dirBytes still has to be populated: it is filled from the size
+			// half of the walk, which is not persisted (it changes with content
+			// inside folders that a mtime signature may not catch).
+			dirBytesCache.clear();
+			for (const [k, v] of sizes) dirBytesCache.set(k, v);
+			cache = { models: persisted.models, mtime: persisted.mtime, signature: sig };
+			console.log(`[cache] memakai cache ${persisted.models.length} model`);
+			return cache.models;
+		}
+	}
+
 	// The tree changed, so cached folder sizes are stale too. scanModels()
 	// reads dirBytes(), so publish the fresh sizes before it runs.
 	dirBytesCache.clear();
 	for (const [k, v] of sizes) dirBytesCache.set(k, v);
-	cache = { models: scanModels(), mtime: Date.now(), signature: sig };
+	const models = scanModels();
+	cache = { models, mtime: Date.now(), signature: sig };
+	savePersistedCache(sig, models);
 	return cache.models;
 }
 
@@ -2089,8 +2159,14 @@ app.use(express.static(path.join(ROOT, "public")));
 app.use((req, res) => res.status(404).json({ error: "Endpoint tidak ditemukan." }));
 
 app.listen(PORT, HOST, () => {
-	const models = scanModels();
+	// getModels(), NOT scanModels(): the former checks the persisted cache
+	// first. Calling scanModels() directly made every restart rescan all
+	// ~17k models (~2 min of 100% CPU) even when nothing had changed, which
+	// defeated the whole point of the cache.
+	const models = getModels();
 	console.log(`\n  Spine Stage  →  http://${HOST}:${PORT}`);
 	console.log(`  aset         :  ${ASSETS}`);
-	console.log(`  model        :  ${models.length} (${models.map((m) => m.id).join(", ") || "-"})\n`);
+	// Listing 16.9k ids floods the journal; the count plus a few examples is
+	// enough to confirm the scan and keeps `journalctl` readable.
+	console.log(`  model        :  ${models.length} (${models.slice(0, 5).map((m) => m.id).join(", ")} …)\n`);
 });
