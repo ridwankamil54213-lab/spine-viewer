@@ -68,3 +68,7 @@ data/models-cache.json.tmp
 # Hasil konversi .skel -> JSON (dulu ~5.5 GB). Dihasilkan ulang oleh
 # tools/convert-spine2.py bila masih diperlukan; tidak perlu ikut ke repo.
 assets/projectqt21/
+
+# Hasil ekstraksi Star Lust (bundle unduhan + model). Dihasilkan ulang oleh
+# tools/extract-starlust.py; tidak perlu ikut ke repo.
+assets/starlust/

@@ -326,6 +326,24 @@ const GAME_ROOTS = [
 		spineRuntime: "2.1.27",
 		pmaDefault: false,
 	},
+	// Star Lust (Erolabs / pinkcore).
+	//
+	// Katalog Addressables-nya berbentuk JSON (bukan biner seperti Megaha:Re),
+	// dan bundle-nya TIDAK dienkripsi — magic UnityFS langsung di offset 0.
+	// Diunduh oleh tools/extract-starlust.py.
+	//
+	// 178 model, semuanya Spine 4.0.64: 87 skeleton ber-JSON, 91 berbentuk
+	// .skel biner. Keduanya bisa dibaca runtime 4.0/4.1 yang sudah ada, jadi
+	// tidak perlu konversi maupun jalur 2.1.
+	//
+	// Terbagi dua: characterspine (karakter) dan cgcharacterspine (CG).
+	// Deteksi versi per berkas sudah cukup — jangan paksa spineRuntime.
+	{
+		match: "starlust",
+		key: "starlust",
+		label: "Star Lust",
+		pmaDefault: false,
+	},
 	// Project QT.
 	//
 	// Modelnya diambil utuh dari gdrive (1863 folder, 1833 di antaranya
