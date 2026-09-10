@@ -65,6 +65,6 @@ data/favorites.json
 data/models-cache.json
 data/models-cache.json.tmp
 
-# Hasil konversi .skel -> JSON (5.5 GB). Dihasilkan ulang oleh
-# tools/convert-spine2.py, jadi tidak perlu ikut ke repo.
+# Hasil konversi .skel -> JSON (dulu ~5.5 GB). Dihasilkan ulang oleh
+# tools/convert-spine2.py bila masih diperlukan; tidak perlu ikut ke repo.
 assets/projectqt21/

@@ -326,46 +326,25 @@ const GAME_ROOTS = [
 		spineRuntime: "2.1.27",
 		pmaDefault: false,
 	},
+	// Project QT.
+	//
+	// Modelnya diambil utuh dari gdrive (1863 folder, 1833 di antaranya
+	// lengkap), bukan hasil ekstraksi sendiri. Alasannya: versi di sana
+	// sebagian besar sudah 3.8.99, jadi bisa dimuat langsung runtime 4.1 —
+	// tanpa konversi, tanpa jalur 2.1, tanpa iframe penampil legacy.
+	//
+	// Pun yang lama (1323 model murni .skel biner) sudah dihapus beserta
+	// folder hasil konversinya. Ia menuntut konversi dulu, dan hasilnya
+	// (2.1.27) tidak bisa dirender runtime 3.8/4.x.
+	//
+	// Masih ada 38 model berlabel 2.1.27 dan 68 folder yang hanya berisi
+	// .skel. Deteksi versi per berkas yang menanganinya: yang terbaca 2.x
+	// diarahkan ke renderer kanvas 2.1, sisanya ke pixi-spine. Karena itu
+	// entri ini TIDAK memaksa spineRuntime — biarkan deteksi bekerja.
 	{
 		match: "projectqt",
 		key: "projectqt",
 		label: "Project QT",
-		spineRuntime: "2.1.27",
-		pmaDefault: false,
-	},
-	// Project QT — .skel 2.1.27 yang sudah dikonversi ke JSON oleh
-	// tools/convert-spine2.py, dirender dengan runtime 2.1 official.
-	//
-	// Berbeda dari "Project QT" di atas (masih .skel biner) dan dari
-	// "Project QT (JSON)" (hasil konversi pihak lain, sudah 3.8.99).
-	// Yang ini formatnya MASIH 2.1.27 — hanya wadahnya yang jadi JSON —
-	// karena konverter mengubah biner menjadi JSON tanpa menaikkan versi.
-	//
-	// spineRuntime "2.1.27" mengarahkannya ke renderer kanvas 2.1
-	// (src/spine21-stage.js), bukan ke iframe penampil GWT.
-	{
-		match: "projectqt21",
-		key: "projectqt21",
-		label: "Project QT (2.1)",
-		spineRuntime: "2.1.27",
-		pmaDefault: false,
-	},
-	//
-	// Isinya model yang SAMA dengan assets/projectqt, hanya saja
-	// skeleton-nya sudah berbentuk JSON. Itu yang membuat perbedaan: berkas
-	// .skel biner tidak bisa dibaca runtime 3.8/4.1, sehingga model-model
-	// itu terpaksa ditampilkan lewat iframe penampil GWT — yang punya loop
-	// sendiri, jadi timeline/skin/export/FPS milik kita mati.
-	// Dalam bentuk JSON, runtime biasa bisa memuatnya dan seluruh fitur
-	// kembali aktif.
-	//
-	// Tanpa spineRuntime: biarkan deteksi dari isi berkas berjalan.
-	// Berkasnya memang masih berlabel 2.1.27, tapi struktur JSON-nya sudah
-	// bisa dimakan runtime 4.1 (terverifikasi 250/250).
-	{
-		match: "projectqt-json",
-		key: "projectqt-json",
-		label: "Project QT (JSON)",
 		pmaDefault: false,
 	},
 	// Cat Shinobi (ねこ親方 / com.cookapps.catshinobi). Unity Addressables
