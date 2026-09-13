@@ -221,6 +221,8 @@ const dirBytesCache = new Map();
 const GAME_ROOTS = [
 	{ match: "nikke", key: "nikke", label: "Nikke: Goddess of Victory" },
 	{ match: "lostsword", key: "lostsword", label: "Lost Sword" },
+	{ match: "talesofangels", key: "talesofangels", label: "Tales of Angels" },
+	{ match: "crosscore", key: "crosscore", label: "CrossCore" },
 	// Longest prefix first: resolveGame matches with startsWith, so the more
 	// specific "azurlane-chibi" must come before "azurlane" or every chibi
 	// model gets absorbed into the main Azur Lane bucket.
