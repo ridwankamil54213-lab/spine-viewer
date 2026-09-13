@@ -143,12 +143,23 @@ function atlasBaseTextures() {
 	const out = [];
 	if (!spine) return out;
 	const seen = new Set();
-	for (const slot of spine.skeleton.slots) {
-		const bt = slot.getAttachment()?.region?.page?.baseTexture;
+	const add = (bt) => {
 		if (bt && !seen.has(bt.uid)) {
 			seen.add(bt.uid);
 			out.push(bt);
 		}
+	};
+	for (const slot of spine.skeleton.slots) {
+		const page = slot.getAttachment()?.region?.page;
+		if (!page) continue;
+		// pixi-spine pages expose `baseTexture` directly. The 4.2 runtime wraps
+		// each page in SpineTexture, where the Pixi texture — and its
+		// baseTexture — live one level deeper. Reading only `.baseTexture`
+		// returned NOTHING for every 4.2 model, so applyPMA() silently iterated
+		// zero textures: a `pma: true` atlas (e.g. all of CrossCore) stayed
+		// uploaded as straight alpha and every sprite got a dark fringe that
+		// the PMA toggle could not remove.
+		add(page.baseTexture || page.texture?.texture?.baseTexture);
 	}
 	return out;
 }
