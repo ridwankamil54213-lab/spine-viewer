@@ -196,6 +196,58 @@ function dirBytes(dir) {
 /** Folder size cache, cleared whenever the asset tree changes. */
 const dirBytesCache = new Map();
 
+/* ------------------------------------------------------------------ *
+ * Model-index disk cache
+ * ------------------------------------------------------------------ *
+ * Building the index means walking assets/ twice and parsing ~15k .skel
+ * files with @pixi-spine, which costs minutes on a large library (74k
+ * files / 17k models here). The result is a pure function of the asset
+ * tree, so persist it and reload on the next boot instead of rebuilding.
+ *
+ * The cache is keyed by the same tree signature getModels() already uses
+ * (newest mtime under assets/), so it self-invalidates: if anything is
+ * added or removed the signature differs and the index is rebuilt once.
+ *
+ * Layout: { version, signature, models, sizes: [[absDir, bytes], ...] }.
+ * `sizes` is saved too because it is produced by the same scanTree() walk
+ * that yields the signature — without it, a disk-cache hit would still
+ * need a full stat() walk just to repopulate folder sizes. Devs can bump
+ * INDEX_VERSION to force a one-time rebuild after changing scanModels().
+ */
+const INDEX_FILE = path.join(DATA, "models-index.json");
+const INDEX_VERSION = 2;
+
+function writeModelsDiskCache(signature, models, sizes) {
+	try {
+		fs.mkdirSync(DATA, { recursive: true });
+		const out = {
+			version: INDEX_VERSION,
+			signature,
+			models,
+			sizes: Array.from(sizes || []),
+		};
+		const tmp = INDEX_FILE + ".tmp";
+		fs.writeFileSync(tmp, JSON.stringify(out));
+		fs.renameSync(tmp, INDEX_FILE); // atomic: never leave a truncated index
+	} catch (err) {
+		console.error("Gagal menulis cache index:", err.message);
+	}
+}
+
+function tryLoadModelsDiskCache() {
+	try {
+		if (!fs.existsSync(INDEX_FILE)) return null;
+		const raw = JSON.parse(fs.readFileSync(INDEX_FILE, "utf8"));
+		// No disk I/O here: the caller still runs the single scanTree() walk
+		// to get the current signature and compares. Reading both from disk
+		// could make a stale index look fresh.
+		if (raw.version !== INDEX_VERSION || !Array.isArray(raw.models)) return null;
+		return raw;
+	} catch {
+		return null;
+	}
+}
+
 /**
  * Maps a top-level asset folder to the game it belongs to.
  * `label` is what the sidebar shows; `key` is the stable filter value.
@@ -1044,11 +1096,32 @@ function scanTree() {
 function getModels({ force = false } = {}) {
 	const { signature: sig, sizes } = scanTree();
 	if (!force && cache.models && cache.signature === sig) return cache.models;
-	// The tree changed, so cached folder sizes are stale too. scanModels()
-	// reads dirBytes(), so publish the fresh sizes before it runs.
+
+	// Publish fresh sizes before scanModels() runs — it reads dirBytes().
 	dirBytesCache.clear();
+	if (!force) {
+		const disk = tryLoadModelsDiskCache();
+		// Size cache is keyed by absolute path, which differs when the project
+		// moved (e.g. /root/projects → /srv), so only reuse it when at least
+		// one entry matches a path this process actually walked.
+		if (
+			disk &&
+			disk.signature === sig &&
+			Array.isArray(disk.sizes) &&
+			disk.sizes.some(([p]) => sizes.has(p))
+		) {
+			for (const [p, v] of disk.sizes) dirBytesCache.set(p, v);
+			cache = { models: disk.models, mtime: Date.now(), signature: sig };
+			console.log(`Model index dari disk cache (${disk.models.length} model).`);
+			return cache.models;
+		}
+	}
+
+	// Miss (or forced refresh): the tree changed, so cached folder sizes are
+	// stale too.
 	for (const [k, v] of sizes) dirBytesCache.set(k, v);
 	cache = { models: scanModels(), mtime: Date.now(), signature: sig };
+	writeModelsDiskCache(sig, cache.models, sizes);
 	return cache.models;
 }
 
@@ -1973,8 +2046,28 @@ app.use(express.static(path.join(ROOT, "public")));
 app.use((req, res) => res.status(404).json({ error: "Endpoint tidak ditemukan." }));
 
 app.listen(PORT, HOST, () => {
-	const models = scanModels();
 	console.log(`\n  Spine Stage  →  http://${HOST}:${PORT}`);
 	console.log(`  aset         :  ${ASSETS}`);
-	console.log(`  model        :  ${models.length} (${models.map((m) => m.id).join(", ") || "-"})\n`);
+
+	// Warm the index in the background. Previously this ran scanModels()
+	// synchronously here, which walks assets/ twice and parses every .skel:
+	// minutes of blocked event loop on a large library, so the server did not
+	// answer a single request until it finished. getModels() does the same
+	// work but reuses the disk cache when the tree is unchanged.
+	const warm = () => {
+		try {
+			const t = Date.now();
+			const models = getModels();
+			console.log(
+				`  model        :  ${models.length}  (index siap dalam ${(
+					(Date.now() - t) / 1000
+				).toFixed(1)}s)\n`
+			);
+		} catch (err) {
+			console.error("Gagal menyiapkan index model:", err.message);
+		}
+	};
+	// setImmediate keeps the listen callback short; on a disk-cache hit the
+	// index is ready almost instantly anyway.
+	setImmediate(warm);
 });

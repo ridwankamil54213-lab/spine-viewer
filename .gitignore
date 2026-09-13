@@ -8,6 +8,11 @@ public/dist/
 public/thumbs/
 public/exports/
 
+# Generated model index (see getModels()/writeModelsDiskCache in src/server.js).
+# Rebuilt automatically when assets/ changes; large and machine-specific.
+data/models-index.json
+data/models-index.json.tmp
+
 # ...but the game icons are small, hand-curated art that cannot be regenerated
 # by fetching, so they are tracked. Only this subdirectory is un-ignored.
 !public/thumbs/_game/
