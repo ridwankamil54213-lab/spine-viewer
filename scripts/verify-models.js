@@ -128,7 +128,7 @@ async function main() {
           active: st.pma && st.pma.active,
           mode: st.pma && st.pma.mode,
           source: st.pma && st.pma.source,
-          gamePmaDefault: st.pma && st.pma.gamePmaDefault,
+          gamePmaDefault: st.pma && st.pma.gameDefaultMode,
           atlasSaysPMA: st.pma && st.pma.atlasSaysPMA,
         },
         worldSpan: (() => {
