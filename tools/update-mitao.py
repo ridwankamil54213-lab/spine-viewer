@@ -58,10 +58,13 @@ STATE_FILE = os.path.join(STATE_DIR, "state.json")
 ASSET_DIR = os.environ.get("MITAO_OUT", "/opt/spine-viewer/assets/mitao-utopia")
 EXTRACTOR = os.path.join(MODULE_DIR, "extract-spine.py")
 
-# Hanya skeleton 2D yang bisa dilihat viewer. `prefabs_spine_mesh_*` (3D) dan
-# `prefabs_spine_ui_*` (prefab UI) TIDAK menghasilkan model — lihat
-# references/mitao-extraction.md.
-SKELETON = "rawdata_spine_"
+# Kandidat skeleton 2D. Skeletons TIDAK hanya di `rawdata_spine_*`:
+# `prefabs_spine_mesh_skill_*` (18), `prefabs_spine_mesh_avg_*` (4) dan
+# `prefabs_spine_ui_cutin_*` (1) juga berisi .skel+.atlas asli — seluruh set
+# "skill" akan terlewat kalau filternya rawdata saja. Sebagian besar
+# `prefabs_spine_*` bukan skeleton; itu tersaring sendiri saat ekstraksi
+# (tidak ada pasangan .skel+.atlas). Lihat references/mitao-extraction.md.
+SKELETON_MARKERS = ("rawdata_spine_", "prefabs_spine_")
 
 APK_TIMEOUT = 900
 
@@ -98,11 +101,18 @@ def save_state(state: dict) -> None:
 
 
 def spine_bundles(manifest: dict) -> dict:
-    """{bundle name -> info} untuk skeleton 2D saja."""
+    """{bundle name -> info} untuk kandidat skeleton 2D.
+
+    Termasuk `prefabs_spine_*` karena sebagian di antaranya benar-benar berisi
+    .skel+.atlas (lihat SKELETON_PREFIXES). Prefab yang bukan skeleton akan
+    terlewati sendiri saat ekstraksi.
+    """
     return {
         b["BundleName"]: b
         for b in manifest["Bundles"]
-        if SKELETON in b["BundleName"]
+        # NB: substring, not startswith — real names are prefixed with
+        # "share_assets_res_" / "assets_res_" before the marker.
+        if any(p in b["BundleName"] for p in SKELETON_MARKERS)
     }
 
 
