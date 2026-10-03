@@ -1076,10 +1076,46 @@ app.disable("x-powered-by");
 app.use((req, res, next) => {
 	res.setHeader("X-Content-Type-Options", "nosniff");
 	res.setHeader("Referrer-Policy", "same-origin");
+	res.setHeader("X-Frame-Options", "SAMEORIGIN");
 	next();
 });
 
 app.use(express.json({ limit: "2mb" }));
+
+/* The app has no accounts, so anyone who can reach the port can ask it to
+ * spawn ffmpeg or a downloader. A tiny in-process rate limit keeps a public
+ * deployment from being trivially turned into a CPU/disk hog. It is per-IP
+ * and intentionally generous: it only stops hammering, not real use. */
+const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/frame", "/api/export/finish", "/api/export/cancel"];
+const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 30;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const rateBuckets = new Map();
+
+function rateLimit(req, res, next) {
+	if (!RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
+	const now = Date.now();
+	const key = req.ip || req.socket?.remoteAddress || "unknown";
+	let bucket = rateBuckets.get(key);
+	if (!bucket || now > bucket.resetAt) {
+		bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+		rateBuckets.set(key, bucket);
+	}
+	bucket.count += 1;
+	if (bucket.count > RATE_LIMIT_MAX) {
+		res.setHeader("Retry-After", Math.ceil((bucket.resetAt - now) / 1000));
+		return res.status(429).json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." });
+	}
+	next();
+}
+
+// Bound the map so a flood of distinct source addresses cannot grow it forever.
+const rateSweeper = setInterval(() => {
+	const now = Date.now();
+	for (const [key, bucket] of rateBuckets) if (now > bucket.resetAt) rateBuckets.delete(key);
+}, RATE_LIMIT_WINDOW_MS);
+if (rateSweeper.unref) rateSweeper.unref();
+
+app.use(rateLimit);
 
 /* Parsing 500+ .skel files on every request would be slow, so cache the scan
  * and invalidate it whenever anything under assets/ changes.
@@ -1808,6 +1844,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-shoujoukaisen.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	"mitao-utopia": {
+		script: path.join(ROOT, "tools", "update-mitao.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log }
@@ -1816,15 +1856,35 @@ function runUpdater(game, args) {
 	const cfg = UPDATERS[game];
 	if (!cfg) return null;
 	return new Promise((resolve) => {
-		const child = spawn(cfg.py, [cfg.script, ...args], { cwd: ROOT });
+		// A missing interpreter or script emits an 'error' event on the child.
+		// Without a listener Node treats it as unhandled and kills the whole
+		// process, so a single unauthenticated GET /api/update/<game> took the
+		// server down (and the restart loop took it down again on every retry).
+		const fail = (message) => resolve({ error: message });
+		let child;
+		try {
+			child = spawn(cfg.py, [cfg.script, ...args], { cwd: ROOT });
+		} catch (err) {
+			return fail(`Tidak bisa menjalankan pembaru: ${err.message}`);
+		}
 		let out = "";
+		// Resolve exactly once: 'error' and 'close' can both fire.
+		let settled = false;
+		const finish = (value) => {
+			if (settled) return;
+			settled = true;
+			resolve(value);
+		};
+		child.on("error", (err) => finish({ error: `Pembaru tidak bisa dijalankan: ${err.message}` }));
 		child.stdout.on("data", (d) => (out += d));
 		child.stderr.on("data", (d) => (out += d));
 		child.on("close", () => {
+			const start = out.indexOf("{");
+			if (start === -1) return finish({ error: "Pembaru tidak mengembalikan JSON.", raw: out.slice(-800) });
 			try {
-				resolve(JSON.parse(out.slice(out.indexOf("{"))));
+				finish(JSON.parse(out.slice(start)));
 			} catch {
-				resolve({ error: "Gagal membaca hasil pembaruan.", raw: out.slice(-800) });
+				finish({ error: "Gagal membaca hasil pembaruan.", raw: out.slice(-800) });
 			}
 		});
 	});
@@ -2103,7 +2163,9 @@ app.post("/api/export/finish", express.json({ limit: "1mb" }), async (req, res) 
 			const p = spawn(bin, args);
 			let err = "";
 			p.stderr.on("data", (d) => { err += d.toString(); });
-			p.on("error", reject);
+			// 'error' fires when the binary cannot be executed at all; without
+			// this listener Node would crash the process instead of rejecting.
+			p.on("error", (e) => reject(new Error(`ffmpeg gagal dijalankan: ${e.message}`)));
 			p.on("close", (code) => (code === 0 ? resolve() : reject(new Error(err.slice(-500) || `ffmpeg keluar ${code}`))));
 		});
 		const stat = await fsp.stat(out).catch(() => null);
@@ -2177,6 +2239,31 @@ app.use(
 app.use(express.static(path.join(ROOT, "public")));
 
 app.use((req, res) => res.status(404).json({ error: "Endpoint tidak ditemukan." }));
+
+/* Safety net: an exception that escapes a route must not take the process
+ * down with it (an uncaught throw inside an async handler is now a rejected
+ * promise, and Express 4 forwards it here). Log it and answer 500 instead. */
+// eslint-disable-next-line no-unused-vars -- Express identifies error middleware by arity (4 args).
+app.use((err, req, res, next) => {
+	if (res.headersSent) return next(err);
+	const status = Number(err && (err.status || err.statusCode));
+	/* Client errors must keep their status. express.static({fallthrough:false})
+	 * reports a missing file as an ENOENT error carrying status 404 — turning
+	 * that into a 500 (as an earlier version of this handler did) breaks every
+	 * not-found case in the UI.
+	 *
+	 * The underlying message is never echoed back: for a static miss it is the
+	 * absolute path on disk. */
+	if (Number.isInteger(status) && status >= 400 && status < 500) {
+		const message =
+			status === 400 ? "Permintaan tidak valid."
+			: status === 404 ? "Tidak ditemukan."
+			: "Permintaan tidak dapat dipenuhi.";
+		return res.status(status).json({ error: message });
+	}
+	console.error("[spine-stage] unhandled route error:", err);
+	res.status(500).json({ error: "Kesalahan internal server." });
+});
 
 app.listen(PORT, HOST, () => {
 	// getModels(), NOT scanModels(): the former checks the persisted cache

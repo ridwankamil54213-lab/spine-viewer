@@ -3263,13 +3263,14 @@ function syncPanes() {
 }
 
 /* --- Asset updater ----------------------------------------------------
- * Only games with a fetch script on the server get the buttons. Ark
- * Re:Code is the first: its router publishes the live catalog and the
- * bundles are public, so no key or device is needed.
+ * Only games with a fetch script on the server get the buttons.
+ * Key di sini adalah nilai `game` dari /api/models (lihat GAME_ROOTS di
+ * server.js), sehingga "mitao" → folder mitao-utopia juga cocok.
  */
 const UPDATABLE = {
 	arkrecode: "/api/update/arkrecode",
 	shoujoukaisen: "/api/update/shoujoukaisen",
+	"mitao-utopia": "/api/update/mitao-utopia",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -3403,8 +3404,9 @@ async function checkUpdate() {
 	}
 	// Ada yang baru: tanya dulu sebelum mengunduh (bisa ratusan MB).
 	const n = pendingCount(info);
-	const what = updaterGame === "shoujoukaisen" ? "model" : "berkas";
-	if (!confirm(`Versi ${info.version ?? info.catalog}: ${n} ${what} baru. Unduh sekarang?`)) return;
+	const what = updaterGame === "shoujoukaisen" || updaterGame === "mitao-utopia" ? "model" : "berkas";
+	const detail = n > 0 ? `${n} ${what} baru` : "versi baru";
+	if (!confirm(`Versi ${info.version ?? info.catalog}: ${detail}. Unduh sekarang?`)) return;
 	applyUpdate();
 }
 
@@ -3432,7 +3434,9 @@ async function applyUpdate() {
 			// Tandai model hasil unduhan supaya diberi badge NEW.
 			const added = res.new_models || [];
 			if (added.length) {
-				const prefix = updaterGame === "shoujoukaisen" ? "shoujoukaisen" : "arkrecode";
+				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia" };
+				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				markNew(added.map((n) => `${prefix}/${n}`));
 			}
 			toast?.(
