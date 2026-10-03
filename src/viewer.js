@@ -79,11 +79,38 @@ const PMA_MODES = { auto: "auto", on: "on", off: "off", upload: "upload" };
 let pmaMode = PMA_MODES.auto;
 let atlasSaysPMA = false;
 /**
- * Game-level PMA assumption, used only when the atlas carries no `pma:` line.
- * Some games (Alliance Sages) ship premultiplied textures without declaring
- * it, so trusting the absent flag alone would leave dark fringes everywhere.
+ * Game-level PMA default — a full MODE (auto / on / off / upload), not just a
+ * boolean. Set per game from the model metadata (`pmaDefault` on /api/models),
+ * so a whole game can default to e.g. "upload" without touching every model.
+ * Used whenever the viewer's selector is on Auto:
+ *   - "on"     → the game ships premultiplied textures without saying so
+ *                (dark fringes if treated as straight) → force PMA
+ *   - "off"    → straight alpha, atlas says nothing
+ *   - "upload" → straight textures with stale colour in transparent texels
+ *                (white patches) → premultiply on upload
  */
-let gamePmaDefault = false;
+let gameDefaultMode = PMA_MODES.auto;
+
+/** Accepts true/false (legacy booleans) or a mode string; returns a mode. */
+function normalizePmaMode(v) {
+	if (v === true) return PMA_MODES.on;
+	if (v === false || v == null) return PMA_MODES.auto;
+	const s = String(v);
+	return PMA_MODES[s] ? s : PMA_MODES.auto;
+}
+
+/** The mode actually in effect: the user's pick, else what Auto resolves to. */
+function resolvedMode() {
+	// An explicit user pick always wins.
+	if (pmaMode !== PMA_MODES.auto) return pmaMode;
+	// Auto. This keeps the ORIGINAL decision untouched — an explicit atlas
+	// `pma:` flag wins, otherwise the game default (false/on/off) applies —
+	// and only refines the straight-alpha case with the game-level "upload"
+	// mode. So games whose default is on/off/auto behave exactly as before.
+	if (declaredPMA()) return PMA_MODES.on;
+	if (gameDefaultMode === PMA_MODES.upload) return PMA_MODES.upload;
+	return PMA_MODES.off;
+}
 
 const PMA_STORE_KEY = "spine-stage:pma-overrides";
 
@@ -116,7 +143,7 @@ function syncPmaToModel(id) {
 function declaredPMA() {
 	// A page's `pma` is null when the atlas has no `pma:` line, false when it
 	// explicitly says "pma: false". Only an explicit declaration is trusted;
-	// otherwise fall back to the game's default.
+	// otherwise fall back to the game's default mode.
 	const flags = ([]).concat(
 		...(current?.atlasPagesFlags || []).length
 			? [current.atlasPagesFlags]
@@ -124,7 +151,7 @@ function declaredPMA() {
 	);
 	const explicit = flags.filter((f) => f === true || f === false);
 	if (explicit.length) return explicit.some((f) => f === true);
-	return gamePmaDefault;
+	return gameDefaultMode === PMA_MODES.on;
 }
 
 /** Where the Auto decision came from: the atlas flag, or the game default. */
@@ -134,13 +161,15 @@ function pmaSource() {
 	if (pmaMode === PMA_MODES.upload) return "forced-upload";
 	const flags = current?.atlasPagesFlags || [];
 	if (flags.some((f) => f === true || f === false)) return "atlas";
-	return gamePmaDefault ? "game-default" : "default";
+	return gameDefaultMode !== PMA_MODES.auto ? "game-default" : "default";
 }
 
 function pmaActive() {
+	// An explicit user pick always wins over the atlas and the game default.
 	if (pmaMode === PMA_MODES.on) return true;
-	if (pmaMode === PMA_MODES.off) return false;
-	return declaredPMA(); // auto: atlas flag, else the game's default
+	if (pmaMode === PMA_MODES.off || pmaMode === PMA_MODES.upload) return false;
+	// Auto: an explicit atlas `pma:` line wins, else the game's default mode.
+	return declaredPMA();
 }
 
 /** The Pixi ALPHA_MODES value matching the current PMA setting. */
@@ -149,7 +178,7 @@ function currentAlphaMode() {
 	// straight-alpha bitmap (UNPACK means "the stored bytes are NOT
 	// premultiplied") and let it premultiply during upload, with the NPM
 	// blend. See the PMA_MODES comment for why this fixes white patches.
-	if (pmaMode === PMA_MODES.upload) return ALPHA_MODES.UNPACK;
+	if (resolvedMode() === PMA_MODES.upload) return ALPHA_MODES.UNPACK;
 	return pmaActive() ? ALPHA_MODES.PMA : ALPHA_MODES.NPM;
 }
 
@@ -201,8 +230,9 @@ function applyBlendMode() {
 	if (!spine) return;
 	// "upload" premultiplies the texture but still wants the straight-alpha
 	// (NPM) blend, and it is not a real PMA state — keep it out of pmaActive()
-	// so the HUD keeps reading it as straight.
-	const pma = pmaActive() && pmaMode !== PMA_MODES.upload;
+	// so the HUD keeps reading it as straight. Same for a game default of
+	// "upload" reached through Auto.
+	const pma = pmaActive() && resolvedMode() !== PMA_MODES.upload;
 
 	// SlotData.blendMode holds a PIXI BLEND_MODES value (0=NORMAL, 1=ADD,
 	// 2=MULTIPLY, 3=SCREEN), not a Spine index. PMA uses the standard set;
@@ -1420,7 +1450,7 @@ async function loadModel(model) {
 		// Remember the game's own default, then read the atlas's `pma:` flags.
 		// Both feed "Auto": an explicit atlas flag wins, otherwise we fall back
 		// to what this game's assets are known to ship with.
-		gamePmaDefault = !!model.pmaDefault;
+		gameDefaultMode = normalizePmaMode(model.pmaDefault);
 		atlasSaysPMA = (atlas.pages || []).some((p) => p.pma);
 		current.atlasPagesFlags = (atlas.pages || []).map((p) => p.pma ?? null);
 		applyPMA();
@@ -2470,7 +2500,7 @@ function renderHud() {
 		`<span><b>${slots}</b> slot</span>` +
 		`<span><b>${bones}</b> tulang</span>` +
 		`<span><b>${anims}</b> animasi</span>` +
-		`<span data-pma="${pmaMode === PMA_MODES.upload ? "upload" : pmaActive() ? "on" : "off"}"><b>PMA ${pmaMode === PMA_MODES.upload ? "upload" : pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
+		`<span data-pma="${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "on" : "off"}"><b>PMA ${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
 		// Show the variant count when there is a family, so it's obvious the
 		// model has siblings even before the dropdown is noticed.
 		(current.family
@@ -3804,9 +3834,13 @@ el.pmaSelect.addEventListener("change", () => {
 /** Reflect the effective PMA state (override + atlas flag) in the transport. */
 function updatePmaUI() {
 	if (!el.pmaSelect) return;
+	// The dropdown shows what the USER picked (Auto stays Auto); the title and
+	// data-modes describe what that pick actually resolves to.
 	el.pmaSelect.value = pmaMode;
+	const mode = resolvedMode();
 	const effective = pmaActive();
 	el.pmaSelect.dataset.effective = String(effective);
+	el.pmaSelect.dataset.mode = mode;
 	// Say where Auto got its answer: an atlas `pma:` line, or the game's own
 	// default for assets that ship premultiplied without declaring it.
 	const origin =
@@ -3817,7 +3851,7 @@ function updatePmaUI() {
 				: pmaSource() === "game-default"
 					? " (bawaan game)"
 					: " (bawaan)";
-	if (pmaMode === PMA_MODES.upload) {
+	if (mode === PMA_MODES.upload) {
 		el.pmaSelect.title = "Alpha lurus, dipramultiply saat upload (perbaiki bercak putih)" + origin;
 		return;
 	}
@@ -4959,7 +4993,7 @@ window.spineStage = {
 		return {
 			mode: pmaMode,
 			atlasSaysPMA,
-			gamePmaDefault,
+			gameDefaultMode,
 			source: pmaSource(),
 			active: pmaActive(),
 			alphaMode: currentAlphaMode(),

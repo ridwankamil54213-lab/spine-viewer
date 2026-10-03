@@ -229,6 +229,19 @@ const GAME_ROOTS = [
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
 	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
+	// 蜜桃乌托邦 (Peach Utopia). Atlases carry no `pma:` line and the textures
+	// are straight-alpha, BUT their fully-transparent texels still hold stale
+	// near-white colour, which leaks as solid WHITE patches when drawn with
+	// the plain straight-alpha blend. Default the game to "upload": Pixi
+	// premultiplies each texel against its own alpha on upload, so an alpha-0
+	// texel becomes black and stops contributing. See the PMA block in
+	// viewer.js and the spine-viewer-pma skill.
+	{
+		match: "mitao-utopia",
+		key: "mitao-utopia",
+		label: "Mitao Utopia",
+		pmaDefault: "upload",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
@@ -679,7 +692,13 @@ function resolveGame(rootRel, id) {
 		return {
 			game: best.key,
 			gameLabel: best.label,
-			pmaDefault: !!best.pmaDefault,
+			// pmaDefault is a full mode ("auto"|"on"|"off"|"upload"), but older
+			// entries only set a boolean. Normalise booleans → "on", and let
+			// "on"/"off"/"upload" strings through unchanged.
+			pmaDefault:
+				typeof best.pmaDefault === "string"
+					? best.pmaDefault
+					: !!best.pmaDefault,
 			spineRuntime: best.spineRuntime || null,
 		};
 	}
