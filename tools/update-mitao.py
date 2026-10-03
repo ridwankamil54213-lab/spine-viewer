@@ -70,6 +70,18 @@ def log(*a):
     print(*a, flush=True)
 
 
+def _ver_eq(a: str, b: str) -> bool:
+    """Samakan versi: "2.48.3" == "2.48.3". Kalau dua-duanya titik-angka,
+    bandingkan sebagai tuple supaya "2.9" != "2.10"."
+    """
+    if a == b:
+        return True
+    try:
+        return tuple(int(x) for x in str(a).split(".")) == tuple(int(x) for x in str(b).split("."))
+    except ValueError:
+        return False
+
+
 def load_state() -> dict:
     if os.path.exists(STATE_FILE):
         try:
@@ -187,20 +199,40 @@ def apply_update(apk_override: str = "", workers: int = 6, keep_apk: bool = True
     except Exception:
         pass
 
-    # 1. APK: pakai yang diberikan / yang sudah ada / unduh baru.
+    # 1. APK. PENTING: APK yang tersimpan bisa dari versi lama, jadi jangan
+    #    asal pakai. Ground truth-nya adalah versi di dalam APK itu sendiri
+    #    (PackageVersion manifest), bukan catatan state — catatan bisa hilang.
+    #    Kalau APK tak ada / PackageVersion-nya beda dari versi live, unduh
+    #    yang baru. Tanpa ini pembaru tak akan pernah melihat versi baru
+    #    setelah APK pertama kali di-cache.
     if apk_override:
         apk = apk_override
-    elif os.path.exists(APK_PATH):
-        apk = APK_PATH
     else:
-        if not apk_url:
-            raise RuntimeError("tidak ada URL APK dari /resource/url")
-        log(f"mengunduh APK dari {apk_url[:90]}…")
-        download_apk(apk_url, APK_PATH)
-        apk = APK_PATH
-        downloaded_apk = True
+        cached = APK_PATH if os.path.exists(APK_PATH) else None
+        cached_pkg = None
+        if cached:
+            try:
+                cached_pkg = catalog_from_apk(cached).get("PackageVersion")
+            except Exception:
+                cached_pkg = None  # APK rusak/tidak terbaca -> unduh ulang
+        stale = (
+            not cached
+            or not (version and cached_pkg and _ver_eq(version, cached_pkg))
+        )
+        if stale and apk_url:
+            log(f"mengunduh APK {version or ''} dari {apk_url[:80]}…")
+            download_apk(apk_url, APK_PATH)
+            apk = APK_PATH
+            downloaded_apk = True
+        else:
+            apk = cached
+            if cached_pkg:
+                log(f"APK tersimpan dipakai (katalog {cached_pkg})")
+            else:
+                log("APK tersimpan tidak terbaca — memakai apa adanya")
 
     # 2. Manifest baru vs lama.
+    assert apk, "APK tidak tersedia"
     manifest = catalog_from_apk(apk)
     new_pkg_version = manifest.get("PackageVersion")
     old_manifest = json.load(open(MANIFEST_PATH)) if os.path.exists(MANIFEST_PATH) else None
@@ -288,6 +320,9 @@ def apply_update(apk_override: str = "", workers: int = 6, keep_apk: bool = True
     state = load_state()
     state["live_version"] = version
     state["catalog_version"] = new_pkg_version
+    # Versi APK yang kita simpan — dipakai untuk memutuskan perlu unduh ulang
+    # APK atau tidak di jalankan berikutnya.
+    state["apk_version"] = new_pkg_version
     state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
     state["skeleton_bundles"] = len(cur)
     save_state(state)
