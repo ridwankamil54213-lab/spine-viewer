@@ -54,9 +54,18 @@ loadTextures.config.preferWorkers = false;
  * seams where attachments overlap, because the blend equation and the texture
  * data disagree about whether alpha has already been applied.
  *
- * Auto  → follow the atlas's own `pma:` flag (correct in almost every case)
- * On    → force PMA upload + PMA blend
- * Off   → force straight alpha upload + NPM blend
+ * Auto   → follow the atlas's own `pma:` flag (correct in almost every case)
+ * On     → force PMA upload + PMA blend
+ * Off    → force straight alpha upload + NPM blend
+ * Upload → premultiply ON UPLOAD (UNPACK) + NPM blend. This is the fix for
+ *          atlases whose transparent texels carry stale colour (white) while
+ *          the visible pixels are straight alpha: "On" blends them as if the
+ *          colours were already premultiplied, so hidden texels leak as white
+ *          patches; "Off" leaves them straight so the transparent texels are
+ *          sampled as-white AND drawn additively. UNPACK premultiplies each
+ *          texel against its own alpha as it is uploaded, so an alpha-0 texel
+ *          becomes black and contributes nothing. That matches what a GPU is
+ *          supposed to do with an RGBA format that has no premultiply built in.
  *
  * alphaMode and blendMode are two halves of the same switch: both must flip
  * together or the seams stay.
@@ -66,7 +75,7 @@ loadTextures.config.preferWorkers = false;
  * user overrides a model, remember it (localStorage) so the choice sticks
  * across reloads and applies to whichever model it was made on.
  */
-const PMA_MODES = { auto: "auto", on: "on", off: "off" };
+const PMA_MODES = { auto: "auto", on: "on", off: "off", upload: "upload" };
 let pmaMode = PMA_MODES.auto;
 let atlasSaysPMA = false;
 /**
@@ -122,6 +131,7 @@ function declaredPMA() {
 function pmaSource() {
 	if (pmaMode === PMA_MODES.on) return "forced-on";
 	if (pmaMode === PMA_MODES.off) return "forced-off";
+	if (pmaMode === PMA_MODES.upload) return "forced-upload";
 	const flags = current?.atlasPagesFlags || [];
 	if (flags.some((f) => f === true || f === false)) return "atlas";
 	return gamePmaDefault ? "game-default" : "default";
@@ -135,6 +145,11 @@ function pmaActive() {
 
 /** The Pixi ALPHA_MODES value matching the current PMA setting. */
 function currentAlphaMode() {
+	// "upload" is its own thing — neither PMA nor straight. Hand Pixi a
+	// straight-alpha bitmap (UNPACK means "the stored bytes are NOT
+	// premultiplied") and let it premultiply during upload, with the NPM
+	// blend. See the PMA_MODES comment for why this fixes white patches.
+	if (pmaMode === PMA_MODES.upload) return ALPHA_MODES.UNPACK;
 	return pmaActive() ? ALPHA_MODES.PMA : ALPHA_MODES.NPM;
 }
 
@@ -184,7 +199,10 @@ function applyPMA() {
 /** Route every slot's rendered sprite/mesh through the matching blend mode. */
 function applyBlendMode() {
 	if (!spine) return;
-	const pma = pmaActive();
+	// "upload" premultiplies the texture but still wants the straight-alpha
+	// (NPM) blend, and it is not a real PMA state — keep it out of pmaActive()
+	// so the HUD keeps reading it as straight.
+	const pma = pmaActive() && pmaMode !== PMA_MODES.upload;
 
 	// SlotData.blendMode holds a PIXI BLEND_MODES value (0=NORMAL, 1=ADD,
 	// 2=MULTIPLY, 3=SCREEN), not a Spine index. PMA uses the standard set;
@@ -2452,7 +2470,7 @@ function renderHud() {
 		`<span><b>${slots}</b> slot</span>` +
 		`<span><b>${bones}</b> tulang</span>` +
 		`<span><b>${anims}</b> animasi</span>` +
-		`<span data-pma="${pmaActive() ? "on" : "off"}"><b>PMA ${pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
+		`<span data-pma="${pmaMode === PMA_MODES.upload ? "upload" : pmaActive() ? "on" : "off"}"><b>PMA ${pmaMode === PMA_MODES.upload ? "upload" : pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
 		// Show the variant count when there is a family, so it's obvious the
 		// model has siblings even before the dropdown is noticed.
 		(current.family
@@ -3776,7 +3794,7 @@ el.pmaSelect.addEventListener("change", () => {
 	if (current) saveOverride(current.id, pmaMode);
 	applyPMA();
 	updatePmaUI();
-	toast(`PMA: ${pmaMode === "auto" ? "Otomatis" : pmaMode === "on" ? "Aktif" : "Nonaktif"}`);
+	toast(`PMA: ${pmaMode === "auto" ? "Otomatis" : pmaMode === "on" ? "Aktif" : pmaMode === "upload" ? "Upload PMA" : "Nonaktif"}`);
 });
 
 /** Reflect the effective PMA state (override + atlas flag) in the transport. */
@@ -3795,6 +3813,10 @@ function updatePmaUI() {
 				: pmaSource() === "game-default"
 					? " (bawaan game)"
 					: " (bawaan)";
+	if (pmaMode === PMA_MODES.upload) {
+		el.pmaSelect.title = "Alpha lurus, dipramultiply saat upload (perbaiki bercak putih)" + origin;
+		return;
+	}
 	el.pmaSelect.title = effective
 		? "Alpha pramultiplied aktif" + origin
 		: "Alpha lurus (tanpa pramultiply)" + origin;
