@@ -274,6 +274,18 @@ const GAME_ROOTS = [
 		key: "chaoszero",
 		label: "Chaos Zero Nightmare",
 	},
+	// Divine Throne: Idle RPG (com.luckystargame.jdxy.gp). Cocos Creator 2.x
+	// again, but the spine data rides inside a Play Asset Delivery pack
+	// (`split_install_time_asset_pack.apk`). Skeleton = the Cocos custom ".bin"
+	// which is actually a plain Spine BINARY skeleton (3.8.99) — renamed to
+	// .skel and the viewer auto-detects the runtime version. Atlas text is
+	// inlined in the Cocos import JSON, and texture pages are custom-header
+	// ASTC (tools/throne/).
+	{
+		match: "throne",
+		key: "throne",
+		label: "Divine Throne",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
