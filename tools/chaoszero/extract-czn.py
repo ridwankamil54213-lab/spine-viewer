@@ -71,14 +71,17 @@ def do_one(args_tuple):
         js = convert_scsp(exe, scsp)
         (dest / f"{name}.json").write_bytes(js)
 
-        # 2. atlas (+ fix nama halaman)
+        # 2. atlas (+ fix nama halaman: .sct/.sct2 -> .png, jaga line ending)
         atlas_path = base + ".atlas"
         atlas = a.read(atlas_path).decode("utf-8", "replace")
         pages = pages_from_atlas(atlas)
-        fixed = atlas
-        for pg in pages:
-            fixed = fixed.replace(pg + "\n", pg.rsplit(".", 1)[0] + ".png\n")
-        (dest / f"{name}.atlas").write_text(fixed)
+        out_lines = []
+        for ln in atlas.splitlines():
+            s = ln.strip()
+            if s and " " not in s and s.lower().endswith((".sct", ".sct2")):
+                ln = ln.replace(s, s.rsplit(".", 1)[0] + ".png")
+            out_lines.append(ln)
+        (dest / f"{name}.atlas").write_text("\n".join(out_lines) + "\n")
 
         # 3. halaman SCT -> PNG
         for pg in pages:
