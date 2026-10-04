@@ -251,6 +251,17 @@ const GAME_ROOTS = [
 		key: "juezhan",
 		label: "决战僵尸舞娘",
 	},
+	// 性界大战 (Xingjie Dazhan). Cocos Creator 2.x H5 build — assets served
+	// directly over HTTP from h5.spj2web.com. The `sp.SkeletonData` JSON is
+	// plain, but every raw texture arrives wrapped as
+	//   "assets-encrypt-2022"+encriptSign + base64(PNG) + "=" + encriptKey
+	// (see tools/xingjie/extract-xjdz.py). Atlases carry no `pma:` line and the
+	// textures are RGBA8888 straight alpha, so PMA stays Auto.
+	{
+		match: "xingjie",
+		key: "xingjie",
+		label: "性界大战",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
