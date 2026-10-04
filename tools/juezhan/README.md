@@ -30,18 +30,49 @@ enkripsi** di jalur asetnya.
   (2 char pertama apa adanya, lalu tiap pasang char → 3 hex) untuk dapat uuid
   36-char yang dipakai nama file. UUID yang sama muncul di `d[1]` (dependency)
   DAN di `paths`/`uuids` — itu cara menemukan PNG halaman atlasnya.
-- **`sp.SkeletonData` hanya ada di hot-update, TIDAK di APK.** APK cuma shell;
-  versi APK (2.0.5.8) beda dari versi aset (2.0.4.9). Jangan buang waktu
-  mencari spine di dalam APK.
+- **`sp.SkeletonData` di APK?** Awalnya dikira tidak ada, ternyata **ADA** — di
+  paket bawaan APK sendiri (`assets/assets/resources` + `assets/assets/startup`),
+  terpisah dari hot-update. APK shell versi 2.0.5.8 lebih baru dari aset server
+  2.0.4.9, jadi isinya bukan duplikat: lihat bagian "Isi APK" di bawah.
 - **Domain di tool basi.** `res.kaipaogames.com/18game/1.0.8.6` sudah 404 dan
   bucket `kaipaodomain.s3…` sudah dihapus (`NoSuchBucket`). Yang hidup:
   `res-kaipao.bmmqga.com` (+ `main.kaipaogames.com` untuk config).
 - **Body XML di balik HTTP 200.** S3/CloudFront balikin `<Error>…` dengan
   status 200; `http_get()` menolaknya.
 
+## Isi APK (bukan cuma shell) — `tools/juezhan/zhanjiang-apk.py`
+
+Server hot-update cuma 2.0.4.9; APK bawa paket sendiri di 2.0.5.8. Hasil:
+APK punya **67** skeleton vs **62** di server. Yang tidak ada di server:
+
+- **role15** — karakter utuh (painting, battle, teach, teach1).
+- Versi **lebih baru** `role5/8/10/14 teach` + `role8 teachBg`.
+- `startup/skeleton` — skeleton layar boot.
+
+Cara (tanpa jaringan, semua dari APK):
+
+```bash
+unzip -o /opt/juezhan/game.apk "assets/assets/resources/import/*" \
+      "assets/assets/resources/native/*" "assets/assets/startup/*" -d apk-res
+/srv/venv-spine/bin/python tools/juezhan/zhanjiang-apk.py \
+      --apk /opt/juezhan/game.apk --out /opt/spine-viewer/assets/juezhan
+```
+
+Jebakan khusus jalur APK:
+
+- Config APK **"packed"**: `paths` per-pack, index bisa ≥ `len(uuids)` — ulangi
+  `uuids` (offset global Cocos) saat lookup.
+- Sebuah uuid `sp.SkeletonData` bisa **tidak ada di `resources/config`**: ia
+  milik paket `startup`. Pakai uuid sebagai nama folder kalau path tak dikenal.
+- Atlas **multi-halaman**: ambil SEMUA dependency texture (`d[1]`) dan salin ke
+  nama halaman atlas secara berurutan, bukan hanya yang pertama.
+- File native ada di `assets/<paket>/native/<xx>/<uuid>.<hash>.<ext>` — coba
+  beberapa base path (`<scan>/assets/…` dan `<scan>/assets/assets/…`).
+
 ## Hasil
 
-62 skeleton **Spine 3.8.99**, 297 MB. Semuanya di bawah
+67 skeleton **Spine 3.8.99**, 304 MB (62 dari server + 5 baru/lebih-baru dari
+APK). Semuanya di bawah
 `tafang/role/roleN/{painting,battle,front,back,story,teach}` untuk role1..role23
 (painting = splash art, battle = animasi tempur, front/back = pop-in/out,
 teach = tutorial, story = CG cerita). Atlas-nya `format: RGBA8888` — straight
