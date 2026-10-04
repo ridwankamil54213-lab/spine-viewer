@@ -262,6 +262,18 @@ const GAME_ROOTS = [
 		key: "xingjie",
 		label: "性界大战",
 	},
+	// Chaos Zero Nightmare (卡厄斯梦境). Smilegate Yuna engine (same engine as
+	// Epic Seven). Assets ship in a multi-GB `manifest.ssra` + `chunks/*.ssrc`
+	// SSRArchive inside the game's files dir. The spine files use Yuna's custom
+	// `.scsp` (LZ4-wrapped binary skeleton), NOT Spine's own format, and the
+	// texture pages are `.sct` (LZ4 + ASTC/ETC2), NOT PNG. Both are converted
+	// offline by tools/chaoszero/ (SCSPParser C++ -> JSON, SCT -> PNG), so the
+	// viewer only ever sees plain .json + .atlas + .png.
+	{
+		match: "chaoszero",
+		key: "chaoszero",
+		label: "Chaos Zero Nightmare",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
