@@ -242,6 +242,15 @@ const GAME_ROOTS = [
 		label: "Mitao Utopia",
 		pmaDefault: "upload",
 	},
+	// 决战僵尸舞娘 (Zombie Dancer). Cocos Creator 3.x (JS), Spine 3.8.99 —
+	// unlike 蜜桃乌托邦 this one needs no decryption: the hot-update assets are
+	// plain JSON/PNG. Atlases carry no `pma:` line and the textures are
+	// RGBA8888 straight alpha, so Auto is left at the default.
+	{
+		match: "juezhan",
+		key: "juezhan",
+		label: "决战僵尸舞娘",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
