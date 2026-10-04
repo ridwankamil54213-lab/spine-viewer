@@ -286,6 +286,16 @@ const GAME_ROOTS = [
 		key: "throne",
 		label: "Divine Throne",
 	},
+	// 异世界后宫物语 (Isekai Harem Monogatari), com.luckystargame/18game build.
+	// Cocos Creator 2.4 again. Assets under assets/assets/<bundle>/, encrypted:
+	//   prefix "GenSanaSneG" + XOR (json/atlas) or XXTEA (png/jpg) with key
+	//   "mygame!fuck@you~" (found in libcocos2djs.so strings). .bin skeletons
+	//   are plain Spine binary and are NOT encrypted. See tools/ysjh/.
+	{
+		match: "ysjh",
+		key: "ysjh",
+		label: "异世界后宫物语",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
