@@ -179,6 +179,9 @@ def main():
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--limit", type=int)
     ap.add_argument("--filter", default="", help="substring path, mis. 'roleSpine'")
+    ap.add_argument("--skip", default="skillEffect",
+                    help="substring path yang dilewati (default 'skillEffect' — "
+                         "efek skill, bukan model karakter; pakai --skip '' untuk ikut)")
     args = ap.parse_args()
 
     m = json.load(open(args.map, encoding="utf-8"))
@@ -186,6 +189,8 @@ def main():
     items = m["skeletons"]
     if args.filter:
         items = [x for x in items if args.filter in x["path"]]
+    if args.skip:
+        items = [x for x in items if args.skip not in x["path"]]
     if args.limit:
         items = items[: args.limit]
     print(f"skeleton: {len(items)}  ->  {args.out}", flush=True)

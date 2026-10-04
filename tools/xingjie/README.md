@@ -66,9 +66,19 @@ handler + `checkIsEncripted`; untuk web build ini berkas raw-nya murni base64.)
 
 ## Hasil
 
-**876 skeleton, 0 gagal, ~595 MB (di disk 817 MB)** — 25 detik dengan 16 worker.
+**297 skeleton, 0 gagal, ~711 MB** dengan 16 worker (default `--skip skillEffect`).
 `roleSpine/*` 164, `r18/{interaction,plotSpineNew}/*` 58, `commonSpine/*` 27,
-`mainCitySpine` 15, `relic` 13, plus 579 `skillEffect/*` + efek lain.
+`mainCitySpine` 15, `relic` 13, plus efek lain.
 
-Spine **3.8.99** (849), sisanya 3.5.49 / 3.8.75 / 3.6.53 / 3.8.82 (efek lama).
+`skillEffect/*` (579 berkas, ~107 MB) adalah **efek skill**, bukan model karakter,
+jadi **dilewati secara default**. Untuk ikut menyertakannya:
+
+```bash
+/srv/venv-spine/bin/python tools/xingjie/extract-xjdz.py \
+    --out /opt/spine-viewer/assets/xingjie --skip ''
+```
+
+Spine **3.8.99** dominan, sisanya 3.5.49 / 3.8.75 / 3.6.53 / 3.8.82 (efek lama).
 Atlas `format: RGBA8888`, tanpa baris `pma:` → mode PMA viewer biarkan **Auto**.
+Beberapa model r18 memuat blok persegi di atlas-nya sendiri (patch sensor bawaan
+game) — bukan cacat ekstraksi.
