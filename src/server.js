@@ -330,6 +330,18 @@ const GAME_ROOTS = [
 		key: "tenkei",
 		label: "天啓パラドクスX (Tenkei Paradox X)",
 	},
+	// Angelica Aster R (当归紫苑), DMM/FANZA. Unity Addressables; the catalog's
+	// 43k bundle keys are plain `<md5>.bundle` hashes with OBFUSCATED group
+	// names, so a spine bundle can only be found by downloading and scanning
+	// its CONTENT. A spine bundle holds TextAsset "<name>.atlas" + TextAsset
+	// "<name>.skel" (plain Spine BINARY 4.0.64) + Texture2D page. The Unity
+	// version string is stripped from every bundle, so the extractor forces a
+	// fallback version (2022.3.58f1). See tools/angelica/.
+	{
+		match: "angelica",
+		key: "angelica",
+		label: "Angelica Aster R (当归紫苑)",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
