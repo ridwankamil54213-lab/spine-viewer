@@ -3323,6 +3323,7 @@ const UPDATABLE = {
 	arkrecode: "/api/update/arkrecode",
 	shoujoukaisen: "/api/update/shoujoukaisen",
 	"mitao-utopia": "/api/update/mitao-utopia",
+	crosscore: "/api/update/crosscore",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -3487,7 +3488,7 @@ async function applyUpdate() {
 			const added = res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				markNew(added.map((n) => `${prefix}/${n}`));
 			}

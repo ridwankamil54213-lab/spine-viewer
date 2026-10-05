@@ -1967,6 +1967,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-mitao.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	crosscore: {
+		script: path.join(ROOT, "tools", "update-crosscore.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log }
