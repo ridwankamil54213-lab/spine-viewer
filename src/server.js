@@ -296,6 +296,18 @@ const GAME_ROOTS = [
 		key: "ysjh",
 		label: "异世界后宫物语",
 	},
+	// 梦琪领导 / President's Ambition - Project Beauty R (cgg4game Cocos 2.x).
+	// Community download-script target from live2dhub topic 4603. Flow: query
+	// city2ntk.cgg4game.com/webfyen/nutakupc.php -> 302 ?resVer=<hash> ->
+	// h.cgg4game.com/.../resource/default.res.<resVer>.json (nested tree of
+	// {<Name>.atlas, <Name>.json, <Name>} hashes) -> pull each file from the
+	// cdnen.cgg4game.com CDN. Spine data is plain JSON (3.7.94), no encryption.
+	// Atlases carry no `pma:` line; textures are straight alpha, so Auto stays.
+	{
+		match: "mengqi",
+		key: "mengqi",
+		label: "梦琪领导 (President's Ambition)",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
