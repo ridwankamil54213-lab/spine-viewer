@@ -318,6 +318,18 @@ const GAME_ROOTS = [
 		key: "everlusting",
 		label: "Everlusting Life",
 	},
+	// 天啓パラドクスX / Tenkei Paradox X (KMS / EXNOA). Unity Addressables
+	// build; bundles live under an Azure blob path whose `production<N>` prefix
+	// (and a fixed uuid) changes with updates. Spines come as one plain
+	// UnityFS bundle each: TextAsset "<id>.atlas" + TextAsset "<id>.skel"
+	// (plain Spine BINARY 3.8.x, no decryption) + Texture2D page. Two sets:
+	// `spines` (full) and `spineslight` (lighter LOD), 341 each. See
+	// tools/tenkei/. Atlases carry no `pma:` line; textures straight alpha.
+	{
+		match: "tenkei",
+		key: "tenkei",
+		label: "天啓パラドクスX (Tenkei Paradox X)",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
