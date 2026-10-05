@@ -59,8 +59,11 @@ STATE_DIR = "/srv/spine-assets/arkrecode"
 CATALOG_DIR = os.path.join(STATE_DIR, "catalogs")
 DOWNLOAD_DIR = os.path.join(STATE_DIR, "downloads")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
-# Where the viewer actually reads models: assets/arkrecode -> /srv/spine-assets/ark_out
-ASSET_DIR = os.environ.get("ARK_OUT", "/srv/spine-assets/ark_out")
+# Where the viewer actually reads models: assets/arkrecode (di dalam repo).
+# Default lama /srv/spine-assets/ark_out sudah usang — model ada di
+# assets/arkrecode, sehingga check() salah melaporkan SEMUA bundle baru.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ASSET_DIR = os.environ.get("ARK_OUT", os.path.join(ROOT, "assets", "arkrecode"))
 EXTRACTOR = "/srv/spine-viewer/tools/extract-unity-spine.py"
 PYTHON = os.environ.get("PY", "/srv/venv-spine/bin/python")
 

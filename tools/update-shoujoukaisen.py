@@ -41,9 +41,12 @@ STATE_DIR = "/srv/spine-assets/shoujoukaisen"
 MANIFEST_DIR = os.path.join(STATE_DIR, "manifest")
 DOWNLOAD_DIR = os.path.join(STATE_DIR, "downloads")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
-# Pohon aset yang dibaca viewer: assets/shoujoukaisen -> /srv/spine-assets/sk-models
-ASSET_DIR = os.environ.get("SK_OUT", "/srv/spine-assets/sk-models")
-EXTRACTOR = "/srv/spine-viewer/tools/shoujoukaisen/extract.py"
+# Pohon aset yang dibaca viewer: assets/shoujoukaisen (di dalam repo).
+# Default lama /srv/spine-assets/sk-models sudah usang — model ada di
+# assets/shoujoukaisen, sehingga check() salah melaporkan SEMUA model baru.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ASSET_DIR = os.environ.get("SK_OUT", os.path.join(ROOT, "assets", "shoujoukaisen"))
+EXTRACTOR = os.path.join(ROOT, "tools", "shoujoukaisen", "extract.py")
 PYTHON = os.environ.get("PY", "/srv/venv-spine/bin/python")
 
 
@@ -63,10 +66,26 @@ def load_extractor():
     return mod
 
 
-def http_get(url: str, timeout: int = 60) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+def http_get(url: str, timeout: int = 60, retries: int = 0, backoff: float = 4.0) -> bytes:
+    """GET dengan retry opsional.
+
+    S3 asal game ini membalas **403 (Forbidden)** ke host-nya sendiri saat
+    kena rate-limit/anti-flood — termasuk untuk berkas yang jelas ada. Jadi
+    403 (dan timeout) diperlakukan sebagai 'coba lagi nanti', bukan fatal.
+    """
+    last = None
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            if attempt < retries:
+                time.sleep(backoff * (attempt + 1))
+    if last is None:
+        raise RuntimeError(f"gagal mengunduh {url}")
+    raise last
 
 
 def fetch_update_info() -> dict:
@@ -102,7 +121,14 @@ def load_manifest(info) -> dict:
         parts = line.split(",")
         if len(parts) < 3:
             continue
-        entries[parts[0]] = {"md5": parts[1], "size": int(parts[2] or 0)}
+        entries[parts[0]] = {
+            "md5": parts[1],
+            "size": int(parts[2] or 0),
+            # Kolom ke-6 = versi saat berkas DITAMBAHKAN. Berkas lama ada di
+            # direktori versi itu, BUKAN di direktori versi saat ini; meminta
+            # versi saat ini untuk berkas lama membalas 403 AccessDenied (S3).
+            "since": parts[5] if len(parts) > 5 else "",
+        }
     return entries
 
 
@@ -141,6 +167,10 @@ def check() -> dict:
     have = set()
     if os.path.isdir(ASSET_DIR):
         have = {n for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
+    # Model yang sudah diputuskan BUKAN Spine (Live2D Cubism: .motion3/.cdi3,
+    # atau cuma Material/Shader) disimpan agar tidak terus muncul sebagai
+    # "baru" padahal tak akan pernah jadi folder model.
+    have |= set(state.get("skipped", []))
     baru = sorted(names - have)
     return {
         "version": info["version"],
@@ -165,6 +195,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     have = set()
     if os.path.isdir(ASSET_DIR):
         have = {n for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
+    have |= set(load_state().get("skipped", []))
     baru = sorted(names - have)
     if limit:
         baru = baru[:limit]
@@ -173,28 +204,42 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     done = failed = 0
     errors = []
 
+    def host_root(host: str) -> str:
+        # base = ".../updatePackage/android/0.820/0_820_69" -> buang komponen versi
+        return host.rsplit("/", 1)[0]
+
     def get(name):
         # Unduh skeleton dan, kalau ada, bundle teksturnya.
         targets = [f"model/{name}.asset"]
         if f"model/{name}_texture.asset" in entries:
             targets.append(f"model/{name}_texture.asset")
-        last = ""
         for rel in targets:
             dest = os.path.join(DOWNLOAD_DIR, rel.replace("/", "__"))
             if os.path.exists(dest) and os.path.getsize(dest) > 0:
                 continue
+            since = (entries.get(rel) or {}).get("since") or ""
+            last = ""
             for host in [info["base"], info["mirror"]]:
                 if not host:
                     continue
-                try:
-                    raw = http_get(f"{host}/{rel}")
-                    os.makedirs(os.path.dirname(dest), exist_ok=True)
-                    with open(dest, "wb") as f:
-                        f.write(raw)
-                    last = ""
+                # Berkas lama ada di direktori versinya SENDIRI (kolom ke-6),
+                # bukan di direktori versi kini. Coba versi asal dulu, lalu
+                # versi kini sebagai cadangan.
+                dirs = ([since] if since else []) + [""]
+                for d in dirs:
+                    url = f"{host_root(host)}/{d}/{rel}" if d else f"{host}/{rel}"
+                    try:
+                        time.sleep(0.4)  # sopan: hindari anti-flood S3
+                        raw = http_get(url, retries=2, backoff=5)
+                        os.makedirs(os.path.dirname(dest), exist_ok=True)
+                        with open(dest, "wb") as f:
+                            f.write(raw)
+                        last = ""
+                        break
+                    except Exception as exc:  # noqa: BLE001
+                        last = f"{rel}: {exc}"
+                if not last:
                     break
-                except Exception as exc:
-                    last = f"{rel}: {exc}"
             if last:
                 return last
         return None
@@ -213,6 +258,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     extract_error = None
     seen_new = []
     errors_ext = []
+    skipped = set()
     # Ekstrak selama ADA berkas di folder unduhan, bukan hanya ketika ada
     # yang baru terunduh. Kalau disyaratkan `done > 0`, menjalankan ulang
     # setelah unduhan selesai (atau setelah --apply --limit) melewati
@@ -251,6 +297,10 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
                     err = sk.extract_bundle(main_data, tmp_out, base_stem, tex_data)
                     if err:
                         errors_ext.append(f"{base_stem}: {err}")
+                        # "no skel+atlas" = bukan Spine (Live2D Cubism). Tandai
+                        # permanen supaya tidak diunduh/dilaporkan lagi.
+                        if "no skel" in err or "no skeleton" in err.lower():
+                            skipped.add(base_stem)
                         continue
                     # extract_bundle menulis berkas rata di out_dir (skel,
                     # atlas, png...) — bukan ke dalam subfolder. Kumpulkan
@@ -280,6 +330,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     state = load_state()
     state["version"] = info["version"]
     state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    state["skipped"] = sorted(set(state.get("skipped", [])) | skipped)
     save_state(state)
 
     return {
