@@ -308,6 +308,16 @@ const GAME_ROOTS = [
 		key: "mengqi",
 		label: "梦琪领导 (President's Ambition)",
 	},
+	// Everlusting Life (adult-chess.com / Nutaku). Assets come from a JSON
+	// index (POST /ac/get_assets_with_als, state "ac-release-v<VER>") and each
+	// entry is a plain UnityFS AssetBundle (Unity 2022.3.20f1) holding one
+	// Spine model: TextAsset "<Name>.atlas" + TextAsset "<Name>" (plain JSON,
+	// Spine 4.2.40) + Texture2D page. No decryption. See tools/everlusting/.
+	{
+		match: "everlusting",
+		key: "everlusting",
+		label: "Everlusting Life",
+	},
 	// Same longest-prefix rule as Azur Lane: "alliancesages-cg" has to precede
 	// "alliancesages" or every CG scene is swallowed by the character bucket.
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
