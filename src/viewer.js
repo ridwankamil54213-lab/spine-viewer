@@ -1,5 +1,6 @@
 import { Application, Container, Graphics, Assets, BaseTexture, Texture, RenderTexture, Rectangle, SCALE_MODES, MIPMAP_MODES, WRAP_MODES, ALPHA_MODES, BLEND_MODES } from "pixi.js";
 import { Spine, SkeletonBounds, TextureAtlas } from "pixi-spine";
+import * as runtime37 from "@pixi-spine/runtime-3.7";
 import { AtlasAttachmentLoader as AtlasAttachmentLoader41 } from "@pixi-spine/runtime-4.1";
 import * as runtime38 from "@pixi-spine/runtime-3.8";
 import * as runtime40 from "@pixi-spine/runtime-4.0";
@@ -641,8 +642,9 @@ function upscaleBaseTexture(bt, factorX, factorY = factorX) {
  * loader error before 3.8 finally parsed it).
  */
 const RUNTIME_LOADERS = {
-	// 3.7 has no SkeletonBinary of its own; the 3.8 package reads it.
-	"3.7": () => markRuntime(runtime38, "3.8"),
+	// 3.7 (JSON) is read by the 3.7 package; it has no SkeletonBinary of its
+	// own, so BINARY 3.7 models are still routed to 3.8 below (see pickRuntime).
+	"3.7": () => markRuntime(runtime37, "3.7"),
 	"3.8": () => markRuntime(runtime38, "3.8"),
 	"4.0": () => markRuntime(runtime40, "4.0"),
 	"4.1": () => markRuntime(runtime41, "4.1"),
@@ -654,7 +656,13 @@ const RUNTIME_LOADERS = {
 // `runtime42` is the namespace we fall back to for version tagging, but the
 // PARSERS must be the exact classes the renderer compares against with
 // `instanceof` — see the import note. Override them per-key here.
+//
+// 3.7 mirrors the 4.2 situation: pixi-spine's `Spine` builds its 3.7 skeleton
+// from a nested `@pixi-spine/runtime-3.7` copy, so the parser must be that
+// exact copy or the renderer's `attachment instanceof RegionAttachment` tests
+// fail and nothing is drawn.
 const PARSER_OVERRIDES = {
+	"3.7": { SkeletonBinary: null, SkeletonJson: runtime37.SkeletonJson },
 	"4.2": { SkeletonBinary: SkeletonBinary42, SkeletonJson: SkeletonJson42 },
 };
 
@@ -667,7 +675,7 @@ const PARSER_OVERRIDES = {
  * pattern works — its data classes feed pixi-spine's renderer fine.
  */
 const ATTACHMENT_LOADERS = {
-	"3.7": (atlas) => new runtime38.AtlasAttachmentLoader(atlas),
+	"3.7": (atlas) => new runtime37.AtlasAttachmentLoader(atlas),
 	"3.8": (atlas) => new runtime38.AtlasAttachmentLoader(atlas),
 	"4.0": (atlas) => new runtime40.AtlasAttachmentLoader(atlas),
 	"4.1": (atlas) => new AtlasAttachmentLoader41(atlas),
@@ -792,7 +800,16 @@ async function parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor }) {
 		: rawSkeleton;
 
 	const detected = detectSpineVersion({ isBinary, raw: bytes });
-	const wanted = pickRuntime(detected);
+	let wanted = pickRuntime(detected);
+	// pickRuntime maps every 3.7-and-older model onto 3.8 because the 3.7
+	// package has no SkeletonBinary. That is right for BINARY, but WRONG for
+	// JSON: the 3.7 package DOES ship a SkeletonJson, and the 3.8 JSON parser
+	// errors on a "3.7.94" header, silently half-parses the file and then dies
+	// on mesh attachments ("Cannot read properties of undefined length").
+	// Route JSON 3.7 (and the rare 3.3–3.6 exports) to the real 3.7 runtime.
+	if (!isBinary && detected && detected.major === 3 && detected.minor <= 7) {
+		wanted = "3.7";
+	}
 	// Try the detected runtime first, then progressively OLDER ones.
 	// A runtime refuses data newer than itself, so offering 4.0/4.1 to a 3.8
 	// file can only fail (and each failure logs a console error before 3.8
@@ -834,7 +851,12 @@ async function parseWithAtlases({ isBinary, rawSkeleton, scale, makeFor }) {
 			//   - skins berbentuk objek, padahal runtime mengharapkan larik
 			// Tanpa ini, model gagal total. Dengan ini, runtime 4.1 memuatnya
 			// baik-baik saja (terverifikasi 250/250).
-			if (!isBinary && typeof rawSkeleton === "object") {
+			//
+			// JANGAN jalankan pada runtime 3.7: normalizer mengubah `skins`
+			// dari objek ke larik (format 3.8+), padahal parser 3.7 justru
+			// mengharapkan bentuk objek lama. Menjalankannya membuat 3.7
+			// gagal dengan "Slot not found: <name>".
+			if (!isBinary && typeof rawSkeleton === "object" && key !== "3.7") {
 				normalizeSpine2Json(rawSkeleton, {
 					onWarn: (m) => console.warn("[spine2]", m),
 				});

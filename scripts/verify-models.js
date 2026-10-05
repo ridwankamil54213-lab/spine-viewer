@@ -24,7 +24,9 @@ const DEFAULT_MODELS = [
   "catshinobi/monster_LD_5012",
 ];
 
-const CHROME = "/root/.cache/ms-playwright/chromium-1234/chrome-linux/chrome";
+const CHROME =
+	process.env.CHROME ||
+	"/root/.cache/ms-playwright/chromium-1243/chrome-linux-arm64/chrome";
 
 async function main() {
   const models = process.argv.slice(2).length ? process.argv.slice(2) : DEFAULT_MODELS;
