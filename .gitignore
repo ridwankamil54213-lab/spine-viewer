@@ -65,6 +65,10 @@ data/favorites.json
 data/models-cache.json
 data/models-cache.json.tmp
 
+# Pelacak model "baru" (badge NEW): state runtime per mesin, bukan sumber.
+data/new-models.json
+data/new-models.json.tmp
+
 # Hasil konversi .skel -> JSON (dulu ~5.5 GB). Dihasilkan ulang oleh
 # tools/convert-spine2.py bila masih diperlukan; tidak perlu ikut ke repo.
 assets/projectqt21/

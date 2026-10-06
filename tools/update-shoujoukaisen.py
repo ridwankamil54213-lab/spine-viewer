@@ -108,10 +108,17 @@ def manifest_path(info) -> str:
     return os.path.join(MANIFEST_DIR, f"versions_{info['version']}.csv")
 
 
+def _log(msg):
+    """Baris progres ke stderr: server menampilkannya sebagai log live."""
+    sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    sys.stderr.flush()
+
+
 def load_manifest(info) -> dict:
     """Unduh (atau pakai cache) versions.csv, lalu petakan path -> md5/size."""
     path = manifest_path(info)
     if not os.path.exists(path):
+        _log(f"mengunduh manifest {info['base']}/versions.csv")
         raw = http_get(f"{info['base']}/versions.csv", timeout=120)
         with open(path, "wb") as f:
             f.write(raw)
@@ -172,6 +179,7 @@ def check() -> dict:
     # "baru" padahal tak akan pernah jadi folder model.
     have |= set(state.get("skipped", []))
     baru = sorted(names - have)
+    _log(f"versi {info['version']}: {len(names)} model, {len(have)} sudah ada, {len(baru)} baru")
     return {
         "version": info["version"],
         "previous": state.get("version"),
@@ -199,6 +207,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     baru = sorted(names - have)
     if limit:
         baru = baru[:limit]
+    _log(f"mengunduh {len(baru)} model (workers={workers})")
 
     os.makedirs(DOWNLOAD_DIR, exist_ok=True)
     done = failed = 0
@@ -250,8 +259,11 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
                 failed += 1
                 if len(errors) < 5:
                     errors.append(err)
+                _log(f"GAGAL {err}")
             else:
                 done += 1
+                if done % 10 == 0:
+                    _log(f"unduh {done}/{len(baru)}")
 
     # Ekstrak langsung dari bytes hasil unduhan.
     extracted = 0
@@ -323,8 +335,10 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
                     extracted += 1
                     if len(seen_new) < 10:
                         seen_new.append(base_stem)
+                    _log(f"ekstrak OK {base_stem}")
                 except Exception as exc:
                     errors_ext.append(f"{base_stem}: {exc}")
+                    _log(f"ekstrak GAGAL {base_stem}: {exc}")
             shutil.rmtree(os.path.join(STATE_DIR, "extract_tmp"), ignore_errors=True)
 
     state = load_state()
@@ -332,6 +346,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
     state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
     state["skipped"] = sorted(set(state.get("skipped", [])) | skipped)
     save_state(state)
+    _log(f"selesai: {done} diunduh, {failed} gagal, {extracted} model diekstrak")
 
     return {
         "version": info["version"],

@@ -161,6 +161,12 @@ def save_state(state: dict) -> None:
 		json.dump(state, f, indent=1)
 
 
+def _log(msg: str) -> None:
+	"""Baris progres ke stderr: server menampilkannya sebagai log live."""
+	sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+	sys.stderr.flush()
+
+
 def catalog_names(path: str) -> set:
 	with open(path, encoding="utf-8-sig") as f:
 		data = json.load(f)
@@ -224,6 +230,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	todo = [n for n in urls if not os.path.exists(os.path.join(DOWNLOAD_DIR, n))]
 	if limit:
 		todo = todo[:limit]
+	_log(f"mengunduh {len(todo)} berkas (workers={workers})")
 
 	done = failed = 0
 	errors = []
@@ -246,10 +253,13 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 		for err in ex.map(get, todo):
 			if err:
 				failed += 1
+				_log(f"GAGAL {err}")
 				if len(errors) < 5:
 					errors.append(err)
 			else:
 				done += 1
+				if done % 50 == 0:
+					_log(f"unduh {done}/{len(todo)}")
 
 	state = load_state()
 	state["catalog"] = info["catalog"]
@@ -282,6 +292,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 				capture_output=True, text=True, timeout=7200, check=False,
 			)
 			extract_log = (proc.stdout or "")[-600:] + (proc.stderr or "")[-600:]
+			_log(f"ekstraksi selesai (rc={proc.returncode})")
 		except Exception as exc:
 			extract_error = str(exc)
 			extract_log = ""
@@ -307,6 +318,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 		)
 		extract_dup = extract_total - extracted
 		shutil.rmtree(tmp_out, ignore_errors=True)
+		_log(f"ekstrak: {extracted} model baru, {extract_dup} sudah ada")
 
 	return {
 		"catalog": info["catalog"],

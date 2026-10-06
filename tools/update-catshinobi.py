@@ -33,6 +33,7 @@ import shutil
 import struct
 import subprocess
 import sys
+import time
 import zipfile
 
 import UnityPy
@@ -52,6 +53,12 @@ SPINE_EXTS = (".skel", ".atlas")
 
 def safe(name):
     return os.path.basename(str(name)).replace("\\", "/").split("/")[-1].strip()
+
+
+def _log(msg):
+    """Baris progres ke stderr: server menampilkannya sebagai log live."""
+    sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    sys.stderr.flush()
 
 
 def parse_text_asset(raw):
@@ -127,6 +134,7 @@ def pull_bundles(force=False):
             return
         size = device_split_size(dev)
         if size > 0 and os.path.exists(APK_CACHE) and os.path.getsize(APK_CACHE) == size:
+            _log("cache cocok dengan perangkat — lewati pull 528 MB")
             return  # cache masih cocok dengan perangkat
     os.makedirs(WORK, exist_ok=True)
     dev = device_split_path()
@@ -136,9 +144,12 @@ def pull_bundles(force=False):
     need_pull = (not os.path.exists(APK_CACHE)
                  or (size > 0 and os.path.getsize(APK_CACHE) != size))
     if need_pull:
+        _log(f"adb pull split_UnityDataAssetPack.apk (~{size/1024**2:.0f} MB)…" if size > 0
+             else "adb pull split_UnityDataAssetPack.apk…")
         subprocess.run([ADB, "-s", SERIAL, "pull", dev, APK_CACHE],
                        check=True, capture_output=True, text=True)
     # bersihkan lalu ekstrak ulang supaya tak ada bundle basi
+    _log("ekstrak bundle dari split APK…")
     if os.path.isdir(BUNDLE_ROOT):
         shutil.rmtree(BUNDLE_ROOT, ignore_errors=True)
     os.makedirs(BUNDLE_ROOT, exist_ok=True)
@@ -155,9 +166,11 @@ def scan_bundles():
     texts, tex_objs = {}, {}
     for fname in sorted(f for f in os.listdir(BUNDLE_DIR) if f.endswith(".bundle")):
         path = os.path.join(BUNDLE_DIR, fname)
+        _log(f"scan {fname}…")
         try:
             env = UnityPy.load(path)
         except Exception:
+            _log(f"  gagal memuat {fname}")
             continue
         for obj in env.objects:
             if obj.type.name == "TextAsset":
@@ -206,6 +219,7 @@ def check():
     have = installed()
     names = {s.rsplit(".", 1)[0] for s in skels}
     baru = sorted(names - have)
+    _log(f"ditemukan {len(names)} skeleton, {len(have)} sudah ada, {len(baru)} baru")
     try:
         ver = "apk-%d" % os.path.getsize(APK_CACHE)
     except OSError:
@@ -234,6 +248,7 @@ def apply_update(limit=0):
     baru = sorted(names - have)
     if limit:
         baru = baru[:limit]
+    _log(f"mengekstrak {len(baru)} model baru")
 
     # atlas (dan varian suffix) per stem
     atlases = {n for n in texts if n.lower().endswith(".atlas")}
@@ -283,6 +298,7 @@ def apply_update(limit=0):
         if not got:
             errors.append("%s: tanpa png" % stem)
         extracted.append(stem)
+        _log(f"  OK {stem} ({got} halaman)")
 
     return {
         "ok": True,

@@ -166,6 +166,7 @@ def fetch_manifest(store=True):
     tmp = local + ".part"
     if os.path.exists(tmp):
         os.remove(tmp)
+    _log(f"mengambil manifest {MANIFEST_URL}")
     try:
         proc = subprocess.run(
             [PYTHON, "-c", _FETCH_HELPER, MANIFEST_URL, tmp],
@@ -184,11 +185,18 @@ def spine_entries(data: bytes):
     return [e for e in parse_manifest(data) if AB_RE.match(e["name"].encode())]
 
 
+def _log(msg):
+    """Baris progres ke stderr: server menampilkan ini sebagai log live."""
+    sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    sys.stderr.flush()
+
+
 def check(manifest_path=None):
     state = load_state()
     try:
         raw = open(manifest_path, "rb").read() if manifest_path else fetch_manifest()
         entries = spine_entries(raw)
+        _log(f"manifest: {len(entries)} bundle spine")
         cur = {e["name"] for e in entries}
         prev = set(state.get("bundles", []))
         added = sorted(cur - prev)
@@ -350,6 +358,8 @@ def apply_update(limit=0, workers=8, manifest_path=None):
 
     downloaded = failed = 0
     errors = []
+    total = len(todo)
+    _log(f"mengunduh {total} bundle baru (workers={workers})")
 
     def get(e):
         nonlocal downloaded, failed
@@ -360,12 +370,15 @@ def apply_update(limit=0, workers=8, manifest_path=None):
                 with open(os.path.join(DOWNLOAD_DIR, e["name"]), "wb") as f:
                     f.write(body)
                 downloaded += 1
+                if downloaded % 10 == 0 or downloaded == total:
+                    _log(f"unduh {downloaded}/{total}")
                 return
             except Exception as exc:  # noqa: BLE001
                 last = f"{e['name']}: {exc}"
         failed += 1
         if len(errors) < 5:
             errors.append(last)
+        _log(f"GAGAL {last}")
 
     if todo:
         with ThreadPoolExecutor(max_workers=workers) as ex:
@@ -392,16 +405,19 @@ def apply_update(limit=0, workers=8, manifest_path=None):
             extracted += 1
             if len(new_models) < 20:
                 new_models.append(name)
+            _log(f"ekstrak OK {name} ({note})")
         elif status in ("load-fail", "error"):
             # fallback ke AssetStudio bila mungkin (sekali saja untuk batch ini)
             if extract_with_assetstudio(DOWNLOAD_DIR, os.path.join(STATE_DIR, "as_out")):
                 pass
             errors.append(f"{name}: {status} {note}")
+            _log(f"ekstrak GAGAL {name}: {status} {note}")
 
     state = load_state()
     state["bundles"] = sorted(e["name"] for e in entries)
     state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
     save_state(state)
+    _log(f"selesai: {extracted} model diekstrak, {already} sudah ada, {failed} gagal")
 
     return {
         "ok": True,

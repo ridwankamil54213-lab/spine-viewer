@@ -54,6 +54,10 @@
 					<svg viewBox="0 0 24 24" class="icon"><path d="M17.65 6.35A8 8 0 1 0 19.73 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4z"/></svg>
 					<span class="update-dot" id="update-dot" hidden></span>
 				</button>
+				<button id="update-log-btn" class="btn btn-icon btn-sm" hidden
+					aria-label="Lihat log proses pembaruan" title="Log proses pembaruan">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
+				</button>
 			</div>
 
 			<input id="search" class="search" type="search" placeholder="Cari model…" autocomplete="off" />
@@ -422,6 +426,27 @@
 		<div class="modal-foot">
 			<button id="export-cancel" class="btn btn-ghost">Batal</button>
 			<button id="export-run" class="btn btn-primary">Mulai ekspor</button>
+		</div>
+	</div>
+</div>
+
+<!-- Log proses pembaruan aset: menampilkan stdout/stderr pembaru secara live. -->
+<div id="update-log-modal" class="modal" hidden>
+	<div class="modal-backdrop" data-close="1"></div>
+	<div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="update-log-title">
+		<div class="modal-head">
+			<h2 id="update-log-title">Log pembaruan</h2>
+			<button id="update-log-close" class="btn btn-icon btn-sm" aria-label="Tutup" title="Tutup (Esc)">
+				<svg viewBox="0 0 24 24" class="icon"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+			</button>
+		</div>
+		<div class="modal-body">
+			<div class="update-log-status" id="update-log-status"></div>
+			<pre id="update-log-view" class="update-log"></pre>
+		</div>
+		<div class="modal-foot">
+			<button id="update-log-clear" class="btn btn-ghost">Bersihkan</button>
+			<button id="update-log-close2" class="btn btn-primary">Tutup</button>
 		</div>
 	</div>
 </div>

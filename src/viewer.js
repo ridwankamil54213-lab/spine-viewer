@@ -346,6 +346,13 @@ const el = {
 	exportResult: $("#export-result"),
 	exportDownload: $("#export-download"),
 	exportMeta: $("#export-meta"),
+	updateLogBtn: $("#update-log-btn"),
+	updateLogModal: $("#update-log-modal"),
+	updateLogView: $("#update-log-view"),
+	updateLogStatus: $("#update-log-status"),
+	updateLogClose: $("#update-log-close"),
+	updateLogClose2: $("#update-log-close2"),
+	updateLogClear: $("#update-log-clear"),
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
 	partsBtn: $("#parts-btn"),
@@ -3347,6 +3354,93 @@ function setUpdateDot(on) {
 	if (btn) btn.title = on ? "Ada pembaruan — klik untuk mengunduh" : "Periksa pembaruan aset";
 }
 
+/* --- Log proses pembaruan ---------------------------------------------
+ * Server mengalirkan stdout/stderr pembaru lewat /api/update/<game>/status,
+ * jadi panel ini menampilkan prosesnya secara live, bukan hanya hasil akhir.
+ */
+let logShownAt = 0;
+
+function updateLogSet(lines) {
+	if (!el.updateLogView) return;
+	const atBottom =
+		el.updateLogView.scrollTop + el.updateLogView.clientHeight >= el.updateLogView.scrollHeight - 24;
+	el.updateLogView.textContent = (lines || []).join("\n");
+	if (atBottom) el.updateLogView.scrollTop = el.updateLogView.scrollHeight;
+}
+
+function updateLogStatus(text, kind) {
+	if (!el.updateLogStatus) return;
+	el.updateLogStatus.textContent = text || "";
+	el.updateLogStatus.className = "update-log-status" + (kind ? " is-" + kind : "");
+}
+
+function openUpdateLog() {
+	if (!el.updateLogModal) return;
+	el.updateLogModal.hidden = false;
+	logShownAt = Date.now();
+	// Ambil status terakhir supaya panel tidak kosong kalau dibuka setelah selesai.
+	fetchLog().then(() => {
+		// Kalau ada pembaruan yang sedang jalan, ikuti terus secara live.
+		fetch(`${updaterBase}/status`)
+			.then((r) => r.json())
+			.then((st) => {
+				if (st?.running) startLogPolling();
+			})
+			.catch(() => {});
+	});
+}
+
+function closeUpdateLog() {
+	if (el.updateLogModal) el.updateLogModal.hidden = true;
+}
+
+let logPollTimer = null;
+
+async function fetchLog() {
+	if (!updaterBase) return;
+	try {
+		const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
+		updateLogSet(st.log);
+		if (st.running) {
+			updateLogStatus(`Berjalan… (${st.game || ""})`, "running");
+		} else if (st.result?.error) {
+			updateLogStatus(`Gagal: ${st.result.error}`, "fail");
+		} else if (st.result) {
+			updateLogStatus("Selesai.", "done");
+		} else {
+			updateLogStatus("Belum ada proses pembaruan di sesi ini.", "");
+		}
+	} catch {
+		/* biarkan isi terakhir */
+	}
+}
+
+function startLogPolling() {
+	stopLogPolling();
+	logPollTimer = setInterval(async () => {
+		await fetchLog();
+		const st = await fetch(`${updaterBase}/status`).then((r) => r.json()).catch(() => ({}));
+		if (!st.running) stopLogPolling();
+	}, 2000);
+}
+
+function stopLogPolling() {
+	if (logPollTimer) {
+		clearInterval(logPollTimer);
+		logPollTimer = null;
+	}
+}
+
+function initUpdateLog() {
+	el.updateLogBtn?.addEventListener("click", openUpdateLog);
+	el.updateLogClose?.addEventListener("click", closeUpdateLog);
+	el.updateLogClose2?.addEventListener("click", closeUpdateLog);
+	el.updateLogModal?.addEventListener("click", (e) => {
+		if (e.target?.dataset?.close) closeUpdateLog();
+	});
+	el.updateLogClear?.addEventListener("click", () => updateLogSet([]));
+}
+
 /* --- "NEW" badge -------------------------------------------------------
  * Models added by the updater. Kept in localStorage (same store as
  * favorites) so it survives a reload, and cleared for a model AS SOON AS it
@@ -3465,6 +3559,7 @@ function syncUpdater(game) {
 	if (!btn) return;
 	const base = game && UPDATABLE[game];
 	btn.hidden = !base;
+	if (el.updateLogBtn) el.updateLogBtn.hidden = !base;
 	updaterBase = base || null;
 	updaterGame = base ? game : null;
 	if (!base) {
@@ -3512,6 +3607,13 @@ async function checkUpdate() {
 	let info;
 	try {
 		info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
+		// Tampilkan log pemeriksaan (server mengirimnya di field `log`) supaya
+		// pengguna bisa melihat langkah apa yang dilewati saat check.
+		if (Array.isArray(info.log) && info.log.length) {
+			openUpdateLog();
+			updateLogSet(info.log);
+			updateLogStatus("Pemeriksaan selesai.", "done");
+		}
 	} catch (err) {
 		btn.classList.remove("is-checking");
 		toast?.(`Gagal memeriksa pembaruan: ${err.message}`);
@@ -3545,18 +3647,29 @@ async function applyUpdate() {
 	btn.classList.add("is-checking");
 	btn.disabled = true;
 	toast?.("Mengunduh pembaruan… ini bisa beberapa menit.");
+	// Buka panel log + pantau prosesnya supaya pengguna bisa melihat apa
+	// yang sedang dikerjakan (unduh/ekstrak) alih-alih menunggu buta.
+	openUpdateLog();
+	updateLogSet([]);
+	updateLogStatus("Memulai…", "running");
 	try {
 		const started = await fetch(`${updaterBase}?mode=apply`).then((r) => r.json());
 		if (!started.started) {
 			toast?.(started.reason || "Tidak bisa memulai unduhan.");
+			updateLogStatus(started.reason || "Tidak bisa memulai.", "fail");
 			btn.disabled = false;
 			btn.classList.remove("is-checking");
 			return;
 		}
+		startLogPolling();
 		for (let i = 0; i < 600; i++) {
 			await new Promise((r) => setTimeout(r, 3000));
 			const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
-			if (st.running) continue;
+			if (st.running) {
+				updateLogSet(st.log);
+				continue;
+			}
+			updateLogSet(st.log);
 			const res = st.result || {};
 			updatePending = false;
 			setUpdateDot(false);
@@ -3579,12 +3692,19 @@ async function applyUpdate() {
 			);
 			btn.disabled = false;
 			btn.classList.remove("is-checking");
+			stopLogPolling();
+			updateLogStatus(
+				res.error ? `Gagal: ${res.error}` : "Selesai.",
+				res.error ? "fail" : "done"
+			);
 			return;
 		}
 		toast?.("Masih berjalan — cek lagi nanti.");
 	} catch (err) {
 		toast?.(`Gagal mengunduh: ${err.message}`);
+		updateLogStatus(`Gagal: ${err.message}`, "fail");
 	}
+	stopLogPolling();
 	btn.disabled = false;
 	btn.classList.remove("is-checking");
 }
@@ -5188,6 +5308,7 @@ initInspector();
 initFullscreen();
 initExport();
 initFavorites();
+initUpdateLog();
 initFps();
 initParts();
 

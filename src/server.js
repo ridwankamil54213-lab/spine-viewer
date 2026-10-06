@@ -2084,9 +2084,10 @@ const UPDATERS = {
 	},
 };
 
-let updateJob = null; // { game, running, result, log }
+let updateJob = null; // { game, running, result, log, startedAt }
+const UPDATE_LOG_MAX = 400; // baris yang disimpan per job
 
-function runUpdater(game, args) {
+function runUpdater(game, args, onLog) {
 	const cfg = UPDATERS[game];
 	if (!cfg) return null;
 	return new Promise((resolve) => {
@@ -2101,8 +2102,26 @@ function runUpdater(game, args) {
 		} catch (err) {
 			return fail(`Tidak bisa menjalankan pembaru: ${err.message}`);
 		}
-		let out = "";
-		// Resolve exactly once: 'error' and 'close' can both fire.
+		// stdout carries the final JSON result, stderr carries progress lines.
+		// Stream both to `onLog`, but stop at the JSON block (the first line
+		// that is just "{" / "[") so the pretty-printed result doesn't flood
+		// the log.
+		let stdout = "";
+		let jsonStarted = false;
+		const emit = (chunk, isStdout) => {
+			for (const line of String(chunk).split(/\r?\n/)) {
+				const t = line.trim();
+				if (!t) continue;
+				if (isStdout) {
+					if (jsonStarted) continue;
+					if (t === "{" || t === "[") {
+						jsonStarted = true;
+						continue;
+					}
+				}
+				if (onLog) onLog(line);
+			}
+		};
 		let settled = false;
 		const finish = (value) => {
 			if (settled) return;
@@ -2110,15 +2129,18 @@ function runUpdater(game, args) {
 			resolve(value);
 		};
 		child.on("error", (err) => finish({ error: `Pembaru tidak bisa dijalankan: ${err.message}` }));
-		child.stdout.on("data", (d) => (out += d));
-		child.stderr.on("data", (d) => (out += d));
+		child.stdout.on("data", (d) => {
+			stdout += d;
+			emit(d, true);
+		});
+		child.stderr.on("data", (d) => emit(d, false));
 		child.on("close", () => {
-			const start = out.indexOf("{");
-			if (start === -1) return finish({ error: "Pembaru tidak mengembalikan JSON.", raw: out.slice(-800) });
+			const start = stdout.indexOf("{");
+			if (start === -1) return finish({ error: "Pembaru tidak mengembalikan JSON.", raw: stdout.slice(-800) });
 			try {
-				finish(JSON.parse(out.slice(start)));
+				finish(JSON.parse(stdout.slice(start)));
 			} catch {
-				finish({ error: "Gagal membaca hasil pembaruan.", raw: out.slice(-800) });
+				finish({ error: "Gagal membaca hasil pembaruan.", raw: stdout.slice(-800) });
 			}
 		});
 	});
@@ -2130,21 +2152,35 @@ app.get("/api/update/:game", async (req, res) => {
 	const mode = req.query.mode === "apply" ? "apply" : "check";
 	// A check is quick; a download is not, so it goes to the background.
 	if (mode === "check") {
-		res.json(await runUpdater(game, ["--check"]));
+		const log = [];
+		const result = await runUpdater(game, ["--check"], (l) => log.length < UPDATE_LOG_MAX && log.push(l));
+		res.json({ ...result, log });
 		return;
 	}
 	if (updateJob?.running) {
 		res.json({ started: false, reason: "Pembaruan masih berjalan." });
 		return;
 	}
-	updateJob = { game, running: true, result: null };
+	updateJob = { game, running: true, result: null, log: [], startedAt: Date.now() };
 	res.json({ started: true });
-	updateJob.result = await runUpdater(game, ["--apply"]);
+	updateJob.result = await runUpdater(game, ["--apply"], (l) => {
+		updateJob.log.push(l);
+		if (updateJob.log.length > UPDATE_LOG_MAX) updateJob.log.shift();
+	});
 	updateJob.running = false;
+	updateJob.finishedAt = Date.now();
 });
 
 app.get("/api/update/:game/status", (_req, res) => {
-	res.json(updateJob || { running: false, result: null });
+	if (!updateJob) return res.json({ running: false, result: null, log: [] });
+	res.json({
+		game: updateJob.game,
+		running: updateJob.running,
+		result: updateJob.result,
+		log: updateJob.log,
+		startedAt: updateJob.startedAt,
+		finishedAt: updateJob.finishedAt || null,
+	});
 });
 
 app.get("/api/thumbnails", (req, res) => {

@@ -70,7 +70,9 @@ APK_TIMEOUT = 900
 
 
 def log(*a):
-    print(*a, flush=True)
+    # Progres ke stderr: server menampilkannya sebagai log live; stdout
+    # disisakan untuk JSON hasil akhir.
+    print(*a, file=sys.stderr, flush=True)
 
 
 def _ver_eq(a: str, b: str) -> bool:
