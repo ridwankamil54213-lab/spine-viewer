@@ -64,7 +64,7 @@ STATE_FILE = os.path.join(STATE_DIR, "state.json")
 # assets/arkrecode, sehingga check() salah melaporkan SEMUA bundle baru.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.environ.get("ARK_OUT", os.path.join(ROOT, "assets", "arkrecode"))
-EXTRACTOR = "/srv/spine-viewer/tools/extract-unity-spine.py"
+EXTRACTOR = os.path.join(ROOT, "tools", "extract-unity-spine.py")
 PYTHON = os.environ.get("PY", "/srv/venv-spine/bin/python")
 
 # Only asset types the viewer can actually use.
@@ -288,7 +288,7 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 		try:
 			proc = subprocess.run(
 				[PYTHON, EXTRACTOR],
-				env=env, cwd="/srv/spine-viewer",
+				env=env, cwd=ROOT,
 				capture_output=True, text=True, timeout=7200, check=False,
 			)
 			extract_log = (proc.stdout or "")[-600:] + (proc.stderr or "")[-600:]
