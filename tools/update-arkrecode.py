@@ -86,6 +86,79 @@ MODEL_BUNDLE = re.compile(
 	re.I,
 )
 
+# Hanya bundle yang benar-benar memuat Spine. Di Ark Re:Code Spine ada di
+# game/hero/ (mis. "b001_<hash>.bundle" -> B001.skel + B001_1.atlas, dan
+# "b001/img_<hash>.bundle" -> halaman teksturnya). Sebagian atlas/skeleton
+# tersebar di bundle "…duplicategroup_…cg_h004_a.atlas_<hash>.bundle", jadi
+# pola kedua menangkapnya. game/cg/ justru ilustrasi Live2D (Texture2D+Sprite),
+# BUKAN Spine — mengunduhnya hanya membuang waktu.
+MODEL_BUNDLE = re.compile(
+	r"/game/hero/\S*_[0-9a-f]{32}\.bundle$"
+	r"|(?:cg_)?[a-z]{1,2}\d{2,4}(?:_[a-z])?\.(?:atlas|skel)_[0-9a-f]{32}\.bundle$",
+	re.I,
+)
+_HERO_SKEL = re.compile(r"/game/hero/([a-z]{1,2}\d{2,4}(?:_\d+)?)_[0-9a-f]{32}\.bundle$", re.I)
+_HERO_IMG = re.compile(r"/game/hero/([a-z]{1,2}\d{2,4})/img_[0-9a-f]{32}\.bundle$", re.I)
+_DUP = re.compile(r"(?:cg_)?([a-z]{1,2}\d{2,4})(?:_[a-z])?\.(?:atlas|skel)_[0-9a-f]{32}\.bundle$", re.I)
+
+
+def model_id_for(i: str):
+	"""Id model (uppercase, mis. 'B001'/'H004') dari sebuah URL bundle."""
+	for rx in (_HERO_SKEL, _HERO_IMG, _DUP):
+		m = rx.search(i)
+		if m:
+			return m.group(1).upper()
+	return None
+
+
+def stem_installed(stem: str, have: set) -> bool:
+	"""True bila model untuk `stem` sudah ada.
+
+	Satu bundle hero bisa memuat beberapa skeleton dengan nama berbeda dari
+	stem-nya (H004 -> CG_H004_a/CG_H004_b; B001 -> B001/B001_1), jadi 'sudah
+	ada' mencakup: folder stem itu sendiri, turunannya (<stem>_<n>), atau
+	folder ber-prefix CG_<stem>_."""
+	s = stem.upper()
+	if s in have or any(h.startswith(s + "_") for h in have):
+		return True
+	return any(h.startswith("CG_" + s + "_") for h in have)
+
+
+
+def installed_models() -> set:
+	if not os.path.isdir(ASSET_DIR):
+		return set()
+	return {n.upper() for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
+
+
+def processed_models() -> set:
+	"""Id yang SUDAH diproses (punya Spine ATAU terbukti bukan Spine).
+
+	Banyak bundle CG Ark Re:Code ternyata ilustrasi Live2D (Texture2D+Sprite),
+	bukan Spine, jadi tidak pernah menghasilkan folder. Tanpa catatan ini
+	mereka akan diunduh+dieksktrak ulang setiap kali — lambat dan sia-sia.
+	"""
+	return {str(x).upper() for x in load_state().get("processed", [])}
+
+
+def model_bundles(urls: dict):
+	"""Kelompokkan bundle menjadi model.
+
+	Kembalikan (models, files) dengan:
+	  models : {ID: [nama_berkas, …]}   — ID = folder model (mis. 'A0038')
+	  files  : nama_berkas -> relpath    — hanya berkas milik model tsb.
+	"""
+	files = {}
+	models = {}
+	for name, rel in urls.items():
+		mid = model_id_for(rel) or model_id_for(name)
+		if not mid:
+			continue
+		files[name] = rel
+		models.setdefault(mid, []).append(name)
+	return models, files
+
+
 
 def bundle_urls(catalog_path: str) -> dict:
 	"""Map nama berkas -> URL bundle yang bisa diunduh.
@@ -174,7 +247,12 @@ def catalog_names(path: str) -> set:
 
 
 def check() -> dict:
-	"""Ambil catalog terbaru dan bandingkan dengan yang terakhir disimpan."""
+	"""Ambil catalog terbaru dan hitung model yang belum ada di disk.
+
+	Yang dihitung adalah MODEL (bundle skeleton), bukan berkas: sebuah model
+	punya 1 skeleton + 0..n tekstur, jadi melaporkan jumlah berkas membuat
+	angka melambung dan terasa seperti "harus unduh semuanya".
+	"""
 	os.makedirs(CATALOG_DIR, exist_ok=True)
 	meta = fetch_latest_catalog_meta()
 	state = load_state()
@@ -182,72 +260,97 @@ def check() -> dict:
 	# Sudah punya catalog ini? Pakai ulang, jangan unduh 25 MB lagi.
 	local = os.path.join(CATALOG_DIR, meta["catalog"] + ".json")
 	if not os.path.exists(local):
+		_log(f"mengunduh catalog {meta['catalog']}…")
 		raw = http_get(meta["url"])
 		with open(local, "wb") as f:
 			f.write(raw)
-	new_names = catalog_names(local)
-
-	prev = state.get("catalog")
-	added = sorted(new_names)
-	removed = 0
-	if prev and prev != meta["catalog"]:
-		prev_path = os.path.join(CATALOG_DIR, prev + ".json")
-		if os.path.exists(prev_path):
-			old_names = catalog_names(prev_path)
-			added = sorted(new_names - old_names)
-			removed = len(old_names - new_names)
-
-	wanted = [n for n in added if WANT.search(n) and not SKIP.search(n)]
+	urls = bundle_urls(local)  # nama berkas -> relpath
+	models, model_files = model_bundles(urls)
+	have = installed_models() | processed_models()
+	missing = sorted(m for m in models if not stem_installed(m, have))
+	_log(f"catalog {meta['catalog']}: {len(models)} model, {len(have)} ada, {len(missing)} baru")
 	return {
 		"catalog": meta["catalog"],
-		"previous": prev,
-		"changed": prev != meta["catalog"],
+		"previous": state.get("catalog"),
+		"changed": bool(missing) or state.get("catalog") != meta["catalog"],
 		"versions": meta.get("versions", []),
-		"total": len(new_names),
-		"added": len(added),
-		"removed": removed,
-		"wanted": len(wanted),
-		"samples": wanted[:10],
+		"total": len(models),
+		"installed": len(have),
+		"new": len(missing),
+		"samples": missing[:10],
+		"new_models": missing[:10],
 		"domain": meta["domain"],
 	}
 
 
-def apply_update(limit: int = 0, workers: int = 8) -> dict:
-	"""Unduh berkas baru yang belum ada di disk.
+def extract_bundle_set(download_dir: str, members: list) -> list:
+	"""Ekstrak SKEL+ATLAS+PNG dari sekumpulan bundle di download_dir.
 
-	Each bundle is tried against every host in CDN_HOSTS in order, because
-	neither host has complete coverage on its own. Residual failures are
-	counted per file rather than aborting the run.
+	Mengembalikan daftar {name, skel, atlas, ok} untuk tiap model yang
+	ditemukan. Decode tekstur hanya untuk halaman yang dirujuk atlas, jadi
+	sebuah model kecil selesai dalam hitungan detik.
+	"""
+	bundles = [f for f in members if os.path.exists(os.path.join(download_dir, f))]
+	if not bundles:
+		return []
+	os.makedirs(ASSET_DIR, exist_ok=True)
+	env = dict(
+		os.environ,
+		BUNDLE_DIR=download_dir,
+		ONLY_BUNDLES=",".join(bundles),
+		TO=ASSET_DIR,
+		OUT_JSON="1",
+	)
+	proc = subprocess.run(
+		[PYTHON, EXTRACTOR], env=env, cwd=ROOT,
+		capture_output=True, text=True, timeout=1800, check=False,
+	)
+	if proc.returncode != 0:
+		raise RuntimeError((proc.stderr or proc.stdout or "extractor gagal")[-300:])
+	return json.loads(proc.stdout)
+
+
+def apply_update(limit: int = 0, workers: int = 8) -> dict:
+	"""Unduh & ekstrak HANYA model yang belum ada di buku aset viewer.
+
+	Tiap model = 1 skeleton + 0..n tekstur; dikelompokkan lewat model_id_for().
+	Untuk setiap model: unduh berkasnya, lalu ekstrak per-model (bukan sekaligus)
+	supaya progres terlihat dan tiap langkah pendek.
 	"""
 	info = check()
 	os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+	urls = bundle_urls(os.path.join(CATALOG_DIR, info["catalog"] + ".json"))
+	models, files = model_bundles(urls)
+	have = installed_models() | processed_models()
 
-	# Bangun ulang daftar URL bundle dari catalog.
-	catalog_path = os.path.join(CATALOG_DIR, info["catalog"] + ".json")
-	urls = bundle_urls(catalog_path)
-
-	# Berkas yang sudah ada tidak diunduh ulang.
-	todo = [n for n in urls if not os.path.exists(os.path.join(DOWNLOAD_DIR, n))]
+	todo = sorted(m for m in models if not stem_installed(m, have))
 	if limit:
 		todo = todo[:limit]
-	_log(f"mengunduh {len(todo)} berkas (workers={workers})")
+	_log(f"mengunduh {len(todo)} model baru (workers={workers})")
 
 	done = failed = 0
 	errors = []
 
-	def get(name):
-		rel = urls[name]
-		# Coba tiap host bergiliran: coverage-nya tidak sama persis.
+	def get(mid):
 		last = ""
-		for host in CDN_HOSTS:
-			try:
-				raw = http_get(host + rel)
-				with open(os.path.join(DOWNLOAD_DIR, name), "wb") as f:
-					f.write(raw)
-				return None
-			except Exception as exc:
-				last = f"{name}: {exc}"
-		return last
+		for name in models.get(mid, []):
+			rel = files[name]
+			dest = os.path.join(DOWNLOAD_DIR, name)
+			if os.path.exists(dest) and os.path.getsize(dest) > 0:
+				continue
+			ok = False
+			for host in CDN_HOSTS:
+				try:
+					raw = http_get(host + rel)
+					with open(dest, "wb") as f:
+						f.write(raw)
+					ok = True
+					break
+				except Exception as exc:
+					last = f"{name}: {exc}"
+			if not ok:
+				return last
+		return None
 
 	with ThreadPoolExecutor(max_workers=workers) as ex:
 		for err in ex.map(get, todo):
@@ -258,78 +361,54 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 					errors.append(err)
 			else:
 				done += 1
-				if done % 50 == 0:
-					_log(f"unduh {done}/{len(todo)}")
+				if done % 25 == 0:
+					_log(f"unduh {done}/{len(todo)} model")
 
 	state = load_state()
 	state["catalog"] = info["catalog"]
 	state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
+	# Semua model dalam `todo` sudah dicoba: yang menghasilkan Spine punya
+	# folder, sisanya terbukti bukan Spine. Catat supaya tidak diulang.
+	state["processed"] = sorted(set(state.get("processed", [])) | {m for m in todo})
 	save_state(state)
 
-	# Tahap 3: ekstrak Spine dari bundle yang baru diunduh langsung ke
-	# pohon aset viewer. Tanpa ini berkas hanya menumpuk di downloads/
-	# dan tidak pernah muncul di antarmuka.
+	# Ekstrak per model supaya progres terlihat dan tiap langkah pendek.
+	os.makedirs(ASSET_DIR, exist_ok=True)
 	extracted = 0
-	extract_error = None
-	extract_log = ""
 	seen_new = []
-	extract_dup = 0
-	# Ekstrak selama ADA berkas di folder unduhan, bukan hanya ketika ada
-	# yang baru terunduh — kalau disyaratkan `done > 0`, menjalankan ulang
-	# setelah unduhan selesai melewati ekstraksi sepenuhnya.
-	downloads = []
-	if os.path.isdir(DOWNLOAD_DIR):
-		downloads = [f for f in os.listdir(DOWNLOAD_DIR) if f.endswith(".bundle")]
-	if downloads:
-		tmp_out = os.path.join(STATE_DIR, "extract_tmp")
-		os.makedirs(tmp_out, exist_ok=True)
-		env = dict(os.environ, BUNDLE_DIR=DOWNLOAD_DIR, OUT=tmp_out)
-		proc = None
+	extract_errors = []
+	for i, mid in enumerate(todo, 1):
+		members = [f for f in models.get(mid, []) if os.path.exists(os.path.join(DOWNLOAD_DIR, f))]
+		if not members:
+			extract_errors.append(f"{mid}: berkas tidak terunduh")
+			_log(f"ekstrak {i}/{len(todo)} {mid}: GAGAL (berkas tidak ada)")
+			continue
 		try:
-			proc = subprocess.run(
-				[PYTHON, EXTRACTOR],
-				env=env, cwd=ROOT,
-				capture_output=True, text=True, timeout=7200, check=False,
-			)
-			extract_log = (proc.stdout or "")[-600:] + (proc.stderr or "")[-600:]
-			_log(f"ekstraksi selesai (rc={proc.returncode})")
+			results = extract_bundle_set(DOWNLOAD_DIR, members)
 		except Exception as exc:
-			extract_error = str(exc)
-			extract_log = ""
-		# Pindahkan model baru ke pohon aset tanpa menimpa yang sudah ada.
-		os.makedirs(ASSET_DIR, exist_ok=True)
-		already = set(os.listdir(ASSET_DIR))
-		seen_new = []
-		for name in os.listdir(tmp_out):
-			src = os.path.join(tmp_out, name)
-			dst = os.path.join(ASSET_DIR, name)
-			if not os.path.isdir(src):
-				continue
-			if os.path.exists(dst):
-				continue  # model sudah ada, biarkan
-			shutil.move(src, dst)
+			extract_errors.append(f"{mid}: {exc}")
+			_log(f"ekstrak {i}/{len(todo)} {mid}: GAGAL {str(exc)[:70]}")
+			continue
+		doc = next((r for r in results if r.get("ok")), results[0] if results else None)
+		_log(f"ekstrak {i}/{len(todo)} {mid} → {doc.get('name') if doc else '?'} "
+		     f"({'skel+atlas' if (doc and doc.get('atlas')) else 'tanpa atlas'})")
+		if doc and doc.get("ok"):
 			extracted += 1
-			if len(seen_new) < 10:
-				seen_new.append(name)
-		# Berapa hasil ekstrak yang ternyata sudah ada — berguna untuk
-		# membedakan "tidak ada model baru" dari "ekstrak gagal".
-		extract_total = sum(
-			1 for n in os.listdir(tmp_out) if os.path.isdir(os.path.join(tmp_out, n))
-		)
-		extract_dup = extract_total - extracted
-		shutil.rmtree(tmp_out, ignore_errors=True)
-		_log(f"ekstrak: {extracted} model baru, {extract_dup} sudah ada")
+			if len(seen_new) < 50:
+				seen_new.append(doc.get("name") or mid)
 
 	return {
 		"catalog": info["catalog"],
+		"total": info["total"],
+		"installed": info["installed"],
+		"new": info["new"],
 		"downloaded": done,
 		"failed": failed,
 		"extracted": extracted,
 		"new_models": seen_new,
-		"already_had": extract_dup,
+		"already_had": len(have),
 		"asset_dir": ASSET_DIR,
-		"extract_error": extract_error,
-		"extract_log": extract_log,
+		"extract_errors": extract_errors[:10],
 		"errors": errors,
 		"dir": DOWNLOAD_DIR,
 	}
