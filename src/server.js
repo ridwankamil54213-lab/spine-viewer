@@ -223,6 +223,7 @@ const GAME_ROOTS = [
 	{ match: "lostsword", key: "lostsword", label: "Lost Sword" },
 	{ match: "talesofangels", key: "talesofangels", label: "Tales of Angels" },
 	{ match: "crosscore", key: "crosscore", label: "CrossCore" },
+	{ match: "kink", key: "kink", label: "异种啪乐町 (Kink)" },
 	// Longest prefix first: resolveGame matches with startsWith, so the more
 	// specific "azurlane-chibi" must come before "azurlane" or every chibi
 	// model gets absorbed into the main Azur Lane bucket.
