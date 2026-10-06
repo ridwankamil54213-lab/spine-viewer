@@ -3379,6 +3379,24 @@ function saveNewSet(set) {
 	}
 }
 
+/** Tarik daftar "baru" dari server (sumber kebenaran) dan gabung ke cache
+ *  localStorage. Ini yang membuat model yang ditambahkan updater CLI tetap
+ *  mendapat badge, walau updater-nya tidak dijalankan dari browser ini. */
+async function syncNewFromServer() {
+	try {
+		const r = await fetch("/api/new-models");
+		if (!r.ok) return;
+		const d = await r.json();
+		const srv = d && d.new && typeof d.new === "object" ? d.new : null;
+		if (!srv) return;
+		// Server menang untuk apa yang ditandainya, tapi entri lokal yang belum
+		// sempat dipindai tetap dipertahankan (union).
+		saveNewSet({ ...loadNewSet(), ...srv });
+	} catch {
+		/* offline — pakai localStorage yang ada */
+	}
+}
+
 function markNew(ids) {
 	if (!ids?.length) return;
 	const cur = loadNewSet();
@@ -3426,6 +3444,14 @@ function markSeen(id) {
 	}
 	if (!hit) return;
 	saveNewSet(cur);
+	// Beri tahu server supaya badge tetap hilang di browser/perangkat lain.
+	fetch("/api/new-models/dismiss", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ id }),
+	}).catch(() => {
+		/* server opsional — lokal sudah cukup */
+	});
 	// Sudah dilihat -> kembali ke urutan abjad: render ulang supaya model ini
 	// turun dari puncak daftar ke posisi alfabetisnya (model "baru" lain tetap
 	// di atas).
@@ -3578,6 +3604,9 @@ async function refresh() {
 		const res = await fetch("/api/models");
 		const data = await res.json();
 		models = data.models || [];
+		// Ambil daftar "baru" dari server lebih dulu supaya badge muncul pada
+		// render pertama, bukan setelah satu putaran lagi.
+		await syncNewFromServer();
 		// Thumbnails are a nice-to-have: if this fails the grid still renders,
 		// just with the initial-letter fallback instead of art.
 		try {

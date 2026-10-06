@@ -1370,8 +1370,104 @@ function getModels({ force = false } = {}) {
 	const models = scanModels();
 	cache = { models, mtime: Date.now(), signature: sig };
 	savePersistedCache(sig, models);
+	// Catat id yang baru muncul supaya badge NEW tidak bergantung pada apakah
+	// updater dijalankan dari browser atau dari CLI di server.
+	recordNewModels(models);
 	return cache.models;
 }
+
+/* --- pelacak "model baru" ------------------------------------------- *
+ * Sumber kebenaran = server, bukan browser. Setiap id yang muncul di hasil
+ * pemindaian tetapi belum pernah terlihat diberi timestamp di sini, sehingga
+ * model yang ditambahkan lewat updater CLI (tombol di browser tidak dipakai)
+ * tetap mendapat badge NEW, dan flag-nya ikut ke semua browser.
+ */
+const NEW_FILE = path.join(DATA, "new-models.json");
+const NEW_TTL_MS = 7 * 24 * 60 * 60 * 1000; // seminggu
+
+function loadNewState() {
+	try {
+		const raw = JSON.parse(fs.readFileSync(NEW_FILE, "utf8"));
+		return {
+			// known === null berarti file belum pernah ada (jalan pertama).
+			known: Array.isArray(raw.known) ? new Set(raw.known) : null,
+			flagged: raw.flagged && typeof raw.flagged === "object" ? raw.flagged : {},
+		};
+	} catch {
+		return { known: null, flagged: {} };
+	}
+}
+
+function saveNewState(state) {
+	const tmp = NEW_FILE + ".tmp";
+	fs.writeFileSync(tmp, JSON.stringify({ known: [...state.known], flagged: state.flagged }));
+	fs.renameSync(tmp, NEW_FILE);
+}
+
+/** Tandai id yang baru muncul; buang yang kedaluwarsa / sudah tak ada. */
+function recordNewModels(models) {
+	try {
+		const state = loadNewState();
+		const cur = models.map((m) => m.id);
+		if (state.known === null) {
+			// Jalan pertama: anggap semua yang ada sekarang "sudah dikenal"
+			// supaya 29rb model tidak sekaligus diberi badge NEW.
+			state.known = new Set(cur);
+			saveNewState(state);
+			return;
+		}
+		const now = Date.now();
+		const curSet = new Set(cur);
+		for (const id of cur) {
+			if (!state.known.has(id)) {
+				state.flagged[id] = now;
+				state.known.add(id);
+			}
+		}
+		for (const [id, ts] of Object.entries(state.flagged)) {
+			if (now - ts > NEW_TTL_MS || !curSet.has(id)) delete state.flagged[id];
+		}
+		saveNewState(state);
+	} catch (err) {
+		console.error("[new-models] gagal mencatat:", err.message);
+	}
+}
+
+app.get("/api/new-models", (_req, res) => {
+	try {
+		const state = loadNewState();
+		const now = Date.now();
+		const out = {};
+		for (const [id, ts] of Object.entries(state.flagged || {})) {
+			if (now - ts <= NEW_TTL_MS) out[id] = ts;
+		}
+		res.json({ new: out });
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+});
+
+app.post("/api/new-models/dismiss", (req, res) => {
+	try {
+		const body = req.body || {};
+		const ids = Array.isArray(body.ids) ? body.ids : body.id ? [body.id] : [];
+		const state = loadNewState();
+		let changed = false;
+		for (const id of ids) {
+			const base = String(id).split("#")[0];
+			for (const k of Object.keys(state.flagged || {})) {
+				if (k === id || k.split("#")[0] === base) {
+					delete state.flagged[k];
+					changed = true;
+				}
+			}
+		}
+		if (changed) saveNewState(state);
+		res.json({ ok: true, removed: changed });
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+});
 
 // --- API ---
 app.get("/api/models", (req, res) => {
