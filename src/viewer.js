@@ -1181,6 +1181,8 @@ async function loadLive2DModel(model) {
 
 async function loadModel(model) {
 	showError(null);
+	// Model dibuka berarti sudah dilihat — hapus badge NEW-nya (dan simpan).
+	markSeen(model.id);
 	el.loading.hidden = false;
 	el.loading.textContent = "Memuat " + model.name + "…";
 
@@ -3346,16 +3348,17 @@ function setUpdateDot(on) {
 }
 
 /* --- "NEW" badge -------------------------------------------------------
- * Models added by the updater during this browser session. Kept in
- * sessionStorage so the badge survives a reload but eventually fades on
- * its own rather than flagging models forever.
+ * Models added by the updater. Kept in localStorage (same store as
+ * favorites) so it survives a reload, and cleared for a model AS SOON AS it
+ * is opened ("seen"). Older entries fade after NEW_TTL_MS so a model can't
+ * stay flagged forever.
  */
 const NEW_KEY = "spine-stage:new-models";
 const NEW_TTL_MS = 7 * 24 * 60 * 60 * 1000; // seminggu
 
 function loadNewSet() {
 	try {
-		const raw = JSON.parse(sessionStorage.getItem(NEW_KEY) || "{}");
+		const raw = JSON.parse(localStorage.getItem(NEW_KEY) || "{}");
 		// { id: timestamp }
 		const cutoff = Date.now() - NEW_TTL_MS;
 		const out = {};
@@ -3368,20 +3371,61 @@ function loadNewSet() {
 	}
 }
 
-function markNew(ids) {
-	if (!ids?.length) return;
-	const cur = loadNewSet();
-	const now = Date.now();
-	for (const id of ids) cur[id] = now;
+function saveNewSet(set) {
 	try {
-		sessionStorage.setItem(NEW_KEY, JSON.stringify(cur));
+		localStorage.setItem(NEW_KEY, JSON.stringify(set));
 	} catch {
 		/* penyimpanan penuh — badge hanya hilang setelah muat ulang */
 	}
 }
 
+function markNew(ids) {
+	if (!ids?.length) return;
+	const cur = loadNewSet();
+	const now = Date.now();
+	for (const id of ids) cur[id] = now;
+	saveNewSet(cur);
+}
+
+/** Buang badge NEW untuk satu model (dipanggil saat model dibuka). */
+function unmarkNew(id) {
+	if (!id) return;
+	const cur = loadNewSet();
+	if (!(id in cur)) return;
+	delete cur[id];
+	saveNewSet(cur);
+}
+
+/** Apakah id termasuk "baru" (untuk badge di kartu). */
 function isNewModel(m) {
 	return !!loadNewSet()[m.id];
+}
+
+/** Hapus badge dari kartu yang terlihat sekarang, tanpa render ulang. */
+function removeNewBadgeFromList(id) {
+	if (!el.list) return;
+	const btn = el.list.querySelector(`.model[data-id="${CSS.escape(id)}"]`);
+	btn?.querySelector(".badge-new")?.remove();
+}
+
+/** Model dibuka = sudah dilihat: hapus badge NEW-nya.
+ *
+ *  Id terkadang ber-suffix varian ("<folder>#<stem>") sementara yang ditandai
+ *  cuma bagian dasarnya (atau sebaliknya), jadi kalau id persis tidak ketemu,
+ *  cocokkan lewat bagian sebelum "#". */
+function markSeen(id) {
+	if (!id) return;
+	const cur = loadNewSet();
+	const base = String(id).split("#")[0];
+	let hit = false;
+	for (const k of Object.keys(cur)) {
+		if (k === id || k.split("#")[0] === base) {
+			delete cur[k];
+			hit = true;
+		}
+	}
+	if (hit) saveNewSet(cur);
+	removeNewBadgeFromList(id);
 }
 
 /** Show the button only for games that have an updater, then auto-check. */
