@@ -1971,6 +1971,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-crosscore.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	catshinobi: {
+		script: path.join(ROOT, "tools", "update-catshinobi.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log }
