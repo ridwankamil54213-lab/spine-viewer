@@ -3374,10 +3374,11 @@ function updateLogStatus(text, kind) {
 	el.updateLogStatus.className = "update-log-status" + (kind ? " is-" + kind : "");
 }
 
-function openUpdateLog() {
+function openUpdateLog(fetchStatus = true) {
 	if (!el.updateLogModal) return;
 	el.updateLogModal.hidden = false;
 	logShownAt = Date.now();
+	if (!fetchStatus) return;
 	// Ambil status terakhir supaya panel tidak kosong kalau dibuka setelah selesai.
 	fetchLog().then(() => {
 		// Kalau ada pembaruan yang sedang jalan, ikuti terus secara live.
@@ -3610,7 +3611,7 @@ async function checkUpdate() {
 		// Tampilkan log pemeriksaan (server mengirimnya di field `log`) supaya
 		// pengguna bisa melihat langkah apa yang dilewati saat check.
 		if (Array.isArray(info.log) && info.log.length) {
-			openUpdateLog();
+			openUpdateLog(false);
 			updateLogSet(info.log);
 			updateLogStatus("Pemeriksaan selesai.", "done");
 		}
@@ -3681,6 +3682,14 @@ async function applyUpdate() {
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				markNew(added.map((n) => `${prefix}/${n}`));
 			}
+			// Muat ulang daftar model otomatis supaya yang baru langsung muncul
+			// (badge NEW + urutan teratas) tanpa perlu refresh manual.
+			if (!res.error && (added.length || res.extracted)) {
+				refresh()
+					.then(syncNewFromServer)
+					.then(() => renderLibrary())
+					.catch(() => {});
+			}
 			toast?.(
 				res.error
 					? `Gagal: ${res.error}`
@@ -3688,7 +3697,7 @@ async function applyUpdate() {
 						(res.failed ? `, ${res.failed} gagal` : "") +
 						(res.extracted ? ` · ${res.extracted} model baru` : "") +
 						(res.already_had ? ` · ${res.already_had} sudah ada` : "") +
-						". Muat ulang untuk melihatnya."
+						(res.extracted ? "." : ". Muat ulang untuk melihatnya.")
 			);
 			btn.disabled = false;
 			btn.classList.remove("is-checking");

@@ -270,6 +270,7 @@ def check() -> dict:
 	missing = sorted(m for m in models if not stem_installed(m, have))
 	_log(f"catalog {meta['catalog']}: {len(models)} model, {len(have)} ada, {len(missing)} baru")
 	return {
+		"ok": True,
 		"catalog": meta["catalog"],
 		"previous": state.get("catalog"),
 		"changed": bool(missing) or state.get("catalog") != meta["catalog"],
