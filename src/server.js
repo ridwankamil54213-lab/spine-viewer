@@ -1205,22 +1205,33 @@ app.use(express.json({ limit: "2mb" }));
  * spawn ffmpeg or a downloader. A tiny in-process rate limit keeps a public
  * deployment from being trivially turned into a CPU/disk hog. It is per-IP
  * and intentionally generous: it only stops hammering, not real use. */
-const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/frame", "/api/export/finish", "/api/export/cancel"];
+const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/finish", "/api/export/cancel"];
+// Exporting a video POSTs ONE REQUEST PER FRAME, so /api/export/frame must not
+// share the 30/min ceiling meant to stop hammering: any export longer than ~1s
+// at 30fps tripped it with "Terlalu banyak permintaan" even though the user did
+// nothing wrong. Frames are cheap (a file write) and the client sends them
+// sequentially, so they get a generous tier of their own; the expensive steps
+// (ffmpeg in /finish, updater downloads) keep the strict one.
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 30;
+const FRAME_LIMIT_MAX = Number(process.env.FRAME_LIMIT_MAX) || 3000;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const rateBuckets = new Map();
 
 function rateLimit(req, res, next) {
-	if (!RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
+	const isFrame = req.path.startsWith("/api/export/frame");
+	if (!isFrame && !RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
+	const max = isFrame ? FRAME_LIMIT_MAX : RATE_LIMIT_MAX;
 	const now = Date.now();
-	const key = req.ip || req.socket?.remoteAddress || "unknown";
+	// Separate bucket per tier: otherwise a long export would burn the strict
+	// budget and then block /finish.
+	const key = (req.ip || req.socket?.remoteAddress || "unknown") + "|" + (isFrame ? "frame" : "strict");
 	let bucket = rateBuckets.get(key);
 	if (!bucket || now > bucket.resetAt) {
 		bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
 		rateBuckets.set(key, bucket);
 	}
 	bucket.count += 1;
-	if (bucket.count > RATE_LIMIT_MAX) {
+	if (bucket.count > max) {
 		res.setHeader("Retry-After", Math.ceil((bucket.resetAt - now) / 1000));
 		return res.status(429).json({ error: "Terlalu banyak permintaan. Coba lagi sebentar." });
 	}
@@ -2232,18 +2243,47 @@ const ALLOWED_BG = new Set(["transparent", "black", "white", "#1a1620"]);
  * downloads (it ships libvpx-vp9, libvpx, gif and libx264), and allow an
  * explicit override via FFMPEG_PATH.
  */
+function ffmpegCandidates() {
+	const out = [];
+	const push = (c) => {
+		if (c && !out.includes(c)) out.push(c);
+	};
+	push(process.env.FFMPEG_PATH);
+	// Look for a full ffmpeg install under the usual tool dirs. Needed because
+	// the PATH the systemd service runs with does not include the shell one,
+	// and the "ffmpeg" that IS on disk here (ms-playwright's) is a cut-down
+	// build with --disable-demuxer=image2, which cannot read "f%05d.png" at all.
+	for (const base of ["/opt", "/root/.hermes/tools", "/root/.cache/ms-playwright", "/usr/local", "/usr"]) {
+		try {
+			for (const name of fs.readdirSync(base)) {
+				for (const sub of ["bin/ffmpeg", "ffmpeg-linux", "ffmpeg"]) {
+					const p = path.join(base, name, sub);
+					try {
+						if (fs.statSync(p).isFile()) push(p);
+					} catch {
+						/* not a file */
+					}
+				}
+			}
+		} catch {
+			/* dir absent */
+		}
+	}
+	for (const c of ["ffmpeg", "/usr/bin/ffmpeg", "/usr/local/bin/ffmpeg", "/bin/ffmpeg"]) push(c);
+	return out;
+}
+
 function ffmpegBin() {
-	const candidates = [
-		process.env.FFMPEG_PATH,
-		"ffmpeg",
-		"/usr/bin/ffmpeg",
-		"/usr/local/bin/ffmpeg",
-		"/root/.cache/ms-playwright/ffmpeg-1011/ffmpeg-linux",
-	].filter(Boolean);
-	for (const c of candidates) {
+	for (const c of ffmpegCandidates()) {
 		try {
 			const r = spawnSync(c, ["-hide_banner", "-loglevel", "error", "-version"], { encoding: "utf8" });
-			if (r.status === 0) return c;
+			if (r.status !== 0) continue;
+			// /api/export/finish feeds ffmpeg a "%05d.png" sequence, which needs
+			// the image2 DEMUXER. ms-playwright's ffmpeg only ships image2pipe
+			// and file protocols, so it "runs" but fails every export with
+			// "Error opening input" — require the demuxer the export needs.
+			const cap = spawnSync(c, ["-hide_banner", "-loglevel", "error", "-h", "demuxer=image2"], { encoding: "utf8" });
+			if (cap.status === 0) return c;
 		} catch {
 			/* not this one */
 		}

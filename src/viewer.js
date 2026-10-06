@@ -4528,10 +4528,18 @@ async function runExport() {
 			const blob = await new Promise((res) => out.toBlob(res, mime, 0.92));
 			if (!blob) throw new Error("Gagal membuat bingkai.");
 
-			const r = await fetch(
-				`/api/export/frame?job=${job}&i=${i}&n=${frames}`,
-				{ method: "POST", headers: { "Content-Type": mime }, body: blob }
-			);
+			// Unggah bingkai. Server memberi tier rate-limit tersendiri untuk
+			// /api/export/frame, tapi kalau toh kena 429 (mis. beberapa tab
+			// mengekspor bersamaan) jangan langsung gagal — hormati Retry-After
+			// lalu coba lagi.
+			const frameUrl = `/api/export/frame?job=${job}&i=${i}&n=${frames}`;
+			let r;
+			for (let attempt = 0; ; attempt++) {
+				r = await fetch(frameUrl, { method: "POST", headers: { "Content-Type": mime }, body: blob });
+				if (r.status !== 429 || attempt >= 5) break;
+				const wait = Number(r.headers.get("Retry-After") || 2) * 1000;
+				await new Promise((r2) => setTimeout(r2, Math.min(wait, 10_000) + 200));
+			}
 			if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || "Gagal mengunggah bingkai.");
 
 			setExportProgress(i + 1, frames);
