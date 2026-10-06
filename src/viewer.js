@@ -3424,8 +3424,13 @@ function markSeen(id) {
 			hit = true;
 		}
 	}
-	if (hit) saveNewSet(cur);
-	removeNewBadgeFromList(id);
+	if (!hit) return;
+	saveNewSet(cur);
+	// Sudah dilihat -> kembali ke urutan abjad: render ulang supaya model ini
+	// turun dari puncak daftar ke posisi alfabetisnya (model "baru" lain tetap
+	// di atas).
+	if (browse.view === "models") renderModels();
+	else removeNewBadgeFromList(id);
 }
 
 /** Show the button only for games that have an updater, then auto-check. */
