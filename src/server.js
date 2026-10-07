@@ -2105,7 +2105,7 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-catshinobi.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
-	browndust: {
+	bd2: {
 		script: path.join(ROOT, "tools", "update-browndust.py"),
 		py: "/srv/venv-spine/bin/python",
 	},

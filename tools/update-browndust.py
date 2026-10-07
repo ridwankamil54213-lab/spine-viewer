@@ -34,6 +34,7 @@ import os
 import re
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -43,7 +44,6 @@ DEST_CHAR = os.path.join(ASSETS, "bd2-char")
 DEST_FLAT = os.path.join(ASSETS, "bd2")
 STATE_DIR = os.environ.get("BD2_STATE_DIR", "/srv/spine-assets/bd2-update")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
-
 SLUG = "Zormolo/Brown-Dust-2-Assets"
 BRANCH = os.environ.get("BD2_BRANCH", "main")
 GH_API = f"https://api.github.com/repos/{SLUG}"
@@ -81,12 +81,57 @@ def _log(msg):
     sys.stderr.flush()
 
 
+def load_state():
+    try:
+        with open(STATE_FILE, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def save_state(d):
+    os.makedirs(STATE_DIR, exist_ok=True)
+    tmp = STATE_FILE + ".part"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(d, f)
+    os.replace(tmp, STATE_FILE)
+
+
+def _token():
+    """Token GitHub (read-only API) tanpa pernah dicetak.
+
+    Urutan: BD2_GH_TOKEN, GH_TOKEN, lalu berkas token yang sudah ada di mesin
+    (dipakai juga untuk push repo ini). Kuota anonim hanya 60/jam — 7 panggilan
+    per check cepat habis; dengan token jadi 5000/jam.
+    """
+    for var in ("BD2_GH_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
+        v = os.environ.get(var)
+        if v:
+            return v.strip()
+    for path in (os.path.expanduser("~/.config/github/token"),
+                 "/root/.config/github/token"):
+        try:
+            with open(path, encoding="utf-8") as f:
+                v = f.read().strip()
+            if v:
+                return v
+        except OSError:
+            continue
+    return None
+
+
+GH_TOKEN = _token()
+
+
 def gh_get(url, raw=False, tries=4):
-    """GET dengan retry; kembalikan bytes (raw) atau objek JSON."""
+    """GET dengan retry; kembalikan bytes (raw) atau objek JSON.
+
+    Rate limit (HTTP 403/429) TIDAK diulang — mengulanginya hanya mengubah satu
+    kegagalan cepat menjadi hang bermenit-menit (banyak endpoint × backoff).
+    """
     headers = {"User-Agent": UA, "Accept": "application/vnd.github+json"}
-    tok = os.environ.get("BD2_GH_TOKEN")
-    if tok:
-        headers["Authorization"] = "Bearer " + tok
+    if GH_TOKEN:
+        headers["Authorization"] = "Bearer " + GH_TOKEN
     last = None
     for i in range(tries):
         try:
@@ -94,18 +139,29 @@ def gh_get(url, raw=False, tries=4):
             with urllib.request.urlopen(req, timeout=120) as r:
                 data = r.read()
             return data if raw else json.loads(data)
+        except urllib.error.HTTPError as e:
+            if e.code in (403, 429):
+                hint = " (set BD2_GH_TOKEN untuk kuota lebih besar)" if not GH_TOKEN else ""
+                raise RuntimeError(f"GitHub menolak ({e.code}) {url}{hint}") from e
+            last = e
+            time.sleep(1.5 * (i + 1))
         except Exception as e:  # noqa: BLE001
             last = e
             time.sleep(1.5 * (i + 1))
     raise RuntimeError(f"GET gagal {url}: {last}")
 
 
-def fetch_tree():
-    """{path: {size, sha}} + versi (sha commit).
+def fetch_tree(saved):
+    """({path: {size, sha}}, version) — dengan cache.
 
-    GitHub menolak (HTTP 500) panggilan `git/trees/main?recursive=1` untuk repo
-    sebesar ini. Jadi pohon diambil PER KATEGORI lewat sintaks `main:<path>`
-    (7 panggilan kecil, jauh di bawah rate limit) — bukan satu panggilan raksasa.
+    GitHub menolak (HTTP 500) `git/trees/main?recursive=1` untuk repo sebesar
+    ini, jadi pohon diambil PER KATEGORI lewat sintaks `main:<path>`.
+
+    Agar `--check` rutin tak menghabiskan rate limit anonim (60/jam, tiap
+    panggilan kategori satu hit), pohon + commit sha di-cache di state: kalau
+    commit sha belum berubah, pohon lama dipakai lagi. Jadi check normal cuma
+    SATU panggilan API (ambil sha HEAD); 7 panggilan kategori hanya saat repo
+    benar-benar berubah.
     """
     blobs = {}
     version = ""
@@ -113,6 +169,11 @@ def fetch_tree():
         version = gh_get(f"{GH_API}/commits/{BRANCH}").get("sha", "")
     except Exception as e:  # noqa: BLE001
         _log("tak bisa baca commit sha: " + str(e)[:80])
+
+    cached = saved.get("tree") or {}
+    if version and saved.get("version") == version and cached:
+        _log(f"pohon dari cache (commit {version[:10]} tak berubah)")
+        return {p: {"size": v[0], "sha": v[1]} for p, v in cached.items()}, version
 
     for cat in CATEGORIES:
         url = f"{GH_API}/git/trees/{BRANCH}:assets/spine/{cat}?recursive=1"
@@ -243,12 +304,18 @@ def main():
     if not (a.check or a.apply):
         a.check = True
 
-    blobs, version = fetch_tree()
+    saved = load_state()
+    blobs, version = fetch_tree(saved)
     ref = build_ref(blobs)
     new = plan(blobs, ref)
     if a.limit:
         new = new[: a.limit]
     installed = len(local_stems())
+    try:
+        prev_files = int(saved.get("fileCount") or 0)
+    except Exception:  # noqa: BLE001
+        prev_files = 0
+    changed = version != saved.get("version") or len(blobs) != prev_files
 
     _log(f"repo: {len(blobs)} berkas, {version[:10] or '?'}")
     _log(f"kamus referensi: {len(ref)} id | terpasang: {installed} skel")
@@ -259,6 +326,9 @@ def main():
     result = {
         "ok": True,
         "version": version[:12] or None,
+        "previous": saved.get("version", "")[:12] or None,
+        "changed": changed,
+        "fileCount": len(blobs),
         "total": len(ref),
         "installed": installed,
         "new": len(new),
@@ -266,6 +336,15 @@ def main():
     }
 
     if a.check or not new:
+        # Simpan baseline (version + jumlah berkas) walau tak ada yang diunduh,
+        # supaya `changed` pada --check berikutnya jadi false dan titik merah
+        # tak menyala terus setelah model benar-benar sudah terpasang.
+        if version:
+            st = load_state()
+            st.update({"version": version, "fileCount": len(blobs),
+                       "checkedAt": int(time.time()),
+                       "tree": {p: [b["size"], b["sha"]] for p, b in blobs.items()}})
+            save_state(st)
         print(json.dumps(result, ensure_ascii=False, indent=1))
         return 0
 
@@ -329,8 +408,16 @@ def main():
         "new_models": [m["stem"] for m in new],
     })
     os.makedirs(STATE_DIR, exist_ok=True)
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump({"version": version, "appliedAt": int(time.time()), "added": added}, f)
+    new_ids = [os.path.relpath(m["dest"], ASSETS).replace(os.sep, "/")
+               for m in new if any(p.endswith(".skel") and p in fetched for p in m["files"])]
+    save_state({
+        "version": version,
+        "fileCount": len(blobs),
+        "appliedAt": int(time.time()),
+        "added": added,
+        "new_ids": new_ids,
+        "new_models": [m["stem"] for m in new],
+    })
 
     _log(f"=== selesai: +{added} model, lewat={skipped}, berkas gagal={len(failed)}")
     print(json.dumps(result, ensure_ascii=False, indent=1))
