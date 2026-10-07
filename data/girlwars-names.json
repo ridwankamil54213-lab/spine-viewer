@@ -1,0 +1,697 @@
+{
+ "1001": {
+  "costume": "SR",
+  "display": "Tsurihime SR",
+  "name": "Tsurihime"
+ },
+ "1002": {
+  "costume": "SR",
+  "display": "Chacha SR",
+  "name": "Chacha"
+ },
+ "1003": {
+  "costume": "SR",
+  "display": "Lancelot SR",
+  "name": "Lancelot"
+ },
+ "1004": {
+  "costume": "SR",
+  "display": "Mori Ranmaru SR",
+  "name": "Mori Ranmaru"
+ },
+ "1005": {
+  "costume": "SR",
+  "display": "Nene SR",
+  "name": "Nene"
+ },
+ "1006": {
+  "costume": "SR",
+  "display": "Maeda Toshiie SR",
+  "name": "Maeda Toshiie"
+ },
+ "1007": {
+  "costume": "SR",
+  "display": "Maeda Keiji SR",
+  "name": "Maeda Keiji"
+ },
+ "1008": {
+  "costume": "SR",
+  "display": "Augustus SR",
+  "name": "Augustus"
+ },
+ "1009": {
+  "costume": "SR",
+  "display": "Sarutobi Sasuke SR",
+  "name": "Sarutobi Sasuke"
+ },
+ "1010": {
+  "costume": "SR",
+  "display": "Shamiram SR",
+  "name": "Shamiram"
+ },
+ "1011": {
+  "costume": "SR",
+  "display": "Imagawa Yoshimoto SR",
+  "name": "Imagawa Yoshimoto"
+ },
+ "1012": {
+  "costume": "SSR",
+  "display": "Sanada Yukimura SSR",
+  "name": "Sanada Yukimura"
+ },
+ "1013": {
+  "costume": "SR",
+  "display": "Honda Komatsu SR",
+  "name": "Honda Komatsu"
+ },
+ "1014": {
+  "costume": "SR",
+  "display": "Naoe Kanetsugu SR",
+  "name": "Naoe Kanetsugu"
+ },
+ "1015": {
+  "costume": "SSR",
+  "display": "Yekaterina SSR",
+  "name": "Yekaterina"
+ },
+ "1016": {
+  "costume": "SSR",
+  "display": "Oda Nobunaga SSR",
+  "name": "Oda Nobunaga"
+ },
+ "1017": {
+  "costume": "SSR",
+  "display": "Napoleon SSR",
+  "name": "Napoleon"
+ },
+ "1018": {
+  "costume": "SSR",
+  "display": "Mori Motonari SSR",
+  "name": "Mori Motonari"
+ },
+ "1019": {
+  "costume": "SSR",
+  "display": "Akechi Mitsuhide SSR",
+  "name": "Akechi Mitsuhide"
+ },
+ "1020": {
+  "costume": "SSR",
+  "display": "Honda Tadakatsu SSR",
+  "name": "Honda Tadakatsu"
+ },
+ "1021": {
+  "costume": "SSR",
+  "display": "Takeda Shingen SSR",
+  "name": "Takeda Shingen"
+ },
+ "1022": {
+  "costume": "SSR",
+  "display": "Uesugi Kenshin SSR",
+  "name": "Uesugi Kenshin"
+ },
+ "1023": {
+  "costume": "SSR",
+  "display": "Tokugawa Ieyasu SSR",
+  "name": "Tokugawa Ieyasu"
+ },
+ "1024": {
+  "costume": "SSR",
+  "display": "Minamoto no Yoshitsune SSR",
+  "name": "Minamoto no Yoshitsune"
+ },
+ "1025": {
+  "costume": "SSR",
+  "display": "Date Masamune SSR",
+  "name": "Date Masamune"
+ },
+ "1026": {
+  "costume": "SSR",
+  "display": "Tachibana Ginchiyo SSR",
+  "name": "Tachibana Ginchiyo"
+ },
+ "1027": {
+  "costume": "SSR",
+  "display": "Tachibana Dosetsu SSR",
+  "name": "Tachibana Dosetsu"
+ },
+ "1028": {
+  "costume": "SSR",
+  "display": "Musashibo Benkei SSR",
+  "name": "Musashibo Benkei"
+ },
+ "1029": {
+  "costume": "SSR",
+  "display": "Saito Kichou SSR",
+  "name": "Saito Kichou"
+ },
+ "1030": {
+  "costume": "SSR",
+  "display": "Taira no Kiyomori SSR",
+  "name": "Taira no Kiyomori"
+ },
+ "1031": {
+  "costume": "SSR",
+  "display": "Hattori Hanzo SSR",
+  "name": "Hattori Hanzo"
+ },
+ "1032": {
+  "costume": "SSR",
+  "display": "King Arthur SSR",
+  "name": "King Arthur"
+ },
+ "1033": {
+  "costume": "SSR",
+  "display": "Elizabeth SSR",
+  "name": "Elizabeth"
+ },
+ "1034": {
+  "costume": "SSR",
+  "display": "Bismarck SSR",
+  "name": "Bismarck"
+ },
+ "1035": {
+  "costume": "SSR",
+  "display": "Zhou Yu SSR",
+  "name": "Zhou Yu"
+ },
+ "1036": {
+  "costume": "SSR",
+  "display": "Friedrich SSR",
+  "name": "Friedrich"
+ },
+ "1037": {
+  "costume": "SSR",
+  "display": "Zhuge Kongming SSR",
+  "name": "Zhuge Kongming"
+ },
+ "1038": {
+  "costume": "SSR",
+  "display": "Mordred SSR",
+  "name": "Mordred"
+ },
+ "1039": {
+  "costume": "SSR",
+  "display": "Merlin SSR",
+  "name": "Merlin"
+ },
+ "1040": {
+  "costume": "SSR",
+  "display": "Cleopatra SSR",
+  "name": "Cleopatra"
+ },
+ "1041": {
+  "costume": "SSR",
+  "display": "Zhao Zilong SSR",
+  "name": "Zhao Zilong"
+ },
+ "1042": {
+  "costume": "SSR",
+  "display": "Siegfried SSR",
+  "name": "Siegfried"
+ },
+ "1043": {
+  "costume": "SSR",
+  "display": "Constantine SSR",
+  "name": "Constantine"
+ },
+ "1044": {
+  "costume": "SSR",
+  "display": "Caesar SSR",
+  "name": "Caesar"
+ },
+ "1045": {
+  "costume": "SSR",
+  "display": "Kobayakawa Hideaki SSR",
+  "name": "Kobayakawa Hideaki"
+ },
+ "1046": {
+  "costume": "SSR",
+  "display": "Leonidas I SSR",
+  "name": "Leonidas I"
+ },
+ "1047": {
+  "costume": "SSR",
+  "display": "Ishida Mitsunari SSR",
+  "name": "Ishida Mitsunari"
+ },
+ "1048": {
+  "costume": "SSR",
+  "display": "Okita Soji SSR",
+  "name": "Okita Soji"
+ },
+ "1049": {
+  "costume": "SSR",
+  "display": "Christain SSR",
+  "name": "Christain"
+ },
+ "1050": {
+  "costume": "SSR",
+  "display": "Sakamoto Ryoma SSR",
+  "name": "Sakamoto Ryoma"
+ },
+ "1051": {
+  "costume": "SSR",
+  "display": "Takenaka Hanbei SSR",
+  "name": "Takenaka Hanbei"
+ },
+ "1052": {
+  "costume": "SSR",
+  "display": "Ghengis Khan SSR",
+  "name": "Ghengis Khan"
+ },
+ "1053": {
+  "costume": "SSR",
+  "display": "Toyotomi Hideyoshi SSR",
+  "name": "Toyotomi Hideyoshi"
+ },
+ "1054": {
+  "costume": "SSR",
+  "display": "Guan Yu SSR",
+  "name": "Guan Yu"
+ },
+ "1055": {
+  "costume": "SSR",
+  "display": "Miyamoto Musashi SSR",
+  "name": "Miyamoto Musashi"
+ },
+ "1056": {
+  "costume": "SSR",
+  "display": "Sasaki Kojiro SSR",
+  "name": "Sasaki Kojiro"
+ },
+ "1057": {
+  "costume": "SSR",
+  "display": "Diaochan SSR",
+  "name": "Diaochan"
+ },
+ "1058": {
+  "costume": "SSR",
+  "display": "Lv Bu SSR",
+  "name": "Lv Bu"
+ },
+ "1059": {
+  "costume": "SSR",
+  "display": "Tachibana Muneshige SSR",
+  "name": "Tachibana Muneshige"
+ },
+ "1060": {
+  "costume": "SSR",
+  "display": "Cao Cao SSR",
+  "name": "Cao Cao"
+ },
+ "1061": {
+  "costume": "SSR",
+  "display": "Alexander SSR",
+  "name": "Alexander"
+ },
+ "1062": {
+  "costume": "SSR",
+  "display": "Beowulf SSR",
+  "name": "Beowulf"
+ },
+ "1063": {
+  "costume": "SSR",
+  "display": "Shizuka Gozen SSR",
+  "name": "Shizuka Gozen"
+ },
+ "1064": {
+  "costume": "SSR",
+  "display": "Frankenstein SSR",
+  "name": "Frankenstein"
+ },
+ "1065": {
+  "costume": "SSR",
+  "display": "Ying Zheng SSR",
+  "name": "Ying Zheng"
+ },
+ "1066": {
+  "costume": "SSR",
+  "display": "Zhang Fei SSR",
+  "name": "Zhang Fei"
+ },
+ "1067": {
+  "costume": "SSR",
+  "display": "Joan of Arc SSR",
+  "name": "Joan of Arc"
+ },
+ "1068": {
+  "costume": "SSR",
+  "display": "Medea SSR",
+  "name": "Medea"
+ },
+ "1098": {
+  "costume": "SSR",
+  "display": "Yatogami Tohka SSR",
+  "name": "Yatogami Tohka"
+ },
+ "1099": {
+  "costume": "SSR",
+  "display": "Tokisaki Kurumi SSR",
+  "name": "Tokisaki Kurumi"
+ },
+ "21012": {
+  "costume": "UR",
+  "display": "Sanada Yukimura UR",
+  "name": "Sanada Yukimura"
+ },
+ "21015": {
+  "costume": "UR",
+  "display": "Yekaterina UR",
+  "name": "Yekaterina"
+ },
+ "21025": {
+  "costume": "UR",
+  "display": "Date Masamune UR",
+  "name": "Date Masamune"
+ },
+ "21029": {
+  "costume": "UR",
+  "display": "Saito Kichou UR",
+  "name": "Saito Kichou"
+ },
+ "21039": {
+  "costume": "UR",
+  "display": "Merlin UR",
+  "name": "Merlin"
+ },
+ "21041": {
+  "costume": "UR",
+  "display": "Zhao Zilong UR",
+  "name": "Zhao Zilong"
+ },
+ "21043": {
+  "costume": "UR",
+  "display": "Constantine UR",
+  "name": "Constantine"
+ },
+ "21044": {
+  "costume": "UR",
+  "display": "Caesar UR",
+  "name": "Caesar"
+ },
+ "21048": {
+  "costume": "UR",
+  "display": "Okita Soji UR",
+  "name": "Okita Soji"
+ },
+ "21049": {
+  "costume": "UR",
+  "display": "Christain UR",
+  "name": "Christain"
+ },
+ "21058": {
+  "costume": "UR",
+  "display": "Lv Bu UR",
+  "name": "Lv Bu"
+ },
+ "21070": {
+  "costume": "UR",
+  "display": "Charlemagne UR",
+  "name": "Charlemagne"
+ },
+ "21072": {
+  "costume": "UR",
+  "display": "Chosokabe Motochika UR",
+  "name": "Chosokabe Motochika"
+ },
+ "21073": {
+  "costume": "UR",
+  "display": "Abe no Seimei UR",
+  "name": "Abe no Seimei"
+ },
+ "21074": {
+  "costume": "UR",
+  "display": "Attila UR",
+  "name": "Attila"
+ },
+ "21075": {
+  "costume": "UR",
+  "display": "Yuki Onna UR",
+  "name": "Yuki Onna"
+ },
+ "21076": {
+  "costume": "UR",
+  "display": "Brynhildr UR",
+  "name": "Brynhildr"
+ },
+ "21077": {
+  "costume": "UR",
+  "display": "Solomon UR",
+  "name": "Solomon"
+ },
+ "21078": {
+  "costume": "UR",
+  "display": "Tomoe Gozen UR",
+  "name": "Tomoe Gozen"
+ },
+ "21079": {
+  "costume": "UR",
+  "display": "Gawain UR",
+  "name": "Gawain"
+ },
+ "21080": {
+  "costume": "UR",
+  "display": "Ma Chao UR",
+  "name": "Ma Chao"
+ },
+ "21081": {
+  "costume": "UR",
+  "display": "Astolfo UR",
+  "name": "Astolfo"
+ },
+ "21082": {
+  "costume": "UR",
+  "display": "Liu Bei UR",
+  "name": "Liu Bei"
+ },
+ "21083": {
+  "costume": "UR",
+  "display": "Cu Chulainn UR",
+  "name": "Cu Chulainn"
+ },
+ "21084": {
+  "costume": "UR",
+  "display": "Himiko UR",
+  "name": "Himiko"
+ },
+ "21085": {
+  "costume": "UR",
+  "display": "Heracles UR",
+  "name": "Heracles"
+ },
+ "21086": {
+  "costume": "UR",
+  "display": "Mephisto UR",
+  "name": "Mephisto"
+ },
+ "21087": {
+  "costume": "UR",
+  "display": "Nero Claudius UR",
+  "name": "Nero Claudius"
+ },
+ "21088": {
+  "costume": "UR",
+  "display": "Gilgamesh UR",
+  "name": "Gilgamesh"
+ },
+ "21089": {
+  "costume": "UR",
+  "display": "Sakata Kintoki UR",
+  "name": "Sakata Kintoki"
+ },
+ "21090": {
+  "costume": "UR",
+  "display": "Huang Zhong UR",
+  "name": "Huang Zhong"
+ },
+ "21101": {
+  "costume": "UR",
+  "display": "Achilles UR",
+  "name": "Achilles"
+ },
+ "21104": {
+  "costume": "UR",
+  "display": "Li Bai UR",
+  "name": "Li Bai"
+ },
+ "31012": {
+  "costume": "UR EX",
+  "display": "Sanada Yukimura UR EX",
+  "name": "Sanada Yukimura"
+ },
+ "31015": {
+  "costume": "UR EX",
+  "display": "Yekaterina UR EX",
+  "name": "Yekaterina"
+ },
+ "31025": {
+  "costume": "UR EX",
+  "display": "Date Masamune UR EX",
+  "name": "Date Masamune"
+ },
+ "31041": {
+  "costume": "UR EX",
+  "display": "Zhao Zilong UR EX",
+  "name": "Zhao Zilong"
+ },
+ "31044": {
+  "costume": "UR EX",
+  "display": "Caesar UR EX",
+  "name": "Caesar"
+ },
+ "31070": {
+  "costume": "UR EX",
+  "display": "Charlemagne UR EX",
+  "name": "Charlemagne"
+ },
+ "31072": {
+  "costume": "UR EX",
+  "display": "Chosokabe Motochika UR EX",
+  "name": "Chosokabe Motochika"
+ },
+ "31073": {
+  "costume": "UR EX",
+  "display": "Abe no Seimei UR EX",
+  "name": "Abe no Seimei"
+ },
+ "31077": {
+  "costume": "UR EX",
+  "display": "Solomon UR EX",
+  "name": "Solomon"
+ },
+ "31079": {
+  "costume": "UR EX",
+  "display": "Gawain UR EX",
+  "name": "Gawain"
+ },
+ "31103": {
+  "costume": "UR EX",
+  "display": "Tamamo no Mae UR EX",
+  "name": "Tamamo no Mae"
+ },
+ "31105": {
+  "costume": "UR EX",
+  "display": "Kamiizumi Nobutsuna UR EX",
+  "name": "Kamiizumi Nobutsuna"
+ },
+ "31106": {
+  "costume": "UR EX",
+  "display": "Perseus UR EX",
+  "name": "Perseus"
+ },
+ "31107": {
+  "costume": "UR EX",
+  "display": "Dante UR EX",
+  "name": "Dante"
+ },
+ "31108": {
+  "costume": "UR EX",
+  "display": "Leonardo da Vinci UR EX",
+  "name": "Leonardo da Vinci"
+ },
+ "31109": {
+  "costume": "UR EX",
+  "display": "Orion UR EX",
+  "name": "Orion"
+ },
+ "31110": {
+  "costume": "UR EX",
+  "display": "Yao Bikuni UR EX",
+  "name": "Yao Bikuni"
+ },
+ "31111": {
+  "costume": "UR EX",
+  "display": "Xiang Yu UR EX",
+  "name": "Xiang Yu"
+ },
+ "31112": {
+  "costume": "UR EX",
+  "display": "Ashiya Doman UR EX",
+  "name": "Ashiya Doman"
+ },
+ "31113": {
+  "costume": "UR EX",
+  "display": "Romulus UR EX",
+  "name": "Romulus"
+ },
+ "31114": {
+  "costume": "UR EX",
+  "display": "Scathach UR EX",
+  "name": "Scathach"
+ },
+ "31115": {
+  "costume": "UR EX",
+  "display": "Minamoto no Yorimitsu UR EX",
+  "name": "Minamoto no Yorimitsu"
+ },
+ "31116": {
+  "costume": "UR EX",
+  "display": "Odysseus UR EX",
+  "name": "Odysseus"
+ },
+ "31117": {
+  "costume": "UR EX",
+  "display": "Sanzang UR EX",
+  "name": "Sanzang"
+ },
+ "31118": {
+  "costume": "UR EX",
+  "display": "Tsukahara Bokuden UR EX",
+  "name": "Tsukahara Bokuden"
+ },
+ "31119": {
+  "costume": "UR EX",
+  "display": "Morgan UR EX",
+  "name": "Morgan"
+ },
+ "31120": {
+  "costume": "UR EX",
+  "display": "Hannibal Barca UR EX",
+  "name": "Hannibal Barca"
+ },
+ "31121": {
+  "costume": "UR EX",
+  "display": "Oberon UR EX",
+  "name": "Oberon"
+ },
+ "31122": {
+  "costume": "UR EX",
+  "display": "Yagyu Jubei UR EX",
+  "name": "Yagyu Jubei"
+ },
+ "31123": {
+  "costume": "UR EX",
+  "display": "Liu Bang UR EX",
+  "name": "Liu Bang"
+ },
+ "31124": {
+  "costume": "UR EX",
+  "display": "Richard UR EX",
+  "name": "Richard"
+ },
+ "31125": {
+  "costume": "UR EX",
+  "display": "Yamato Takeru UR EX",
+  "name": "Yamato Takeru"
+ },
+ "31126": {
+  "costume": "UR EX",
+  "display": "Kashin Koji UR EX",
+  "name": "Kashin Koji"
+ },
+ "31127": {
+  "costume": "UR EX",
+  "display": "Dong Zhuo UR EX",
+  "name": "Dong Zhuo"
+ },
+ "31128": {
+  "costume": "UR EX",
+  "display": "Ozymandias UR EX",
+  "name": "Ozymandias"
+ },
+ "91001": {
+  "costume": "UR EX",
+  "display": "Richard UR EX",
+  "name": "Richard"
+ }
+}

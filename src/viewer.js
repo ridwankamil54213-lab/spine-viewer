@@ -3337,6 +3337,7 @@ const UPDATABLE = {
 	bd2: "/api/update/bd2",
 	azurlane: "/api/update/azurlane",
 	ivntight: "/api/update/ivntight",
+	girlwars: "/api/update/girlwars",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */

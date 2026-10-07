@@ -230,6 +230,8 @@ const GAME_ROOTS = [
 	// model gets absorbed into the main Azur Lane bucket.
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
+	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
+	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
 	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
 	// 蜜桃乌托邦 (Peach Utopia). Atlases carry no `pma:` line and the textures
@@ -1870,6 +1872,31 @@ function attachCharacters(models) {
 		if (ivnHits) console.log(`  ivntight  : ${ivnHits} model diberi nama Jepang`);
 	}
 
+	// --- Girl Wars (少女ウォーズ): nama karakter + kostum -------------------
+	// Folder = id numerik; nama asli disimpan di data/girlwars-names.json
+	// hasil tools/update-girlwars.py. Berlaku utk Spine (girlwars/) maupun
+	// Live2D (girlwars-l2d/), id-nya sama.
+	{
+		const gw = (() => {
+			try {
+				return JSON.parse(fs.readFileSync(path.join(DATA, "girlwars-names.json"), "utf8"));
+			} catch {
+				return {};
+			}
+		})();
+		let gwHits = 0;
+		for (const m of models) {
+			if (m.game !== "girlwars" && m.game !== "girlwars-l2d") continue;
+			const leaf = m.id.split("/")[1].split("#")[0];
+			const rec = gw[leaf];
+			if (!rec) continue;
+			m.character = { name: rec.name || leaf, skin: rec.costume || null, source: "gw-l2d-viewer" };
+			m.name = rec.display || rec.name || leaf;
+			gwHits++;
+		}
+		if (gwHits) console.log(`  girl wars : ${gwHits} model diberi nama karakter`);
+	}
+
 	// --- Brown Dust 2: character + costume names ------------------------
 	// Keyed by asset name (char000101). Cutscene models reuse the same key
 	// with a "cutscene_" prefix, which the data file also indexes.
@@ -2140,6 +2167,10 @@ const UPDATERS = {
 	},
 	ivntight: {
 		script: path.join(ROOT, "tools", "update-ivntight.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	girlwars: {
+		script: path.join(ROOT, "tools", "update-girlwars.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 };
