@@ -230,6 +230,7 @@ const GAME_ROOTS = [
 	// model gets absorbed into the main Azur Lane bucket.
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
+	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
 	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
 	// 蜜桃乌托邦 (Peach Utopia). Atlases carry no `pma:` line and the textures
 	// are straight-alpha, BUT their fully-transparent texels still hold stale
@@ -1845,6 +1846,30 @@ function attachCharacters(models) {
 
 	if (azHits) console.log(`  azur lane : ${azHits} model diberi nama kapal`);
 
+	// --- イヴンタイト (IV-N-Tight): nama asli Jepang ------------------------
+	// Folder sengaja dibuat ASCII (mis. "1004_78c6e6") karena id model di-slug
+	// server (CJK -> "-"); nama tampilan aslinya disimpan di
+	// data/ivntight-names.json hasil tools/update-ivntight.py.
+	{
+		const ivn = (() => {
+			try {
+				return JSON.parse(fs.readFileSync(path.join(DATA, "ivntight-names.json"), "utf8"));
+			} catch {
+				return {};
+			}
+		})();
+		let ivnHits = 0;
+		for (const m of models) {
+			if ((m.game || "") !== "ivntight") continue;
+			const leaf = m.id.split("/").pop().split("#")[0];
+			const rec = ivn[leaf];
+			if (!rec) continue;
+			m.name = rec;
+			ivnHits++;
+		}
+		if (ivnHits) console.log(`  ivntight  : ${ivnHits} model diberi nama Jepang`);
+	}
+
 	// --- Brown Dust 2: character + costume names ------------------------
 	// Keyed by asset name (char000101). Cutscene models reuse the same key
 	// with a "cutscene_" prefix, which the data file also indexes.
@@ -2111,6 +2136,10 @@ const UPDATERS = {
 	},
 	azurlane: {
 		script: path.join(ROOT, "tools", "update-azurlane.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	ivntight: {
+		script: path.join(ROOT, "tools", "update-ivntight.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 };

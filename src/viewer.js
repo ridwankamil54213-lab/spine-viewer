@@ -3336,6 +3336,7 @@ const UPDATABLE = {
 	catshinobi: "/api/update/catshinobi",
 	bd2: "/api/update/bd2",
 	azurlane: "/api/update/azurlane",
+	ivntight: "/api/update/ivntight",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -3683,7 +3684,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.
