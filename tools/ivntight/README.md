@@ -44,10 +44,19 @@ keys → a `CharacterBattleSpine_<id>.prefab` whose DependencyKey points at an
 # extract the 6 models that ship inside the build (data.unity3d):
 /srv/venv-spine/bin/python tools/extract-ivntight.py --bundle /opt/ivntight/extract/data.unity3d
 
-# updater: pulls every Spine bundle from the addressables CDN
+# updater: downloads ALL bundles (Test2+Test3) and finds Spine by CONTENT
 /srv/venv-spine/bin/python tools/update-ivntight.py --check   # ~0.4 s, JSON
-/srv/venv-spine/bin/python tools/update-ivntight.py --apply    # download + extract
+/srv/venv-spine/bin/python tools/update-ivntight.py --apply    # download + scan + extract
 ```
+
+`--apply` downloads **every** bundle (~3.8 GB across Test2+Test3), then scans
+each UnityFS bundle for a Spine JSON TextAsset. Filtering by catalog name is
+NOT enough: the catalog stores no bundle sizes, and some Spine bundles have
+random-hash names with no "spine" anywhere (e.g. the `chiika`/`Clarity`/
+`Ep_boss*` models). Found: 136 unique Spine bundles → 84 models (the other
+Test3 bundles are duplicate copies of the same character data). The bundles are
+cached under `/srv/spine-assets/ivntight-update/bundles-all/` so re-runs are
+instant (scan-only, ~3 min).
 
 `--check` reports `{version, previous, changed, total, installed, new}`
 (catalog sha1 = version). `--apply` downloads each Spine bundle to
