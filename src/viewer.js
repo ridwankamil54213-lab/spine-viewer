@@ -3334,6 +3334,7 @@ const UPDATABLE = {
 	"mitao-utopia": "/api/update/mitao-utopia",
 	crosscore: "/api/update/crosscore",
 	catshinobi: "/api/update/catshinobi",
+	browndust: "/api/update/browndust",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -3674,13 +3675,18 @@ async function applyUpdate() {
 			const res = st.result || {};
 			updatePending = false;
 			setUpdateDot(false);
-			// Tandai model hasil unduhan supaya diberi badge NEW.
-			const added = res.new_models || [];
+			// Tandai model hasil unduhan supaya diberi badge NEW. Sebagian
+			// pembaru (mis. Brown Dust 2) menaruh model di beberapa root
+			// (bd2/ dan bd2-char/), jadi mereka mengirim id LENGKAP-nya
+			// (`new_ids`); sisanya cukup stem dan prefix ditebak dari game.
+			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", browndust: "bd2" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
-				markNew(added.map((n) => `${prefix}/${n}`));
+				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
+				// jadi jangan ditambahi prefix lagi.
+				markNew(res.new_ids ? added : added.map((n) => `${prefix}/${n}`));
 			}
 			// Muat ulang daftar model otomatis supaya yang baru langsung muncul
 			// (badge NEW + urutan teratas) tanpa perlu refresh manual.
