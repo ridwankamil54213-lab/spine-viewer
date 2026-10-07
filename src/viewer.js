@@ -30,7 +30,7 @@ import {
 	detectSpineVersion,
 	pickRuntime,
 } from "./spine-version.js";
-import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion } from "./live2d.js";
+import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion, setLive2DExpression, live2DExpressions } from "./live2d.js";
 import { normalizeSpine2Json } from "./spine2-normalize.js";
 import {
 	loadSpine21Model,
@@ -1135,6 +1135,7 @@ async function loadLive2DModel(model) {
 		mocFile,
 		textureFiles,
 		motionFiles: model.motionFiles || [],
+		expressionFiles: model.expressions || [],
 	});
 
 	// Drop any previous model before putting this one on the stage.
@@ -1165,8 +1166,11 @@ async function loadLive2DModel(model) {
 	duration = 0;
 	el.timeDur.textContent = "0.00s";
 
-	// No Spine skins or slots to inspect.
-	fillSelect(el.skinSelect, [], null);
+	// Cubism has no Spine skins — what the Skin dropdown should offer is the
+	// expression set. `(diam)` resets to the neutral expression.
+	const exprs = live2DExpressions(live2d, model.expressions);
+	const skinList = exprs.length ? ["(diam)", ...exprs] : [];
+	fillSelect(el.skinSelect, skinList, skinList[0] || null);
 	if (insp.open) {
 		renderSkinOptions();
 		renderSlots();
@@ -3942,7 +3946,23 @@ el.animSelect.addEventListener("change", () => {
 	setAnimation(el.animSelect.value, true);
 	renderTimeline();
 });
-el.skinSelect.addEventListener("change", () => setSkin(el.skinSelect.value));
+el.skinSelect.addEventListener("change", () => {
+	// Live2D Cubism has no Spine skins; the dropdown drives expressions.
+	if (isLive2D(current)) {
+		const v = el.skinSelect.value;
+		// "(diam)" is the placeholder for the default/neutral expression.
+		if (v && v !== "(diam)") setLive2DExpression(spine, v);
+		else if (spine?.internalModel?.motionManager?.expressionManager) {
+			try {
+				spine.internalModel.motionManager.expressionManager.resetExpression();
+			} catch {
+				/* no expressions loaded */
+			}
+		}
+		return;
+	}
+	setSkin(el.skinSelect.value);
+});
 el.variantSelect.addEventListener("change", () => {
 	const opt = el.variantSelect.selectedOptions[0];
 	switchVariant(opt?.dataset?.id);

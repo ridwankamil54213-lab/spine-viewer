@@ -78,7 +78,7 @@ function orderTextures(coreModel, textureUrls) {
  * Load a Cubism model from a folder.
  * Resolves to { model, dispose }.
  */
-export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, onProgress }) {
+export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, expressionFiles, onProgress }) {
 	const mocUrl = base + encodeURIComponent(mocFile);
 
 	// The game never ships a .model3.json, so build the settings ourselves.
@@ -93,6 +93,16 @@ export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, onP
 		Groups: [],
 		HitAreas: [],
 	};
+
+	// Register the expression set. Cubism only creates its ExpressionManager
+	// when Expressions are declared up front, so without this the Skin dropdown
+	// can never drive anything. Files sit in expressions/<name>.exp3.json.
+	if (expressionFiles && expressionFiles.length) {
+		settings.FileReferences.Expressions = expressionFiles.map((n) => ({
+			Name: n,
+			File: base + "expressions/" + encodeURIComponent(n) + ".exp3.json",
+		}));
+	}
 
 	// The shipped build has no .motion3.json either; we synthesise them from
 	// the Unity fade-assets. Registering them under Motions makes them
@@ -186,18 +196,63 @@ export function forcePartsVisible(model) {
 export function playLive2DMotion(model, name) {
 	const mm = model?.internalModel?.motionManager;
 	if (!mm || typeof mm.startMotion !== "function" || !name) return false;
-	// Motion groups are keyed by the group name used when loading; "idle" is
-	// what loadLive2D() registers everything under.
+	// Motion definitions live under one group ("idle"); each def's file is a
+	// full URL held in `File` (capital F — the Cubism MotionDef shape), with
+	// `file`/`fileName` fallbacks for other builds. Match the basename's stem
+	// so "idle" hits idle.motion3.json but NOT idle2.motion3.json.
+	const stemOf = (d) => String(d?.File || d?.file || d?.fileName || d?.name || "")
+		.split("/").pop().replace(/\.motion3\.json$/i, "");
 	const groups = mm.definitions || {};
 	for (const g of Object.keys(groups)) {
 		const list = groups[g] || [];
-		const idx = list.findIndex((d) => (d?.name || d?.fileName || "").includes(name));
+		const idx = list.findIndex((d) => stemOf(d) === name);
 		if (idx >= 0) {
-			mm.startMotion(g, idx);
-			return true;
+			try {
+				mm.startMotion(g, idx);
+				return true;
+			} catch {
+				/* fall through to any other group */
+			}
 		}
 	}
 	return false;
+}
+
+/**
+ * Apply a Cubism expression by name.
+ *
+ * Cubism models have no Spine "skins"; what users want from the Skin dropdown
+ * on these models is the expression set (exp1/exp2/…). Returns false when the
+ * model has no expressions so callers can fall back.
+ */
+export function setLive2DExpression(model, name) {
+	const em = model?.internalModel?.motionManager?.expressionManager;
+	if (!em || !name) return false;
+	try {
+		em.setExpression(name);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/** Expression names from the loaded model's settings. */
+export function live2DExpressions(model, fallback) {
+	const em = model?.internalModel?.motionManager?.expressionManager;
+	const defs = em?.definitions || em?._definitions;
+	if (Array.isArray(defs) && defs.length) {
+		return defs.map((d) => d?.Name || d?.name).filter(Boolean);
+	}
+	const list = model?.internalModel?.settings?.expressions;
+	if (Array.isArray(list) && list.length) {
+		return list.map((e) => e?.Name || e?.name).filter(Boolean);
+	}
+	// The settings are synthesised in this module, so the live lookup can miss;
+	// fall back to what the server listed for this model's folder.
+	if (Array.isArray(fallback) && fallback.length) {
+		return fallback.filter((n) => n && n !== "(diam)");
+	}
+	return [];
 }
 
 /** Cubism models have no Spine animations; expose a single idle entry. */

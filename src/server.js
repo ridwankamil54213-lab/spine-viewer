@@ -1058,6 +1058,21 @@ function scanModels() {
 			} catch {
 				motions = [];
 			}
+			// Cubism expressions, when the model ships them. Exposed through
+			// the Skin dropdown in the browser (Cubism has no Spine skins).
+			let expressions = [];
+			const edir = path.join(dir, "expressions");
+			try {
+				if (fs.statSync(edir).isDirectory()) {
+					expressions = fs
+						.readdirSync(edir)
+						.filter((f) => f.toLowerCase().endsWith(".exp3.json"))
+						.map((f) => f.replace(/\.exp3\.json$/i, ""))
+						.sort();
+				}
+			} catch {
+				expressions = [];
+			}
 			const rel = path.relative(ASSETS, dir).split(path.sep).join("/");
 			const id = rel.replace(/[^\w.\-/]+/g, "-");
 			const inner =
@@ -1087,7 +1102,10 @@ function scanModels() {
 				animations: motions.length
 					? motions.map((f) => f.split("/").pop().replace(/\.motion3\.json$/, ""))
 					: ["idle"],
-				skins: [],
+				// Cubism expressions (shown via the Skin dropdown); the browser
+				// also rebuilds this from the live model, so it is a hint.
+				expressions,
+				skins: expressions.length ? ["(diam)", ...expressions] : [],
 				spine: null,
 				runtime: "cubism4",
 				bones: null,
