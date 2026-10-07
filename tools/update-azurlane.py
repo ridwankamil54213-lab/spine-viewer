@@ -20,6 +20,7 @@ import concurrent.futures as cf
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -37,6 +38,13 @@ REPO = "ww-rm/azurlane_spinepainting"
 BRANCH = os.environ.get("AZL_BRANCH", "main")
 RAW = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/"
 INDEX_URL = RAW + "docs/index.json"
+# Sumber nama INGGRIS (resmi). Di balik Cloudflare — coba langsung dulu, lalu
+# lewat r.jina.ai yang bisa menembusnya. Hanya untuk NAMA; berkas tetap dari
+# repo ww-rm (nagami tak menghosting skeleton-nya).
+NAGAMI_URLS = (
+    "https://data.nagami.moe/spine/index.json",
+    "https://r.jina.ai/https://data.nagami.moe/spine/index.json",
+)
 UA = "spine-viewer-azurlane-updater/1.0"
 WORKERS = 8
 
@@ -65,6 +73,50 @@ def http_get(url, tries=4):
             last = e
             time.sleep(1.5 * (i + 1))
     raise RuntimeError(f"GET gagal {url}: {last}")
+
+
+def fetch_english_names():
+    """{asset: {id, shipName, skinName, displayName, type}} dari nagami.
+
+    Opsional: kalau gagal (Cloudflare), kembalikan {} dan updater tetap jalan
+    memakai nama Tionghoa dari repo. Daftar nama yang dipakai:
+      - jika skin sudah punya nama Inggris (bukan CJK) -> DIPERTAHANKAN;
+      - jika masih CJK -> ditimpa nama Inggris;
+      - skin baru -> langsung nama Inggris.
+    """
+    for url in NAGAMI_URLS:
+        try:
+            raw = http_get(url, tries=2)
+            if url.endswith(".json") and url.startswith(NAGAMI_URLS[0]):
+                data = json.loads(raw)
+            else:
+                txt = raw.decode("utf-8", "replace")
+                m = re.search(r"Markdown Content:\s*", txt)
+                body = txt[m.end():] if m else txt
+                data = json.loads(body[body.find("{"):body.rfind("}") + 1])
+            out = {}
+            for s in data.get("skins", []):
+                asset = s.get("asset")
+                ship = (s.get("shipName") or "").strip()
+                if not asset or not ship:
+                    continue
+                skin = (s.get("skinName") or "").strip()
+                out[asset] = {
+                    "id": s.get("id"),
+                    "shipName": ship,
+                    "skinName": skin or None,
+                    "displayName": f"{ship} — {skin}" if skin and skin != ship else ship,
+                    "type": s.get("type"),
+                }
+            _log(f"nama Inggris dari nagami: {len(out)} entri")
+            return out
+        except Exception as e:  # noqa: BLE001
+            _log(f"nagami gagal ({str(e)[:60]}) — pakai nama Tionghoa saja")
+    return {}
+
+
+def is_cjk(s):
+    return bool(re.search(r"[\u3400-\u9fff]", s or ""))
 
 
 def load_state():
@@ -202,8 +254,17 @@ def main():
     for f in failed[:10]:
         _log("   GAGAL " + f)
 
+    if a.apply:
+        english = fetch_english_names()
+    else:
+        english = {}
+
     added = 0
     new_names = {}
+    try:
+        names = json.load(open(NAMES, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        names = {}
     for m in new:
         folder = os.path.join(DEST, m["skin"])
         skels = 0
@@ -227,32 +288,29 @@ def main():
         if not skels:
             continue
         added += 1
-        # nama Tionghoa dari repo (hanya kalau belum ada)
-        try:
-            names = json.load(open(NAMES, encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            names = {}
-        if m["skin"] not in names:
-            disp = " — ".join(x for x in (m["shipCh"], m["skinCh"]) if x) or m["skin"]
-            new_names[m["skin"]] = {
+        # Nama: pakai nama INGGRIS (nagami) bila ada; nama CJK yang sudah
+        # tersimpan juga ditimpa. Fallback: nama Tionghoa dari repo.
+        rec = dict(english.get(m["skin"]) or {})
+        if not rec:
+            rec = {
                 "id": None,
                 "shipName": m["shipCh"] or m["ship"],
                 "skinName": m["skinCh"] or None,
-                "displayName": disp,
+                "displayName": (" — ".join(x for x in (m["shipCh"], m["skinCh"]) if x)
+                                or m["skin"]),
                 "type": "spine",
-                "source": "ww-rm/azurlane_spinepainting",
             }
+        rec["source"] = "nagami-moe" if english.get(m["skin"]) else "ww-rm/azurlane_spinepainting"
+        cur = names.get(m["skin"])
+        if m["skin"] not in names or is_cjk((cur or {}).get("displayName")):
+            new_names[m["skin"]] = rec
     if new_names:
-        try:
-            names = json.load(open(NAMES, encoding="utf-8"))
-        except Exception:  # noqa: BLE001
-            names = {}
         names.update(new_names)
         tmp = NAMES + ".part"
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(names, f, ensure_ascii=False, indent=1, sort_keys=True)
         os.replace(tmp, NAMES)
-        _log(f"nama ditambahkan: {len(new_names)}")
+        _log(f"nama ditambahkan/diperbaiki: {len(new_names)}")
 
     result.update({
         "added": added,

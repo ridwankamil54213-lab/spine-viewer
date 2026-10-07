@@ -35,11 +35,11 @@
   "type": "spine"
  },
  "aersasi": {
-  "displayName": "阿尔萨斯 — 阿尔萨斯",
-  "id": null,
-  "shipName": "阿尔萨斯",
-  "skinName": "阿尔萨斯",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Alsace",
+  "id": "805030",
+  "shipName": "Alsace",
+  "skinName": "Alsace",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "aidang_6": {
@@ -50,11 +50,11 @@
   "type": "spine"
  },
  "aierdeliqi_g": {
-  "displayName": "埃尔德里奇 — 埃尔德里奇.改",
-  "id": null,
-  "shipName": "埃尔德里奇",
-  "skinName": "埃尔德里奇.改",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Eldridge — Eldridge (Retrofit)",
+  "id": "101269",
+  "shipName": "Eldridge",
+  "skinName": "Eldridge (Retrofit)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "aifosen_2": {
@@ -65,11 +65,11 @@
   "type": "spine"
  },
  "aijier": {
-  "displayName": "埃吉尔 — 埃吉尔",
-  "id": null,
-  "shipName": "埃吉尔",
-  "skinName": "埃吉尔",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Ägir",
+  "id": "499050",
+  "shipName": "Ägir",
+  "skinName": "Ägir",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "aila_2": {
@@ -129,11 +129,11 @@
   "type": "spine"
  },
  "aisaikesi_g": {
-  "displayName": "埃塞克斯 — 埃塞克斯.改",
-  "id": null,
-  "shipName": "埃塞克斯",
-  "skinName": "埃塞克斯.改",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Essex — Essex (Retrofit)",
+  "id": "107099",
+  "shipName": "Essex",
+  "skinName": "Essex (Retrofit)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "alabama_3": {
@@ -165,19 +165,19 @@
   "type": "spine"
  },
  "baifeng": {
-  "displayName": "白凤 — 白凤",
-  "id": null,
-  "shipName": "白凤",
-  "skinName": "白凤",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Hakuhou",
+  "id": "307160",
+  "shipName": "Hakuhou",
+  "skinName": "Hakuhou",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "bailong": {
-  "displayName": "白龙 — 白龙",
-  "id": null,
-  "shipName": "白龙",
-  "skinName": "白龙",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Hakuryuu",
+  "id": "399050",
+  "shipName": "Hakuryuu",
+  "skinName": "Hakuryuu",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "balaka_2": {
@@ -216,11 +216,11 @@
   "type": "spine"
  },
  "bisimaiz": {
-  "displayName": "俾斯麦Zwei — 俾斯麦Zwei",
-  "id": null,
-  "shipName": "俾斯麦Zwei",
-  "skinName": "俾斯麦Zwei",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Bismarck Zwei",
+  "id": "405050",
+  "shipName": "Bismarck Zwei",
+  "skinName": "Bismarck Zwei",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "bisimaiz_2": {
@@ -259,19 +259,19 @@
   "type": "spine"
  },
  "buleisite": {
-  "displayName": "布雷斯特 — 布雷斯特",
-  "id": null,
-  "shipName": "布雷斯特",
-  "skinName": "布雷斯特",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Brest",
+  "id": "899030",
+  "shipName": "Brest",
+  "skinName": "Brest",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "buli_super": {
-  "displayName": "特装型布里MKIII — 特装型布里MKIII",
-  "id": null,
-  "shipName": "特装型布里MKIII",
-  "skinName": "特装型布里MKIII",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Specialized Bulin Custom MKIII",
+  "id": "100020",
+  "shipName": "Specialized Bulin Custom MKIII",
+  "skinName": "Specialized Bulin Custom MKIII",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "changmen_6": {
@@ -296,11 +296,11 @@
   "type": "spine"
  },
  "daofeng": {
-  "displayName": "岛风 — 岛风",
-  "id": null,
-  "shipName": "岛风",
-  "skinName": "岛风",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Shimakaze",
+  "id": "301290",
+  "shipName": "Shimakaze",
+  "skinName": "Shimakaze",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "dashan_2": {
@@ -311,11 +311,11 @@
   "type": "spine"
  },
  "deleike": {
-  "displayName": "德雷克 — 德雷克",
-  "id": null,
-  "shipName": "德雷克",
-  "skinName": "德雷克",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Drake",
+  "id": "299040",
+  "shipName": "Drake",
+  "skinName": "Drake",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "digaiteluyin_2": {
@@ -347,11 +347,11 @@
   "type": "spine"
  },
  "feiteliedadi": {
-  "displayName": "腓特烈大帝 — 腓特烈大帝",
-  "id": null,
-  "shipName": "腓特烈大帝",
-  "skinName": "腓特烈大帝",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Friedrich der Große",
+  "id": "499020",
+  "shipName": "Friedrich der Große",
+  "skinName": "Friedrich der Große",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "feiteliedadi_5": {
@@ -383,11 +383,11 @@
   "type": "spine"
  },
  "fulici": {
-  "displayName": "弗里茨·鲁梅 — 弗里茨·鲁梅",
-  "id": null,
-  "shipName": "弗里茨·鲁梅",
-  "skinName": "弗里茨·鲁梅",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Fritz Rumey",
+  "id": "407040",
+  "shipName": "Fritz Rumey",
+  "skinName": "Fritz Rumey",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "fulici_3": {
@@ -440,11 +440,11 @@
   "type": "spine"
  },
  "guandao": {
-  "displayName": "关岛 — 关岛",
-  "id": null,
-  "shipName": "关岛",
-  "skinName": "关岛",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Guam",
+  "id": "118020",
+  "shipName": "Guam",
+  "skinName": "Guam",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "guanghui_8": {
@@ -574,11 +574,11 @@
   "type": "spine"
  },
  "i404": {
-  "displayName": "伊404 — 伊404",
-  "id": null,
-  "shipName": "伊404",
-  "skinName": "伊404",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "I-404",
+  "id": "317020",
+  "shipName": "I-404",
+  "skinName": "I-404",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "i404_2": {
@@ -624,11 +624,11 @@
   "type": "spine"
  },
  "jinshi": {
-  "displayName": "金狮 — 金狮",
-  "id": null,
-  "shipName": "金狮",
-  "skinName": "金狮",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Gouden Leeuw",
+  "id": "1199010",
+  "shipName": "Gouden Leeuw",
+  "skinName": "Gouden Leeuw",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "jishang_3": {
@@ -667,11 +667,11 @@
   "type": "spine"
  },
  "kalangshitade": {
-  "displayName": "喀琅施塔得 — 喀琅施塔得",
-  "id": null,
-  "shipName": "喀琅施塔得",
-  "skinName": "喀琅施塔得",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Kronshtadt",
+  "id": "718010",
+  "shipName": "Kronshtadt",
+  "skinName": "Kronshtadt",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "kalangshitade_3": {
@@ -717,11 +717,11 @@
   "type": "spine"
  },
  "lafeier": {
-  "displayName": "拉斐尔 — 拉斐尔",
-  "id": null,
-  "shipName": "拉斐尔",
-  "skinName": "拉斐尔",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Raffaello",
+  "id": "605080",
+  "shipName": "Raffaello",
+  "skinName": "Raffaello",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "lafeier_3": {
@@ -732,11 +732,11 @@
   "type": "spine"
  },
  "lafeiii": {
-  "displayName": "拉菲II — 拉菲II",
-  "id": null,
-  "shipName": "拉菲II",
-  "skinName": "拉菲II",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Laffey II",
+  "id": "101510",
+  "shipName": "Laffey II",
+  "skinName": "Laffey II",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "lafeiii_4": {
@@ -845,11 +845,11 @@
   "type": "spine"
  },
  "meikelunbao": {
-  "displayName": "梅克伦堡 — 梅克伦堡",
-  "id": null,
-  "shipName": "梅克伦堡",
-  "skinName": "梅克伦堡",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Mecklenburg",
+  "id": "499100",
+  "shipName": "Mecklenburg",
+  "skinName": "Mecklenburg",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "moermansike_3": {
@@ -860,11 +860,11 @@
   "type": "spine"
  },
  "mojiaduoer": {
-  "displayName": "莫加多尔 — 莫加多尔",
-  "id": null,
-  "shipName": "莫加多尔",
-  "skinName": "莫加多尔",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Mogador",
+  "id": "901070",
+  "shipName": "Mogador",
+  "skinName": "Mogador",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "mojiaduoer_5": {
@@ -903,19 +903,19 @@
   "type": "spine"
  },
  "nabulesi": {
-  "displayName": "那不勒斯 — 那不勒斯",
-  "id": null,
-  "shipName": "那不勒斯",
-  "skinName": "那不勒斯",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Napoli",
+  "id": "699020",
+  "shipName": "Napoli",
+  "skinName": "Napoli",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "naximofu": {
-  "displayName": "纳希莫夫海军上将 — 纳希莫夫海军上将",
-  "id": null,
-  "shipName": "纳希莫夫海军上将",
-  "skinName": "纳希莫夫海军上将",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Admiral Nakhimov",
+  "id": "799020",
+  "shipName": "Admiral Nakhimov",
+  "skinName": "Admiral Nakhimov",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "naximofu_4": {
@@ -968,11 +968,11 @@
   "type": "spine"
  },
  "pulimaosi": {
-  "displayName": "普利茅斯 — 普利茅斯",
-  "id": null,
-  "shipName": "普利茅斯",
-  "skinName": "普利茅斯",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Plymouth",
+  "id": "299050",
+  "shipName": "Plymouth",
+  "skinName": "Plymouth",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "qiannai_2_doa": {
@@ -983,19 +983,19 @@
   "type": "spine"
  },
  "qianwei": {
-  "displayName": "前卫 — 前卫",
-  "id": null,
-  "shipName": "前卫",
-  "skinName": "前卫",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Vanguard",
+  "id": "205130",
+  "shipName": "Vanguard",
+  "skinName": "Vanguard",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "qiershazhi": {
-  "displayName": "奇尔沙治 — 奇尔沙治",
-  "id": null,
-  "shipName": "奇尔沙治",
-  "skinName": "奇尔沙治",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Kearsarge",
+  "id": "199040",
+  "shipName": "Kearsarge",
+  "skinName": "Kearsarge",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "qiershazhi_3": {
@@ -1013,19 +1013,19 @@
   "type": "spine"
  },
  "shengdiyage_g": {
-  "displayName": "圣地亚哥 — 圣地亚哥.改",
-  "id": null,
-  "shipName": "圣地亚哥",
-  "skinName": "圣地亚哥.改",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "San Diego — San Diego (Retrofit)",
+  "id": "102089",
+  "shipName": "San Diego",
+  "skinName": "San Diego (Retrofit)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "shi": {
-  "displayName": "狮 — 狮",
-  "id": null,
-  "shipName": "狮",
-  "skinName": "狮",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Lion",
+  "id": "205160",
+  "shipName": "Lion",
+  "skinName": "Lion",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "shixiang_2": {
@@ -1071,11 +1071,11 @@
   "type": "spine"
  },
  "suweiaitongmengnew": {
-  "displayName": "苏维埃同盟 — 苏维埃同盟",
-  "id": null,
-  "shipName": "苏维埃同盟",
-  "skinName": "苏维埃同盟",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Sovetsky Soyuz",
+  "id": "705020",
+  "shipName": "Sovetsky Soyuz",
+  "skinName": "Sovetsky Soyuz",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "talin_4": {
@@ -1100,11 +1100,11 @@
   "type": "spine"
  },
  "telafaerjia": {
-  "displayName": "特拉法尔加 — 特拉法尔加",
-  "id": null,
-  "shipName": "特拉法尔加",
-  "skinName": "特拉法尔加",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Trafalgar",
+  "id": "201380",
+  "shipName": "Trafalgar",
+  "skinName": "Trafalgar",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "telinida_2": {
@@ -1115,11 +1115,11 @@
   "type": "spine"
  },
  "tiancheng_cv": {
-  "displayName": "天城 — 天城",
-  "id": null,
-  "shipName": "天城",
-  "skinName": "天城",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Amagi(CV)",
+  "id": "307150",
+  "shipName": "Amagi(CV)",
+  "skinName": "Amagi(CV)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "tianjinfeng_2": {
@@ -1179,11 +1179,11 @@
   "type": "spine"
  },
  "wuerlixi": {
-  "displayName": "乌尔里希·冯·胡滕 — 乌尔里希·冯·胡滕",
-  "id": null,
-  "shipName": "乌尔里希·冯·胡滕",
-  "skinName": "乌尔里希·冯·胡滕",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Ulrich von Hutten",
+  "id": "405030",
+  "shipName": "Ulrich von Hutten",
+  "skinName": "Ulrich von Hutten",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "wuerlixi_4": {
@@ -1201,19 +1201,19 @@
   "type": "spine"
  },
  "wuqi": {
-  "displayName": "吾妻 — 吾妻",
-  "id": null,
-  "shipName": "吾妻",
-  "skinName": "吾妻",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Azuma",
+  "id": "399040",
+  "shipName": "Azuma",
+  "skinName": "Azuma",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "wuzang": {
-  "displayName": "武藏 — 武藏",
-  "id": null,
-  "shipName": "武藏",
-  "skinName": "武藏",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Musashi",
+  "id": "305100",
+  "shipName": "Musashi",
+  "skinName": "Musashi",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "xiafei_3": {
@@ -1231,19 +1231,19 @@
   "type": "spine"
  },
  "xili_g": {
-  "displayName": "夕立 — 夕立.改",
-  "id": null,
-  "shipName": "夕立",
-  "skinName": "夕立.改",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Yuudachi — Yuudachi (Retrofit)",
+  "id": "301149",
+  "shipName": "Yuudachi",
+  "skinName": "Yuudachi (Retrofit)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "xingdengbao": {
-  "displayName": "兴登堡 — 兴登堡",
-  "id": null,
-  "shipName": "兴登堡",
-  "skinName": "兴登堡",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Hindenburg",
+  "id": "499090",
+  "shipName": "Hindenburg",
+  "skinName": "Hindenburg",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "xingzuo_2": {
@@ -1254,19 +1254,19 @@
   "type": "spine"
  },
  "xinnong": {
-  "displayName": "信浓 — 信浓",
-  "id": null,
-  "shipName": "信浓",
-  "skinName": "信浓",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Shinano",
+  "id": "307080",
+  "shipName": "Shinano",
+  "skinName": "Shinano",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "xinzexi": {
-  "displayName": "新泽西 — 新泽西",
-  "id": null,
-  "shipName": "新泽西",
-  "skinName": "新泽西",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "New Jersey",
+  "id": "105170",
+  "shipName": "New Jersey",
+  "skinName": "New Jersey",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "xinzexi_4": {
@@ -1291,11 +1291,11 @@
   "type": "spine"
  },
  "yanzhan_g": {
-  "displayName": "厌战 — 厌战.改",
-  "id": null,
-  "shipName": "厌战",
-  "skinName": "厌战.改",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Warspite — Warspite (Retrofit)",
+  "id": "205029",
+  "shipName": "Warspite",
+  "skinName": "Warspite (Retrofit)",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "yichui_7": {
@@ -1355,11 +1355,11 @@
   "type": "spine"
  },
  "yuanchou": {
-  "displayName": "怨仇 — 怨仇",
-  "id": null,
-  "shipName": "怨仇",
-  "skinName": "怨仇",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Implacable",
+  "id": "207070",
+  "shipName": "Implacable",
+  "skinName": "Implacable",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "yuanchou_2": {
@@ -1377,11 +1377,11 @@
   "type": "spine"
  },
  "yuekechengii": {
-  "displayName": "约克城II — 约克城II",
-  "id": null,
-  "shipName": "约克城II",
-  "skinName": "约克城II",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Yorktown II",
+  "id": "107100",
+  "shipName": "Yorktown II",
+  "skinName": "Yorktown II",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "yuekechengii_2": {
@@ -1420,11 +1420,11 @@
   "type": "spinePlus"
  },
  "yunxian": {
-  "displayName": "云仙 — 云仙",
-  "id": null,
-  "shipName": "云仙",
-  "skinName": "云仙",
-  "source": "ww-rm/azurlane_spinepainting",
+  "displayName": "Unzen",
+  "id": "303190",
+  "shipName": "Unzen",
+  "skinName": "Unzen",
+  "source": "nagami-moe",
   "type": "spine"
  },
  "z15_2": {
