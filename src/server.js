@@ -2191,6 +2191,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-girlwars.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	lostsword: {
+		script: path.join(ROOT, "tools", "update-lostsword.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }

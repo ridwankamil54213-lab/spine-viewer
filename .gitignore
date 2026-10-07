@@ -69,6 +69,14 @@ data/models-cache.json.tmp
 data/new-models.json
 data/new-models.json.tmp
 
+# Cap versi + daftar bundle updater (diperbarui oleh --apply). Menyimpan
+# ~470 nama bundle spesifik mesin, jadi tidak perlu ikut ke repo.
+data/*-state.json
+data/*-state.json.tmp
+
+# XAPK/bundle yang diunduh updater (2.6 GB utk Lost Sword) — cache lokal.
+cache/
+
 # Hasil konversi .skel -> JSON (dulu ~5.5 GB). Dihasilkan ulang oleh
 # tools/convert-spine2.py bila masih diperlukan; tidak perlu ikut ke repo.
 assets/projectqt21/
