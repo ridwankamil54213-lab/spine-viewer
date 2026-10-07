@@ -2109,6 +2109,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-browndust.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	azurlane: {
+		script: path.join(ROOT, "tools", "update-azurlane.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }

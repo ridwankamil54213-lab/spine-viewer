@@ -1,1 +1,1473 @@
-{"bote_2": {"id": "101101", "shipName": "William D. Porter", "skinName": "The Daredevil's Maidly Service", "displayName": "William D. Porter — The Daredevil's Maidly Service", "type": "spinePlus"}, "ailunsamuna_3": {"id": "101452", "shipName": "Allen M. Sumner", "skinName": "Two Faces of Justice", "displayName": "Allen M. Sumner — Two Faces of Justice", "type": "spine"}, "molisen_3": {"id": "101472", "shipName": "Morrison", "skinName": "Technology or Ninjutsu?", "displayName": "Morrison — Technology or Ninjutsu?", "type": "spinePlus"}, "lafeiii_4": {"id": "101512", "shipName": "Laffey II", "skinName": "Lady Laffey's Languid Tour", "displayName": "Laffey II — Lady Laffey's Languid Tour", "type": "spine"}, "hailunna_5": {"id": "102054", "shipName": "Helena", "skinName": "Basking in the Cypress' Warmth", "displayName": "Helena — Basking in the Cypress' Warmth", "type": "spine"}, "mabuerheide_5": {"id": "102274", "shipName": "Marblehead", "skinName": "Not-So-Serendipitous Rain", "displayName": "Marblehead — Not-So-Serendipitous Rain", "type": "spine"}, "fage_2": {"id": "102331", "shipName": "Fargo", "skinName": "Dairy in the Dreary Sun", "displayName": "Fargo — Dairy in the Dreary Sun", "type": "spine"}, "pasadina_2": {"id": "102351", "shipName": "Pasadena", "skinName": "Surprising Game", "displayName": "Pasadena — Surprising Game", "type": "spine"}, "weikesibao_2": {"id": "102361", "shipName": "Vicksburg", "skinName": "Dazzling Diva of the Raceway", "displayName": "Vicksburg — Dazzling Diva of the Raceway", "type": "spinePlus"}, "weikesibao_3": {"id": "102362", "shipName": "Vicksburg", "skinName": "Dazzling Diva of the Raceway", "displayName": "Vicksburg — Dazzling Diva of the Raceway", "type": "spinePlus"}, "bulaimodun_6": {"id": "103245", "shipName": "Bremerton", "skinName": "Pillowed Counseling", "displayName": "Bremerton — Pillowed Counseling", "type": "spine"}, "luyisiweier_2": {"id": "103271", "shipName": "Louisville", "skinName": "An Order of Dreams", "displayName": "Louisville — An Order of Dreams", "type": "spine"}, "xingzuo_2": {"id": "104011", "shipName": "Constellation", "skinName": "Galaxy's Finest", "displayName": "Constellation — Galaxy's Finest", "type": "spine"}, "beikaluolaina_3": {"id": "105122", "shipName": "North Carolina", "skinName": "Unique Sunshine", "displayName": "North Carolina — Unique Sunshine", "type": "spine"}, "huashengdun_3": {"id": "105132", "shipName": "Washington", "skinName": "Making the Rounds", "displayName": "Washington — Making the Rounds", "type": "spine"}, "yindianna_2": {"id": "105151", "shipName": "Indiana", "skinName": "High Noon Arrest", "displayName": "Indiana — High Noon Arrest", "type": "spine"}, "xinzexi_4": {"id": "105173", "shipName": "New Jersey", "skinName": "Dancing in the Moonlight", "displayName": "New Jersey — Dancing in the Moonlight", "type": "spine"}, "alabama_3": {"id": "105202", "shipName": "Alabama", "skinName": "Through Your Lens, My Everything", "displayName": "Alabama — Through Your Lens, My Everything", "type": "spine"}, "aisaikesi_7": {"id": "107095", "shipName": "Essex", "skinName": "Crossbones Especial", "displayName": "Essex — Crossbones Especial", "type": "spine"}, "aisaikesi_9": {"id": "107097", "shipName": "Essex", "skinName": "Start Line Splash", "displayName": "Essex — Start Line Splash", "type": "spine"}, "yuekechengii_2": {"id": "107101", "shipName": "Yorktown II", "skinName": "Bright-Sky Mermaid", "displayName": "Yorktown II — Bright-Sky Mermaid", "type": "spine"}, "yuekechengii_4": {"id": "107103", "shipName": "Yorktown II", "skinName": "An Evening's Companionship", "displayName": "Yorktown II — An Evening's Companionship", "type": "spine"}, "dahuangfengii_2": {"id": "107121", "shipName": "Hornet II", "skinName": "Racing Across the Waves!", "displayName": "Hornet II — Racing Across the Waves!", "type": "spine"}, "fulankelin_2": {"id": "107131", "shipName": "Franklin", "skinName": "Heart-Throbbing Records", "displayName": "Franklin — Heart-Throbbing Records", "type": "spine"}, "lafei_12": {"id": "131172", "shipName": "Laffey", "skinName": "Lazy Days", "displayName": "Laffey — Lazy Days", "type": "spine"}, "aisaikesi_10": {"id": "137090", "shipName": "Essex", "skinName": "Telepathy Training", "displayName": "Essex — Telepathy Training", "type": "spine"}, "qiershazhi_3": {"id": "199042", "shipName": "Kearsarge", "skinName": "Springtime Monitoring", "displayName": "Kearsarge — Springtime Monitoring", "type": "spine"}, "haerfude_2": {"id": "199051", "shipName": "Halford", "skinName": "A Special Day with the Bunny Lord", "displayName": "Halford — A Special Day with the Bunny Lord", "type": "spine"}, "kansasi_2": {"id": "199061", "shipName": "Kansas", "skinName": "Late-Night Leisure", "displayName": "Kansas — Late-Night Leisure", "type": "spine"}, "yanusi_4": {"id": "201352", "shipName": "Janus", "skinName": "Fear of Changing... Clothes", "displayName": "Janus — Fear of Changing... Clothes", "type": "spine"}, "yongqi_2": {"id": "201391", "shipName": "Gallant", "skinName": "Express-ive Delivery", "displayName": "Gallant — Express-ive Delivery", "type": "spine"}, "geluosite_3": {"id": "202102", "shipName": "Gloucester", "skinName": "Violet Enrapturement", "displayName": "Gloucester — Violet Enrapturement", "type": "spine"}, "beierfasite_9": {"id": "202127", "shipName": "Belfast", "skinName": "Blissful Service", "displayName": "Belfast — Blissful Service", "type": "spine"}, "sikula_4": {"id": "202333", "shipName": "Scylla", "skinName": "A Maid's Judgment", "displayName": "Scylla — A Maid's Judgment", "type": "spine"}, "telinida_2": {"id": "202361", "shipName": "Trinidad", "skinName": "Trapper in the Changing Room", "displayName": "Trinidad — Trapper in the Changing Room", "type": "spine"}, "huali_2": {"id": "202371", "shipName": "Superb", "skinName": "Superb Dentistry", "displayName": "Superb — Superb Dentistry", "type": "spine"}, "lundun_3": {"id": "203011", "shipName": "London", "skinName": "The Sterling Secretary", "displayName": "London — The Sterling Secretary", "type": "spine"}, "hude_6": {"id": "204035", "shipName": "Hood", "skinName": "Elegance Meant for One", "displayName": "Hood — Elegance Meant for One", "type": "spine"}, "yuekegongjue_4": {"id": "205074", "shipName": "Duke of York", "skinName": "The Chic Counselor", "displayName": "Duke of York — The Chic Counselor", "type": "spine"}, "aerbien_4": {"id": "206073", "shipName": "Albion", "skinName": "A Fairy-Tale Breakfast", "displayName": "Albion — A Fairy-Tale Breakfast", "type": "spine"}, "kewei_5": {"id": "207054", "shipName": "Formidable", "skinName": "Rockin' Encore", "displayName": "Formidable — Rockin' Encore", "type": "spine"}, "yuanchou_2": {"id": "207071", "shipName": "Implacable", "skinName": "Shepherd of the \"Lost\"", "displayName": "Implacable — Shepherd of the \"Lost\"", "type": "spine"}, "guanghui_8": {"id": "237030", "shipName": "Illustrious", "skinName": "Sweet Afternoon Teatime", "displayName": "Illustrious — Sweet Afternoon Teatime", "type": "spine"}, "tianjinfeng_2": {"id": "301191", "shipName": "Amatsukaze", "skinName": "The Fox Spirit Descends On Heavenly Winds", "displayName": "Amatsukaze — The Fox Spirit Descends On Heavenly Winds", "type": "spinePlus"}, "tianjinfeng_3": {"id": "301192", "shipName": "Amatsukaze", "skinName": "The Fox Spirit Descends On Heavenly Winds", "displayName": "Amatsukaze — The Fox Spirit Descends On Heavenly Winds", "type": "spinePlus"}, "fengyun_2": {"id": "301862", "shipName": "Kazagumo", "skinName": "Placid Waves, Passionate Heart", "displayName": "Kazagumo — Placid Waves, Passionate Heart", "type": "spine"}, "linglai_2": {"id": "302261", "shipName": "Ayase", "skinName": "A Glimpse of the Moon Rabbit", "displayName": "Ayase — A Glimpse of the Moon Rabbit", "type": "spine"}, "gaoxiong_6": {"id": "303116", "shipName": "Takao", "skinName": "Divine Exorcist's Blade", "displayName": "Takao — Divine Exorcist's Blade", "type": "spinePlus"}, "aidang_6": {"id": "303125", "shipName": "Atago", "skinName": "Full Moon's Feral Wolf", "displayName": "Atago — Full Moon's Feral Wolf", "type": "spine"}, "niaohai_3": {"id": "303142", "shipName": "Choukai", "skinName": "Steal Your Heart", "displayName": "Choukai — Steal Your Heart", "type": "spine"}, "jingang_5": {"id": "304014", "shipName": "Kongou", "skinName": "Troubled Seas", "displayName": "Kongou — Troubled Seas", "type": "spine"}, "changmen_6": {"id": "305055", "shipName": "Nagato", "skinName": "Guardian Fox's Blessed Bonds", "displayName": "Nagato — Guardian Fox's Blessed Bonds", "type": "spine"}, "tuzuo_3": {"id": "305082", "shipName": "Tosa", "skinName": "A Glimpse of Greatness", "displayName": "Tosa — A Glimpse of Greatness", "type": "spine"}, "weizhang_2": {"id": "305131", "shipName": "Owari", "skinName": "Shimmering Forsythia", "displayName": "Owari — Shimmering Forsythia", "type": "spine"}, "yunlong_2": {"id": "307171", "shipName": "Unryuu", "skinName": "Mirage in the Night", "displayName": "Unryuu — Mirage in the Night", "type": "spinePlus"}, "yunlong_3": {"id": "307172", "shipName": "Unryuu", "skinName": "Mirage in the Night", "displayName": "Unryuu — Mirage in the Night", "type": "spinePlus"}, "i404_2": {"id": "317021", "shipName": "I-404", "skinName": "Dance of Crimson Strings", "displayName": "I-404 — Dance of Crimson Strings", "type": "spinePlus"}, "i404_3": {"id": "317022", "shipName": "I-404", "skinName": "Dance of Crimson Strings", "displayName": "I-404 — Dance of Crimson Strings", "type": "spinePlus"}, "jianye_5": {"id": "319014", "shipName": "Kashino", "skinName": "Fresh and Sweet", "displayName": "Kashino — Fresh and Sweet", "type": "spine"}, "nengdai_9": {"id": "332210", "shipName": "Noshiro", "skinName": "A Dip in the Moonlight", "displayName": "Noshiro — A Dip in the Moonlight", "type": "spine"}, "yichui_7": {"id": "399015", "shipName": "Ibuki", "skinName": "Traces of Summery Love", "displayName": "Ibuki — Traces of Summery Love", "type": "spine"}, "chuyun_3": {"id": "399022", "shipName": "Izumo", "skinName": "Tail-Stirred Cocktail", "displayName": "Izumo — Tail-Stirred Cocktail", "type": "spine"}, "siwanshi_4": {"id": "399063", "shipName": "Shimanto", "skinName": "The Relaxing Dragon God", "displayName": "Shimanto — The Relaxing Dragon God", "type": "spine"}, "dashan_2": {"id": "399071", "shipName": "Daisen", "skinName": "Bunny Priestess in Prayer", "displayName": "Daisen — Bunny Priestess in Prayer", "type": "spine"}, "z15_2": {"id": "401151", "shipName": "Z15", "skinName": "Dancing Diver", "displayName": "Z15 — Dancing Diver", "type": "spinePlus"}, "z52_2": {"id": "401521", "shipName": "Z52", "skinName": "The Rapid Rabbit", "displayName": "Z52 — The Rapid Rabbit", "type": "spine"}, "aotuo_3": {"id": "401992", "shipName": "Otto von Alvensleben", "skinName": "The Clumsy Maid is in a Bind!", "displayName": "Otto von Alvensleben — The Clumsy Maid is in a Bind!", "type": "spine"}, "aimudeng_4": {"id": "402073", "shipName": "Emden", "skinName": "Duet of Guiding Stars", "displayName": "Emden — Duet of Guiding Stars", "type": "spine"}, "aimudeng_5": {"id": "402074", "shipName": "Emden", "skinName": "Waterside Whispers at Dusk", "displayName": "Emden — Waterside Whispers at Dusk", "type": "spine"}, "aimudeng_5_asmr": {"id": "402075", "shipName": "Emden", "skinName": "Waterside Whispers at Dusk", "displayName": "Emden — Waterside Whispers at Dusk", "type": "spine"}, "duyisibao_2": {"id": "402111", "shipName": "Duisburg", "skinName": "Endurance Training (Gone Wrong)", "displayName": "Duisburg — Endurance Training (Gone Wrong)", "type": "spine"}, "ougen_7": {"id": "403036", "shipName": "Prinz Eugen", "skinName": "Brilliant Touchdown", "displayName": "Prinz Eugen — Brilliant Touchdown", "type": "spine"}, "adaerbote_4": {"id": "403103", "shipName": "Prinz Adalbert", "skinName": "The Black-and-White Magician", "displayName": "Prinz Adalbert — The Black-and-White Magician", "type": "spine"}, "yueke_ger_3": {"id": "403112", "shipName": "Yorck", "skinName": "Late-Night Companion", "displayName": "Yorck — Late-Night Companion", "type": "spine"}, "molici_2": {"id": "403171", "shipName": "Prinz Moritz", "skinName": "The Genie's Game", "displayName": "Prinz Moritz — The Genie's Game", "type": "spinePlus"}, "yaerweite_2": {"id": "404061", "shipName": "Alvitr", "skinName": "Muspel's Torrid Secrets", "displayName": "Alvitr — Muspel's Torrid Secrets", "type": "spine"}, "wuerlixi_4": {"id": "405033", "shipName": "Ulrich von Hutten", "skinName": "What Comes After the Bell", "displayName": "Ulrich von Hutten — What Comes After the Bell", "type": "spine"}, "bisimaiz_2": {"id": "405051", "shipName": "Bismarck Zwei", "skinName": "Crystal-Clear Holiday", "displayName": "Bismarck Zwei — Crystal-Clear Holiday", "type": "spine"}, "bisimaiz_3": {"id": "405052", "shipName": "Bismarck Zwei", "skinName": "Bathed in Brightness and Spirit", "displayName": "Bismarck Zwei — Bathed in Brightness and Spirit", "type": "spine"}, "fulici_3": {"id": "407042", "shipName": "Fritz Rumey", "skinName": "Verabredung in the Night Breeze", "displayName": "Fritz Rumey — Verabredung in the Night Breeze", "type": "spine"}, "u96_4": {"id": "408093", "shipName": "U-96", "skinName": "Wolfen Dolly", "displayName": "U-96 — Wolfen Dolly", "type": "spine"}, "feiteliedadi_5": {"id": "499024", "shipName": "Friedrich der Große", "skinName": "Boudoir's Lingering Flame", "displayName": "Friedrich der Große — Boudoir's Lingering Flame", "type": "spine"}, "aogusite_3": {"id": "499062", "shipName": "August von Parseval", "skinName": "The Unhulde's Midday Respite", "displayName": "August von Parseval — The Unhulde's Midday Respite", "type": "spine"}, "huben_2": {"id": "501061", "shipName": "Hu Pen", "skinName": "Prancing Tiger Welcomes the Spring", "displayName": "Hu Pen — Prancing Tiger Welcomes the Spring", "type": "spine"}, "yixian_2": {"id": "502011", "shipName": "Yat Sen", "skinName": "Paragon of Celestial Grace", "displayName": "Yat Sen — Paragon of Celestial Grace", "type": "spine"}, "yixian_4": {"id": "502013", "shipName": "Yat Sen", "skinName": "Pristine Waves Embrace the Wind", "displayName": "Yat Sen — Pristine Waves Embrace the Wind", "type": "spine"}, "yingrui_4": {"id": "502043", "shipName": "Ying Swei", "skinName": "Blue Waves, Limpid Summer", "displayName": "Ying Swei — Blue Waves, Limpid Summer", "type": "spine"}, "zhaohe_4": {"id": "502053", "shipName": "Chao Ho", "skinName": "Azure Ripples, Shimmering Sun", "displayName": "Chao Ho — Azure Ripples, Shimmering Sun", "type": "spine"}, "haichou_2": {"id": "502121", "shipName": "Hai Chou", "skinName": "Aroma of Awakening", "displayName": "Hai Chou — Aroma of Awakening", "type": "spine"}, "haichou_2_asmr": {"id": "502122", "shipName": "Hai Chou", "skinName": "Aroma of Awakening", "displayName": "Hai Chou — Aroma of Awakening", "type": "spine"}, "jianwu_3": {"id": "503012", "shipName": "Chien Wu", "skinName": "Dressed for Just Tonight", "displayName": "Chien Wu — Dressed for Just Tonight", "type": "spine"}, "jianwu_4": {"id": "503013", "shipName": "Chien Wu", "skinName": "All-Nighter Masterpiece", "displayName": "Chien Wu — All-Nighter Masterpiece", "type": "spine"}, "huanchang_2": {"id": "504011", "shipName": "Huan Ch'ang", "skinName": "Dance Beneath the Moonlight", "displayName": "Huan Ch'ang — Dance Beneath the Moonlight", "type": "spine"}, "huajia_2": {"id": "506021", "shipName": "Hwah Jah", "skinName": "The Festive Undead", "displayName": "Hwah Jah — The Festive Undead", "type": "spine"}, "haerbin_3": {"id": "599012", "shipName": "Harbin", "skinName": "Set Sail for Summer Treasure", "displayName": "Harbin — Set Sail for Summer Treasure", "type": "spine"}, "diliyasite_3": {"id": "603042", "shipName": "Trieste", "skinName": "Amore Termico", "displayName": "Trieste — Amore Termico", "type": "spine"}, "geliqiya_3": {"id": "603062", "shipName": "Gorizia", "skinName": "The Spy Who Crushed on Me", "displayName": "Gorizia — The Spy Who Crushed on Me", "type": "spine"}, "lafeier_3": {"id": "605082", "shipName": "Raffaello", "skinName": "Magical Combo Masterpiece", "displayName": "Raffaello — Magical Combo Masterpiece", "type": "spine"}, "fulangxisike_2": {"id": "605091", "shipName": "Francesco Caracciolo", "skinName": "Confession Under the Spotlight", "displayName": "Francesco Caracciolo — Confession Under the Spotlight", "type": "spine"}, "balaka_2": {"id": "608031", "shipName": "Maggiore Baracca", "skinName": "The God Craves Punishment", "displayName": "Maggiore Baracca — The God Craves Punishment", "type": "spine"}, "makeboluo_3": {"id": "699012", "shipName": "Marco Polo", "skinName": "Ambitious Showcase", "displayName": "Marco Polo — Ambitious Showcase", "type": "spine"}, "tashigan_4": {"id": "701043", "shipName": "Tashkent", "skinName": "The Sprite's Snapshot", "displayName": "Tashkent — The Sprite's Snapshot", "type": "spine"}, "moermansike_3": {"id": "702062", "shipName": "Murmansk", "skinName": "Chamber of Fragrance", "displayName": "Murmansk — Chamber of Fragrance", "type": "spine"}, "fuluoxiluofu_2": {"id": "702071", "shipName": "Voroshilov", "skinName": "Devoted as the Warm Snow", "displayName": "Voroshilov — Devoted as the Warm Snow", "type": "spine"}, "fuluoxiluofu_3": {"id": "702072", "shipName": "Voroshilov", "skinName": "The Nurse's Special Rehearsal", "displayName": "Voroshilov — The Nurse's Special Rehearsal", "type": "spine"}, "hongseshanmai_2": {"id": "702091", "shipName": "Krasny Kavkaz", "skinName": "Playing Blind ♥", "displayName": "Krasny Kavkaz — Playing Blind ♥", "type": "spine"}, "bojiateli_2": {"id": "702101", "shipName": "Bogatyr", "skinName": "Emotional Data Maintenance", "displayName": "Bogatyr — Emotional Data Maintenance", "type": "spinePlus"}, "talin_4": {"id": "703013", "shipName": "Tallinn", "skinName": "Night of Full Moon and Overflowing Love", "displayName": "Tallinn — Night of Full Moon and Overflowing Love", "type": "spine"}, "mosike_2": {"id": "703031", "shipName": "Moskva", "skinName": "Awaiting the Next Move", "displayName": "Moskva — Awaiting the Next Move", "type": "spine"}, "suweiaitongmeng_4": {"id": "705023", "shipName": "Sovetsky Soyuz", "skinName": "Stringed Interrogation", "displayName": "Sovetsky Soyuz — Stringed Interrogation", "type": "spine"}, "aerhangeersike_3": {"id": "705062", "shipName": "Arkhangelsk", "skinName": "Supporting Sorceress", "displayName": "Arkhangelsk — Supporting Sorceress", "type": "spine"}, "kashan_2": {"id": "705091", "shipName": "Kazan", "skinName": "The Warm Morning Sunshine", "displayName": "Kazan — The Warm Morning Sunshine", "type": "spine"}, "kalangshitade_3": {"id": "718012", "shipName": "Kronshtadt", "skinName": "Animal Agent", "displayName": "Kronshtadt — Animal Agent", "type": "spine"}, "naximofu_4": {"id": "799023", "shipName": "Admiral Nakhimov", "skinName": "Cheerleading Mechanic?", "displayName": "Admiral Nakhimov — Cheerleading Mechanic?", "type": "spine"}, "wuju_2": {"id": "801061", "shipName": "L'Intrépide", "skinName": "Blazing Dash!", "displayName": "L'Intrépide — Blazing Dash!", "type": "spine"}, "jishang_3": {"id": "802032", "shipName": "Guichen", "skinName": "Milk and Kisses", "displayName": "Guichen — Milk and Kisses", "type": "spine"}, "jishang_3_asmr": {"id": "802033", "shipName": "Guichen", "skinName": "Milk&Kiss", "displayName": "Guichen — Milk&Kiss", "type": "spine"}, "digaiteluyin_2": {"id": "802041", "shipName": "Duguay-Trouin", "skinName": "Covetous Bathgoer", "displayName": "Duguay-Trouin — Covetous Bathgoer", "type": "spine"}, "aluomangshi_2": {"id": "806021", "shipName": "Arromanches", "skinName": "Acrobatic Archery", "displayName": "Arromanches — Acrobatic Archery", "type": "spinePlus"}, "banerwei_2": {"id": "807021", "shipName": "Painlevé", "skinName": "Team Stretching", "displayName": "Painlevé — Team Stretching", "type": "spine"}, "kaiersheng_2": {"id": "901041", "shipName": "Kersaint", "skinName": "Reverent Runner", "displayName": "Kersaint — Reverent Runner", "type": "spine"}, "kaiersheng_3": {"id": "901042", "shipName": "Kersaint", "skinName": "A Saint's Mercy Can Do No Wrong", "displayName": "Kersaint — A Saint's Mercy Can Do No Wrong", "type": "spine"}, "mojiaduoer_5": {"id": "901074", "shipName": "Mogador", "skinName": "Diving for Desire", "displayName": "Mogador — Diving for Desire", "type": "spine"}, "masaiqu_2": {"id": "902021", "shipName": "Marseillaise", "skinName": "Fighting Angel's Regimen", "displayName": "Marseillaise — Fighting Angel's Regimen", "type": "spine"}, "xiafei_3": {"id": "907012", "shipName": "Joffre", "skinName": "Sublime Elysium", "displayName": "Joffre — Sublime Elysium", "type": "spine"}, "aifosen_2": {"id": "1101011", "shipName": "Evertsen", "skinName": "Basking by the Window", "displayName": "Evertsen — Basking by the Window", "type": "spine"}, "huangjiacaifu_3": {"id": "9600012", "shipName": "Royal Fortune", "skinName": "Eyes on the Prize", "displayName": "Royal Fortune — Eyes on the Prize", "type": "spine"}, "weida_2": {"id": "9600051", "shipName": "Whydah", "skinName": "Lazy Pirate Angel", "displayName": "Whydah — Lazy Pirate Angel", "type": "spine"}, "gangyishawa_2": {"id": "9600071", "shipName": "Ganj-i-Sawai", "skinName": "Mermaid in Distress", "displayName": "Ganj-i-Sawai — Mermaid in Distress", "type": "spine"}, "hemuhao_2": {"id": "9600091", "shipName": "Amity", "skinName": "Friendly Franken", "displayName": "Amity — Friendly Franken", "type": "spine"}, "laimuhao_2": {"id": "9600131", "shipName": "Lyme", "skinName": "Corrupting Trap", "displayName": "Lyme — Corrupting Trap", "type": "spine"}, "maoxianhao_2": {"id": "9600161", "shipName": "Adventure", "skinName": "Master of the Safe House", "displayName": "Adventure — Master of the Safe House", "type": "spine"}, "lingyangzhe3_2": {"id": "9900011", "shipName": "Imp of the Bathtub", "skinName": "Imp of the Bathtub", "displayName": "Imp of the Bathtub — Imp of the Bathtub", "type": "spine"}, "linghangyuan3_2": {"id": "9900021", "shipName": "Data Set: My Countless Selves", "skinName": "Data Set: My Countless Selves", "displayName": "Data Set: My Countless Selves — Data Set: My Countless Selves", "type": "spine"}, "tansuozhe_2": {"id": "9900031", "shipName": "Closeness on a Holiday", "skinName": "Closeness on a Holiday", "displayName": "Closeness on a Holiday — Closeness on a Holiday", "type": "spine"}, "haixiao_3_doa": {"id": "10600042", "shipName": "Misaki", "skinName": "Blooms in the Night Sky", "displayName": "Misaki — Blooms in the Night Sky", "type": "spine"}, "luna_2_doa": {"id": "10600081", "shipName": "Luna", "skinName": "Venus of the Beach", "displayName": "Luna — Venus of the Beach", "type": "spine"}, "yilisi_2_doa": {"id": "10600101", "shipName": "Elise", "skinName": "One Divine Afternoon", "displayName": "Elise — One Divine Afternoon", "type": "spine"}, "na_2_doa": {"id": "10600111", "shipName": "Shizuku", "skinName": "Frolicking in the Tide", "displayName": "Shizuku — Frolicking in the Tide", "type": "spine"}, "xiangdi_2_doa": {"id": "10600121", "shipName": "Shandy", "skinName": "An Enchanting Sip", "displayName": "Shandy — An Enchanting Sip", "type": "spine"}, "zhuzi_2_doa": {"id": "10600131", "shipName": "Tsukushi", "skinName": "Dream Machine", "displayName": "Tsukushi — Dream Machine", "type": "spine"}, "paidi_2_doa": {"id": "10600141", "shipName": "Patty", "skinName": "Fluffy-Wuffy Paradise", "displayName": "Patty — Fluffy-Wuffy Paradise", "type": "spine"}, "qiannai_2_doa": {"id": "10600151", "shipName": "Yukino", "skinName": "Charming Beast", "displayName": "Yukino — Charming Beast", "type": "spine"}, "laisha_3": {"id": "10900012", "shipName": "Reisalin Stout", "skinName": "New Culinary Horizons", "displayName": "Reisalin Stout — New Culinary Horizons", "type": "spine"}, "kala_2": {"id": "10900061", "shipName": "Kala Ideas", "skinName": "Chief Turned Chef", "displayName": "Kala Ideas — Chief Turned Chef", "type": "spine"}, "heiyansheshou_2": {"id": "11200011", "shipName": "BLACK★ROCK SHOOTER", "skinName": "Goddess in Black", "displayName": "BLACK★ROCK SHOOTER — Goddess in Black", "type": "spine"}, "siwangzhuzai_2": {"id": "11200021", "shipName": "DEAD MASTER", "skinName": "Warrior's Respite", "displayName": "DEAD MASTER — Warrior's Respite", "type": "spine"}, "youmiya_2": {"id": "11300011", "shipName": "Yumia Liessfeldt", "skinName": "Everyone's Favorite Patissier", "displayName": "Yumia Liessfeldt — Everyone's Favorite Patissier", "type": "spine"}, "aila_2": {"id": "11300021", "shipName": "Isla von Duerer", "skinName": "Open-Air Vacationeer", "displayName": "Isla von Duerer — Open-Air Vacationeer", "type": "spine"}, "nina_2": {"id": "11300031", "shipName": "Nina Friede", "skinName": "Café & Diner Mode", "displayName": "Nina Friede — Café & Diner Mode", "type": "spine"}, "leiniya_2": {"id": "11300041", "shipName": "Lenja", "skinName": "Summer Vacation Time", "displayName": "Lenja — Summer Vacation Time", "type": "spine"}, "hesitiya_2": {"id": "11400011", "shipName": "Hestia", "skinName": "Godly Vacation!", "displayName": "Hestia — Godly Vacation!", "type": "spine"}, "liuliang_2": {"id": "11400021", "shipName": "Ryu Lion", "skinName": "Night at the Pub", "displayName": "Ryu Lion — Night at the Pub", "type": "spine"}, "shixiang_2": {"id": "11500011", "shipName": "Tohka Yatogami", "skinName": "Break Time", "displayName": "Tohka Yatogami — Break Time", "type": "spine"}, "zhezhi_2": {"id": "11500021", "shipName": "Origami Tobiichi", "skinName": "The Spirit of Allure", "displayName": "Origami Tobiichi — The Spirit of Allure", "type": "spine"}, "qinli_2": {"id": "11500031", "shipName": "Kotori Itsuka", "skinName": "Waterside Goddess", "displayName": "Kotori Itsuka — Waterside Goddess", "type": "spine"}, "sisinai_2": {"id": "11500041", "shipName": "Yoshino", "skinName": "Secret Base", "displayName": "Yoshino — Secret Base", "type": "spine"}, "kuangsan_2": {"id": "11500051", "shipName": "Kurumi Tokisaki", "skinName": "Twin Rose", "displayName": "Kurumi Tokisaki — Twin Rose", "type": "spine"}, "bawu_2": {"id": "11500061", "shipName": "Kaguya Yamai・Yuzuru Yamai", "skinName": "Blue Ocean Rendezvous", "displayName": "Kaguya Yamai・Yuzuru Yamai — Blue Ocean Rendezvous", "type": "spine"}, "a2_2": {"id": "11700011", "shipName": "A2", "skinName": "fruit of tempt[A]tion", "displayName": "A2 — fruit of tempt[A]tion", "type": "spine"}, "2b_2": {"id": "11700021", "shipName": "2B", "skinName": "[B]rief respite", "displayName": "2B — [B]rief respite", "type": "spine"}}
+{
+ "2b_2": {
+  "displayName": "2B — [B]rief respite",
+  "id": "11700021",
+  "shipName": "2B",
+  "skinName": "[B]rief respite",
+  "type": "spine"
+ },
+ "a2_2": {
+  "displayName": "A2 — fruit of tempt[A]tion",
+  "id": "11700011",
+  "shipName": "A2",
+  "skinName": "fruit of tempt[A]tion",
+  "type": "spine"
+ },
+ "adaerbote_4": {
+  "displayName": "Prinz Adalbert — The Black-and-White Magician",
+  "id": "403103",
+  "shipName": "Prinz Adalbert",
+  "skinName": "The Black-and-White Magician",
+  "type": "spine"
+ },
+ "aerbien_4": {
+  "displayName": "Albion — A Fairy-Tale Breakfast",
+  "id": "206073",
+  "shipName": "Albion",
+  "skinName": "A Fairy-Tale Breakfast",
+  "type": "spine"
+ },
+ "aerhangeersike_3": {
+  "displayName": "Arkhangelsk — Supporting Sorceress",
+  "id": "705062",
+  "shipName": "Arkhangelsk",
+  "skinName": "Supporting Sorceress",
+  "type": "spine"
+ },
+ "aersasi": {
+  "displayName": "阿尔萨斯 — 阿尔萨斯",
+  "id": null,
+  "shipName": "阿尔萨斯",
+  "skinName": "阿尔萨斯",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "aidang_6": {
+  "displayName": "Atago — Full Moon's Feral Wolf",
+  "id": "303125",
+  "shipName": "Atago",
+  "skinName": "Full Moon's Feral Wolf",
+  "type": "spine"
+ },
+ "aierdeliqi_g": {
+  "displayName": "埃尔德里奇 — 埃尔德里奇.改",
+  "id": null,
+  "shipName": "埃尔德里奇",
+  "skinName": "埃尔德里奇.改",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "aifosen_2": {
+  "displayName": "Evertsen — Basking by the Window",
+  "id": "1101011",
+  "shipName": "Evertsen",
+  "skinName": "Basking by the Window",
+  "type": "spine"
+ },
+ "aijier": {
+  "displayName": "埃吉尔 — 埃吉尔",
+  "id": null,
+  "shipName": "埃吉尔",
+  "skinName": "埃吉尔",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "aila_2": {
+  "displayName": "Isla von Duerer — Open-Air Vacationeer",
+  "id": "11300021",
+  "shipName": "Isla von Duerer",
+  "skinName": "Open-Air Vacationeer",
+  "type": "spine"
+ },
+ "ailunsamuna_3": {
+  "displayName": "Allen M. Sumner — Two Faces of Justice",
+  "id": "101452",
+  "shipName": "Allen M. Sumner",
+  "skinName": "Two Faces of Justice",
+  "type": "spine"
+ },
+ "aimudeng_4": {
+  "displayName": "Emden — Duet of Guiding Stars",
+  "id": "402073",
+  "shipName": "Emden",
+  "skinName": "Duet of Guiding Stars",
+  "type": "spine"
+ },
+ "aimudeng_5": {
+  "displayName": "Emden — Waterside Whispers at Dusk",
+  "id": "402074",
+  "shipName": "Emden",
+  "skinName": "Waterside Whispers at Dusk",
+  "type": "spine"
+ },
+ "aimudeng_5_asmr": {
+  "displayName": "Emden — Waterside Whispers at Dusk",
+  "id": "402075",
+  "shipName": "Emden",
+  "skinName": "Waterside Whispers at Dusk",
+  "type": "spine"
+ },
+ "aisaikesi_10": {
+  "displayName": "Essex — Telepathy Training",
+  "id": "137090",
+  "shipName": "Essex",
+  "skinName": "Telepathy Training",
+  "type": "spine"
+ },
+ "aisaikesi_7": {
+  "displayName": "Essex — Crossbones Especial",
+  "id": "107095",
+  "shipName": "Essex",
+  "skinName": "Crossbones Especial",
+  "type": "spine"
+ },
+ "aisaikesi_9": {
+  "displayName": "Essex — Start Line Splash",
+  "id": "107097",
+  "shipName": "Essex",
+  "skinName": "Start Line Splash",
+  "type": "spine"
+ },
+ "aisaikesi_g": {
+  "displayName": "埃塞克斯 — 埃塞克斯.改",
+  "id": null,
+  "shipName": "埃塞克斯",
+  "skinName": "埃塞克斯.改",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "alabama_3": {
+  "displayName": "Alabama — Through Your Lens, My Everything",
+  "id": "105202",
+  "shipName": "Alabama",
+  "skinName": "Through Your Lens, My Everything",
+  "type": "spine"
+ },
+ "aluomangshi_2": {
+  "displayName": "Arromanches — Acrobatic Archery",
+  "id": "806021",
+  "shipName": "Arromanches",
+  "skinName": "Acrobatic Archery",
+  "type": "spinePlus"
+ },
+ "aogusite_3": {
+  "displayName": "August von Parseval — The Unhulde's Midday Respite",
+  "id": "499062",
+  "shipName": "August von Parseval",
+  "skinName": "The Unhulde's Midday Respite",
+  "type": "spine"
+ },
+ "aotuo_3": {
+  "displayName": "Otto von Alvensleben — The Clumsy Maid is in a Bind!",
+  "id": "401992",
+  "shipName": "Otto von Alvensleben",
+  "skinName": "The Clumsy Maid is in a Bind!",
+  "type": "spine"
+ },
+ "baifeng": {
+  "displayName": "白凤 — 白凤",
+  "id": null,
+  "shipName": "白凤",
+  "skinName": "白凤",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "bailong": {
+  "displayName": "白龙 — 白龙",
+  "id": null,
+  "shipName": "白龙",
+  "skinName": "白龙",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "balaka_2": {
+  "displayName": "Maggiore Baracca — The God Craves Punishment",
+  "id": "608031",
+  "shipName": "Maggiore Baracca",
+  "skinName": "The God Craves Punishment",
+  "type": "spine"
+ },
+ "banerwei_2": {
+  "displayName": "Painlevé — Team Stretching",
+  "id": "807021",
+  "shipName": "Painlevé",
+  "skinName": "Team Stretching",
+  "type": "spine"
+ },
+ "bawu_2": {
+  "displayName": "Kaguya Yamai・Yuzuru Yamai — Blue Ocean Rendezvous",
+  "id": "11500061",
+  "shipName": "Kaguya Yamai・Yuzuru Yamai",
+  "skinName": "Blue Ocean Rendezvous",
+  "type": "spine"
+ },
+ "beierfasite_9": {
+  "displayName": "Belfast — Blissful Service",
+  "id": "202127",
+  "shipName": "Belfast",
+  "skinName": "Blissful Service",
+  "type": "spine"
+ },
+ "beikaluolaina_3": {
+  "displayName": "North Carolina — Unique Sunshine",
+  "id": "105122",
+  "shipName": "North Carolina",
+  "skinName": "Unique Sunshine",
+  "type": "spine"
+ },
+ "bisimaiz": {
+  "displayName": "俾斯麦Zwei — 俾斯麦Zwei",
+  "id": null,
+  "shipName": "俾斯麦Zwei",
+  "skinName": "俾斯麦Zwei",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "bisimaiz_2": {
+  "displayName": "Bismarck Zwei — Crystal-Clear Holiday",
+  "id": "405051",
+  "shipName": "Bismarck Zwei",
+  "skinName": "Crystal-Clear Holiday",
+  "type": "spine"
+ },
+ "bisimaiz_3": {
+  "displayName": "Bismarck Zwei — Bathed in Brightness and Spirit",
+  "id": "405052",
+  "shipName": "Bismarck Zwei",
+  "skinName": "Bathed in Brightness and Spirit",
+  "type": "spine"
+ },
+ "bojiateli_2": {
+  "displayName": "Bogatyr — Emotional Data Maintenance",
+  "id": "702101",
+  "shipName": "Bogatyr",
+  "skinName": "Emotional Data Maintenance",
+  "type": "spinePlus"
+ },
+ "bote_2": {
+  "displayName": "William D. Porter — The Daredevil's Maidly Service",
+  "id": "101101",
+  "shipName": "William D. Porter",
+  "skinName": "The Daredevil's Maidly Service",
+  "type": "spinePlus"
+ },
+ "bulaimodun_6": {
+  "displayName": "Bremerton — Pillowed Counseling",
+  "id": "103245",
+  "shipName": "Bremerton",
+  "skinName": "Pillowed Counseling",
+  "type": "spine"
+ },
+ "buleisite": {
+  "displayName": "布雷斯特 — 布雷斯特",
+  "id": null,
+  "shipName": "布雷斯特",
+  "skinName": "布雷斯特",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "buli_super": {
+  "displayName": "特装型布里MKIII — 特装型布里MKIII",
+  "id": null,
+  "shipName": "特装型布里MKIII",
+  "skinName": "特装型布里MKIII",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "changmen_6": {
+  "displayName": "Nagato — Guardian Fox's Blessed Bonds",
+  "id": "305055",
+  "shipName": "Nagato",
+  "skinName": "Guardian Fox's Blessed Bonds",
+  "type": "spine"
+ },
+ "chuyun_3": {
+  "displayName": "Izumo — Tail-Stirred Cocktail",
+  "id": "399022",
+  "shipName": "Izumo",
+  "skinName": "Tail-Stirred Cocktail",
+  "type": "spine"
+ },
+ "dahuangfengii_2": {
+  "displayName": "Hornet II — Racing Across the Waves!",
+  "id": "107121",
+  "shipName": "Hornet II",
+  "skinName": "Racing Across the Waves!",
+  "type": "spine"
+ },
+ "daofeng": {
+  "displayName": "岛风 — 岛风",
+  "id": null,
+  "shipName": "岛风",
+  "skinName": "岛风",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "dashan_2": {
+  "displayName": "Daisen — Bunny Priestess in Prayer",
+  "id": "399071",
+  "shipName": "Daisen",
+  "skinName": "Bunny Priestess in Prayer",
+  "type": "spine"
+ },
+ "deleike": {
+  "displayName": "德雷克 — 德雷克",
+  "id": null,
+  "shipName": "德雷克",
+  "skinName": "德雷克",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "digaiteluyin_2": {
+  "displayName": "Duguay-Trouin — Covetous Bathgoer",
+  "id": "802041",
+  "shipName": "Duguay-Trouin",
+  "skinName": "Covetous Bathgoer",
+  "type": "spine"
+ },
+ "diliyasite_3": {
+  "displayName": "Trieste — Amore Termico",
+  "id": "603042",
+  "shipName": "Trieste",
+  "skinName": "Amore Termico",
+  "type": "spine"
+ },
+ "duyisibao_2": {
+  "displayName": "Duisburg — Endurance Training (Gone Wrong)",
+  "id": "402111",
+  "shipName": "Duisburg",
+  "skinName": "Endurance Training (Gone Wrong)",
+  "type": "spine"
+ },
+ "fage_2": {
+  "displayName": "Fargo — Dairy in the Dreary Sun",
+  "id": "102331",
+  "shipName": "Fargo",
+  "skinName": "Dairy in the Dreary Sun",
+  "type": "spine"
+ },
+ "feiteliedadi": {
+  "displayName": "腓特烈大帝 — 腓特烈大帝",
+  "id": null,
+  "shipName": "腓特烈大帝",
+  "skinName": "腓特烈大帝",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "feiteliedadi_5": {
+  "displayName": "Friedrich der Große — Boudoir's Lingering Flame",
+  "id": "499024",
+  "shipName": "Friedrich der Große",
+  "skinName": "Boudoir's Lingering Flame",
+  "type": "spine"
+ },
+ "fengyun_2": {
+  "displayName": "Kazagumo — Placid Waves, Passionate Heart",
+  "id": "301862",
+  "shipName": "Kazagumo",
+  "skinName": "Placid Waves, Passionate Heart",
+  "type": "spine"
+ },
+ "fulangxisike_2": {
+  "displayName": "Francesco Caracciolo — Confession Under the Spotlight",
+  "id": "605091",
+  "shipName": "Francesco Caracciolo",
+  "skinName": "Confession Under the Spotlight",
+  "type": "spine"
+ },
+ "fulankelin_2": {
+  "displayName": "Franklin — Heart-Throbbing Records",
+  "id": "107131",
+  "shipName": "Franklin",
+  "skinName": "Heart-Throbbing Records",
+  "type": "spine"
+ },
+ "fulici": {
+  "displayName": "弗里茨·鲁梅 — 弗里茨·鲁梅",
+  "id": null,
+  "shipName": "弗里茨·鲁梅",
+  "skinName": "弗里茨·鲁梅",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "fulici_3": {
+  "displayName": "Fritz Rumey — Verabredung in the Night Breeze",
+  "id": "407042",
+  "shipName": "Fritz Rumey",
+  "skinName": "Verabredung in the Night Breeze",
+  "type": "spine"
+ },
+ "fuluoxiluofu_2": {
+  "displayName": "Voroshilov — Devoted as the Warm Snow",
+  "id": "702071",
+  "shipName": "Voroshilov",
+  "skinName": "Devoted as the Warm Snow",
+  "type": "spine"
+ },
+ "fuluoxiluofu_3": {
+  "displayName": "Voroshilov — The Nurse's Special Rehearsal",
+  "id": "702072",
+  "shipName": "Voroshilov",
+  "skinName": "The Nurse's Special Rehearsal",
+  "type": "spine"
+ },
+ "gangyishawa_2": {
+  "displayName": "Ganj-i-Sawai — Mermaid in Distress",
+  "id": "9600071",
+  "shipName": "Ganj-i-Sawai",
+  "skinName": "Mermaid in Distress",
+  "type": "spine"
+ },
+ "gaoxiong_6": {
+  "displayName": "Takao — Divine Exorcist's Blade",
+  "id": "303116",
+  "shipName": "Takao",
+  "skinName": "Divine Exorcist's Blade",
+  "type": "spinePlus"
+ },
+ "geliqiya_3": {
+  "displayName": "Gorizia — The Spy Who Crushed on Me",
+  "id": "603062",
+  "shipName": "Gorizia",
+  "skinName": "The Spy Who Crushed on Me",
+  "type": "spine"
+ },
+ "geluosite_3": {
+  "displayName": "Gloucester — Violet Enrapturement",
+  "id": "202102",
+  "shipName": "Gloucester",
+  "skinName": "Violet Enrapturement",
+  "type": "spine"
+ },
+ "guandao": {
+  "displayName": "关岛 — 关岛",
+  "id": null,
+  "shipName": "关岛",
+  "skinName": "关岛",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "guanghui_8": {
+  "displayName": "Illustrious — Sweet Afternoon Teatime",
+  "id": "237030",
+  "shipName": "Illustrious",
+  "skinName": "Sweet Afternoon Teatime",
+  "type": "spine"
+ },
+ "haerbin_3": {
+  "displayName": "Harbin — Set Sail for Summer Treasure",
+  "id": "599012",
+  "shipName": "Harbin",
+  "skinName": "Set Sail for Summer Treasure",
+  "type": "spine"
+ },
+ "haerfude_2": {
+  "displayName": "Halford — A Special Day with the Bunny Lord",
+  "id": "199051",
+  "shipName": "Halford",
+  "skinName": "A Special Day with the Bunny Lord",
+  "type": "spine"
+ },
+ "haichou_2": {
+  "displayName": "Hai Chou — Aroma of Awakening",
+  "id": "502121",
+  "shipName": "Hai Chou",
+  "skinName": "Aroma of Awakening",
+  "type": "spine"
+ },
+ "haichou_2_asmr": {
+  "displayName": "Hai Chou — Aroma of Awakening",
+  "id": "502122",
+  "shipName": "Hai Chou",
+  "skinName": "Aroma of Awakening",
+  "type": "spine"
+ },
+ "hailunna_5": {
+  "displayName": "Helena — Basking in the Cypress' Warmth",
+  "id": "102054",
+  "shipName": "Helena",
+  "skinName": "Basking in the Cypress' Warmth",
+  "type": "spine"
+ },
+ "haixiao_3_doa": {
+  "displayName": "Misaki — Blooms in the Night Sky",
+  "id": "10600042",
+  "shipName": "Misaki",
+  "skinName": "Blooms in the Night Sky",
+  "type": "spine"
+ },
+ "heiyansheshou_2": {
+  "displayName": "BLACK★ROCK SHOOTER — Goddess in Black",
+  "id": "11200011",
+  "shipName": "BLACK★ROCK SHOOTER",
+  "skinName": "Goddess in Black",
+  "type": "spine"
+ },
+ "hemuhao_2": {
+  "displayName": "Amity — Friendly Franken",
+  "id": "9600091",
+  "shipName": "Amity",
+  "skinName": "Friendly Franken",
+  "type": "spine"
+ },
+ "hesitiya_2": {
+  "displayName": "Hestia — Godly Vacation!",
+  "id": "11400011",
+  "shipName": "Hestia",
+  "skinName": "Godly Vacation!",
+  "type": "spine"
+ },
+ "hongseshanmai_2": {
+  "displayName": "Krasny Kavkaz — Playing Blind ♥",
+  "id": "702091",
+  "shipName": "Krasny Kavkaz",
+  "skinName": "Playing Blind ♥",
+  "type": "spine"
+ },
+ "huajia_2": {
+  "displayName": "Hwah Jah — The Festive Undead",
+  "id": "506021",
+  "shipName": "Hwah Jah",
+  "skinName": "The Festive Undead",
+  "type": "spine"
+ },
+ "huali_2": {
+  "displayName": "Superb — Superb Dentistry",
+  "id": "202371",
+  "shipName": "Superb",
+  "skinName": "Superb Dentistry",
+  "type": "spine"
+ },
+ "huanchang_2": {
+  "displayName": "Huan Ch'ang — Dance Beneath the Moonlight",
+  "id": "504011",
+  "shipName": "Huan Ch'ang",
+  "skinName": "Dance Beneath the Moonlight",
+  "type": "spine"
+ },
+ "huangjiacaifu_3": {
+  "displayName": "Royal Fortune — Eyes on the Prize",
+  "id": "9600012",
+  "shipName": "Royal Fortune",
+  "skinName": "Eyes on the Prize",
+  "type": "spine"
+ },
+ "huashengdun_3": {
+  "displayName": "Washington — Making the Rounds",
+  "id": "105132",
+  "shipName": "Washington",
+  "skinName": "Making the Rounds",
+  "type": "spine"
+ },
+ "huben_2": {
+  "displayName": "Hu Pen — Prancing Tiger Welcomes the Spring",
+  "id": "501061",
+  "shipName": "Hu Pen",
+  "skinName": "Prancing Tiger Welcomes the Spring",
+  "type": "spine"
+ },
+ "hude_6": {
+  "displayName": "Hood — Elegance Meant for One",
+  "id": "204035",
+  "shipName": "Hood",
+  "skinName": "Elegance Meant for One",
+  "type": "spine"
+ },
+ "i404": {
+  "displayName": "伊404 — 伊404",
+  "id": null,
+  "shipName": "伊404",
+  "skinName": "伊404",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "i404_2": {
+  "displayName": "I-404 — Dance of Crimson Strings",
+  "id": "317021",
+  "shipName": "I-404",
+  "skinName": "Dance of Crimson Strings",
+  "type": "spinePlus"
+ },
+ "i404_3": {
+  "displayName": "I-404 — Dance of Crimson Strings",
+  "id": "317022",
+  "shipName": "I-404",
+  "skinName": "Dance of Crimson Strings",
+  "type": "spinePlus"
+ },
+ "jianwu_3": {
+  "displayName": "Chien Wu — Dressed for Just Tonight",
+  "id": "503012",
+  "shipName": "Chien Wu",
+  "skinName": "Dressed for Just Tonight",
+  "type": "spine"
+ },
+ "jianwu_4": {
+  "displayName": "Chien Wu — All-Nighter Masterpiece",
+  "id": "503013",
+  "shipName": "Chien Wu",
+  "skinName": "All-Nighter Masterpiece",
+  "type": "spine"
+ },
+ "jianye_5": {
+  "displayName": "Kashino — Fresh and Sweet",
+  "id": "319014",
+  "shipName": "Kashino",
+  "skinName": "Fresh and Sweet",
+  "type": "spine"
+ },
+ "jingang_5": {
+  "displayName": "Kongou — Troubled Seas",
+  "id": "304014",
+  "shipName": "Kongou",
+  "skinName": "Troubled Seas",
+  "type": "spine"
+ },
+ "jinshi": {
+  "displayName": "金狮 — 金狮",
+  "id": null,
+  "shipName": "金狮",
+  "skinName": "金狮",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "jishang_3": {
+  "displayName": "Guichen — Milk and Kisses",
+  "id": "802032",
+  "shipName": "Guichen",
+  "skinName": "Milk and Kisses",
+  "type": "spine"
+ },
+ "jishang_3_asmr": {
+  "displayName": "Guichen — Milk&Kiss",
+  "id": "802033",
+  "shipName": "Guichen",
+  "skinName": "Milk&Kiss",
+  "type": "spine"
+ },
+ "kaiersheng_2": {
+  "displayName": "Kersaint — Reverent Runner",
+  "id": "901041",
+  "shipName": "Kersaint",
+  "skinName": "Reverent Runner",
+  "type": "spine"
+ },
+ "kaiersheng_3": {
+  "displayName": "Kersaint — A Saint's Mercy Can Do No Wrong",
+  "id": "901042",
+  "shipName": "Kersaint",
+  "skinName": "A Saint's Mercy Can Do No Wrong",
+  "type": "spine"
+ },
+ "kala_2": {
+  "displayName": "Kala Ideas — Chief Turned Chef",
+  "id": "10900061",
+  "shipName": "Kala Ideas",
+  "skinName": "Chief Turned Chef",
+  "type": "spine"
+ },
+ "kalangshitade": {
+  "displayName": "喀琅施塔得 — 喀琅施塔得",
+  "id": null,
+  "shipName": "喀琅施塔得",
+  "skinName": "喀琅施塔得",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "kalangshitade_3": {
+  "displayName": "Kronshtadt — Animal Agent",
+  "id": "718012",
+  "shipName": "Kronshtadt",
+  "skinName": "Animal Agent",
+  "type": "spine"
+ },
+ "kansasi_2": {
+  "displayName": "Kansas — Late-Night Leisure",
+  "id": "199061",
+  "shipName": "Kansas",
+  "skinName": "Late-Night Leisure",
+  "type": "spine"
+ },
+ "kashan_2": {
+  "displayName": "Kazan — The Warm Morning Sunshine",
+  "id": "705091",
+  "shipName": "Kazan",
+  "skinName": "The Warm Morning Sunshine",
+  "type": "spine"
+ },
+ "kewei_5": {
+  "displayName": "Formidable — Rockin' Encore",
+  "id": "207054",
+  "shipName": "Formidable",
+  "skinName": "Rockin' Encore",
+  "type": "spine"
+ },
+ "kuangsan_2": {
+  "displayName": "Kurumi Tokisaki — Twin Rose",
+  "id": "11500051",
+  "shipName": "Kurumi Tokisaki",
+  "skinName": "Twin Rose",
+  "type": "spine"
+ },
+ "lafei_12": {
+  "displayName": "Laffey — Lazy Days",
+  "id": "131172",
+  "shipName": "Laffey",
+  "skinName": "Lazy Days",
+  "type": "spine"
+ },
+ "lafeier": {
+  "displayName": "拉斐尔 — 拉斐尔",
+  "id": null,
+  "shipName": "拉斐尔",
+  "skinName": "拉斐尔",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "lafeier_3": {
+  "displayName": "Raffaello — Magical Combo Masterpiece",
+  "id": "605082",
+  "shipName": "Raffaello",
+  "skinName": "Magical Combo Masterpiece",
+  "type": "spine"
+ },
+ "lafeiii": {
+  "displayName": "拉菲II — 拉菲II",
+  "id": null,
+  "shipName": "拉菲II",
+  "skinName": "拉菲II",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "lafeiii_4": {
+  "displayName": "Laffey II — Lady Laffey's Languid Tour",
+  "id": "101512",
+  "shipName": "Laffey II",
+  "skinName": "Lady Laffey's Languid Tour",
+  "type": "spine"
+ },
+ "laimuhao_2": {
+  "displayName": "Lyme — Corrupting Trap",
+  "id": "9600131",
+  "shipName": "Lyme",
+  "skinName": "Corrupting Trap",
+  "type": "spine"
+ },
+ "laisha_3": {
+  "displayName": "Reisalin Stout — New Culinary Horizons",
+  "id": "10900012",
+  "shipName": "Reisalin Stout",
+  "skinName": "New Culinary Horizons",
+  "type": "spine"
+ },
+ "leiniya_2": {
+  "displayName": "Lenja — Summer Vacation Time",
+  "id": "11300041",
+  "shipName": "Lenja",
+  "skinName": "Summer Vacation Time",
+  "type": "spine"
+ },
+ "linghangyuan3_2": {
+  "displayName": "Data Set: My Countless Selves — Data Set: My Countless Selves",
+  "id": "9900021",
+  "shipName": "Data Set: My Countless Selves",
+  "skinName": "Data Set: My Countless Selves",
+  "type": "spine"
+ },
+ "linglai_2": {
+  "displayName": "Ayase — A Glimpse of the Moon Rabbit",
+  "id": "302261",
+  "shipName": "Ayase",
+  "skinName": "A Glimpse of the Moon Rabbit",
+  "type": "spine"
+ },
+ "lingyangzhe3_2": {
+  "displayName": "Imp of the Bathtub — Imp of the Bathtub",
+  "id": "9900011",
+  "shipName": "Imp of the Bathtub",
+  "skinName": "Imp of the Bathtub",
+  "type": "spine"
+ },
+ "liuliang_2": {
+  "displayName": "Ryu Lion — Night at the Pub",
+  "id": "11400021",
+  "shipName": "Ryu Lion",
+  "skinName": "Night at the Pub",
+  "type": "spine"
+ },
+ "luna_2_doa": {
+  "displayName": "Luna — Venus of the Beach",
+  "id": "10600081",
+  "shipName": "Luna",
+  "skinName": "Venus of the Beach",
+  "type": "spine"
+ },
+ "lundun_3": {
+  "displayName": "London — The Sterling Secretary",
+  "id": "203011",
+  "shipName": "London",
+  "skinName": "The Sterling Secretary",
+  "type": "spine"
+ },
+ "luyisiweier_2": {
+  "displayName": "Louisville — An Order of Dreams",
+  "id": "103271",
+  "shipName": "Louisville",
+  "skinName": "An Order of Dreams",
+  "type": "spine"
+ },
+ "mabuerheide_5": {
+  "displayName": "Marblehead — Not-So-Serendipitous Rain",
+  "id": "102274",
+  "shipName": "Marblehead",
+  "skinName": "Not-So-Serendipitous Rain",
+  "type": "spine"
+ },
+ "makeboluo_3": {
+  "displayName": "Marco Polo — Ambitious Showcase",
+  "id": "699012",
+  "shipName": "Marco Polo",
+  "skinName": "Ambitious Showcase",
+  "type": "spine"
+ },
+ "maoxianhao_2": {
+  "displayName": "Adventure — Master of the Safe House",
+  "id": "9600161",
+  "shipName": "Adventure",
+  "skinName": "Master of the Safe House",
+  "type": "spine"
+ },
+ "masaiqu_2": {
+  "displayName": "Marseillaise — Fighting Angel's Regimen",
+  "id": "902021",
+  "shipName": "Marseillaise",
+  "skinName": "Fighting Angel's Regimen",
+  "type": "spine"
+ },
+ "meikelunbao": {
+  "displayName": "梅克伦堡 — 梅克伦堡",
+  "id": null,
+  "shipName": "梅克伦堡",
+  "skinName": "梅克伦堡",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "moermansike_3": {
+  "displayName": "Murmansk — Chamber of Fragrance",
+  "id": "702062",
+  "shipName": "Murmansk",
+  "skinName": "Chamber of Fragrance",
+  "type": "spine"
+ },
+ "mojiaduoer": {
+  "displayName": "莫加多尔 — 莫加多尔",
+  "id": null,
+  "shipName": "莫加多尔",
+  "skinName": "莫加多尔",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "mojiaduoer_5": {
+  "displayName": "Mogador — Diving for Desire",
+  "id": "901074",
+  "shipName": "Mogador",
+  "skinName": "Diving for Desire",
+  "type": "spine"
+ },
+ "molici_2": {
+  "displayName": "Prinz Moritz — The Genie's Game",
+  "id": "403171",
+  "shipName": "Prinz Moritz",
+  "skinName": "The Genie's Game",
+  "type": "spinePlus"
+ },
+ "molisen_3": {
+  "displayName": "Morrison — Technology or Ninjutsu?",
+  "id": "101472",
+  "shipName": "Morrison",
+  "skinName": "Technology or Ninjutsu?",
+  "type": "spinePlus"
+ },
+ "mosike_2": {
+  "displayName": "Moskva — Awaiting the Next Move",
+  "id": "703031",
+  "shipName": "Moskva",
+  "skinName": "Awaiting the Next Move",
+  "type": "spine"
+ },
+ "na_2_doa": {
+  "displayName": "Shizuku — Frolicking in the Tide",
+  "id": "10600111",
+  "shipName": "Shizuku",
+  "skinName": "Frolicking in the Tide",
+  "type": "spine"
+ },
+ "nabulesi": {
+  "displayName": "那不勒斯 — 那不勒斯",
+  "id": null,
+  "shipName": "那不勒斯",
+  "skinName": "那不勒斯",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "naximofu": {
+  "displayName": "纳希莫夫海军上将 — 纳希莫夫海军上将",
+  "id": null,
+  "shipName": "纳希莫夫海军上将",
+  "skinName": "纳希莫夫海军上将",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "naximofu_4": {
+  "displayName": "Admiral Nakhimov — Cheerleading Mechanic?",
+  "id": "799023",
+  "shipName": "Admiral Nakhimov",
+  "skinName": "Cheerleading Mechanic?",
+  "type": "spine"
+ },
+ "nengdai_9": {
+  "displayName": "Noshiro — A Dip in the Moonlight",
+  "id": "332210",
+  "shipName": "Noshiro",
+  "skinName": "A Dip in the Moonlight",
+  "type": "spine"
+ },
+ "niaohai_3": {
+  "displayName": "Choukai — Steal Your Heart",
+  "id": "303142",
+  "shipName": "Choukai",
+  "skinName": "Steal Your Heart",
+  "type": "spine"
+ },
+ "nina_2": {
+  "displayName": "Nina Friede — Café & Diner Mode",
+  "id": "11300031",
+  "shipName": "Nina Friede",
+  "skinName": "Café & Diner Mode",
+  "type": "spine"
+ },
+ "ougen_7": {
+  "displayName": "Prinz Eugen — Brilliant Touchdown",
+  "id": "403036",
+  "shipName": "Prinz Eugen",
+  "skinName": "Brilliant Touchdown",
+  "type": "spine"
+ },
+ "paidi_2_doa": {
+  "displayName": "Patty — Fluffy-Wuffy Paradise",
+  "id": "10600141",
+  "shipName": "Patty",
+  "skinName": "Fluffy-Wuffy Paradise",
+  "type": "spine"
+ },
+ "pasadina_2": {
+  "displayName": "Pasadena — Surprising Game",
+  "id": "102351",
+  "shipName": "Pasadena",
+  "skinName": "Surprising Game",
+  "type": "spine"
+ },
+ "pulimaosi": {
+  "displayName": "普利茅斯 — 普利茅斯",
+  "id": null,
+  "shipName": "普利茅斯",
+  "skinName": "普利茅斯",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "qiannai_2_doa": {
+  "displayName": "Yukino — Charming Beast",
+  "id": "10600151",
+  "shipName": "Yukino",
+  "skinName": "Charming Beast",
+  "type": "spine"
+ },
+ "qianwei": {
+  "displayName": "前卫 — 前卫",
+  "id": null,
+  "shipName": "前卫",
+  "skinName": "前卫",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "qiershazhi": {
+  "displayName": "奇尔沙治 — 奇尔沙治",
+  "id": null,
+  "shipName": "奇尔沙治",
+  "skinName": "奇尔沙治",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "qiershazhi_3": {
+  "displayName": "Kearsarge — Springtime Monitoring",
+  "id": "199042",
+  "shipName": "Kearsarge",
+  "skinName": "Springtime Monitoring",
+  "type": "spine"
+ },
+ "qinli_2": {
+  "displayName": "Kotori Itsuka — Waterside Goddess",
+  "id": "11500031",
+  "shipName": "Kotori Itsuka",
+  "skinName": "Waterside Goddess",
+  "type": "spine"
+ },
+ "shengdiyage_g": {
+  "displayName": "圣地亚哥 — 圣地亚哥.改",
+  "id": null,
+  "shipName": "圣地亚哥",
+  "skinName": "圣地亚哥.改",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "shi": {
+  "displayName": "狮 — 狮",
+  "id": null,
+  "shipName": "狮",
+  "skinName": "狮",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "shixiang_2": {
+  "displayName": "Tohka Yatogami — Break Time",
+  "id": "11500011",
+  "shipName": "Tohka Yatogami",
+  "skinName": "Break Time",
+  "type": "spine"
+ },
+ "sikula_4": {
+  "displayName": "Scylla — A Maid's Judgment",
+  "id": "202333",
+  "shipName": "Scylla",
+  "skinName": "A Maid's Judgment",
+  "type": "spine"
+ },
+ "sisinai_2": {
+  "displayName": "Yoshino — Secret Base",
+  "id": "11500041",
+  "shipName": "Yoshino",
+  "skinName": "Secret Base",
+  "type": "spine"
+ },
+ "siwangzhuzai_2": {
+  "displayName": "DEAD MASTER — Warrior's Respite",
+  "id": "11200021",
+  "shipName": "DEAD MASTER",
+  "skinName": "Warrior's Respite",
+  "type": "spine"
+ },
+ "siwanshi_4": {
+  "displayName": "Shimanto — The Relaxing Dragon God",
+  "id": "399063",
+  "shipName": "Shimanto",
+  "skinName": "The Relaxing Dragon God",
+  "type": "spine"
+ },
+ "suweiaitongmeng_4": {
+  "displayName": "Sovetsky Soyuz — Stringed Interrogation",
+  "id": "705023",
+  "shipName": "Sovetsky Soyuz",
+  "skinName": "Stringed Interrogation",
+  "type": "spine"
+ },
+ "suweiaitongmengnew": {
+  "displayName": "苏维埃同盟 — 苏维埃同盟",
+  "id": null,
+  "shipName": "苏维埃同盟",
+  "skinName": "苏维埃同盟",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "talin_4": {
+  "displayName": "Tallinn — Night of Full Moon and Overflowing Love",
+  "id": "703013",
+  "shipName": "Tallinn",
+  "skinName": "Night of Full Moon and Overflowing Love",
+  "type": "spine"
+ },
+ "tansuozhe_2": {
+  "displayName": "Closeness on a Holiday — Closeness on a Holiday",
+  "id": "9900031",
+  "shipName": "Closeness on a Holiday",
+  "skinName": "Closeness on a Holiday",
+  "type": "spine"
+ },
+ "tashigan_4": {
+  "displayName": "Tashkent — The Sprite's Snapshot",
+  "id": "701043",
+  "shipName": "Tashkent",
+  "skinName": "The Sprite's Snapshot",
+  "type": "spine"
+ },
+ "telafaerjia": {
+  "displayName": "特拉法尔加 — 特拉法尔加",
+  "id": null,
+  "shipName": "特拉法尔加",
+  "skinName": "特拉法尔加",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "telinida_2": {
+  "displayName": "Trinidad — Trapper in the Changing Room",
+  "id": "202361",
+  "shipName": "Trinidad",
+  "skinName": "Trapper in the Changing Room",
+  "type": "spine"
+ },
+ "tiancheng_cv": {
+  "displayName": "天城 — 天城",
+  "id": null,
+  "shipName": "天城",
+  "skinName": "天城",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "tianjinfeng_2": {
+  "displayName": "Amatsukaze — The Fox Spirit Descends On Heavenly Winds",
+  "id": "301191",
+  "shipName": "Amatsukaze",
+  "skinName": "The Fox Spirit Descends On Heavenly Winds",
+  "type": "spinePlus"
+ },
+ "tianjinfeng_3": {
+  "displayName": "Amatsukaze — The Fox Spirit Descends On Heavenly Winds",
+  "id": "301192",
+  "shipName": "Amatsukaze",
+  "skinName": "The Fox Spirit Descends On Heavenly Winds",
+  "type": "spinePlus"
+ },
+ "tuzuo_3": {
+  "displayName": "Tosa — A Glimpse of Greatness",
+  "id": "305082",
+  "shipName": "Tosa",
+  "skinName": "A Glimpse of Greatness",
+  "type": "spine"
+ },
+ "u96_4": {
+  "displayName": "U-96 — Wolfen Dolly",
+  "id": "408093",
+  "shipName": "U-96",
+  "skinName": "Wolfen Dolly",
+  "type": "spine"
+ },
+ "weida_2": {
+  "displayName": "Whydah — Lazy Pirate Angel",
+  "id": "9600051",
+  "shipName": "Whydah",
+  "skinName": "Lazy Pirate Angel",
+  "type": "spine"
+ },
+ "weikesibao_2": {
+  "displayName": "Vicksburg — Dazzling Diva of the Raceway",
+  "id": "102361",
+  "shipName": "Vicksburg",
+  "skinName": "Dazzling Diva of the Raceway",
+  "type": "spinePlus"
+ },
+ "weikesibao_3": {
+  "displayName": "Vicksburg — Dazzling Diva of the Raceway",
+  "id": "102362",
+  "shipName": "Vicksburg",
+  "skinName": "Dazzling Diva of the Raceway",
+  "type": "spinePlus"
+ },
+ "weizhang_2": {
+  "displayName": "Owari — Shimmering Forsythia",
+  "id": "305131",
+  "shipName": "Owari",
+  "skinName": "Shimmering Forsythia",
+  "type": "spine"
+ },
+ "wuerlixi": {
+  "displayName": "乌尔里希·冯·胡滕 — 乌尔里希·冯·胡滕",
+  "id": null,
+  "shipName": "乌尔里希·冯·胡滕",
+  "skinName": "乌尔里希·冯·胡滕",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "wuerlixi_4": {
+  "displayName": "Ulrich von Hutten — What Comes After the Bell",
+  "id": "405033",
+  "shipName": "Ulrich von Hutten",
+  "skinName": "What Comes After the Bell",
+  "type": "spine"
+ },
+ "wuju_2": {
+  "displayName": "L'Intrépide — Blazing Dash!",
+  "id": "801061",
+  "shipName": "L'Intrépide",
+  "skinName": "Blazing Dash!",
+  "type": "spine"
+ },
+ "wuqi": {
+  "displayName": "吾妻 — 吾妻",
+  "id": null,
+  "shipName": "吾妻",
+  "skinName": "吾妻",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "wuzang": {
+  "displayName": "武藏 — 武藏",
+  "id": null,
+  "shipName": "武藏",
+  "skinName": "武藏",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "xiafei_3": {
+  "displayName": "Joffre — Sublime Elysium",
+  "id": "907012",
+  "shipName": "Joffre",
+  "skinName": "Sublime Elysium",
+  "type": "spine"
+ },
+ "xiangdi_2_doa": {
+  "displayName": "Shandy — An Enchanting Sip",
+  "id": "10600121",
+  "shipName": "Shandy",
+  "skinName": "An Enchanting Sip",
+  "type": "spine"
+ },
+ "xili_g": {
+  "displayName": "夕立 — 夕立.改",
+  "id": null,
+  "shipName": "夕立",
+  "skinName": "夕立.改",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "xingdengbao": {
+  "displayName": "兴登堡 — 兴登堡",
+  "id": null,
+  "shipName": "兴登堡",
+  "skinName": "兴登堡",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "xingzuo_2": {
+  "displayName": "Constellation — Galaxy's Finest",
+  "id": "104011",
+  "shipName": "Constellation",
+  "skinName": "Galaxy's Finest",
+  "type": "spine"
+ },
+ "xinnong": {
+  "displayName": "信浓 — 信浓",
+  "id": null,
+  "shipName": "信浓",
+  "skinName": "信浓",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "xinzexi": {
+  "displayName": "新泽西 — 新泽西",
+  "id": null,
+  "shipName": "新泽西",
+  "skinName": "新泽西",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "xinzexi_4": {
+  "displayName": "New Jersey — Dancing in the Moonlight",
+  "id": "105173",
+  "shipName": "New Jersey",
+  "skinName": "Dancing in the Moonlight",
+  "type": "spine"
+ },
+ "yaerweite_2": {
+  "displayName": "Alvitr — Muspel's Torrid Secrets",
+  "id": "404061",
+  "shipName": "Alvitr",
+  "skinName": "Muspel's Torrid Secrets",
+  "type": "spine"
+ },
+ "yanusi_4": {
+  "displayName": "Janus — Fear of Changing... Clothes",
+  "id": "201352",
+  "shipName": "Janus",
+  "skinName": "Fear of Changing... Clothes",
+  "type": "spine"
+ },
+ "yanzhan_g": {
+  "displayName": "厌战 — 厌战.改",
+  "id": null,
+  "shipName": "厌战",
+  "skinName": "厌战.改",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "yichui_7": {
+  "displayName": "Ibuki — Traces of Summery Love",
+  "id": "399015",
+  "shipName": "Ibuki",
+  "skinName": "Traces of Summery Love",
+  "type": "spine"
+ },
+ "yilisi_2_doa": {
+  "displayName": "Elise — One Divine Afternoon",
+  "id": "10600101",
+  "shipName": "Elise",
+  "skinName": "One Divine Afternoon",
+  "type": "spine"
+ },
+ "yindianna_2": {
+  "displayName": "Indiana — High Noon Arrest",
+  "id": "105151",
+  "shipName": "Indiana",
+  "skinName": "High Noon Arrest",
+  "type": "spine"
+ },
+ "yingrui_4": {
+  "displayName": "Ying Swei — Blue Waves, Limpid Summer",
+  "id": "502043",
+  "shipName": "Ying Swei",
+  "skinName": "Blue Waves, Limpid Summer",
+  "type": "spine"
+ },
+ "yixian_2": {
+  "displayName": "Yat Sen — Paragon of Celestial Grace",
+  "id": "502011",
+  "shipName": "Yat Sen",
+  "skinName": "Paragon of Celestial Grace",
+  "type": "spine"
+ },
+ "yixian_4": {
+  "displayName": "Yat Sen — Pristine Waves Embrace the Wind",
+  "id": "502013",
+  "shipName": "Yat Sen",
+  "skinName": "Pristine Waves Embrace the Wind",
+  "type": "spine"
+ },
+ "yongqi_2": {
+  "displayName": "Gallant — Express-ive Delivery",
+  "id": "201391",
+  "shipName": "Gallant",
+  "skinName": "Express-ive Delivery",
+  "type": "spine"
+ },
+ "youmiya_2": {
+  "displayName": "Yumia Liessfeldt — Everyone's Favorite Patissier",
+  "id": "11300011",
+  "shipName": "Yumia Liessfeldt",
+  "skinName": "Everyone's Favorite Patissier",
+  "type": "spine"
+ },
+ "yuanchou": {
+  "displayName": "怨仇 — 怨仇",
+  "id": null,
+  "shipName": "怨仇",
+  "skinName": "怨仇",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "yuanchou_2": {
+  "displayName": "Implacable — Shepherd of the \"Lost\"",
+  "id": "207071",
+  "shipName": "Implacable",
+  "skinName": "Shepherd of the \"Lost\"",
+  "type": "spine"
+ },
+ "yueke_ger_3": {
+  "displayName": "Yorck — Late-Night Companion",
+  "id": "403112",
+  "shipName": "Yorck",
+  "skinName": "Late-Night Companion",
+  "type": "spine"
+ },
+ "yuekechengii": {
+  "displayName": "约克城II — 约克城II",
+  "id": null,
+  "shipName": "约克城II",
+  "skinName": "约克城II",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "yuekechengii_2": {
+  "displayName": "Yorktown II — Bright-Sky Mermaid",
+  "id": "107101",
+  "shipName": "Yorktown II",
+  "skinName": "Bright-Sky Mermaid",
+  "type": "spine"
+ },
+ "yuekechengii_4": {
+  "displayName": "Yorktown II — An Evening's Companionship",
+  "id": "107103",
+  "shipName": "Yorktown II",
+  "skinName": "An Evening's Companionship",
+  "type": "spine"
+ },
+ "yuekegongjue_4": {
+  "displayName": "Duke of York — The Chic Counselor",
+  "id": "205074",
+  "shipName": "Duke of York",
+  "skinName": "The Chic Counselor",
+  "type": "spine"
+ },
+ "yunlong_2": {
+  "displayName": "Unryuu — Mirage in the Night",
+  "id": "307171",
+  "shipName": "Unryuu",
+  "skinName": "Mirage in the Night",
+  "type": "spinePlus"
+ },
+ "yunlong_3": {
+  "displayName": "Unryuu — Mirage in the Night",
+  "id": "307172",
+  "shipName": "Unryuu",
+  "skinName": "Mirage in the Night",
+  "type": "spinePlus"
+ },
+ "yunxian": {
+  "displayName": "云仙 — 云仙",
+  "id": null,
+  "shipName": "云仙",
+  "skinName": "云仙",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "z15_2": {
+  "displayName": "Z15 — Dancing Diver",
+  "id": "401151",
+  "shipName": "Z15",
+  "skinName": "Dancing Diver",
+  "type": "spinePlus"
+ },
+ "z52": {
+  "displayName": "Z52 — Z52",
+  "id": null,
+  "shipName": "Z52",
+  "skinName": "Z52",
+  "source": "ww-rm/azurlane_spinepainting",
+  "type": "spine"
+ },
+ "z52_2": {
+  "displayName": "Z52 — The Rapid Rabbit",
+  "id": "401521",
+  "shipName": "Z52",
+  "skinName": "The Rapid Rabbit",
+  "type": "spine"
+ },
+ "zhaohe_4": {
+  "displayName": "Chao Ho — Azure Ripples, Shimmering Sun",
+  "id": "502053",
+  "shipName": "Chao Ho",
+  "skinName": "Azure Ripples, Shimmering Sun",
+  "type": "spine"
+ },
+ "zhezhi_2": {
+  "displayName": "Origami Tobiichi — The Spirit of Allure",
+  "id": "11500021",
+  "shipName": "Origami Tobiichi",
+  "skinName": "The Spirit of Allure",
+  "type": "spine"
+ },
+ "zhuzi_2_doa": {
+  "displayName": "Tsukushi — Dream Machine",
+  "id": "10600131",
+  "shipName": "Tsukushi",
+  "skinName": "Dream Machine",
+  "type": "spine"
+ }
+}

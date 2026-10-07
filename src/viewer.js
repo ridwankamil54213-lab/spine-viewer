@@ -3335,6 +3335,7 @@ const UPDATABLE = {
 	crosscore: "/api/update/crosscore",
 	catshinobi: "/api/update/catshinobi",
 	bd2: "/api/update/bd2",
+	azurlane: "/api/update/azurlane",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
