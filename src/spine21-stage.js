@@ -102,8 +102,12 @@ function makeTextureLoader(basePath, atlasParent) {
 			img.src = url;
 			pending.push(p);
 			page.rendererObject = img;
-			page.width = 0;
-			page.height = 0;
+			// JANGAN menimpa page.width/height di sini. Atlas masih sedang
+			// di-parse dan parser menghitung region.u = x / page.width dari
+			// nilai "size:" yang baru saja dibaca; menolkan di sini membuat
+			// SEMUA UV jadi Infinity (tampil null di JSON) dan mesh tak
+			// tergambar. Ukuran asli diisi setelah gambar selesai dimuat —
+			// hanya bila atlas tak mencantumkan "size:".
 		},
 		unload() {},
 	};
@@ -141,9 +145,11 @@ export async function loadSpine21Model({ basePath, jsonFile, atlasFile }) {
 	const atlas = new sp.Atlas(atlasText, textureLoader);
 	await Promise.all(textureLoader.pending);
 
-	// Ukuran asli baru diketahui setelah gambar selesai dimuat.
+	// Ukuran asli HANYA diisi bila atlas tidak mencantumkan "size:" — kalau
+	// ditimpa selalu, UV yang dihitung parser (x / page.width) jadi tak cocok
+	// dengan tekstur yang digambar.
 	for (const page of atlas.pages) {
-		if (page.rendererObject) {
+		if (page.rendererObject && !page.width) {
 			page.width = page.rendererObject.naturalWidth || page.width;
 			page.height = page.rendererObject.naturalHeight || page.height;
 		}
@@ -195,6 +201,85 @@ export async function loadSpine21Model({ basePath, jsonFile, atlasFile }) {
 }
 
 /**
+ * Gambar satu attachment MESH / SKINNED-MESH ke kanvas 2D.
+ *
+ * Kenapa perlu jalur ini
+ * ----------------------
+ * Renderer 2.1 asli (vendor/spine21/spine-canvas.js) HANYA menggambar
+ * RegionAttachment — ia melewati mesh. Itu cukup untuk Project QT/Epic Seven
+ * yang seluruh lampirannya region, tetapi TIDAK untuk model seperti
+ * 极乐深渊 (Blissful Abyss): kulit "default"-nya berisi 38 skinnedmesh + 17
+ * mesh dan 0 region, jadi tak ada satu pun yang tergambar.
+ *
+ * Kanvas 2D tak punya jalur mesh bertekstur seperti WebGL, jadi tiap segitiga
+ * digambar terpisah: potong (clip) ke segitiga di ruang dunia, lalu pasang
+ * transform affine yang memetakan koordinat teksturnya ke titik-titik dunia,
+ * baru drawImage seluruh halaman atlas. Ini teknik kanvas 2D standar untuk
+ * mesh Spine 2.x.
+ *
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {object} sp    objek runtime spine (spine21)
+ * @param {object} att   MeshAttachment / SkinnedMeshAttachment
+ * @param {object} slot  slot pemilik attachment
+ */
+function drawMeshAttachment(ctx, sp, att, slot) {
+	const region = att.rendererObject;
+	const page = region?.page;
+	const img = page?.rendererObject;
+	if (!region || !img || !att.triangles || !att.uvs || !att.triangles.length) return;
+
+	const pw = page.width || img.naturalWidth || img.width || 0;
+	const ph = page.height || img.naturalHeight || img.height || 0;
+	if (!pw || !ph) return;
+
+	// Titik-titik dunia untuk attachment ini (sudah termasuk bobot tulang
+	// untuk skinned mesh, dan FFD bila ada).
+	const world = new Float32Array(att.uvs.length);
+	att.computeWorldVertices(0, 0, slot, world);
+
+	const tris = att.triangles;
+	const uvs = att.uvs;
+	for (let t = 0; t + 2 < tris.length; t += 3) {
+		const i0 = tris[t] * 2;
+		const i1 = tris[t + 1] * 2;
+		const i2 = tris[t + 2] * 2;
+
+		const x0 = world[i0], y0 = world[i0 + 1];
+		const x1 = world[i1], y1 = world[i1 + 1];
+		const x2 = world[i2], y2 = world[i2 + 1];
+
+		// Posisi tekstur (piksel) untuk tiap sudut, dari UV absolut.
+		const t0x = uvs[i0] * pw, t0y = uvs[i0 + 1] * ph;
+		const t1x = uvs[i1] * pw, t1y = uvs[i1 + 1] * ph;
+		const t2x = uvs[i2] * pw, t2y = uvs[i2 + 1] * ph;
+
+		// Affine yang memetakan (tx,ty) -> (x,y):
+		//   x = a*tx + c*ty + e ;  y = b*tx + d*ty + f
+		const det =
+			(t1x - t0x) * (t2y - t0y) - (t2x - t0x) * (t1y - t0y);
+		if (Math.abs(det) < 1e-9) continue; // segitiga degenerate
+
+		const a = ((x1 - x0) * (t2y - t0y) - (x2 - x0) * (t1y - t0y)) / det;
+		const c = ((x2 - x0) * (t1x - t0x) - (x1 - x0) * (t2x - t0x)) / det;
+		const e = x0 - a * t0x - c * t0y;
+		const b = ((y1 - y0) * (t2y - t0y) - (y2 - y0) * (t1y - t0y)) / det;
+		const d = ((y2 - y0) * (t1x - t0x) - (y1 - y0) * (t2x - t0x)) / det;
+		const f = y0 - b * t0x - d * t0y;
+
+		ctx.save();
+		ctx.beginPath();
+		ctx.moveTo(x0, y0);
+		ctx.lineTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.closePath();
+		ctx.clip();
+		ctx.transform(a, b, c, d, e, f);
+		ctx.drawImage(img, 0, 0);
+		ctx.restore();
+	}
+}
+
+/**
  * Gambar satu frame ke konteks kanvas 2D.
  *
  * @param {object} st      hasil loadSpine21Model
@@ -229,9 +314,18 @@ export function drawSpine21(st, opts) {
 		for (const slot of skeleton.drawOrder) {
 			if (!slot) continue;
 			const att = slot.attachment;
-			// Hanya RegionAttachment yang didukung renderer ini — mesh dan
-			// skinned mesh butuh jalur berbeda yang belum diimplementasi.
-			if (!att || !(att instanceof sp.RegionAttachment)) continue;
+			if (!att) continue;
+
+			// Mesh & skinned-mesh digambar lewat jalur segitiga sendiri.
+			if (
+				att instanceof sp.MeshAttachment ||
+				att instanceof sp.SkinnedMeshAttachment
+			) {
+				drawMeshAttachment(ctx, sp, att, slot);
+				continue;
+			}
+
+			if (!(att instanceof sp.RegionAttachment)) continue;
 
 			const region = att.rendererObject;
 			const img = region?.page?.rendererObject;

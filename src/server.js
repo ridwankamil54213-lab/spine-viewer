@@ -224,6 +224,7 @@ const GAME_ROOTS = [
 	{ match: "talesofangels", key: "talesofangels", label: "Tales of Angels" },
 	{ match: "crosscore", key: "crosscore", label: "CrossCore" },
 	{ match: "kink", key: "kink", label: "异种啪乐町 (Kink)" },
+	{ match: "blissful", key: "blissful", label: "极乐深渊 (Blissful Abyss)", spineRuntime: "2.1.27", pmaDefault: false },
 	// Longest prefix first: resolveGame matches with startsWith, so the more
 	// specific "azurlane-chibi" must come before "azurlane" or every chibi
 	// model gets absorbed into the main Azur Lane bucket.
@@ -1310,6 +1311,27 @@ function savePersistedCache(sig, models) {
  * makes the same work rougly twice as cheap and, more importantly, keeps it
  * from growing again.
  */
+/**
+ * Fingerprint of the SCAN CONFIG, mixed into the cache signature.
+ *
+ * scanModels() output depends on GAME_ROOTS (label, spineRuntime, pmaDefault)
+ * as much as on the files. But the signature was derived from assets/ mtimes
+ * alone — so editing a game entry (e.g. adding `spineRuntime: "2.1.27"` to
+ * route a new game to the legacy viewer) did NOT invalidate the persisted
+ * cache. The server kept serving the old models and the config silently never
+ * took effect. Mixing this in means a GAME_ROOTS edit busts the cache, no
+ * asset write required.
+ */
+const SCAN_CONFIG = JSON.stringify(
+	GAME_ROOTS.map((g) => [g.match, g.key, g.label, g.spineRuntime ?? null, g.pmaDefault ?? null]),
+);
+
+function configHash(s) {
+	let h = 5381;
+	for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+	return h.toString(36);
+}
+
 function scanTree() {
 	let newest = 0;
 	const sizes = new Map();
@@ -1349,7 +1371,7 @@ function scanTree() {
 		return total;
 	};
 	walk(ASSETS, 0);
-	return { signature: String(newest), sizes };
+	return { signature: `${newest}:${configHash(SCAN_CONFIG)}`, sizes };
 }
 
 function getModels({ force = false } = {}) {
