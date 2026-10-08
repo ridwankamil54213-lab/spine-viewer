@@ -2436,6 +2436,14 @@ const UPDATERS = {
 		// The extractor has no --check; the button runs it directly.
 		noCheck: true,
 	},
+	dragontravelers: {
+		script: path.join(ROOT, "tools", "extract-dragontravelers.py"),
+		py: "/srv/venv-spine/bin/python",
+		// Pulls the game's res_update tree + APK split from redroid, then
+		// re-extracts. No --check either; the button runs --pull directly.
+		noCheck: true,
+		applyArgs: ["--pull"],
+	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }
@@ -2524,7 +2532,7 @@ app.get("/api/update/:game", async (req, res) => {
 	}
 	updateJob = { game, running: true, result: null, log: [], startedAt: Date.now() };
 	res.json({ started: true });
-	updateJob.result = await runUpdater(game, ["--apply"], (l) => {
+	updateJob.result = await runUpdater(game, cfg.applyArgs || ["--apply"], (l) => {
 		updateJob.log.push(l);
 		if (updateJob.log.length > UPDATE_LOG_MAX) updateJob.log.shift();
 	});
