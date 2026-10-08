@@ -65,3 +65,29 @@ Terdaftar di `GAME_ROOTS` sebagai `dragontravelers` (spineRuntime `4.1`,
 `pmaDefault: false`). Tombol update muncul lewat `UPDATERS.dragontravelers`
 dengan `noCheck: true` + `applyArgs: ["--pull"]` — menekan tombol menarik ulang
 aset dari redroid lalu ekstraksi, lalu badge NEW dipasang dari `new_ids`.
+
+## Info forum (live2dhub.com) — topik 龙魂旅人
+
+Hasil baca forum mengonfirmasi metode kita dan menambah 2 model:
+
+- **Tidak ada enkripsi.** Dikonfirmasi beberapa thread: yang ada cuma
+  **fake header** (topik #4797: "这…不是一眼fakeheader吗?"; #6311: "没有fakerheader").
+  UnityCN tidak berlaku di sini — persis temuan `rfind(b"UnityFS")`.
+- **Model ada di berkas hot-update** `Android/data/<pkg>/…` (bukan hanya APK)
+  — topik #6162: "在热更新文件里面啊，在Android/data/的数据包里面".
+- **Banyak "skin" karakter berupa VIDEO, bukan Spine** (topik #6162:
+  "这些皮肤都是视频格式的 没有spine"; "raw文件夹里的.usm就是视频"). Video-nya
+  **CriWare `.usm`** (header `CRID`) di `res_update/raw/`; audio `.awb` (AFS2) +
+  cue-sheet `.acb` (`@UTF`). Lokal ada **12 `.usm`** (1–3,7 MB) — sebagian besar
+  skin (World Cup, dll.) jadi video, bukan model.
+- **Instalasi lokal bisa sebagian**, jadi sebagian model hanya ada di paket
+  orang lain. Dari lampiran forum didapat 2 Spine 4.1.23 yang TIDAK ada saat
+  scan dan sudah ditambahkan:
+  - `jixieji_pf01` (机械姬, skin World Cup; 2 halaman tekstur)
+  - `l2d_beimihu` (multi-state: idle1/idle2/idle3 + transisi & varian)
+  → total **36** model.
+
+### Kalau mau video skin (`.usm`)
+`.usm` = CriWare. ffmpeg biasa tidak membacanya; perlu `vgmstream-cli` (atau
+USM tool) untuk demux → biasanya H.264, lalu langsung diputar. Opsi lanjutan.
+
