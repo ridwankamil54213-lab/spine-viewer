@@ -31,6 +31,7 @@ import {
 	pickRuntime,
 } from "./spine-version.js";
 import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion, setLive2DExpression, live2DExpressions } from "./live2d.js";
+import { loadVideo, disposeVideo, videoElement, videoStageActive } from "./video-stage.js";
 import { normalizeSpine2Json } from "./spine2-normalize.js";
 import {
 	loadSpine21Model,
@@ -1190,8 +1191,77 @@ async function loadLive2DModel(model) {
 	if (fps.on) fpsResetStats();
 }
 
+/**
+ * Play a plain video file (Lost Sword cutscene). The PIXI canvas is hidden by
+ * the `is-video` class on the wrap; a native <video> takes over the stage.
+ * Skeleton-only controls are disabled — they have nothing to drive here.
+ */
+async function loadVideoModel(model) {
+	const vid = loadVideo({ wrap: el.canvasWrap, url: model.videoFile });
+	if (!vid) throw new Error("Tidak bisa menyiapkan pemutar video.");
+
+	current = model;
+	spine = null;
+	atlas = null;
+	atlasSaysPMA = false;
+
+	// No skeleton: hide the timeline and disable the model controls. The play
+	// button stays live — it toggles this <video>.
+	if (el.timeline && !el.timeline.hidden) el.timeline.hidden = true;
+	if (el.animSelect) {
+		el.animSelect.innerHTML = "";
+		el.animSelect.disabled = true;
+	}
+	if (el.skinSelect) {
+		el.skinSelect.innerHTML = "";
+		el.skinSelect.disabled = true;
+	}
+	el.playBtn.disabled = false;
+	el.playBtn.dataset.playing = "true";
+	const syncPlayBtn = () => {
+		const playing = !vid.paused && !vid.ended;
+		el.playBtn.dataset.playing = String(playing);
+		el.playBtn.setAttribute("aria-label", playing ? "Jeda" : "Mainkan");
+		el.playBtn.querySelector(".icon").innerHTML = playing ? ICON.pause : ICON.play;
+	};
+	vid.addEventListener("play", syncPlayBtn);
+	vid.addEventListener("pause", syncPlayBtn);
+	renderVariants(model);
+	renderAudio(model);
+
+	vid.addEventListener("error", () => {
+		showError(new Error("Gagal memutar video (kode " + (vid.error?.code ?? "?") + ")."));
+	});
+	// A clip that plays clears any stale error (e.g. from a previous format
+	// the browser could not decode).
+	vid.addEventListener("canplay", () => showError(null));
+	vid.addEventListener("playing", () => showError(null));
+
+	const dur = () => (Number.isFinite(vid.duration) ? vid.duration : 0);
+	el.timeDur.textContent = dur().toFixed(2) + "s";
+	vid.addEventListener("loadedmetadata", () => {
+		el.timeDur.textContent = dur().toFixed(2) + "s";
+	});
+	vid.addEventListener("timeupdate", () => {
+		const d = dur();
+		el.timeCur.textContent = vid.currentTime.toFixed(2) + "s";
+		el.scrub.value = String(d ? (vid.currentTime / d) * 1000 : 0);
+	});
+
+	el.empty.hidden = true;
+	setActive(model.id);
+	renderHud();
+	if (fps.on) fpsResetStats();
+	el.loading.hidden = true;
+}
+
 async function loadModel(model) {
 	showError(null);
+	// A previous video left the play button (and selects) disabled; a skeleton
+	// model needs them live again.
+	el.playBtn.disabled = false;
+	if (el.skinSelect) el.skinSelect.disabled = false;
+	if (el.animSelect) el.animSelect.disabled = false;
 	// Model dibuka berarti sudah dilihat — hapus badge NEW-nya (dan simpan).
 	markSeen(model.id);
 	el.loading.hidden = false;
@@ -1199,8 +1269,14 @@ async function loadModel(model) {
 
 	try {
 		// Any previous Spine 2.x model left an iframe over the stage; clear it
-		// before deciding how to render this one.
+		// before deciding how to render this one. Also drop a previous video.
 		teardownLegacyViewer();
+		disposeVideo();
+
+		// Lost Sword cutscene movies are plain .mp4/.m4v files — no skeleton.
+		if (model.format === "video") {
+			return await loadVideoModel(model);
+		}
 
 		// Live2D Cubism models (.moc3) take a completely different path —
 		// they have no .skel/.atlas, and are rendered by the Cubism runtime.
@@ -2506,6 +2582,19 @@ function modelPartCount(core) {
 }
 
 function renderHud() {
+	// Lost Sword movies have no `spine` object at all, so they must be handled
+	// BEFORE the skeleton guard below (which would otherwise hide the HUD).
+	if (current && current.format === "video") {
+		const mb = current.bytes ? (current.bytes / 1048576).toFixed(1) : "?";
+		el.hud.hidden = false;
+		$("#hud-model").textContent = current.name;
+		$("#hud-stats").innerHTML =
+			`<span><b>${mb}</b> MB</span>` +
+			`<span><b>Video</b></span>` +
+			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
+		$("#title-model").textContent = current.name;
+		return;
+	}
 	if (!current || !spine) {
 		el.hud.hidden = true;
 		return;
@@ -3133,6 +3222,16 @@ function backToGames() {
 	browse.game = null;
 	browse.page = 1;
 	el.search.value = "";
+	// Leaving a game must stop any playing video: a <video> keeps downloading
+	// and decoding off-screen, which stalls the library render.
+	if (videoStageActive()) {
+		disposeVideo();
+		spine = null;
+		current = null;
+		el.empty.hidden = false;
+		el.hud.hidden = true;
+		el.playBtn.disabled = false;
+	}
 	renderLibrary();
 }
 
@@ -3343,6 +3442,7 @@ const UPDATABLE = {
 	ivntight: "/api/update/ivntight",
 	girlwars: "/api/update/girlwars",
 	lostsword: "/api/update/lostsword",
+	"lostsword-video": "/api/update/lostsword-video",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -3907,7 +4007,18 @@ function showError(msg) {
 /* ------------------------------------------------------------------ *
  * Events
  * ------------------------------------------------------------------ */
-el.playBtn.addEventListener("click", () => setPlaying(!state.playing));
+el.playBtn.addEventListener("click", () => {
+	// Video models drive their own <video> element; the Spine clock is unused.
+	if (videoStageActive()) {
+		const v = videoElement();
+		if (v) {
+			if (v.paused) v.play().catch(() => {});
+			else v.pause();
+		}
+		return;
+	}
+	setPlaying(!state.playing);
+});
 el.loopBtn.addEventListener("click", () => {
 	state.loop = !state.loop;
 	el.loopBtn.dataset.on = String(state.loop);

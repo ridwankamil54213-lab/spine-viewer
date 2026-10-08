@@ -220,6 +220,7 @@ const dirBytesCache = new Map();
  */
 const GAME_ROOTS = [
 	{ match: "nikke", key: "nikke", label: "Nikke: Goddess of Victory" },
+	{ match: "lostsword-video", key: "lostsword-video", label: "Lost Sword — Video" },
 	{ match: "lostsword", key: "lostsword", label: "Lost Sword" },
 	{ match: "talesofangels", key: "talesofangels", label: "Tales of Angels" },
 	{ match: "crosscore", key: "crosscore", label: "CrossCore" },
@@ -1208,7 +1209,66 @@ function scanModels() {
 
 	walk(ASSETS, 0, null);
 	const sorted = models.sort((a, b) => a.name.localeCompare(b.name));
+	scanVideos(models);
 	return attachCharacters(attachFamilies(sorted));
+}
+
+/**
+ * Lost Sword movies are plain .mp4/.m4v files (skill / summon / quest
+ * cutscenes) that no skeleton scan would ever surface. Walk
+ * assets/lostsword-video/ and add one entry per file with format "video" so
+ * the viewer can list and play them; `bytes` gives the size for the badge.
+ */
+function scanVideos(models) {
+	const root = path.join(ASSETS, "lostsword-video");
+	if (!fs.existsSync(root)) return;
+	const files = [];
+	const walkV = (dir, depth) => {
+		if (depth > 6) return;
+		let entries = [];
+		try {
+			entries = fs.readdirSync(dir, { withFileTypes: true });
+		} catch {
+			return;
+		}
+		for (const e of entries) {
+			const full = path.join(dir, e.name);
+			if (e.isDirectory()) walkV(full, depth + 1);
+			else if (/\.(mp4|m4v|webm|mov)$/i.test(e.name)) files.push(full);
+		}
+	};
+	walkV(root, 0);
+	for (const full of files) {
+		const rel = path.relative(root, full).split(path.sep).join("/");
+		const id = "lostsword-video/" + rel.replace(/\.[^.]+$/, "");
+		let bytes = 0;
+		try {
+			bytes = fs.statSync(full).size;
+		} catch {
+			/* keep 0 */
+		}
+		const parts = rel.replace(/\.[^.]+$/, "").split("/");
+		const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+		models.push({
+			id,
+			game: "lostsword-video",
+			gameLabel: "Lost Sword — Video",
+			format: "video",
+			subgroup: parts.slice(0, -1).join(" › "),
+			name: parts.map(title).join(" › "),
+			group: "lostsword-video / " + parts.slice(0, -1).join(" / "),
+			videoFile: `/lostsword-video/${rel.split("/").map(encodeURIComponent).join("/")}`,
+			files: [path.basename(full)],
+			bytes,
+			size: null,
+			spine: null,
+			runtime: null,
+			bones: null,
+			slots: null,
+			animations: [],
+			skins: [],
+		});
+	}
 }
 
 const app = express();
@@ -2191,9 +2251,16 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-girlwars.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// Lost Sword video extractor: rows videos out of UnityDataAssetPack.
 	lostsword: {
 		script: path.join(ROOT, "tools", "update-lostsword.py"),
 		py: "/srv/venv-spine/bin/python",
+	},
+	"lostsword-video": {
+		script: path.join(ROOT, "tools", "extract-lostsword-video.py"),
+		py: "/srv/venv-spine/bin/python",
+		// The extractor has no --check; the button runs it directly.
+		noCheck: true,
 	},
 };
 
@@ -2261,7 +2328,14 @@ function runUpdater(game, args, onLog) {
 
 app.get("/api/update/:game", async (req, res) => {
 	const game = req.params.game;
-	if (!UPDATERS[game]) return res.status(404).json({ error: `Tidak ada pembaru untuk ${game}.` });
+	const cfg = UPDATERS[game];
+	if (!cfg) return res.status(404).json({ error: `Tidak ada pembaru untuk ${game}.` });
+	// Extractor-only jobs (e.g. Lost Sword video) have no --check; a "check"
+	// just reports what is already on disk so the button can be offered.
+	if (cfg.noCheck && req.query.mode !== "apply") {
+		res.json({ ok: true, extractor: true, new: 0, log: [`Pembaru ${game} hanya punya mode terapkan.`] });
+		return;
+	}
 	const mode = req.query.mode === "apply" ? "apply" : "check";
 	// A check is quick; a download is not, so it goes to the background.
 	if (mode === "check") {
@@ -2647,6 +2721,16 @@ app.use(
 app.use(
 	"/orisries-audio",
 	express.static(OR_AUDIO_DIR, { fallthrough: false, maxAge: "7d", immutable: true })
+);
+// Lost Sword cutscene videos (skill / summon / quest .mp4|.m4v). Served under
+// its own prefix so a missing folder can never shadow /assets.
+app.use(
+	"/lostsword-video",
+	express.static(path.join(ASSETS, "lostsword-video"), {
+		fallthrough: false,
+		maxAge: "7d",
+		immutable: true,
+	})
 );
 app.use(express.static(path.join(ROOT, "public")));
 
