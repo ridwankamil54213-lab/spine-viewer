@@ -58,16 +58,26 @@ ffmpeg -y -i <klip>.mp4 -t 6 -an -c:v libvpx-vp9 -b:v 900k -vf scale=480:-2 t.we
 
 ## Viewer
 
-- `src/server.js` `scanVideos()` memindai `assets/lostsword-video/` dan menambah
-  satu model ber-`format: "video"` per berkas (id `lostsword-video/<rel>`),
-  `game "lostsword-video"` (GAME_ROOTS "lostsword-video" **sebelum**
-  "lostsword" agar tidak tertelan). File disajikan di `/lostsword-video/`
-  (range request → video bisa di-scrub).
+- `src/server.js` `attachLostSwordFamilies()` menyatukan **satu karakter = satu
+  kartu**, dengan semua yang berhubungan masuk ke dropdown **Varian**:
+  - model `unit/<base>` (root = "Utama"),
+  - kostum/nampan `lobbyunit/<base>[_kostum]`, pet `pet/<base>_01`,
+  - dan **video cutscene** karakter itu (`lostsword-video/.../Pc_<Char>_NN`).
+  Penggabungan hanya terjadi kalau ada folder unit bernama persis `<base>`,
+  supaya kata depan yang sama antar monster berbeda (`goblin_archer`,
+  `goblin_king`, `dragon_gold`, `dragon_green`) tidak ikut tergabung. Folder
+  unit berisi banyak skeleton (Abyss + kabut + efek, Goblin_Carriage b/u,
+  Kraken Far/Mid/Front) juga digabung, dinamai dari stem-nya.
+  Hasil: 91 keluarga, 61 di antaranya punya varian video; label duplikat 0.
+- `scanVideos()` tetap memindai `assets/lostsword-video/` dan menambah satu model
+  ber-`format: "video"` per berkas; berkas disajikan di `/lostsword-video/`
+  (range request → bisa di-scrub). Video yang tak punya karakter (`Prologue`,
+  `Summon_*`) tetap muncul sebagai entri di tile "Lost Sword — Video".
 - `src/video-stage.js` memasang `<video controls>` overlay di `#canvas-wrap`
-  dan menambahkan kelas `is-video` (canvas PIXI disembunyikan — tak ada skeleton
-  untuk digambar). `disposeVideo()` melepas + menghentikan unduhan.
-- **Wajib**: hentikan video saat keluar game (`backToGames()`), kalau tidak
-  `<video>` terus mengunduh/mendekode dan render library tersendat.
+  dan menambah kelas `is-video` (canvas PIXI disembunyikan — tak ada skeleton).
+  `disposeVideo()` melepas + menghentikan unduhan; **wajib** dipanggil saat
+  keluar game (`backToGames()`), kalau tidak video 52 MB terus mengunduh dan
+  render library tersendat.
 - HUD video (`renderHud`) ditangani **sebelum** guard `!spine` — model video
   tidak punya objek `spine`, jadi guard itu akan menyembunyikan HUD-nya.
 - Tombol update: `UPDATERS["lostsword-video"]` dengan `noCheck: true` (ekstraktor

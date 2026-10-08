@@ -1001,6 +1001,175 @@ function pairSkeletonAtlas(skels, atlases) {
 	return out;
 }
 
+/**
+ * Lost Sword variants: one character = one card, with everything about that
+ * character in the dropdown.
+ *
+ * The game scatters a single character across THREE places:
+ *   - unit/<base>            the battle / sprite model (plus monster/effect
+ *                            siblings inside the same folder: `<folder>#<stem>`)
+ *   - lobbyunit/<base>[_x]    the lobby painting and its costume/daily variants,
+ *                            often split across folders (`bedivere`, `_bunny`,
+ *                            `_jin`, `_jin_bunny`)
+ *   - pet/<base>_01           the pet
+ * and its cutscenes live under a DIFFERENT root entirely
+ * (`lostsword-video/...`, extracted from VideoClip objects, named
+ * `Pc_<Char>_NN[_Special|_Memorial]`).
+ *
+ * Left alone a character with four costumes and three movies showed up as a
+ * dozen unrelated tiles. This merges them all — skeleton models AND videos —
+ * into one family whose root is the plain unit model, so the stage's "Varian"
+ * dropdown lists them together.
+ *
+ * Only characters that HAVE a unit model are merged, so monsters with a shared
+ * word but no plain folder (`goblin_archer`, `fishman_*`) and lobby-only NPCs
+ * stay standalone.
+ */
+function attachLostSwordFamilies(models, videos) {
+	const ls = models.filter((m) => (m.game || "") === "lostsword");
+	if (!ls.length) return models;
+
+	const TAG = /^(lobby_|pc_|npc_|bg_|ps_|pet_)/i;
+	const stripTag = (name) => name.replace(TAG, "");
+	const baseOf = (name) => stripTag(name).split("_")[0].toLowerCase();
+	const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+	const folderOf = (id) => id.split("#")[0];
+	const partsOf = (id) => folderOf(id).split("/"); // [game, group, folderName]
+
+	// "<group>|<base>" -> { group, base, models: [] }
+	const buckets = new Map();
+	for (const m of ls) {
+		const [, group, fname] = partsOf(m.id);
+		const base = baseOf(fname);
+		const key = `${group}|${base}`;
+		if (!buckets.has(key)) buckets.set(key, { group, base, models: [] });
+		buckets.get(key).models.push(m);
+	}
+
+	// Videos indexed by character base (Summon_*/Prologue have none → skip).
+	const vidsByBase = new Map();
+	for (const v of videos || []) {
+		const name = v.id.split("/").pop();
+		if (/^Summon_/i.test(name)) continue;
+		const mm = name.match(/^(?:Pc|Eb)_([A-Za-z0-9]+)/);
+		if (!mm) continue;
+		const base = mm[1].toLowerCase();
+		if (!vidsByBase.has(base)) vidsByBase.set(base, []);
+		vidsByBase.get(base).push(v);
+	}
+
+	// Build one family from a flat list of models. `base` strips the character
+	// prefix off labels; `rootModel` leads the dropdown as "Utama".
+	const makeFamily = (all, base, rootModel, prop = false) => {
+		if (all.length < 2) return;
+		const labelFor = (m) => {
+			if (m.id === rootModel.id) return "Utama";
+			const [, group, fname] = partsOf(m.id);
+			const stem = m.id.split("#")[1] || "";
+			if (m.game === "lostsword-video") {
+				// `<Quality> › <Category…>`; keep the category + the clip's own
+				// suffix so several movies of one character stay distinct.
+				const [quality, ...rest] = m.subgroup.split(" › ");
+				let sfx = m.id.split("/").pop().replace(/^(?:Pc|Eb)_/i, "");
+				if (sfx.toLowerCase().startsWith(base)) sfx = sfx.slice(base.length);
+				sfx = sfx.replace(/[-_]+/g, " ").trim();
+				const lbl = [rest.join(" "), title(sfx)].filter(Boolean).join(" ").trim();
+				return (lbl || "Video") + (quality === "Low" ? " (Low)" : "");
+			}
+			// A prop part is named by its own skeleton stem (Carriage B 01,
+			// Abyss Fog B, Kraken Front), which stays unique across halves.
+			if (prop && stem) return title(stem);
+			const tag = fname.match(TAG);
+			const tagWord = tag ? tag[0].replace(/_$/, "") : "";
+			const ps = /^ps_/i.test(fname);
+			const eff = stripTag(fname).toLowerCase(); // base + qualifier
+			let s = eff.startsWith(base) ? eff.slice(base.length) : eff;
+			// A sibling skeleton inside a shared folder (`<folder>#<stem>`) is
+			// distinguished by its stem, not the folder.
+			if (stem && eff === base) {
+				const se = stripTag(stem).toLowerCase();
+				s = se.startsWith(base) ? se.slice(base.length) : se;
+			}
+			s = s.replace(/^[-_]+/, "");
+			if (!s) s = tagWord || stem || fname;
+			const label = title(s) || "Varian";
+			let prefix = "";
+			if (ps) prefix = "PS ";
+			else if (group === "pet") prefix = "Pet ";
+			else if (tagWord && s.toLowerCase() !== tagWord.toLowerCase()) prefix = title(tagWord) + " ";
+			return prefix + label;
+		};
+
+		// Disambiguate repeated labels: a folder holds the same pose from two
+		// angles (`#Lobby_Kei_Awakening_B` / `_F`) which would both read
+		// "Lobby Awakening"; append the discriminating tail (B, F…).
+		const counts = new Map();
+		for (const x of all) counts.set(labelFor(x), (counts.get(labelFor(x)) || 0) + 1);
+		const finalLabel = (m) => {
+			let label = labelFor(m);
+			if (counts.get(label) > 1) {
+				const leaf = m.id.split("#")[1] || m.id.split("/").pop();
+				const tail = leaf.split(/[-_]/).pop();
+				if (tail && !label.toLowerCase().endsWith(tail.toLowerCase())) {
+					label = `${label} ${title(tail)}`;
+				}
+			}
+			return label;
+		};
+
+		const members = all
+			.map((x) => ({ id: x.id, label: finalLabel(x) }))
+			.sort((a, b) => (a.label === "Utama" ? -1 : b.label === "Utama" ? 1 : a.label.localeCompare(b.label)));
+		for (const m of all) m.family = { root: rootModel.id, label: finalLabel(m), members };
+	};
+
+	// Character merge: a character's unit + lobbyunit + pet + its cutscene
+	// videos. Only when a unit FOLDER named exactly the base exists —
+	// otherwise a shared word like "goblin"/"dragon" would merge unrelated
+	// models (goblin_archer, goblin_king, dragon_gold, dragon_green).
+	for (const [, bucket] of buckets) {
+		if (bucket.group !== "unit") continue;
+		const base = bucket.base;
+		const plainFolder = `lostsword/unit/${base}`;
+		const plain =
+			bucket.models.find(
+				(m) =>
+					folderOf(m.id) === plainFolder &&
+					(m.id.split("#")[1] || "").toLowerCase() === base
+			) || bucket.models.find((m) => folderOf(m.id) === plainFolder);
+		if (!plain) continue;
+		const all = [...bucket.models];
+		for (const g of ["lobbyunit", "pet"]) {
+			const b = buckets.get(`${g}|${base}`);
+			if (b) all.push(...b.models);
+		}
+		if (vidsByBase.has(base)) all.push(...vidsByBase.get(base));
+		makeFamily(all, base, plain);
+	}
+
+	// Prop merge: a unit FOLDER with several skeletons is one entity whose
+	// parts are named by their stems (Abyss + fog + effects; Goblin_Carriage
+	// + _b/_u halves; Kraken Far/Mid/Front). Group per FOLDER, never across the
+	// whole base bucket — otherwise unrelated dragons/goblins that merely share
+	// a first word (`dragon_gold` / `dragon_green`, `goblin_archer` /
+	// `goblin_carriage`) would fuse into one card.
+	const byFolder = new Map();
+	for (const m of ls) {
+		const f = folderOf(m.id);
+		if (!byFolder.has(f)) byFolder.set(f, []);
+		byFolder.get(f).push(m);
+	}
+	for (const [folder, group] of byFolder) {
+		if (group.length < 2 || group.some((m) => m.family)) continue;
+		const [, , fname] = folder.split("/");
+		const base = baseOf(fname);
+		const rootModel =
+			group.find((m) => (m.id.split("#")[1] || "").toLowerCase() === base) || group[0];
+		makeFamily(group, base, rootModel, true);
+	}
+	return models;
+}
+
 function scanModels() {
 	if (!fs.existsSync(ASSETS)) return [];
 	const models = [];
@@ -1210,7 +1379,12 @@ function scanModels() {
 	walk(ASSETS, 0, null);
 	const sorted = models.sort((a, b) => a.name.localeCompare(b.name));
 	scanVideos(models);
-	return attachCharacters(attachFamilies(sorted));
+	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
+	// into one family so the "Varian" dropdown carries them all. Videos stay in
+	// `models` (the client resolves variant ids against it) but only the family
+	// root is listed, so they never appear as separate cards.
+	const lsVideos = models.filter((m) => (m.game || "") === "lostsword-video");
+	return attachLostSwordFamilies(attachCharacters(attachFamilies(sorted)), lsVideos);
 }
 
 /**
