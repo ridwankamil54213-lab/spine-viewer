@@ -70,7 +70,6 @@ UA = "Mozilla/5.0 (Linux; Android 13)"
 
 TEXT_ASSET = "TextAsset"
 TEXTURE2D = "Texture2D"
-SPINE_EXTS = (".skel", ".atlas", ".json")
 
 
 def _log(msg):
@@ -226,7 +225,7 @@ def installed_folders():
         rel = os.path.relpath(dp, OUT).replace(os.sep, "/")
         if rel == "." or rel.count("/") > 1:
             continue  # only <group>/<folder>
-        if any(f.lower().endswith(".skel") for f in files):
+        if any(f.lower().endswith((".skel", ".json")) for f in files):
             found.add(rel.lower())
     return found
 
@@ -303,8 +302,24 @@ def list_bundles(split):
 # --------------------------------------------------------------------------- #
 # bundle -> models
 # --------------------------------------------------------------------------- #
+def is_json_skeleton(blob):
+    """True when a TextAsset holds a Spine JSON skeleton.
+
+    Some models ship the skeleton as a Spine JSON with NO extension at all
+    (TextAsset named "iris", "mordred", "Mercedes", …), so extension matching
+    misses them entirely. Their content always opens with `{"skeleton"`.
+    """
+    return blob[:16].lstrip()[:11].startswith(b'{"skeleton')
+
+
 def parse_bundle(data):
-    """Return ({stem: {'skel':bytes,'atlas':bytes}}, {lower_tex_stem: image})."""
+    """Return ({stem: {'skel'|'json':bytes,'atlas':bytes}}, {tex_stem: image}).
+
+    A skeleton is recognised EITHER by a `.skel`/`.json` extension OR by its
+    content, because Lost Sword ships some skeletons as extension-less JSON
+    TextAssets. `.atlas` is always extension-matched (its first line is a page
+    filename, so content sniffing is unreliable there).
+    """
     env = UnityPy.load(io.BytesIO(data))
     texts, pages = {}, {}
     for obj in env.objects:
@@ -314,14 +329,12 @@ def parse_bundle(data):
             if not (nm and blob):
                 continue
             low = nm.lower()
-            if not low.endswith(SPINE_EXTS):
-                continue
-            stem = nm.rsplit(".", 1)[0]
-            slot = texts.setdefault(stem, {})
-            if low.endswith(".skel"):
-                slot["skel"] = blob
-            elif low.endswith(".atlas"):
-                slot["atlas"] = blob
+            if low.endswith(".atlas"):
+                texts.setdefault(nm.rsplit(".", 1)[0], {})["atlas"] = blob
+            elif low.endswith(".skel"):
+                texts.setdefault(nm.rsplit(".", 1)[0], {})["skel"] = blob
+            elif low.endswith(".json") or is_json_skeleton(blob):
+                texts.setdefault(nm.rsplit(".", 1)[0], {})["json"] = blob
         elif kind == TEXTURE2D:
             try:
                 d = obj.read()
@@ -337,11 +350,13 @@ def parse_bundle(data):
 
 
 def models_of(texts, pages):
-    """Pair each skeleton with its atlas + the textures that atlas declares."""
+    """Pair each skeleton (binary or JSON) with its atlas + declared textures."""
     out = []
     for stem, blobs in texts.items():
-        if not (blobs.get("skel") and blobs.get("atlas")):
+        data = blobs.get("skel") or blobs.get("json")
+        if not (data and blobs.get("atlas")):
             continue
+        is_json = blobs.get("json") is not None
         refs = referenced_pages(blobs["atlas"])
         ref_stems = {r.rsplit(".", 1)[0] for r in refs}
         texs = []
@@ -350,7 +365,15 @@ def models_of(texts, pages):
                 continue
             fname = orig if orig.lower().endswith(".png") else orig + ".png"
             texs.append((fname, img))
-        out.append({"stem": stem, "skel": blobs["skel"], "atlas": blobs["atlas"], "texs": texs})
+        out.append(
+            {
+                "stem": stem,
+                "data": data,
+                "ext": ".json" if is_json else ".skel",
+                "atlas": blobs["atlas"],
+                "texs": texs,
+            }
+        )
     return out
 
 
@@ -358,9 +381,12 @@ def model_rel_id(group, folder, stem):
     """Relative model id as the server builds it: <group>/<folder>[#<stem>].
 
     The server ids a multi-skeleton folder as `<group>/<folder>#<stem>` and a
-    single-skeleton folder as just `<group>/<folder>` (folder == stem).
+    single-skeleton folder as just `<group>/<folder>` (folder == stem). Compare
+    case-insensitively because the folder is lower-cased from the bundle name
+    while the stem keeps its original casing.
     """
-    return "%s/%s" % (group, folder) if stem == folder else "%s/%s#%s" % (group, folder, stem)
+    same = stem.lower() == folder.lower()
+    return "%s/%s" % (group, folder) if same else "%s/%s#%s" % (group, folder, stem)
 
 
 def write_models(models, group, folder):
@@ -372,8 +398,8 @@ def write_models(models, group, folder):
     os.makedirs(dest, exist_ok=True)
     written = 0
     for m in models:
-        with open(os.path.join(dest, m["stem"] + ".skel"), "wb") as fh:
-            fh.write(m["skel"])
+        with open(os.path.join(dest, m["stem"] + m["ext"]), "wb") as fh:
+            fh.write(m["data"])
         with open(os.path.join(dest, m["stem"] + ".atlas"), "wb") as fh:
             fh.write(m["atlas"])
         for fname, img in m["texs"]:

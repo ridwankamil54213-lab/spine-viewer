@@ -37,6 +37,16 @@ int32 name_len | char[] name (pad 4) | int32 data_len | byte[] data
 
 Texture2D tetap lewat `obj.read().image` (Pillow).
 
+### Skeleton JSON tanpa ekstensi
+
+Sebagian model (mis. `Iris`, `mordred`, `Mercedes`, `Grand_Commander`) menyimpan
+skeleton sebagai **Spine JSON tanpa ekstensi sama sekali** — TextAsset-nya
+bernama `Iris`, `mordred`, dst., jadi filter berbasis ekstensi `.skel` akan
+**membuangnya** dan modelnya hilang tanpa jejak. Deteksi skeleton dari
+**isinya** (`{"skeleton"...`) — bukan dari nama berkas — lalu tulis ulang
+sebagai `<stem>.json` (viewer memilih runtime Spine dari field versi di JSON-nya;
+inilah sumber versi campur 4.1.06–4.1.24).
+
 ## Tata letak keluaran (yang dibaca viewer)
 
 ```
@@ -75,13 +85,23 @@ Idempoten: `--check --force` mengembalikan `new: 0` saat semua sudah terpasang.
 
 ## Hasil (v1.591.1)
 
-- 468 bundle → **375 folder / 430 skeleton** (72 bundle peta dilewati, 20 bundle
+- 468 bundle → **392 folder / 449 model** (72 bundle peta dilewati, 20 bundle
   bukan-spine).
-- 146 lobby (kartu lobby + memorial/daily/bikini), 160 unit (karakter + monster
-  + boss), 69 pet.
+- 156 lobby (kartu lobby + memorial/daily/bikini), 224 unit (karakter + monster
+  + boss + efek), 69 pet.
+- **422 skeleton biner + 19 skeleton JSON tanpa ekstensi** (19 terakhir inilah
+  yang tadinya hilang: `iris`, `mordred`, `mercedes`, `grand_commander`,
+  `imperial_giant_soldie`, `nimue`, `lilith`, `roy`, `urien`, `igraine`,
+  `beirin`, `gawain_lobby`, `goblin_s_boss`, `dummy`, `merry`, `enya_ultimate`,
+  `worlddragon_01`, `cristina_bikini`, …).
 - **90 model punya varian** (dropdown), mis. `unit/isabel` → `Isabel` +
   `Isabel_Throne`; `lobbyunit/elizabeth` → `Elizabeth` + `Elizabeth_Special`.
-- Spine **4.1.24**; atlas PMA (`pma:true`) — viewer mendeteksi PMA dari atlas.
+- Spine **4.1.06–4.1.24** (versi campur); atlas PMA (`pma:true`) — viewer
+  mendeteksi PMA dari atlas.
+- Sisa yang tak bisa render (memang tak lengkap di APK): 11 skeleton tanpa atlas
+  (`enya_ultimate`, `worlddragon_01`, `skull_*`, `goblin_carriage` b_05/b_06,
+  `cristina_bikini`, …) dan 16 atlas tanpa skeleton (kartu lobby diam yang
+  atlas-nya dipakai ulang, mis. `mordred`/`iris` lobby).
 
 ## Catatan
 
