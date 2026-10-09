@@ -303,6 +303,16 @@ const GAME_ROOTS = [
 		key: "wuhua",
 		label: "物华弥新 (Neo Artifacts)",
 	},
+	// 钢岚 / Mecharashi (com.tentree.gp.mecharashi, v1.21.1). UnityFS + UnityCN.
+	// Bundles at assets/ExportAssetBundle/*.b; UnityCN key (hex)
+	// "31433743463543423144313841304630" (= bytes 1C7CF5CB1D18A0F0). Each pilot_*
+	// bundle carries a complete Spine (3.8.76) .skel + .atlas + Texture2D.
+	// See tools/mecharashi/.
+	{
+		match: "mecharashi",
+		key: "mecharashi",
+		label: "钢岚 (Mecharashi)",
+	},
 	// 异世界后宫物语 (Isekai Harem Monogatari), com.luckystargame/18game build.
 	// Cocos Creator 2.4 again. Assets under assets/assets/<bundle>/, encrypted:
 	//   prefix "GenSanaSneG" + XOR (json/atlas) or XXTEA (png/jpg) with key
