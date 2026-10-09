@@ -292,6 +292,17 @@ const GAME_ROOTS = [
 		key: "throne",
 		label: "Divine Throne",
 	},
+	// 物华弥新 / Neo Artifacts (com.cipaishe.wuhua.google, v1.5.0). Unity 2018.4.
+	// SmallPack*.apk bundles (assets/bundles/*.ab) are UnityFS but BLOCK-ENCRYPTED:
+	//   key = data[51]; XOR data[50:end] ^= key   (per-file `end`; live2dhub #5896)
+	// TextAsset .skel (Spine 3.8.95) + .atlas + Texture2D. The pack holds the
+	// KV splash-art set + effects/UI/shaders/audio/lua; the collectible artifact
+	// sprites are pulled from the CDN at runtime. See tools/wuhua/.
+	{
+		match: "wuhua",
+		key: "wuhua",
+		label: "物华弥新 (Neo Artifacts)",
+	},
 	// 异世界后宫物语 (Isekai Harem Monogatari), com.luckystargame/18game build.
 	// Cocos Creator 2.4 again. Assets under assets/assets/<bundle>/, encrypted:
 	//   prefix "GenSanaSneG" + XOR (json/atlas) or XXTEA (png/jpg) with key
