@@ -438,6 +438,16 @@ const GAME_ROOTS = [
 		key: "alcherystars",
 		label: "白夜极光 (Alchemy Stars)",
 	},
+	// 深蓝终末录 (Deep Blue). Unity 2021.3. APK (CloudFront signed URL) holds
+	// assets/prefab/hero/herospines/hero_<id>/*.unity3d; each bundle is a plain
+	// UnityFS with a complete Spine (.skel + .atlas + 2048x2048 pages). All
+	// atlases carry `pma: true`. See tools/shenlan/.
+	{
+		match: "shenlan",
+		key: "shenlan",
+		label: "深蓝终末录 (Deep Blue)",
+		pmaDefault: true,
+	},
 	// 异世界后宫物语 (Isekai Harem Monogatari), com.luckystargame/18game build.
 	// Cocos Creator 2.4 again. Assets under assets/assets/<bundle>/, encrypted:
 	//   prefix "GenSanaSneG" + XOR (json/atlas) or XXTEA (png/jpg) with key

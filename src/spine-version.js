@@ -15,7 +15,7 @@
  *             pattern near the start rather than assuming offset 0.
  */
 
-export const SPINE_RUNTIMES = ["3.7", "3.8", "4.0", "4.1", "4.2"];
+export const SPINE_RUNTIMES = ["3.7", "3.8", "4.0", "4.1", "4.2", "4.3"];
 
 /** Major.minor (and optional patch) pulled out of a candidate version string. */
 export function parseVersion(str) {
@@ -55,9 +55,11 @@ export function pickRuntime(version) {
 	if (major === 3 && minor <= 7) return "3.8"; // 3.7 has no SkeletonBinary
 	if (major === 3 && minor === 8) return "3.8";
 	if (major === 4 && minor === 0) return "4.0";
-	// 4.2+ is past the last @pixi-spine runtime (they stop at 4.1). Route
-	// those to the official Esoteric runtime, which reads 4.0-4.3 alike.
-	if (major === 4 && minor >= 2) return "4.2";
+	// 4.3 needs the genuine 4.3 runtime: the 4.2 core predates the 4.3 binary
+	// layout (it never gets past readString on the header).
+	if (major === 4 && minor >= 3) return "4.3";
+	// 4.2 has its own official runtime too.
+	if (major === 4 && minor === 2) return "4.2";
 	if (major === 4) return "4.1";
 	if (major < 3) return "3.8";
 	return "4.1";

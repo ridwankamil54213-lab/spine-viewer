@@ -25,6 +25,20 @@ import {
 	AtlasAttachmentLoader as AtlasAttachmentLoader42,
 } from "spine-pixi-v7-42";
 import * as runtime42 from "spine-pixi-v7-42";
+// Spine 4.3 — same story as 4.2: pixi-spine's `Spine` only knows 3.7/3.8/4.0/4.1,
+// and 4.2's spine-core predates the 4.3 binary layout (it never gets past
+// readString on the header). So 4.3 models are parsed AND drawn by the official
+// renderer at the matching release, all taken from this one package (its nested
+// spine-core must be the same copy the renderer's `instanceof` checks use).
+import {
+	Spine as Spine43,
+	SpineTexture as SpineTexture43,
+	SkeletonBinary as SkeletonBinary43,
+	SkeletonJson as SkeletonJson43,
+	TextureAtlas as TextureAtlas43,
+	AtlasAttachmentLoader as AtlasAttachmentLoader43,
+} from "@esotericsoftware/spine-pixi-v7";
+import * as runtime43 from "@esotericsoftware/spine-pixi-v7";
 import { loadTextures } from "@pixi/assets";
 import {
 	detectSpineVersion,
@@ -692,6 +706,8 @@ const RUNTIME_LOADERS = {
 	// Genuine Spine 4.2. Stellar Affinity ships 4.2.35; neither 4.1 nor 4.3
 	// can read that layout (see the import note above).
 	"4.2": () => markRuntime(runtime42, "4.2"),
+	// Genuine Spine 4.3 (e.g. 4.3.39-beta — 深蓝终末录).
+	"4.3": () => markRuntime(runtime43, "4.3"),
 };
 
 // `runtime42` is the namespace we fall back to for version tagging, but the
@@ -705,6 +721,7 @@ const RUNTIME_LOADERS = {
 const PARSER_OVERRIDES = {
 	"3.7": { SkeletonBinary: null, SkeletonJson: runtime37.SkeletonJson },
 	"4.2": { SkeletonBinary: SkeletonBinary42, SkeletonJson: SkeletonJson42 },
+	"4.3": { SkeletonBinary: SkeletonBinary43, SkeletonJson: SkeletonJson43 },
 };
 
 /**
@@ -721,6 +738,7 @@ const ATTACHMENT_LOADERS = {
 	"4.0": (atlas) => new runtime40.AtlasAttachmentLoader(atlas),
 	"4.1": (atlas) => new AtlasAttachmentLoader41(atlas),
 	"4.2": (atlas) => new AtlasAttachmentLoader42(atlas),
+	"4.3": (atlas) => new AtlasAttachmentLoader43(atlas),
 };
 
 /** Build the attachment loader for a runtime key, defaulting to 4.1. */
@@ -742,6 +760,7 @@ function makeAttachmentLoader(key, atlas) {
  */
 function makeSpine(key, skeletonData) {
 	if (key === "4.2") return new Spine42({ skeletonData });
+	if (key === "4.3") return new Spine43({ skeletonData });
 	return new Spine(skeletonData);
 }
 
@@ -791,9 +810,12 @@ function makeAtlas(key, atlasText, pageCache) {
 	// callback, no completion callback (unlike pixi-spine's, which resolves
 	// through its third argument). Passing the pixi-spine signature here made
 	// the atlas build fine but never settle: the load hung forever with zero
-	// errors. So 4.2 gets its pages assigned afterwards, per page.
-	if (key === "4.2") {
-		const ta = new TextureAtlas42(atlasText);
+	// errors. So 4.2 (and 4.3, same API) gets its pages assigned afterwards,
+	// per page.
+	if (key === "4.2" || key === "4.3") {
+		const TA = key === "4.3" ? TextureAtlas43 : TextureAtlas42;
+		const Wrap = key === "4.3" ? SpineTexture43 : SpineTexture42;
+		const ta = new TA(atlasText);
 		for (const page of ta.pages) {
 			const bt = pageCache.get(page.name);
 			if (!bt) throw new Error(`Halaman atlas “${page.name}” tidak tersedia.`);
@@ -801,7 +823,7 @@ function makeAtlas(key, atlasText, pageCache) {
 			// Pixi texture inside the SpineTexture wrapper. A bare BaseTexture
 			// leaves every mesh with `texture === undefined`, which draws
 			// absolutely nothing and throws no error.
-			page.setTexture(SpineTexture42.from(bt));
+			page.setTexture(Wrap.from(bt));
 		}
 		return Promise.resolve(ta);
 	}

@@ -43,9 +43,10 @@ function pickRuntime(version) {
 	if (major === 3 && minor <= 7) return "3.8"; // 3.7 has no SkeletonBinary
 	if (major === 3 && minor === 8) return "3.8";
 	if (major === 4 && minor === 0) return "4.0";
-	// 4.2 needs the genuine 4.2 runtime: 4.1 predates it and 4.3 reads an
-	// extra `referenceScale` float in the header that 4.2 files lack.
-	if (major === 4 && minor >= 2) return "4.2";
+	// 4.3 needs the genuine 4.3 runtime (the 4.2 core predates the 4.3 binary
+	// layout). 4.2 needs its own too: 4.1 predates it.
+	if (major === 4 && minor >= 3) return "4.3";
+	if (major === 4 && minor === 2) return "4.2";
 	if (major === 4) return "4.1";
 	if (major < 3) return "3.8";
 	return "4.1";
