@@ -357,6 +357,7 @@ const el = {
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
 	partsBtn: $("#parts-btn"),
+	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
 
 	// FPS meter
@@ -380,6 +381,15 @@ const el = {
 	folder: $("#folder"),
 	uploadBtn: $("#upload-btn"),
 	delBtn: $("#del-btn"),
+
+	// permalink / "Tautan tampilan"
+	gridLink: $("#link-btn"),
+	linkModal: $("#link-modal"),
+	linkUrl: $("#link-url"),
+	linkCopy: $("#link-copy"),
+	linkRefresh: $("#link-refresh"),
+	linkClose: $("#link-close"),
+	linkNote: $("#link-note"),
 };
 
 /* ------------------------------------------------------------------ *
@@ -419,6 +429,10 @@ const state = {
 	showBones: false,
 	showGrid: true,
 	bg: "dark",
+	// Render pixel density. "auto" = devicePixelRatio capped at 2 (previous
+	// behaviour); a number overrides it, so the stage can be rendered at 3-4x
+	// for extra sharpness on zoomed-in art or high-DPI screens.
+	density: "auto",
 	scrubbing: false,
 	trackTime: 0,
 };
@@ -577,6 +591,25 @@ function fitModel() {
 	state.panX = 0;
 	state.panY = 0;
 	applyTransform();
+}
+
+function rendererDensity() {
+	// Explicit override from the toolbar; "auto" keeps the old behaviour
+	// (devicePixelRatio, capped at 2 so 4K/retina screens don't explode).
+	if (state.density !== "auto") {
+		const n = Number(state.density);
+		if (Number.isFinite(n) && n > 0) return Math.min(4, n);
+	}
+	return Math.min(window.devicePixelRatio || 1, 2);
+}
+
+function resizeRenderer() {
+	try {
+		app.renderer.resolution = rendererDensity();
+	} catch {
+		/* renderer may not allow live resolution on some backends */
+	}
+	app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
 }
 
 function applyTransform() {
@@ -2593,10 +2626,13 @@ function renderHud() {
 			`<span><b>Video</b></span>` +
 			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
 		$("#title-model").textContent = current.name;
+	document.title = current.name + " — Spine Stage";
+	el.gridLink.hidden = false;
 		return;
 	}
 	if (!current || !spine) {
 		el.hud.hidden = true;
+		if (el.gridLink) el.gridLink.hidden = true;
 		return;
 	}
 	el.hud.hidden = false;
@@ -2614,6 +2650,8 @@ function renderHud() {
 			`<span><b>Live2D Cubism 4</b></span>` +
 			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
 		$("#title-model").textContent = current.name;
+	document.title = current.name + " — Spine Stage";
+	el.gridLink.hidden = false;
 		return;
 	}
 	const slots = spine.skeleton.slots.length;
@@ -2640,6 +2678,8 @@ function renderHud() {
 			? `<span><b>runtime ${spineRuntime}</b></span>`
 			: "");
 	$("#title-model").textContent = current.name;
+	document.title = current.name + " — Spine Stage";
+	el.gridLink.hidden = false;
 	el.delBtn.hidden = false;
 }
 
@@ -4162,6 +4202,17 @@ el.fpsReset?.addEventListener("click", fpsResetStats);
 // Part picker toggle.
 el.partsBtn?.addEventListener("click", () => setPartsVisible(!parts.on));
 
+// Render pixel density ("Tajam"). Higher = sharper on-screen render, at the
+// cost of GPU fill rate. The PNG export is unaffected (it always targets the
+// atlas' native resolution), so this only tunes what you see live.
+const DENSITY_KEY = "spine-stage:density";
+el.densitySelect?.addEventListener("change", () => {
+	state.density = el.densitySelect.value;
+	try { localStorage.setItem(DENSITY_KEY, state.density); } catch { /* private mode */ }
+	resizeRenderer();
+	applyTransform();
+});
+
 // --- stage backdrop -------------------------------------------------------
 // Cycling the backdrop is how you actually see edge problems: a dark or light
 // halo around the art (a PMA mistake) disappears against the default dark grid
@@ -5354,7 +5405,9 @@ el.delBtn.addEventListener("click", async () => {
 		el.empty.hidden = false;
 		el.hud.hidden = true;
 		el.delBtn.hidden = true;
+		el.gridLink.hidden = true;
 		$("#title-model").textContent = "—";
+		document.title = "Spine Stage — Penampil Skeleton 2D";
 		toast("Model dihapus.");
 		await refresh();
 	} catch (err) {
@@ -5425,10 +5478,321 @@ window.spineStage = {
 };
 
 const ro = new ResizeObserver(() => {
-	app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
+	resizeRenderer();
 	applyTransform();
 });
 ro.observe(el.canvasWrap);
+
+/* ------------------------------------------------------------------ *
+ * Permalink — encode the current view into the URL, restore it on load
+ *
+ * The URL is the single source of truth for "a shared view": model, clip,
+ * skin/variant, the whole camera (zoom/pan/flip), playback rate, the toggles
+ * (bone/grid/FPS/part, timeline open, inspector tab, sidebar), the backdrop
+ * and the clock position. Writing it is debounced so dragging the model does
+ * not spam history.replaceState; reading it never throws on a mangled query.
+ *
+ * The playhead is honest about intent: if playback was paused (or scrubbed)
+ * the link reopens paused at that instant, otherwise it reopens playing.
+ * ------------------------------------------------------------------ */
+
+/** Base64url of a JSON payload — never throws, returns "" on bad input. */
+function b64urlEncode(str) {
+	try {
+		return btoa(unescape(encodeURIComponent(str)))
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=+$/, "");
+	} catch {
+		return "";
+	}
+}
+function b64urlDecode(str) {
+	try {
+		const p = String(str).replace(/-/g, "+").replace(/_/g, "/");
+		return decodeURIComponent(escape(atob(p + "===".slice((p.length + 3) % 4))));
+	} catch {
+		return null;
+	}
+}
+
+const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100;
+
+/** Snapshot of everything shareable in the current view. */
+function permalinkState() {
+	const s = {
+		v: 1,
+		g: browse.game || undefined,
+		m: current?.id || undefined,
+	};
+	if (current) {
+		if (animName) s.a = animName;
+		if (el.skinSelect?.value) s.k = el.skinSelect.value;
+		// Variant options carry the model id on dataset.id (their value is the
+		// human label), so that is what travels in the link.
+		const vopt = el.variantSelect?.selectedOptions?.[0];
+		if (vopt?.dataset?.id) s.va = vopt.dataset.id;
+	}
+	if (state.rate !== 1) s.r = state.rate;
+	if (!state.playing) s.p = 0;
+	if (state.trackTime > 0.001) s.t = round2(state.trackTime);
+	if (state.flip) s.f = 1;
+	if (state.showBones) s.b = 1;
+	if (!state.showGrid) s.gr = 0;
+	if (fps.on) s.fps = 1;
+	if (parts.on) s.pt = 1;
+	if (state.bg !== "dark") s.bg = state.bg;
+	if (!el.timeline?.hidden) s.tl = 1;
+	if (!el.inspector?.hidden) s.insp = insp.tab;
+	if (document.querySelector(".layout")?.classList.contains("sidebar-hidden")) s.sb = 0;
+	// Skip zoom/pan when the camera is at its untouched defaults — the restore
+	// side treats a missing pair as "run fitModel()".
+	if (Math.abs(state.zoom - 1) > 1e-4 || Math.abs(state.panX) > 0.5 || Math.abs(state.panY) > 0.5) {
+		s.z = round2(state.zoom);
+		s.x = round2(state.panX);
+		s.y = round2(state.panY);
+	}
+	return s;
+}
+
+/** Build the shareable URL for the current view. */
+function buildPermalink() {
+	let qs = "";
+	try {
+		qs = b64urlEncode(JSON.stringify(permalinkState()));
+	} catch {
+		/* fall through with an empty payload */
+	}
+	const u = new URL(location.href);
+	u.hash = "";
+	if (qs) u.searchParams.set("v", qs);
+	else u.searchParams.delete("v");
+	return u.toString();
+}
+
+/** Decode a ?v= payload (raw base64url or a whole pasted URL) into an object. */
+function parsePermalink(search) {
+	let raw = "";
+	try {
+		raw = new URLSearchParams(search ?? location.search).get("v") || "";
+	} catch {
+		return null;
+	}
+	if (!raw) {
+		// The caller may have pasted a full URL; pull the v= out of it.
+		const m = String(search).match(/[?&]v=([A-Za-z0-9\-_]+)/);
+		if (!m) return null;
+		raw = m[1];
+	}
+	const json = b64urlDecode(raw);
+	if (!json) return null;
+	try {
+		const o = JSON.parse(json);
+		return o && typeof o === "object" ? o : null;
+	} catch {
+		return null;
+	}
+}
+
+// Coalesces a burst of edits into one history entry.
+let permalinkTimer = null;
+function schedulePermalinkWrite(delay = 400) {
+	// Never clobber the address bar while a permalink is still being restored:
+	// the model loads asynchronously, and an early write would omit it.
+	if (permalinkRestoring) return;
+	if (permalinkTimer) clearTimeout(permalinkTimer);
+	permalinkTimer = setTimeout(() => {
+		permalinkTimer = null;
+		writePermalinkNow();
+	}, delay);
+}
+
+function writePermalinkNow() {
+	if (permalinkRestoring) return;
+	try {
+		history.replaceState(history.state, "", buildPermalink());
+	} catch {
+		/* sandboxed iframe / file: — the dialog still builds URLs on demand */
+	}
+}
+
+/** Open the "Tautan tampilan" dialog with a freshly built URL. */
+function openPermalink() {
+	if (!el.linkModal) return;
+	el.linkUrl.value = buildPermalink();
+	if (el.linkNote) {
+		el.linkNote.hidden = true;
+		el.linkNote.textContent = "";
+	}
+	el.linkModal.hidden = false;
+	// The shared URL reloads the view on open, so start the field selected.
+	el.linkUrl.focus();
+	el.linkUrl.select();
+}
+function closePermalink() {
+	if (el.linkModal) el.linkModal.hidden = true;
+}
+
+async function copyPermalink() {
+	const url = el.linkUrl?.value || buildPermalink();
+	let ok = false;
+	try {
+		if (navigator.clipboard?.writeText) {
+			await navigator.clipboard.writeText(url);
+			ok = true;
+		}
+	} catch {
+		/* fall through to the legacy path below */
+	}
+	if (!ok) {
+		try {
+			el.linkUrl.select();
+			ok = document.execCommand("copy");
+		} catch {
+			ok = false;
+		}
+	}
+	toast(ok ? "Tautan disalin ke papan klip." : "Tidak bisa menyalin otomatis — salin manual dari kotak URL.");
+}
+
+/** True while a permalink is being applied — blocks URL writes until the model
+ *  it names has finished loading. */
+let permalinkRestoring = false;
+
+/**
+ * Apply a decoded permalink to the live viewer and load the model it names.
+ * Instant toggles first, the model last, then the deferred bits (skin /
+ * variant / playhead) which only exist once the skeleton is live.
+ */
+async function applyPermalink(s) {
+	if (!s || typeof s !== "object") return false;
+	// A shared view is a fresh start: don't let the last session's sidebar,
+	// timeline, FPS or backdrop choices bleed into what the link describes.
+	permalinkRestoring = true;
+
+	browse.favOnly = false;
+	el.favFilter?.classList.remove("is-on");
+	if (s.g) {
+		browse.view = "models";
+		browse.game = s.g;
+		browse.page = 1;
+	}
+	// Camera, playback rate and the panel toggles — cheap and independent of
+	// whether the named model still exists.
+	state.rate = s.r > 0 ? s.r : 1;
+	if (el.rateSelect?.querySelector(`option[value="${state.rate}"]`)) {
+		el.rateSelect.value = String(state.rate);
+	}
+	state.flip = !!s.f;
+	el.flipBtn.dataset.on = String(state.flip);
+	setTimelineVisible(!!s.tl);
+	setPartsVisible(!!s.pt);
+	setFpsVisible(!!s.fps);
+	if (el.inspector) setInspectorVisible(!!s.insp);
+	if (s.insp === "slots" || s.insp === "compare") setInspectorTab(s.insp);
+	if (typeof s.b === "boolean" || typeof s.b === "number") {
+		state.showBones = !!s.b;
+		bonesGfx.visible = state.showBones;
+		el.bonesBtn.dataset.on = String(state.showBones);
+		drawBones();
+	}
+	if (typeof s.gr === "boolean" || typeof s.gr === "number") {
+		state.showGrid = !!s.gr;
+		el.grid.classList.toggle("is-on", state.showGrid);
+		el.gridBtn.dataset.on = String(state.showGrid);
+	}
+	// A permalink that omits the backdrop means the default (dark) — reset it,
+	// so a shared link keeps its own look instead of inheriting a saved one.
+	setStageBg(s.bg && BG_ORDER.includes(s.bg) ? s.bg : "dark", { persist: false });
+	if (typeof s.sb === "boolean" || typeof s.sb === "number") setSidebarHidden(!s.sb, { persist: false });
+
+	// Load the model, if the link names one that still exists.
+	const model = s.m ? models.find((m) => m.id === s.m) : null;
+	if (model) {
+		await loadModel(model);
+		// The sidebar must follow the game the link opened.
+		renderLibrary();
+		// Animation / skin / variant are per-skeleton, so only now are they safe.
+		// Variant goes first: switching it reloads the skeleton, which would
+		// wipe an animation or skin applied before it.
+		if (s.va) {
+			const opt = [...(el.variantSelect?.options || [])].find((o) => o.dataset.id === s.va);
+			if (opt && s.va !== current?.id) await switchVariant(s.va);
+		}
+		if (s.a && [...(el.animSelect?.options || [])].some((o) => o.value === s.a)) {
+			el.animSelect.value = s.a;
+			el.animSelect.dispatchEvent(new Event("change"));
+		}
+		if (s.k && [...(el.skinSelect?.options || [])].some((o) => o.value === s.k)) {
+			el.skinSelect.value = s.k;
+			el.skinSelect.dispatchEvent(new Event("change"));
+		}
+		// Camera: rebuild it exactly, or fall back to fitting the art.
+		if (Number.isFinite(Number(s.z))) {
+			state.zoom = Number(s.z);
+			state.panX = Number(s.x) || 0;
+			state.panY = Number(s.y) || 0;
+			applyTransform();
+		} else {
+			fitModel();
+		}
+		// The playhead goes last, once animation/skin/variant have settled.
+		if (Number.isFinite(Number(s.t))) {
+			state.trackTime = Number(s.t);
+			if (spine?.state?.tracks?.[0]) spine.state.tracks[0].trackTime = state.trackTime;
+			clock.syncTo(state.trackTime);
+			updateScrubUI();
+			updateTimelinePlayhead();
+		}
+		if (s.p === 0 || s.p === false || s.p === "0") setPlaying(false);
+	} else if (s.m) {
+		toast(`Model “${s.m}” dari tautan tidak ada di pustaka.`);
+	}
+
+	// Keep the address bar in sync with what the link actually produced (it may
+	// have dropped a variant that no longer exists), then resume live writes.
+	permalinkRestoring = false;
+	writePermalinkNow();
+	return true;
+}
+
+function initPermalink() {
+	el.gridLink?.addEventListener("click", openPermalink);
+	el.linkClose?.addEventListener("click", closePermalink);
+	el.linkCopy?.addEventListener("click", copyPermalink);
+	el.linkRefresh?.addEventListener("click", () => {
+		el.linkUrl.value = buildPermalink();
+		toast("URL disegarkan.");
+	});
+	el.linkModal?.addEventListener("click", (e) => {
+		if (e.target instanceof Element && e.target.closest("[data-close]")) closePermalink();
+	});
+	// Ctrl/Cmd-Shift-C copies the current view link from anywhere.
+	window.addEventListener("keydown", (e) => {
+		if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "c" || e.key === "C")) {
+			e.preventDefault();
+			copyPermalink();
+		}
+	});
+	// Mirror every view change into the URL (debounced). Toggles persist their
+	// own keys inside their setters, so a generic listener is enough here.
+	document.addEventListener("click", () => schedulePermalinkWrite());
+	document.addEventListener("input", () => schedulePermalinkWrite());
+	window.addEventListener("pointerup", () => schedulePermalinkWrite());
+}
+
+/** Restore the view named by ?v= (if any). Runs after refresh() so `models`
+ *  is populated. */
+async function bootPermalink() {
+	const s = parsePermalink(location.search);
+	if (!s) return;
+	await applyPermalink(s);
+	try {
+		history.replaceState({ permalink: true }, "", buildPermalink());
+	} catch {
+		/* ignore */
+	}
+}
 
 /* ------------------------------------------------------------------ *
  * Boot
@@ -5440,6 +5804,17 @@ el.grid.classList.add("is-on");
 el.bonesBtn.dataset.on = "false";
 el.flipBtn.dataset.on = "false";
 el.delBtn.hidden = true;
+
+// Restore the saved render density (default "auto").
+try {
+	const saved = localStorage.getItem(DENSITY_KEY);
+	if (saved && el.densitySelect && [...el.densitySelect.options].some((o) => o.value === saved)) {
+		state.density = saved;
+		el.densitySelect.value = saved;
+	}
+} catch {
+	/* private mode */
+}
 
 /* Debug handle: lets the smoke tests (and the browser console) inspect the
  * live viewer state without re-deriving it — harmless in production. */
@@ -5462,6 +5837,7 @@ initFavorites();
 initUpdateLog();
 initFps();
 initParts();
+initPermalink();
 
 // Restore the saved backdrop, if any. setStageBg() would also persist it, so
 // only call it when we actually have a stored value.
@@ -5473,4 +5849,10 @@ try {
 }
 
 app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
-refresh();
+// Build the library first (so `models` is populated), then restore the view a
+// shared ?v= link describes. Async IIFE, not top-level await: the bundle is an
+// IIFE and top-level await is not supported in that output format.
+(async () => {
+	await refresh();
+	await bootPermalink();
+})();

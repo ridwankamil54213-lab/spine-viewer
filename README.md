@@ -54,6 +54,13 @@ langsung dimuat dan diputar.
   hover buat highlight, klik buat inspect.
 - **FPS meter** — rate live + min/avg + grafik.
 - **Live2D** — model Cubism (`.moc3`) juga didukung selain Spine.
+- **Tautan (permalink)** — tombol 🔗 di header (atau `Ctrl/Cmd-Shift-C`)
+  menghasilkan URL yang memuat ulang persis tampilan sekarang: model, animasi,
+  skin/varian, waktu di playhead, dan status play/pause, plus seluruh kamera
+  (zoom/geser/balik), kecepatan, latar, dan panel yang terbuka. URL di address
+  bar juga ikut diperbarui (debounced) setiap kali tampilan berubah, jadi kamu
+  bisa langsung salin dari sana. Payload-nya JSON base64url di `?v=`, jadi
+  bisa dibaca balik tanpa server. Lihat `docs/permalink.md`.
 
 ### Shortcut
 
@@ -75,6 +82,7 @@ langsung dimuat dan diputar.
 | `\` | Toggle sidebar |
 | `,` `.` | Step keyframe (kalau timeline kebuka) |
 | `Esc` | Tutup dialog / keluar fullscreen |
+| `Ctrl/Cmd-Shift-C` | Salin tautan tampilan |
 
 ## Nambahin aset
 
@@ -151,6 +159,7 @@ node tools/check-controls.cjs    # tombol & toggle masih jalan
 node tools/check-toolbar.cjs     # layout toolbar
 node tools/check-fps.cjs         # FPS meter
 node tools/check-mad-ports.cjs   # export PNG, clock, part picker
+node tools/check-permalink.cjs   # tautan: tulis, dialog, pulihkan, payload rusak
 ```
 
 Butuh `playwright-core` dan server jalan di port 3000.
