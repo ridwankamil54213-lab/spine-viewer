@@ -22,7 +22,7 @@ setelah terpasang (APK + aset runtime), bukan ukuran file.
 ## Format
 
 ```
-assets/prefab/hero/herospines/hero_<id>/hero_<id>.unity3d      # model spine
+assets/prefab/hero/herospines/hero_<id>/hero_<id>.unity3d       # model spine
 assets/prefab/hero/herospines/hero_<id>/herocg_<id>_<n>.unity3d # CG (spine juga)
 ```
 
@@ -42,31 +42,50 @@ unzip -q shenlan.apk 'assets/prefab/hero/herospines/*' -d sl_h
 Keluaran: **77 model** — `hero_<id>` (model tempur) + `heroCG_<id>_<n>` (CG).
 Di viewer: `assets/shenlan/<Nama>/`, `pmaDefault: true`.
 
-## ⚠️ Terblokir: Spine **4.3.39-beta**
+## Spine 4.3.39-beta — perlu patch spine-core
 
-Semua 77 `.skel` memakai versi **4.3.39-beta** dari editor Spine *unreleased*.
-Rilis runtime publik terakhir adalah **4.3.13** (npm `@esotericsoftware/spine-core`
-& `spine-pixi-v7`), dan binary-nya **tidak** kompatibel:
+Semua 77 `.skel` memakai versi **4.3.39-beta**. Rilis runtime JS publik terakhir
+adalah **4.3.13** (npm `@esotericsoftware/spine-core` / `spine-pixi-v7`), dan
+binary-nya **tidak kompatibel** (gagal baca dari `Bone name must not be null`).
 
-- spine-core 4.3.13 → gagal baca header, `Bone name must not be null`.
-- spine-core 4.2.120 (versi terdekat) → parse 256 nama benar (sampai region
-  `Battleship_*`, `pom_L/R`, `arm_R3`) lalu melenceng di section **IK constraints**
-  (`IK constraint data name must not be null`), yaitu di antara Bones dan Skins.
-- Header 4.3.39-beta ter-parse sempurna dengan `BinaryInput` 4.3.13
-  (`version=4.3.39-beta`, `refScale=100`, `imagesPath=./images/`), jadi
-  divergensinya ada di **layout section constraints/attachments**, bukan header.
+Format 4.3.39-beta diambil dari **`skeletonViewer-4.3.39-beta.jar`** (libgdx,
+runtime resmi yang mendukung versi ini) — di-*decompile* untuk membaca
+`com/esotericsoftware/spine/SkeletonBinary.java`:
 
-Ekstraksinya sendiri 100% benar — 77 model lengkap (`.skel` + `.atlas` + PNG).
-Model tinggal dipakai begitu runtime 4.3.39 keluar, atau dengan viewer/editor
-Spine resmi yang mendukung versi tersebut. Jangan buang waktu mencoba runtime
-4.x lain: semuanya lebih tua dari 4.3.39.
+```bash
+curl -Lo sv439.jar https://esotericsoftware.com/files/sv/skeletonViewer-4.3.39-beta.jar
+curl -Lo cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr-0.152.jar
+java -jar cfr.jar sv439.jar --outputdir sv_src   # -> com/esotericsoftware/spine/*.java
+```
 
-Upaya yang sudah dicoba: npm `@esotericsoftware/spine-core` 4.3.2–4.3.13,
-alias `spine-pixi-v7-42` (4.2.120), branch GitHub `4.3`/`4.4`/`5.0`, tag
-`spine-ts-4.3.x` — tidak ada yang >= 4.3.39.
+Perbedaan 4.3.39-beta vs 4.3.13 yang ditemukan & dipatch ke spine-core
+(`patches/@esotericsoftware+spine-core+4.3.13.patch`):
+
+1. **Bones** (nonessential): 4.3.39 tidak punya `iconSize`/`iconRotation`.
+2. **Weighted vertices**: tanpa leading total-entry count.
+3. **Mesh**: tanpa `slotCount`/`timelineSlots`.
+4. **LinkedMesh**: satu index saja (tanpa `skinIndex`).
+5. **Draw order folder timelines**: tidak ada.
+6. **Animasi**: sebagian layout timeline 4.3.39 belum terpetakan; parser dibuat
+   **toleran** — bones/slots/skins tetap terpakai (model dirender), animasi yang
+   desync dilewati sampai patch dilengkapi.
+7. BoundingBox/Point/Path/Clipping: `nonessential` = int biasa (bukan bool).
+
+Tambah patch API runtime 4.3: `slot.getAttachment()` → `slot.pose.getAttachment()`
+(helper `slotAttachment()` di `src/viewer.js`).
+
+Terapkan setelah `npm install` (otomatis via `"postinstall"`):
+```bash
+npx patch-package
+```
+
+**Hasil**: **76/77 model ter-render** (bones+slots+skins), mis. `hero_11000101`
+(40 slot, 72 tulang, Spine 4.3.39, runtime 4.3). Satu model (`hero_31200101`)
+masih gagal parse skins (belum terpetakan).
 
 ## Jebakan
 
 - Tekstur 2048x2048 → stream ke disk (`_texcache/`), jangan tahan di RAM (OOM).
 - URL APK harus yang **bertanda-tangan**; regex `\.apk` memotong query string —
   ambil sampai `Key-Pair-Id` ikut.
+- `slot.attachment` pindah ke `slot.pose.attachment` di runtime 4.2/4.3.

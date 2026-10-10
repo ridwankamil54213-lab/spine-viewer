@@ -210,7 +210,7 @@ function atlasBaseTextures() {
 		}
 	};
 	for (const slot of spine.skeleton.slots) {
-		const page = slot.getAttachment()?.region?.page;
+		const page = slotAttachment(slot)?.region?.page;
 		if (!page) continue;
 		// pixi-spine pages expose `baseTexture` directly. The 4.2 runtime wraps
 		// each page in SpineTexture, where the Pixi texture — and its
@@ -2295,13 +2295,26 @@ function attachmentsForSlot(data, slotIndex, skinName) {
 }
 
 /**
+ * The attachment currently shown by a slot.
+ * Spine 4.1 (pixi-spine) stores it on the slot itself (`slot.getAttachment()`);
+ * the official 4.2/4.3 runtime moved it to `slot.pose` (`slot.pose.getAttachment()`).
+ * Try both so PA/slot inspection works across runtimes.
+ */
+function slotAttachment(slot) {
+	if (!slot) return null;
+	if (typeof slot.getAttachment === "function") return slot.getAttachment();
+	if (slot.pose && typeof slot.pose.getAttachment === "function") return slot.pose.getAttachment();
+	return slot.attachment || null;
+}
+
+/**
  * Current attachment shown in a slot.
  * `slot.attachment` is null until a skin is applied; the setup pose lives on
  * slot.data.attachmentName, so fall back to that — otherwise every slot reads
  * as empty on models whose skins aren't named "default".
  */
 function slotAttachmentName(slot) {
-	return slot?.getAttachment?.()?.name || slot?.data?.attachmentName || "";
+	return slotAttachment(slot)?.name || slot?.data?.attachmentName || "";
 }
 
 function renderSlots() {
@@ -4708,7 +4721,7 @@ function attachmentPixelScale(slot, attachment) {
 function sourcePixelScale(sp) {
 	const scales = [];
 	for (const slot of sp.skeleton.slots) {
-		const att = slot.getAttachment?.();
+		const att = slotAttachment(slot);
 		if (!att) continue;
 		const s = attachmentPixelScale(slot, att);
 		if (s > 0 && Number.isFinite(s)) scales.push(s);

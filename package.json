@@ -8,7 +8,8 @@
     "build": "esbuild src/viewer.js --bundle --format=iife --outfile=public/dist/viewer.js --target=es2020 --sourcemap",
     "watch": "npm run build -- --watch",
     "start": "node src/server.js",
-    "dev": "npm run build && node src/server.js"
+    "dev": "npm run build && node src/server.js",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@esotericsoftware/spine-pixi-v7": "^4.3.13",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
+    "patch-package": "^8.0.0",
     "playwright-core": "^1.62.1"
   }
 }

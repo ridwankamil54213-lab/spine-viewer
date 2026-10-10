@@ -1,0 +1,146 @@
+diff --git a/node_modules/@esotericsoftware/spine-core/dist/SkeletonBinary.js b/node_modules/@esotericsoftware/spine-core/dist/SkeletonBinary.js
+index 2f00a25..b90fabb 100644
+--- a/node_modules/@esotericsoftware/spine-core/dist/SkeletonBinary.js
++++ b/node_modules/@esotericsoftware/spine-core/dist/SkeletonBinary.js
+@@ -109,8 +109,6 @@ export class SkeletonBinary {
+             if (nonessential) {
+                 Color.rgba8888ToColor(data.color, input.readInt32());
+                 data.icon = input.readString() ?? undefined;
+-                data.iconSize = input.readFloat();
+-                data.iconRotation = input.readFloat();
+                 data.visible = input.readBoolean();
+             }
+             bones.push(data);
+@@ -431,11 +429,9 @@ export class SkeletonBinary {
+         for (let i = 0; i < n; i++) {
+             const linkedMesh = this.linkedMeshes[i];
+             const skin = skeletonData.skins[linkedMesh.skinIndex];
+-            if (!linkedMesh.source)
+-                throw new Error("Linked mesh parent must not be null");
++            if (!linkedMesh.source || !skin) continue;
+             const source = skin.getAttachment(linkedMesh.sourceIndex, linkedMesh.source);
+-            if (!source)
+-                throw new Error(`Source mesh not found: ${linkedMesh.source}`);
++            if (!source) continue;
+             linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimelines ? source : linkedMesh.mesh;
+             linkedMesh.mesh.setSourceMesh(source);
+             linkedMesh.mesh.updateSequence();
+@@ -460,18 +456,33 @@ export class SkeletonBinary {
+             skeletonData.events.push(data);
+         }
+         // Animations.
++        // Spine 4.3.39-beta animations are not fully understood yet (the 4.3.39
++        // binary added/changed timeline data). Bones, slots and skins above are
++        // parsed correctly and are what the model needs to DRAW, so if an
++        // animation desyncs we keep everything parsed so far and stop: the model
++        // renders (static / without the bad animations) instead of failing whole.
+         const animations = skeletonData.animations;
+         n = input.readInt(true);
++        let animationsOk = true;
+         for (let i = 0; i < n; i++) {
+             const animationName = input.readString();
+-            if (!animationName)
+-                throw new Error("Animation name must not be null.");
+-            animations.push(this.readAnimation(input, animationName, skeletonData, nonessential));
++            if (!animationName) { animationsOk = false; break; }
++            try {
++                animations.push(this.readAnimation(input, animationName, skeletonData, nonessential));
++            } catch (err) {
++                console.warn(`[spine] animasi "${animationName}" dilewati: ${err.message}`);
++                animationsOk = false;
++                break;
++            }
+         }
+-        for (let i = 0; i < constraintCount; i++) {
+-            const constraint = constraints[i];
+-            if (constraint instanceof SliderData)
+-                constraint.animation = animations[input.readInt(true)];
++        // Only trust the trailing slider-animation indices when every animation
++        // parsed; otherwise the read index is mid-garbage.
++        if (animationsOk) {
++            for (let i = 0; i < constraintCount; i++) {
++                const constraint = constraints[i];
++                if (constraint instanceof SliderData)
++                    constraint.animation = animations[input.readInt(true)];
++            }
+         }
+         return skeletonData;
+     }
+@@ -571,13 +582,6 @@ export class SkeletonBinary {
+                 const vertices = this.readVertices(input, (flags & 128) !== 0);
+                 const uvs = this.readFloatArray(input, vertices.length, 1);
+                 const triangles = this.readShortArray(input, (vertices.length - hullLength - 2) * 3);
+-                const slotCount = input.readInt(true);
+-                let timelineSlots = null;
+-                if (slotCount > 0) {
+-                    timelineSlots = [];
+-                    for (let i = 0; i < slotCount; i++)
+-                        timelineSlots[i] = input.readInt(true);
+-                }
+                 let edges = [];
+                 let width = 0, height = 0;
+                 if (nonessential) {
+@@ -598,8 +602,6 @@ export class SkeletonBinary {
+                 mesh.worldVerticesLength = vertices.length;
+                 mesh.regionUVs = uvs;
+                 mesh.triangles = triangles;
+-                if (timelineSlots)
+-                    mesh.timelineSlots = timelineSlots;
+                 if (nonessential) {
+                     mesh.edges = edges;
+                     mesh.width = width * scale;
+@@ -616,7 +618,6 @@ export class SkeletonBinary {
+                 const sequence = this.readSequence(input, (flags & 64) !== 0);
+                 const inheritTimelines = (flags & 128) !== 0;
+                 const sourceIndex = input.readInt(true);
+-                const skinIndex = input.readInt(true);
+                 const source = input.readStringRef();
+                 let width = 0, height = 0;
+                 if (nonessential) {
+@@ -632,7 +633,7 @@ export class SkeletonBinary {
+                     mesh.width = width * scale;
+                     mesh.height = height * scale;
+                 }
+-                this.linkedMeshes.push(new LinkedMesh(mesh, skinIndex, slotIndex, sourceIndex, source, inheritTimelines));
++                this.linkedMeshes.push(new LinkedMesh(mesh, 0, slotIndex, sourceIndex, source, inheritTimelines));
+                 return mesh;
+             }
+             case AttachmentType.Path: {
+@@ -703,10 +704,11 @@ export class SkeletonBinary {
+         const length = vertexCount << 1;
+         if (!weighted)
+             return new Vertices(null, this.readFloatArray(input, length, scale), length);
+-        const n = input.readInt(true);
+         const bones = [];
+         const weights = [];
+-        for (let b = 0, w = 0; b < n;) {
++        // 4.3.39-beta weighted vertices: NO leading total-entry count (4.3.13 read
++        // one extra int here, which desynced every subsequent byte).
++        for (let i = 0, b = 0, w = 0; i < vertexCount; i++) {
+             const boneCount = input.readInt(true);
+             bones[b++] = boneCount;
+             for (let ii = 0; ii < boneCount; ii++, w += 3) {
+@@ -1224,19 +1226,10 @@ export class SkeletonBinary {
+                 timeline.setFrame(i, input.readFloat(), readDrawOrder(input, slotCount));
+             timelines.push(timeline);
+         }
+-        // Draw order folder timelines.
+-        const folderCount = input.readInt(true);
+-        for (let i = 0; i < folderCount; i++) {
+-            const folderSlotCount = input.readInt(true);
+-            const folderSlots = new Array(folderSlotCount);
+-            for (let ii = 0; ii < folderSlotCount; ii++)
+-                folderSlots[ii] = input.readInt(true);
+-            const keyCount = input.readInt(true);
+-            const timeline = new DrawOrderFolderTimeline(keyCount, folderSlots, slotCount);
+-            for (let ii = 0; ii < keyCount; ii++)
+-                timeline.setFrame(ii, input.readFloat(), readDrawOrder(input, folderSlotCount));
+-            timelines.push(timeline);
+-        }
++        // Draw order folder timelines: NOT present in 4.3.39-beta (libgdx reads
++        // the event-timeline count immediately after the draw order timeline).
++        // 4.3.13 read an extra folderCount int here, which swallowed the event
++        // count and desynced every animation that had events.
+         // Event timeline.
+         const eventCount = input.readInt(true);
+         if (eventCount > 0) {
