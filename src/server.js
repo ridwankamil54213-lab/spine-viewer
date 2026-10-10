@@ -98,7 +98,114 @@ function probeSkelBinary(file, atlasFile) {
 	};
 }
 
+/* ------------------------------------------------------------------ *
+ * Per-file inspection memo (inspectSkeleton + countAtlasPages)
+ *
+ * A full scan parses ~32k .skel files — each one loads a Spine runtime and
+ * walks the skeleton — and reads ~32k .atlas files. That parse, not the
+ * directory walk (which is under a second), is what made a rescan take ~13
+ * minutes. The result for one file depends on just two things: its size and
+ * its mtime. So memoise it per path and persist to disk:
+ *   - an updater that adds 80 models parses only those ~200 files;
+ *   - a restart re-reads the cache instead of re-parsing everything.
+ * A changed file (size/mtime differs) misses and is re-parsed, so the memo
+ * can never serve a stale skeleton for a file that changed on disk.
+ * ------------------------------------------------------------------ */
+const MEMO_FILE = path.join(DATA, "scan-memo.json");
+let inspectMemo = null;
+let inspectMemoDirty = false;
+let inspectMemoHits = 0;
+let inspectMemoMiss = 0;
+
+function diskFingerprint(p) {
+	try {
+		const st = fs.statSync(p);
+		if (!st.isFile()) return null;
+		return `${st.size}:${Math.floor(st.mtimeMs)}`;
+	} catch {
+		return null;
+	}
+}
+
+function loadInspectMemo() {
+	if (inspectMemo) return inspectMemo;
+	inspectMemo = new Map();
+	try {
+		const raw = JSON.parse(fs.readFileSync(MEMO_FILE, "utf8"));
+		for (const [k, v] of Object.entries(raw.entries || {})) {
+			if (v && typeof v.fp === "string") {
+				inspectMemo.set(k, { fp: v.fp, skel: v.skel ?? null, pages: v.pages });
+			}
+		}
+	} catch {
+		/* first run / unreadable — start empty */
+	}
+	return inspectMemo;
+}
+
+function saveInspectMemo() {
+	if (!inspectMemoDirty || !inspectMemo) return;
+	try {
+		fs.mkdirSync(DATA, { recursive: true });
+		const entries = {};
+		for (const [k, v] of inspectMemo) entries[k] = v;
+		const tmp = MEMO_FILE + ".tmp";
+		fs.writeFileSync(tmp, JSON.stringify({ v: 1, entries }));
+		fs.renameSync(tmp, MEMO_FILE);
+		inspectMemoDirty = false;
+	} catch (err) {
+		console.warn("[memo] gagal menyimpan:", err.message);
+	}
+}
+
+function memoGet(p) {
+	const m = loadInspectMemo();
+	const e = m.get(p);
+	if (!e) {
+		inspectMemoMiss++;
+		return undefined;
+	}
+	if (diskFingerprint(p) !== e.fp) {
+		m.delete(p);
+		inspectMemoMiss++;
+		return undefined;
+	}
+	inspectMemoHits++;
+	return e;
+}
+
+function memoPut(p, patch) {
+	const fp = diskFingerprint(p);
+	if (fp == null) return;
+	const m = loadInspectMemo();
+	const e = m.get(p) || {};
+	m.set(p, { ...e, fp, ...patch });
+	inspectMemoDirty = true;
+}
+
+/** Buang entri untuk berkas yang sudah tidak ada; jaga memo tetap ramping. */
+function pruneInspectMemo() {
+	const m = loadInspectMemo();
+	let removed = 0;
+	for (const p of m.keys()) {
+		if (!fs.existsSync(p)) {
+			m.delete(p);
+			removed++;
+		}
+	}
+	if (removed) inspectMemoDirty = true;
+	return { kept: m.size, removed };
+}
+
 function inspectSkeleton(file, atlasFile) {
+	const cached = memoGet(file);
+	if (cached && cached.skel !== undefined) return cached.skel;
+	const meta = inspectSkeletonUncached(file, atlasFile);
+	memoPut(file, { skel: meta ?? null });
+	return meta;
+}
+
+function inspectSkeletonUncached(file, atlasFile) {
 	try {
 		const buf = fs.readFileSync(file);
 		if (buf.length < 8) return null;
@@ -180,6 +287,14 @@ function inspectSkeleton(file, atlasFile) {
 
 /** Counts atlas pages by reading the header block before the first region name. */
 function countAtlasPages(file) {
+	const cached = memoGet(file);
+	if (cached && cached.pages !== undefined) return cached.pages;
+	const pages = countAtlasPagesUncached(file);
+	memoPut(file, { pages });
+	return pages;
+}
+
+function countAtlasPagesUncached(file) {
 	try {
 		const lines = fs.readFileSync(file, "utf8").split(/\r?\n/);
 		let pages = 0;
@@ -1687,11 +1802,21 @@ function getModels({ force = false } = {}) {
 	// reads dirBytes(), so publish the fresh sizes before it runs.
 	dirBytesCache.clear();
 	for (const [k, v] of sizes) dirBytesCache.set(k, v);
+	inspectMemoHits = 0;
+	inspectMemoMiss = 0;
+	const t0 = Date.now();
 	const models = scanModels();
+	const scanMs = Date.now() - t0;
 	cache = { models, mtime: Date.now(), signature: sig };
 	savePersistedCache(sig, models);
-	// Catat id yang baru muncul supaya badge NEW tidak bergantung pada apakah
-	// updater dijalankan dari browser atau dari CLI di server.
+	// Drop memo entries for files that vanished, then persist so the next
+	// rescan only parses what actually changed.
+	pruneInspectMemo();
+	saveInspectMemo();
+	console.log(
+		`[scan] ${models.length} model dalam ${(scanMs / 1000).toFixed(1)}s ` +
+		`(memo hit=${inspectMemoHits} miss=${inspectMemoMiss})`,
+	);
 	recordNewModels(models);
 	return cache.models;
 }

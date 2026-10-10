@@ -89,3 +89,7 @@ assets/projectqt21/
 # tools/extract-starlust.py; tidak perlu ikut ke repo.
 assets/starlust/
 assets/cherrytale/
+
+# Per-file inspect memo written by the server (data/scan-memo.json).
+# Regenerated on scan; machine-specific and large.
+data/scan-memo.json
