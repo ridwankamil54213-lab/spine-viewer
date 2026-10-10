@@ -1,10 +1,21 @@
 # CrossCore (交错战线) — asset updater
 
-CrossCore ships its Spine models as public AssetBundles on a resource CDN;
-there is no APK unpacking step. `tools/update-crosscore.py` keeps the viewer's
-`assets/crosscore/` tree in sync with that CDN.
+CrossCore ships its Spine models as public AssetBundles on a resource CDN.
+`tools/update-crosscore.py` keeps the viewer's `assets/crosscore/` tree in sync.
 
-## Source
+## Sources
+
+**Primary: GitHub mirrors** (the official CDN blocks many non-CN hosts, so the
+updater uses community mirrors that re-publish the official `curr_1` channel):
+
+```
+kmou424/Crosscore_Anti_Hexie_Assets    # anti-censor build; prefabs_spine_* bundles
+R2iCecho/Crosscore_Assets_curr_1       # ilist.txt index (assets live on a branch)
+```
+
+Add more with `CROSSCORE_GH="owner/repo,owner/repo@branch"`.
+
+**Official CDN** (tried first when reachable; also used with `--manifest`):
 
 ```
 https://cdn.megagamelog.com/cross/release/android/curr_1/ver.bytes
@@ -14,9 +25,8 @@ https://cdn.megagamelog.com/cross/release/android/curr_1/Custom/<AB name>
 ```
 
 Each `prefabs_spine_*` bundle is **self-contained**: skeleton (a TextAsset whose
-payload is JSON), the atlas text, and the page texture all live in the one
-bundle, so one bundle == one model and no cross-bundle texture matching is
-needed.
+payload is JSON, named just `<Name>` — no extension), the atlas text, and the
+page texture all live in the one bundle, so one bundle == one model.
 
 ## Bundles are FakeHeader-encoded
 
@@ -68,13 +78,18 @@ confirm, then downloads in the background and marks new models with a NEW badge.
 
 - `assets/crosscore` may be a **symlink** into a big disk (`/srv/spine-assets`).
   The scanner and this updater both follow it; write the models, not a fresh dir.
-- The CDN sits behind Volcengine (CN) and **blackholes** some hosts (TCP connect
-  hangs with no error, DNS fans out to many IPs, so `urllib`/SIGALRM alone are
-  not enough). Manifest fetch therefore runs in a subprocess with a hard kill;
-  `--check` always returns within `CROSSCORE_FETCH_TIMEOUT` instead of hanging.
+- The official CDN sits behind Volcengine (CN) and **blackholes** many non-CN
+  hosts (TCP connect hangs with no error, DNS fans out to many IPs) — verified
+  from an AWS Tokyo box: every CDN IP times out, while `baidu`/`github` are
+  fine. That is why the **GitHub mirror is the default source**, and why the
+  manifest fetch runs in a subprocess with a hard kill (`--check` still returns
+  within `CROSSCORE_FETCH_TIMEOUT` when only the CDN is reachable-ish).
+- `--doctor` reports both paths: how many `prefabs_spine_*` the mirror has, and
+  whether any CDN IP accepts TCP:443. Run it first when something looks blocked.
 - `check()` diffs against the files **actually on disk**, not only the saved
   state, so a first run on an already-complete install reports "up to date".
-- Never re-download a bundle whose size matches what is already in `downloads/`.
+- `CROSSCORE_PROXY=http://host:port` routes both manifest and downloads through
+  a proxy, if one is available.
 
 ## History
 

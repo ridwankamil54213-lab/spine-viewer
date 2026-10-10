@@ -1,52 +1,65 @@
 #!/usr/bin/env python3
-"""Perbarui aset CrossCore (交错战线) dari CDN resmi.
+"""Perbarui aset CrossCore (交错战线).
 
-Alur (tanpa APK, tanpa enkripsi simetris yang perlu di-brute-force):
-    1. GET  https://cdn.megagamelog.com/cross/release/android/curr_1/ver.bytes
-       -> manifest .NET BinaryFormatter: daftar AssetBundle (nama, size, md5)
-    2. GET  <CDN>/Custom/<nama bundle>
-    3. Simpan manifest terakhir; bandingkan untuk tahu bundle yang *baru* saja.
-    4. Unduh yang baru, buka enkripsinya, ekstrak Spine-nya ke pohon aset viewer.
+SUMBER UTAMA = mirror GitHub. CDN resmi `cdn.megagamelog.com` ada di balik
+Volcengine (CN) dan mem-**blackhole** banyak host di luar CN (TCP connect
+menggantung tanpa error, DNS menyebar ke 10 IP). Komunitas mencerminkan CDN
+resmi ke GitHub, yang bisa diakses dari mana saja dan di-update berkala:
 
-Bundle-nya "FakeHeader": ada sampah di depan header `UnityFS` yang asli.
-`FakeHeader.py` komunitas memangkasnya dengan `content.rfind(b"UnityFS")`.
-Sebagian bundle juga UnityCN (butuh key 32-hex) — sediakan lewat variabel
-lingkungan `CROSSCORE_UNITYCN_KEY` kalau ternyata perlu; tanpa itu bundle CN
-tetap gagal dan dilaporkan, bukan crash.
+    kmou424/Crosscore_Anti_Hexie_Assets   (varian anti-sensor; prefabs_spine_*)
+    R2iCecho/Crosscore_Assets_curr_1      (indeks ilist.txt)
 
-Ekstraksi TIDAK memerlukan dotnet/AssetStudio lagi: setelah header dipangkas,
-UnityPy membaca bundle langsung (TextAsset skeleton JSON + atlas, Texture2D PNG).
-Bila UnityPy tetap gagal dan `dotnet` + AssetStudioModCLI tersedia, dipakai
-sebagai fallback.
+Repo lain bisa ditambah lewat `CROSSCORE_GH` ("owner/repo", dipisah koma).
 
-Setiap bundle `prefabs_spine_*` berisi satu model utuh:
-    <Name>.json    (skeleton; JSON — ekstensi .json agar viewer parse sbg teks)
-    <Name>.atlas
-    <Name>.png
+Alur:
+    1. Daftar bundle `prefabs_spine_*` dari mirror GitHub (tree API).
+    2. Unduh yang belum ada dari raw.githubusercontent.com.
+    3. Ekstrak ke pohon aset viewer.
+CDN resmi tetap dipakai lebih dulu bila `--manifest` diberikan atau bila CDN
+kebetulan terjangkau.
+
+Bundle = FakeHeader (sampah sebelum `UnityFS` asli; pangkas dgn rfind) + UnityFS.
+Satu bundle = satu model:
+    TextAsset <Name>          -> skeleton JSON
+    TextAsset <Name>.atlas    -> atlas
+    Texture2D <Name>          -> halaman tekstur
 
 Pemakaian:
     /srv/venv-spine/bin/python tools/update-crosscore.py --check
     /srv/venv-spine/bin/python tools/update-crosscore.py --apply
-    # uji tanpa jaringan:
-    /srv/venv-spine/bin/python tools/update-crosscore.py --check --manifest /path/ver.bytes
+    /srv/venv-spine/bin/python tools/update-crosscore.py --doctor
 """
 import argparse
 import io
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
+# --------------------------------------------------------------------------- #
+# sources
+# --------------------------------------------------------------------------- #
 CDN = "https://cdn.megagamelog.com/cross/release/android/curr_1"
 MANIFEST_URL = f"{CDN}/ver.bytes"
-# CDN ini di balik Volcengine (CN); bila tidak terjangkau dari host ini,
-# sediakan mirror lewat env CROSSCORE_CDN (dipisah koma).
 CDN_HOSTS = [h for h in os.environ.get("CROSSCORE_CDN", CDN).split(",") if h]
+
+GH_API = "https://api.github.com"
+GH_RAW = "https://raw.githubusercontent.com"
+# "owner/repo" atau "owner/repo@branch".
+GH_REPOS = [r for r in os.environ.get(
+    "CROSSCORE_GH",
+    "kmou424/Crosscore_Anti_Hexie_Assets,R2iCecho/Crosscore_Assets_curr_1",
+).split(",") if r]
+# Direktori bundle di dalam repo (nama berkas = prefabs_spine_*).
+GH_BUNDLE_DIR = os.environ.get("CROSSCORE_GH_DIR", "Custom")
+GH_TOKEN = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+
+# Proxy HTTP/HTTPS opsional (mis. VPN): CROSSCORE_PROXY=http://host:port
+PROXY = os.environ.get("CROSSCORE_PROXY") or None
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 HEADERS = {"User-Agent": UA}
@@ -58,14 +71,99 @@ STATE_FILE = os.path.join(STATE_DIR, "state.json")
 ASSET_DIR = os.environ.get("CROSSCORE_OUT", "/opt/spine-viewer/assets/crosscore")
 
 PYTHON = os.environ.get("PY", "/srv/venv-spine/bin/python")
-ASSETSTUDIO = os.environ.get("ASSETSTUDIO",
-                             "/opt/studio3/AssetStudioModCLI_net8_portable/AssetStudioModCLI.dll")
 AB_RE = re.compile(rb"^prefabs_spine_[A-Za-z0-9_]+$")
-SPINE_BUNDLE_RE = re.compile(r"^prefabs_spine_")
+SPINE_PREFIX = "prefabs_spine_"
+
+
+def _log(msg):
+    """Baris progres ke stderr: server menampilkannya sebagai log live."""
+    sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
+    sys.stderr.flush()
 
 
 # --------------------------------------------------------------------------- #
-# manifest
+# HTTP helper (proxy-aware)
+# --------------------------------------------------------------------------- #
+def _opener():
+    if PROXY:
+        return urllib.request.build_opener(
+            urllib.request.ProxyHandler({"http": PROXY, "https": PROXY}))
+    return None
+
+
+def http_get(url, timeout=60, retries=4, headers=None):
+    hdrs = dict(HEADERS)
+    if headers:
+        hdrs.update(headers)
+    opener = _opener()
+    last = None
+    for i in range(retries):
+        try:
+            req = urllib.request.Request(url, headers=hdrs)
+            if opener is not None:
+                with opener.open(req, timeout=timeout) as r:
+                    return r.read()
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            time.sleep(1.2 * (i + 1))
+    if last is None:
+        raise RuntimeError(f"gagal mengunduh {url}")
+    raise last
+
+
+def _gh_headers():
+    return {"Authorization": f"Bearer {GH_TOKEN}"} if GH_TOKEN else {}
+
+
+# --------------------------------------------------------------------------- #
+# GitHub mirror
+# --------------------------------------------------------------------------- #
+def gh_default_branch(repo):
+    try:
+        d = json.loads(http_get(f"{GH_API}/repos/{repo}", timeout=20, headers=_gh_headers()))
+        return d.get("default_branch", "main")
+    except Exception:  # noqa: BLE001
+        return "main"
+
+
+def gh_tree_bundles(spec):
+    """{nama bundle: info} untuk satu repo mirror.
+
+    `spec` boleh "owner/repo" atau "owner/repo@branch".
+    """
+    repo, _, branch = spec.partition("@")
+    if not branch:
+        branch = gh_default_branch(repo)
+    try:
+        d = json.loads(http_get(
+            f"{GH_API}/repos/{repo}/git/trees/{branch}?recursive=1",
+            timeout=45, headers=_gh_headers()))
+    except Exception:  # noqa: BLE001
+        return {}
+    out = {}
+    for x in d.get("tree", []):
+        if x.get("type") != "blob":
+            continue
+        base = x["path"].rsplit("/", 1)[-1]
+        if base.startswith(SPINE_PREFIX) and x["path"].startswith(GH_BUNDLE_DIR + "/"):
+            out[base] = {"repo": repo, "branch": branch, "path": x["path"]}
+    return out
+
+
+def gh_catalog():
+    """Gabungkan daftar bundle dari semua mirror -> {nama: info}."""
+    cat = {}
+    for spec in GH_REPOS:
+        got = gh_tree_bundles(spec)
+        if got:
+            cat.update(got)
+    return cat
+
+
+# --------------------------------------------------------------------------- #
+# CDN manifest (sumber resmi — dicoba bila CDN terjangkau)
 # --------------------------------------------------------------------------- #
 def _read_7bit(data, i):
     val, shift = 0, 0
@@ -81,9 +179,7 @@ def _read_7bit(data, i):
 
 
 def parse_manifest(data: bytes):
-    """BinaryFormatter strings are 7-bit-length-prefixed; pair each AB name with
-    the FileMD5/size that follow it. (A plain regex over the file over-matches:
-    the byte after a name can itself be a letter.)"""
+    """BinaryFormatter strings = panjang 7-bit; pasangkan nama AB dgn MD5/ukuran."""
     names = []
     i = 0
     while i < len(data):
@@ -107,19 +203,40 @@ def parse_manifest(data: bytes):
     return names
 
 
-def http_get(url, timeout=60, retries=4):
-    last = None
-    for i in range(retries):
-        try:
-            req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.read()
-        except Exception as exc:  # noqa: BLE001
-            last = exc
-            time.sleep(1.5 * (i + 1))
-    if last is None:
-        raise RuntimeError(f"gagal mengunduh {url}")
-    raise last
+def spine_entries(data: bytes):
+    return [e for e in parse_manifest(data) if AB_RE.match(e["name"].encode())]
+
+
+_FETCH_HELPER = (
+    "import sys,urllib.request\n"
+    "u=sys.argv[1];o=sys.argv[2];p=(sys.argv[3] or None)\n"
+    "op=urllib.request.build_opener(urllib.request.ProxyHandler({'http':p,'https':p})) if p else urllib.request\n"
+    "d=op.urlopen(u,timeout=12).read()\n"
+    "open(o,'wb').write(d)\n"
+)
+
+
+def fetch_manifest(store=True):
+    """Unduh ver.bytes via subprocess + hard-kill (CDN suka 'blackhole')."""
+    os.makedirs(MANIFEST_DIR, exist_ok=True)
+    local = os.path.join(MANIFEST_DIR, "ver.bytes")
+    deadline = int(os.environ.get("CROSSCORE_FETCH_TIMEOUT", "30"))
+    tmp = local + ".part"
+    if os.path.exists(tmp):
+        os.remove(tmp)
+    _log(f"mengambil manifest CDN {MANIFEST_URL}")
+    try:
+        proc = subprocess.run(
+            [PYTHON, "-c", _FETCH_HELPER, MANIFEST_URL, tmp, PROXY or ""],
+            capture_output=True, text=True, timeout=deadline,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"timeout {deadline}s (CDN tidak terjangkau)")
+    if proc.returncode != 0 or not os.path.exists(tmp):
+        raise RuntimeError((proc.stderr or proc.stdout or "unduhan gagal").strip()[:200])
+    raw = open(tmp, "rb").read()
+    os.replace(tmp, local)
+    return raw
 
 
 # --------------------------------------------------------------------------- #
@@ -140,120 +257,88 @@ def save_state(state):
         json.dump(state, f, indent=1)
 
 
-# --------------------------------------------------------------------------- #
-# steps
-# --------------------------------------------------------------------------- #
-_FETCH_HELPER = (
-    "import sys,urllib.request\n"
-    "u=sys.argv[1];o=sys.argv[2]\n"
-    "d=urllib.request.urlopen(u,timeout=12).read()\n"
-    "open(o,'wb').write(d)\n"
-)
+def _installed_names():
+    if not os.path.isdir(ASSET_DIR):
+        return set()
+    out = set()
+    for n in os.listdir(ASSET_DIR):
+        d = os.path.join(ASSET_DIR, n)
+        if not os.path.isdir(d):
+            continue
+        # Terhitung "sudah ada" bila punya skeleton, ATAU sudah ditandai .skip
+        # (bundle yang ternyata bukan spine, mis. VFX/particle) supaya tidak
+        # terus dilaporkan "missing" setiap kali check.
+        if (os.path.exists(os.path.join(d, n + ".json"))
+                or os.path.exists(os.path.join(d, n + ".skel"))
+                or os.path.exists(os.path.join(d, n + ".skip"))):
+            out.add(n)
+    return out
 
 
-def fetch_manifest(store=True):
-    """Unduh ver.bytes; simpan di manifest/ untuk diff berikutnya.
-
-    Host ini (Volcengine/CN) sering 'blackhole': connect() menggantung tanpa
-    error dan DNS memetakan banyak IP, sehingga SIGALRM/urllib-timeout TIDAK
-    cukup (Python otomatis mengulang syscall yang ter-interupsi). Karena itu
-    unduhan dijalankan di subprocess dan dibunuh paksa lewat timeout, supaya
-    `--check` SELALU balik cepat.
-    """
-    os.makedirs(MANIFEST_DIR, exist_ok=True)
-    local = os.path.join(MANIFEST_DIR, "ver.bytes")
-    deadline = int(os.environ.get("CROSSCORE_FETCH_TIMEOUT", "30"))
-    tmp = local + ".part"
-    if os.path.exists(tmp):
-        os.remove(tmp)
-    _log(f"mengambil manifest {MANIFEST_URL}")
+def _targets(manifest_path=None):
+    """Kembalikan (sumber, [{'name','model','gh'}]). CDN dulu, lalu GitHub."""
+    if manifest_path:
+        raw = open(manifest_path, "rb").read()
+        return "local-manifest", [
+            {"name": e["name"], "model": e["name"][len(SPINE_PREFIX):]}
+            for e in spine_entries(raw)]
     try:
-        proc = subprocess.run(
-            [PYTHON, "-c", _FETCH_HELPER, MANIFEST_URL, tmp],
-            capture_output=True, text=True, timeout=deadline,
-        )
-    except subprocess.TimeoutExpired:
-        raise RuntimeError(f"timeout {deadline}s (host tidak terjangkau)")
-    if proc.returncode != 0 or not os.path.exists(tmp):
-        raise RuntimeError((proc.stderr or proc.stdout or "unduhan gagal").strip()[:200])
-    raw = open(tmp, "rb").read()
-    os.replace(tmp, local)
-    return raw
-
-
-def spine_entries(data: bytes):
-    return [e for e in parse_manifest(data) if AB_RE.match(e["name"].encode())]
-
-
-def _log(msg):
-    """Baris progres ke stderr: server menampilkan ini sebagai log live."""
-    sys.stderr.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), msg))
-    sys.stderr.flush()
+        raw = fetch_manifest()
+        entries = spine_entries(raw)
+        if entries:
+            return "cdn", [{"name": e["name"], "model": e["name"][len(SPINE_PREFIX):]}
+                           for e in entries]
+    except Exception as exc:  # noqa: BLE001
+        _log(f"CDN tak terjangkau ({exc}); pakai mirror GitHub")
+    cat = gh_catalog()
+    return "github", [
+        {"name": n, "model": n[len(SPINE_PREFIX):], "gh": cat[n]}
+        for n in sorted(cat) if n.startswith(SPINE_PREFIX)]
 
 
 def check(manifest_path=None):
-    state = load_state()
     try:
-        raw = open(manifest_path, "rb").read() if manifest_path else fetch_manifest()
-        entries = spine_entries(raw)
-        _log(f"manifest: {len(entries)} bundle spine")
-        cur = {e["name"] for e in entries}
-        prev = set(state.get("bundles", []))
-        added = sorted(cur - prev)
-        # Diff against what is ACTUALLY on disk, not just the saved state: a
-        # first ever run has no state, yet all models may already be present.
-        def installed(n):
-            d = os.path.join(ASSET_DIR, n)
-            return os.path.exists(os.path.join(d, n + ".json")) or os.path.exists(os.path.join(d, n + ".skel"))
-        missing = [e["name"] for e in entries
-                   if not installed(e["name"][len("prefabs_spine_"):])]
-        result = {
-            "ok": True,
-            "bundles": len(entries),
-            "added": len(added),
-            "missing": len(missing),
-            "removed": len(prev - cur),
-            "changed": bool(added or missing),
-            "new_models": [m[len("prefabs_spine_"):] for m in (added or missing)[:20]],
-            "source": "local-manifest" if manifest_path else "cdn",
-        }
+        source, targets = _targets(manifest_path)
     except Exception as exc:  # noqa: BLE001
-        cur = state.get("bundles", [])
-        result = {
-            "ok": False,
-            "error": f"tidak bisa mengambil manifest: {exc}",
-            "reachable": False,
-            "bundles": len(cur),
-            "added": 0,
-            "new_models": [],
-        }
-    return result
+        return {"ok": False, "error": f"tak bisa mengambil daftar: {exc}",
+                "reachable": False, "bundles": 0, "added": 0, "missing": 0, "new_models": []}
+    if not targets:
+        return {"ok": False, "error": "tak ada model dari CDN maupun GitHub",
+                "reachable": False, "bundles": 0, "added": 0, "missing": 0, "new_models": []}
+    installed = _installed_names()
+    cur = {t["model"] for t in targets}
+    state = load_state()
+    prev = set(state.get("models", []))
+    added = sorted(cur - prev) if prev else []
+    missing = sorted(cur - installed)
+    return {
+        "ok": True,
+        "source": source,
+        "bundles": len(cur),
+        "installed": len(cur & installed),
+        "added": len(added),
+        "missing": len(missing),
+        "removed": len(prev - cur),
+        "changed": bool(missing or added),
+        "new_models": (missing or added)[:30],
+    }
 
 
 # --------------------------------------------------------------------------- #
 # decryption + extraction
 # --------------------------------------------------------------------------- #
 def trim_fake_header(data: bytes) -> bytes:
-    """FakeHeader = junk before the real `UnityFS` magic (last occurrence)."""
+    """FakeHeader = sampah sebelum `UnityFS` asli (kemunculan TERAKHIR)."""
     pos = data.rfind(b"UnityFS")
-    if pos > 0:
-        return data[pos:]
-    return data
+    return data[pos:] if pos > 0 else data
 
 
 _PAGE_RE = re.compile(r"\.(png|jpe?g|webp)$", re.I)
 
 
 def extract_with_unitypy(raw: bytes, dest: str, name: str, cn_key=None):
-    """Return (status, note). Writes <dest>/<name>.<json|skel> + <name>.atlas + pages.
-
-    Handles both skeleton encodings seen across games:
-      * spine JSON  shipped as a TextAsset named `*.prefab` (CrossCore) or `*.json`
-      * spine BINARY shipped as a TextAsset named `*.skel`
-    Page textures are named after the atlas's own page entry, so a model whose
-    texture object name differs from the atlas reference still resolves.
-    """
-    import UnityPy  # imported lazily so --check needs no heavy deps
+    """Tulis <dest>/<name>.<json|skel> + <name>.atlas + halaman PNG. (status, note)."""
+    import UnityPy  # lazy
 
     data = trim_fake_header(raw)
     if cn_key:
@@ -288,6 +373,9 @@ def extract_with_unitypy(raw: bytes, dest: str, name: str, cn_key=None):
                     skel, skel_ext = payload, ".json"
             elif low.endswith((".skel", ".prefab")) and skel is None:
                 skel, skel_ext = (payload, ".json") if payload[:1] == b"{" else (payload, ".skel")
+            elif skel is None and low.startswith(name.lower()):
+                # CrossCore: skeleton TextAsset dinamai <Name> tanpa ekstensi.
+                skel, skel_ext = (payload, ".json") if payload[:1] == b"{" else (payload, ".skel")
         elif t == "Texture2D":
             try:
                 pages.append((nm, d.image))
@@ -300,8 +388,7 @@ def extract_with_unitypy(raw: bytes, dest: str, name: str, cn_key=None):
         f.write(skel)
     with open(os.path.join(dest, name + ".atlas"), "w", encoding="utf-8") as f:
         f.write(atlas)
-    # Save each page under the name the atlas references (page lines are the
-    # non-indented lines that look like image files).
+    # Simpan tiap halaman memakai nama yang dirujuk atlas.
     refs = [ln.strip() for ln in atlas.splitlines()
             if ln.strip() and not ln[0].isspace() and _PAGE_RE.search(ln.strip())]
     used = set()
@@ -325,103 +412,108 @@ def extract_with_unitypy(raw: bytes, dest: str, name: str, cn_key=None):
     return "ok", note
 
 
-def extract_with_assetstudio(bundle_dir: str, out_dir: str):
-    """Fallback: aelurum AssetStudioModCLI (butuh dotnet)."""
-    dotnet = shutil.which("dotnet")
-    if not dotnet or not os.path.exists(ASSETSTUDIO):
-        return None
-    os.makedirs(out_dir, exist_ok=True)
-    r = subprocess.run([dotnet, ASSETSTUDIO, bundle_dir, "-o", out_dir, "--log-level", "error"],
-                       capture_output=True, text=True)
-    return r.returncode == 0
-
-
+# --------------------------------------------------------------------------- #
+# apply
+# --------------------------------------------------------------------------- #
 def apply_update(limit=0, workers=8, manifest_path=None):
-    info = check(manifest_path=manifest_path)
-    if not info.get("ok") and not manifest_path:
-        # CDN tidak terjangkau — kembalikan apa adanya, jangan crash.
-        return {"ok": False, "error": info.get("error"), "downloaded": 0, "extracted": 0}
+    try:
+        source, targets = _targets(manifest_path)
+    except Exception as exc:  # noqa: BLE001
+        return {"ok": False, "error": f"tak bisa mengambil daftar: {exc}",
+                "downloaded": 0, "extracted": 0}
+    if not targets:
+        return {"ok": False, "error": "tak ada model dari CDN maupun GitHub",
+                "downloaded": 0, "extracted": 0}
 
-    raw = open(manifest_path, "rb").read() if manifest_path else open(
-        os.path.join(MANIFEST_DIR, "ver.bytes"), "rb").read()
-    entries = spine_entries(raw)
-    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
-
-    # Hanya unduh bundle Spine yang belum ada / ukurannya beda.
-    def need(e):
-        p = os.path.join(DOWNLOAD_DIR, e["name"])
-        return not (os.path.exists(p) and os.path.getsize(p) == e["size"])
-
-    todo = [e for e in entries if need(e)]
+    installed = _installed_names()
+    todo = [t for t in targets if t["model"] not in installed]
     if limit:
         todo = todo[:limit]
+    os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+    _log(f"sumber={source}: {len(targets)} model, {len(todo)} baru (workers={workers})")
 
     downloaded = failed = 0
     errors = []
     total = len(todo)
-    _log(f"mengunduh {total} bundle baru (workers={workers})")
 
-    def get(e):
+    def get(t):
         nonlocal downloaded, failed
-        last = ""
-        for host in CDN_HOSTS:
+        local = os.path.join(DOWNLOAD_DIR, t["name"])
+        errs = []
+        if t.get("gh"):  # mirror GitHub dulu
+            info = t["gh"]
             try:
-                body = http_get(f"{host}/Custom/{e['name']}")
-                with open(os.path.join(DOWNLOAD_DIR, e["name"]), "wb") as f:
+                body = http_get(f"{GH_RAW}/{info['repo']}/{info['branch']}/{info['path']}",
+                                timeout=180, headers=_gh_headers())
+                with open(local, "wb") as f:
                     f.write(body)
                 downloaded += 1
                 if downloaded % 10 == 0 or downloaded == total:
                     _log(f"unduh {downloaded}/{total}")
                 return
             except Exception as exc:  # noqa: BLE001
-                last = f"{e['name']}: {exc}"
+                errs.append(f"gh={exc}")
+        for host in CDN_HOSTS:  # lalu CDN resmi
+            try:
+                body = http_get(f"{host}/Custom/{t['name']}")
+                with open(local, "wb") as f:
+                    f.write(body)
+                downloaded += 1
+                return
+            except Exception as exc:  # noqa: BLE001
+                errs.append(f"cdn={exc}")
         failed += 1
         if len(errors) < 5:
-            errors.append(last)
-        _log(f"GAGAL {last}")
+            errors.append(f"{t['name']}: {'; '.join(errs)[:140]}")
+        _log(f"GAGAL unduh {t['name']}")
 
     if todo:
         with ThreadPoolExecutor(max_workers=workers) as ex:
             list(ex.map(get, todo))
 
-    # Ekstraksi ke pohon aset viewer.
     cn_key = os.environ.get("CROSSCORE_UNITYCN_KEY")
     extracted = already = 0
     new_models = []
-    for e in entries:
-        name = e["name"][len("prefabs_spine_"):]
-        dest = os.path.join(ASSET_DIR, name)
-        if os.path.exists(os.path.join(dest, name + ".json")):
+    for t in targets:
+        model = t["model"]
+        dest = os.path.join(ASSET_DIR, model)
+        if model in installed:
             already += 1
             continue
-        p = os.path.join(DOWNLOAD_DIR, e["name"])
+        p = os.path.join(DOWNLOAD_DIR, t["name"])
         if not os.path.exists(p):
             continue
         try:
-            status, note = extract_with_unitypy(open(p, "rb").read(), dest, name, cn_key)
+            status, note = extract_with_unitypy(open(p, "rb").read(), dest, model, cn_key)
         except Exception as exc:  # noqa: BLE001
             status, note = "error", str(exc)[:80]
         if status == "ok":
             extracted += 1
-            if len(new_models) < 20:
-                new_models.append(name)
-            _log(f"ekstrak OK {name} ({note})")
+            if len(new_models) < 30:
+                new_models.append(model)
+            _log(f"ekstrak OK {model} ({note})")
+        elif status == "not-spine":
+            # Bundle yang ternyata bukan spine (VFX/particle) — tandai supaya
+            # tidak dilaporkan "missing" terus tiap check.
+            os.makedirs(dest, exist_ok=True)
+            with open(os.path.join(dest, model + ".skip"), "w") as f:
+                f.write(f"bukan spine: {note}\n")
+            _log(f"lewati {model} (bukan spine: {note})")
         elif status in ("load-fail", "error"):
-            # fallback ke AssetStudio bila mungkin (sekali saja untuk batch ini)
-            if extract_with_assetstudio(DOWNLOAD_DIR, os.path.join(STATE_DIR, "as_out")):
-                pass
-            errors.append(f"{name}: {status} {note}")
-            _log(f"ekstrak GAGAL {name}: {status} {note}")
+            errors.append(f"{model}: {status} {note}")
+            _log(f"ekstrak GAGAL {model}: {status} {note}")
 
     state = load_state()
-    state["bundles"] = sorted(e["name"] for e in entries)
+    state["models"] = sorted(t["model"] for t in targets)
+    state["source"] = source
     state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
     save_state(state)
-    _log(f"selesai: {extracted} model diekstrak, {already} sudah ada, {failed} gagal")
+    _log(f"selesai: {extracted} baru, {already} sudah ada, {failed} gagal unduh")
 
     return {
         "ok": True,
-        "bundles": len(entries),
+        "source": source,
+        "bundles": len(targets),
         "downloaded": downloaded,
         "failed": failed,
         "extracted": extracted,
@@ -432,16 +524,51 @@ def apply_update(limit=0, workers=8, manifest_path=None):
     }
 
 
+# --------------------------------------------------------------------------- #
+# doctor
+# --------------------------------------------------------------------------- #
+def doctor():
+    import socket
+    out = {"ok": False, "steps": []}
+    try:
+        cat = gh_catalog()
+        out["github_bundles"] = len(cat)
+        out["steps"].append(f"mirror GitHub: {len(cat)} bundle prefabs_spine_*")
+        out["ok"] = len(cat) > 0
+    except Exception as exc:  # noqa: BLE001
+        out["steps"].append(f"GitHub gagal: {exc}")
+    host = MANIFEST_URL.split("/")[2]
+    try:
+        ips = sorted({str(i[4][0]) for i in socket.getaddrinfo(host, 443, proto=socket.IPPROTO_TCP)})
+        out["steps"].append(f"DNS CDN {host} -> {', '.join(ips[:6])}")
+        ok = []
+        for ip in ips[:6]:
+            try:
+                with socket.create_connection((ip, 443), timeout=5):
+                    ok.append(ip)
+            except Exception:  # noqa: BLE001
+                pass
+        out["cdn_reachable_ips"] = ok
+        out["steps"].append(f"CDN TCP OK: {ok or 'TIDAK ADA (diblok dari host ini)'}")
+    except Exception as exc:  # noqa: BLE001
+        out["steps"].append(f"DNS CDN gagal: {exc}")
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--apply", action="store_true")
+    ap.add_argument("--doctor", action="store_true",
+                    help="diagnosa keterjangkauan (mirror GitHub + CDN resmi)")
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--manifest", default=None, help="ver.bytes lokal (uji tanpa jaringan)")
     a = ap.parse_args()
 
-    if a.apply:
+    if a.doctor:
+        print(json.dumps(doctor(), indent=1, ensure_ascii=False))
+    elif a.apply:
         print(json.dumps(apply_update(limit=a.limit, workers=a.workers, manifest_path=a.manifest),
                          indent=1, ensure_ascii=False))
     elif a.check:
