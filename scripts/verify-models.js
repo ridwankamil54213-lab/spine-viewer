@@ -77,7 +77,12 @@ async function main() {
     // 3. Wait for the skeleton to actually load
     try {
       await page.waitForFunction(
-        () => window.spineStage && window.spineStage.spine && window.spineStage.spine.state,
+        () => {
+          const s = window.spineStage && window.spineStage.spine;
+          // Spine: has a state machine. Live2D Cubism: has an internalModel
+          // (pixi-live2d-display), no `.state`.
+          return !!(s && (s.state || s.internalModel));
+        },
         { timeout: 25000 }
       );
     } catch (e) {
@@ -95,9 +100,9 @@ async function main() {
         (want) =>
           window.spineStage &&
           window.spineStage.spine &&
-          window.spineStage.spine.skeleton &&
           window.spineStage.model &&
-          String(window.spineStage.model.id || "").endsWith(want),
+          String(window.spineStage.model.id || "").endsWith(want) &&
+          (window.spineStage.spine.skeleton || window.spineStage.spine.internalModel),
         short,
         { timeout: 20000 }
       );
@@ -126,6 +131,19 @@ async function main() {
         hudModel: (document.querySelector("#hud-model") || {}).textContent || null,
         animations,
         skins,
+        live2d: (() => {
+          // pixi-live2d-display model: report drawables/parts as a sanity check.
+          try {
+            const cm = sp && sp.internalModel && sp.internalModel.coreModel;
+            if (!cm) return null;
+            return {
+              drawables: typeof cm.getDrawableCount === "function" ? cm.getDrawableCount() : null,
+              parts: typeof cm.getPartCount === "function" ? cm.getPartCount() : null,
+            };
+          } catch {
+            return null;
+          }
+        })(),
         pma: {
           active: st.pma && st.pma.active,
           mode: st.pma && st.pma.mode,
@@ -146,6 +164,7 @@ async function main() {
     console.log("  hudModel   :", info.hudModel);
     console.log("  animasi    :", info.animations.slice(0, 8).join(", ") || "(none)");
     console.log("  skin       :", info.skins.join(", ") || "(none)");
+    if (info.live2d) console.log("  live2d     :", JSON.stringify(info.live2d));
     console.log("  pma        :", JSON.stringify(info.pma));
     console.log("  worldSpan  :", JSON.stringify(info.worldSpan));
 

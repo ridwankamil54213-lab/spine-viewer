@@ -93,3 +93,6 @@ assets/cherrytale/
 # Per-file inspect memo written by the server (data/scan-memo.json).
 # Regenerated on scan; machine-specific and large.
 data/scan-memo.json
+
+# azlassets config dir created if azl runs in repo root
+/config/

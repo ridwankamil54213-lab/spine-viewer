@@ -1,0 +1,1843 @@
+{
+ "abeikelongbi_3": {
+  "ship": "阿贝克隆比",
+  "pinyin": "abeikelongbi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "abeikelongbi_3_hx": {
+  "ship": "阿贝克隆比",
+  "pinyin": "abeikelongbi",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "adaerbote_2": {
+  "ship": "阿达尔伯特",
+  "pinyin": "adaerbote",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "adaerbote_3": {
+  "ship": "阿达尔伯特",
+  "pinyin": "adaerbote",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aerbien_3": {
+  "ship": "阿尔比恩",
+  "pinyin": "aerbien",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aersasi_2": {
+  "ship": "阿二萨斯",
+  "pinyin": "aersasi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aersasi_3": {
+  "ship": "阿二萨斯",
+  "pinyin": "aersasi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aidang_2": {
+  "ship": "爱宕",
+  "pinyin": "aidang",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aierdeliqi_4": {
+  "ship": "埃尔德里奇",
+  "pinyin": "aierdeliqi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "aierdeliqi_5": {
+  "ship": "埃尔德里奇",
+  "pinyin": "aierdeliqi",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "aijier_2": {
+  "ship": "阿基尔",
+  "pinyin": "aijier",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aijier_3": {
+  "ship": "阿基尔",
+  "pinyin": "aijier",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aijier_4": {
+  "ship": "阿基尔",
+  "pinyin": "aijier",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "ailunsamuna_2": {
+  "ship": "艾尔萨姆纳",
+  "pinyin": "ailunsamuna",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "ailunsamuna_2_hx": {
+  "ship": "艾尔萨姆纳",
+  "pinyin": "ailunsamuna",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "ailunsamuna_3": {
+  "ship": "艾尔萨姆纳",
+  "pinyin": "ailunsamuna",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aimierbeierding_2": {
+  "ship": "艾米尔·贝廷",
+  "pinyin": "aimierbeierding",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aimierbeierding_3": {
+  "ship": "艾米尔·贝廷",
+  "pinyin": "aimierbeierding",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "aimierbeierding_3_hx": {
+  "ship": "艾米尔·贝廷",
+  "pinyin": "aimierbeierding",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "aimudeng_2": {
+  "ship": "艾姆登",
+  "pinyin": "aimudeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aimudeng_2_hx": {
+  "ship": "艾姆登",
+  "pinyin": "aimudeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "aisaikesi_4": {
+  "ship": "艾塞克斯",
+  "pinyin": "aisaikesi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "ankeleiqi_2": {
+  "ship": "安克雷奇",
+  "pinyin": "ankeleiqi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "ankeleiqi_2_hx": {
+  "ship": "安克雷奇",
+  "pinyin": "ankeleiqi",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "ankeleiqi_3": {
+  "ship": "安克雷奇",
+  "pinyin": "ankeleiqi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "ankeleiqi_4": {
+  "ship": "安克雷奇",
+  "pinyin": "ankeleiqi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "anninvwang_2": {
+  "ship": "暗黑女王",
+  "pinyin": "anninvwang",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "antu_2": {
+  "ship": "antu",
+  "pinyin": "antu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "aogusite_4": {
+  "ship": "奥古斯特",
+  "pinyin": "aogusite",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "baerdimo_5": {
+  "ship": "巴尔的摩",
+  "pinyin": "baerdimo",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "baerdimo_6": {
+  "ship": "巴尔的摩",
+  "pinyin": "baerdimo",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "baifeng_2": {
+  "ship": "白风",
+  "pinyin": "baifeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "baifeng_3": {
+  "ship": "白风",
+  "pinyin": "baifeng",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "bailong_3": {
+  "ship": "白龙",
+  "pinyin": "bailong",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "baiyanjuren_4": {
+  "ship": "白盐巨人",
+  "pinyin": "baiyanjuren",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "banerwei_3": {
+  "ship": "班尔维",
+  "pinyin": "banerwei",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "banrenma_2": {
+  "ship": "半人马",
+  "pinyin": "banrenma",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "beianpudunii_2": {
+  "ship": "beianpudunii",
+  "pinyin": "beianpudunii",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "beierfasite_2": {
+  "ship": "贝尔法斯特",
+  "pinyin": "beierfasite",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "beikaluolaina_2": {
+  "ship": "贝卡洛莱纳",
+  "pinyin": "beikaluolaina",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "beikaluolaina_2_hx": {
+  "ship": "贝卡洛莱纳",
+  "pinyin": "beikaluolaina",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "beilaosenlin_2": {
+  "ship": "贝拉森林",
+  "pinyin": "beilaosenlin",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "benningdun_2": {
+  "ship": "benningdun",
+  "pinyin": "benningdun",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "biaoqiang": {
+  "ship": "标枪",
+  "pinyin": "biaoqiang",
+  "variant": null,
+  "variantName": null,
+  "hx": false
+ },
+ "biaoqiang_3": {
+  "ship": "标枪",
+  "pinyin": "biaoqiang",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "bisimai_2": {
+  "ship": "俾斯麦",
+  "pinyin": "bisimai",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "bisimai_4": {
+  "ship": "俾斯麦",
+  "pinyin": "bisimai",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "bola_2": {
+  "ship": "波拉",
+  "pinyin": "bola",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "boyixi_2": {
+  "ship": "博伊西",
+  "pinyin": "boyixi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "bulaimodun_2": {
+  "ship": "布莱默顿",
+  "pinyin": "bulaimodun",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "bulaimodun_4": {
+  "ship": "布莱默顿",
+  "pinyin": "bulaimodun",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "bulaimodun_5": {
+  "ship": "布莱默顿",
+  "pinyin": "bulaimodun",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "buleisite_2": {
+  "ship": "布雷斯特",
+  "pinyin": "buleisite",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "buleisite_3": {
+  "ship": "布雷斯特",
+  "pinyin": "buleisite",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "bunao_3": {
+  "ship": "布瑙",
+  "pinyin": "bunao",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "chaijun_3": {
+  "ship": "柴郡",
+  "pinyin": "chaijun",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "chaijun_4": {
+  "ship": "柴郡",
+  "pinyin": "chaijun",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "chaijun_4_hx": {
+  "ship": "柴郡",
+  "pinyin": "chaijun",
+  "variant": "4",
+  "variantName": null,
+  "hx": true
+ },
+ "chaijun_5": {
+  "ship": "柴郡",
+  "pinyin": "chaijun",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "chaijun_6": {
+  "ship": "柴郡",
+  "pinyin": "chaijun",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "chicheng_5": {
+  "ship": "赤城",
+  "pinyin": "chicheng",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "chuixue_3": {
+  "ship": "吹雪",
+  "pinyin": "chuixue",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "chuyue_2": {
+  "ship": "筑摩",
+  "pinyin": "chuyue",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "dafeng_2": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "dafeng_2_hx": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "dafeng_3": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "dafeng_4": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "dafeng_6": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "dafeng_7": {
+  "ship": "大凤",
+  "pinyin": "dafeng",
+  "variant": "7",
+  "variantName": null,
+  "hx": false
+ },
+ "daofeng_4": {
+  "ship": "岛风",
+  "pinyin": "daofeng",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "daofeng_5": {
+  "ship": "岛风",
+  "pinyin": "daofeng",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "daofeng_5_hx": {
+  "ship": "岛风",
+  "pinyin": "daofeng",
+  "variant": "5",
+  "variantName": null,
+  "hx": true
+ },
+ "dewenjun_2": {
+  "ship": "德文郡",
+  "pinyin": "dewenjun",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "deyizhi_3": {
+  "ship": "deyizhi",
+  "pinyin": "deyizhi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "dujiaoshou_4": {
+  "ship": "独角兽",
+  "pinyin": "dujiaoshou",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "dujiaoshou_6": {
+  "ship": "独角兽",
+  "pinyin": "dujiaoshou",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "dulianglai_2": {
+  "ship": "杜良来",
+  "pinyin": "dulianglai",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "dunkeerke_2": {
+  "ship": "敦刻尔克",
+  "pinyin": "dunkeerke",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "edu_3": {
+  "ship": "恶毒",
+  "pinyin": "edu",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "edu_3_hx": {
+  "ship": "恶毒",
+  "pinyin": "edu",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "edu_4": {
+  "ship": "恶毒",
+  "pinyin": "edu",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "feiteliedadi_3": {
+  "ship": "斐特烈大帝",
+  "pinyin": "feiteliedadi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "feiteliedadi_4": {
+  "ship": "斐特烈大帝",
+  "pinyin": "feiteliedadi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "feiteliekaer_3": {
+  "ship": "腓特烈·卡尔",
+  "pinyin": "feiteliekaer",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "feiteliekaer_4": {
+  "ship": "腓特烈·卡尔",
+  "pinyin": "feiteliekaer",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "fengyun_4": {
+  "ship": "风云",
+  "pinyin": "fengyun",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "fulici_2": {
+  "ship": "弗里斯",
+  "pinyin": "fulici",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "gangyishawa_3": {
+  "ship": "冈伊沙瓦",
+  "pinyin": "gangyishawa",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "gaoxiong_7": {
+  "ship": "高雄",
+  "pinyin": "gaoxiong",
+  "variant": "7",
+  "variantName": null,
+  "hx": false
+ },
+ "geliqiya_2": {
+  "ship": "格里奇亚",
+  "pinyin": "geliqiya",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "genaisennao_2": {
+  "ship": "格奈森瑙",
+  "pinyin": "genaisennao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "gezi_2": {
+  "ship": "鸽子",
+  "pinyin": "gezi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "guandao_2": {
+  "ship": "关岛",
+  "pinyin": "guandao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "guandao_3": {
+  "ship": "关岛",
+  "pinyin": "guandao",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "guanghui_7": {
+  "ship": "光辉",
+  "pinyin": "guanghui",
+  "variant": "7",
+  "variantName": null,
+  "hx": false
+ },
+ "guanghui_9": {
+  "ship": "光辉",
+  "pinyin": "guanghui",
+  "variant": "9",
+  "variantName": null,
+  "hx": false
+ },
+ "guangrong_3": {
+  "ship": "光荣",
+  "pinyin": "guangrong",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "hailunna_4": {
+  "ship": "海伦娜",
+  "pinyin": "hailunna",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "haiyinlixi_2": {
+  "ship": "海因里希",
+  "pinyin": "haiyinlixi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "heitaizi_2": {
+  "ship": "黑太子",
+  "pinyin": "heitaizi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "hemin_2": {
+  "ship": "赫敏",
+  "pinyin": "hemin",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "hemin_3": {
+  "ship": "赫敏",
+  "pinyin": "hemin",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "huangjiafangzhou_3": {
+  "ship": "皇家方舟",
+  "pinyin": "huangjiafangzhou",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "huonululu_3": {
+  "ship": "火奴鲁鲁",
+  "pinyin": "huonululu",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "huonululu_5": {
+  "ship": "火奴鲁鲁",
+  "pinyin": "huonululu",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "jialisuoniye_3": {
+  "ship": "加里索尼耶",
+  "pinyin": "jialisuoniye",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "jialisuoniye_3_hx": {
+  "ship": "加里索尼耶",
+  "pinyin": "jialisuoniye",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "jialisuoniye_4": {
+  "ship": "加里索尼耶",
+  "pinyin": "jialisuoniye",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "jian_3": {
+  "ship": "坚",
+  "pinyin": "jian",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "jianwu_2": {
+  "ship": "建武",
+  "pinyin": "jianwu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "jianye_2": {
+  "ship": "翔鹤",
+  "pinyin": "jianye",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "jianye_2_hx": {
+  "ship": "翔鹤",
+  "pinyin": "jianye",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "jianye_3": {
+  "ship": "翔鹤",
+  "pinyin": "jianye",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "jianye_4": {
+  "ship": "翔鹤",
+  "pinyin": "jianye",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "jiluofu_3": {
+  "ship": "基洛夫",
+  "pinyin": "jiluofu",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "jinjiang_2": {
+  "ship": "近江",
+  "pinyin": "jinjiang",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "jinluhao_2": {
+  "ship": "金刚",
+  "pinyin": "jinluhao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "jinluhao_3": {
+  "ship": "金刚",
+  "pinyin": "jinluhao",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "jinshi_2": {
+  "ship": "金狮",
+  "pinyin": "jinshi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "jiuyun_2": {
+  "ship": "加贺",
+  "pinyin": "jiuyun",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "junhe_4": {
+  "ship": "君河",
+  "pinyin": "junhe",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "junzhu_5": {
+  "ship": "郡主",
+  "pinyin": "junzhu",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "kalangshitade_2": {
+  "ship": "卡朗施塔德",
+  "pinyin": "kalangshitade",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "kalvbudisi_2": {
+  "ship": "卡尔布迪斯",
+  "pinyin": "kalvbudisi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "kebensi_2": {
+  "ship": "肯彭斯",
+  "pinyin": "kebensi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "kelaimengsuo_2": {
+  "ship": "克莱蒙梭",
+  "pinyin": "kelaimengsuo",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "kelifulan_3": {
+  "ship": "科隆",
+  "pinyin": "kelifulan",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "kelifulan_8": {
+  "ship": "科隆",
+  "pinyin": "kelifulan",
+  "variant": "8",
+  "variantName": null,
+  "hx": false
+ },
+ "kewei_4": {
+  "ship": "可畏",
+  "pinyin": "kewei",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "kewei_6": {
+  "ship": "可畏",
+  "pinyin": "kewei",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "kubo_2": {
+  "ship": "久保",
+  "pinyin": "kubo",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "kuersike_2": {
+  "ship": "库尔斯克",
+  "pinyin": "kuersike",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "lafei_4": {
+  "ship": "拉菲",
+  "pinyin": "lafei",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "lafeier_2": {
+  "ship": "拉菲儿",
+  "pinyin": "lafeier",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "lafeiii_3": {
+  "ship": "拉菲III",
+  "pinyin": "lafeiii",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "leigensibao_2": {
+  "ship": "雷根斯堡",
+  "pinyin": "leigensibao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "liekexingdunii_2": {
+  "ship": "liekexingdunii",
+  "pinyin": "liekexingdunii",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "lingbo": {
+  "ship": "凌波",
+  "pinyin": "lingbo",
+  "variant": null,
+  "variantName": null,
+  "hx": false
+ },
+ "lingbo_10": {
+  "ship": "凌波",
+  "pinyin": "lingbo",
+  "variant": "10",
+  "variantName": null,
+  "hx": false
+ },
+ "linuo_3": {
+  "ship": "利托里奥",
+  "pinyin": "linuo",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "linuo_3_hx": {
+  "ship": "利托里奥",
+  "pinyin": "linuo",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "lisailiu_2": {
+  "ship": "利塞留",
+  "pinyin": "lisailiu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "lisailiu_3": {
+  "ship": "利塞留",
+  "pinyin": "lisailiu",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "longfeng_2": {
+  "ship": "龙凤",
+  "pinyin": "longfeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "longfeng_2_hx": {
+  "ship": "龙凤",
+  "pinyin": "longfeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "longwu_2": {
+  "ship": "龙武",
+  "pinyin": "longwu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "luoen_4": {
+  "ship": "罗恩",
+  "pinyin": "luoen",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "luoma_2": {
+  "ship": "罗马",
+  "pinyin": "luoma",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "lupuleixite_2": {
+  "ship": "卢普雷希特",
+  "pinyin": "lupuleixite",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "luyijiushi_2": {
+  "ship": "陆基旧式",
+  "pinyin": "luyijiushi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "luyijiushi_4": {
+  "ship": "陆基旧式",
+  "pinyin": "luyijiushi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "lvzuofu_2": {
+  "ship": "吕佐夫",
+  "pinyin": "lvzuofu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "maliluosi_3_doa": {
+  "ship": "玛利萝丝",
+  "pinyin": "maliluosi",
+  "variant": "3_doa",
+  "variantName": null,
+  "hx": false
+ },
+ "masaina_2": {
+  "ship": "马萨伊纳",
+  "pinyin": "masaina",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "meikelunbao_2": {
+  "ship": "梅克伦堡",
+  "pinyin": "meikelunbao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "meiyinci_3": {
+  "ship": "美因茨",
+  "pinyin": "meiyinci",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "mingji_2": {
+  "ship": "鸣门",
+  "pinyin": "mingji",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "mingshi": {
+  "ship": "明石",
+  "pinyin": "mingshi",
+  "variant": null,
+  "variantName": null,
+  "hx": false
+ },
+ "mojiaduoer_2": {
+  "ship": "莫加多尔",
+  "pinyin": "mojiaduoer",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "mojiaduoer_3": {
+  "ship": "莫加多尔",
+  "pinyin": "mojiaduoer",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "mojiaduoer_4": {
+  "ship": "莫加多尔",
+  "pinyin": "mojiaduoer",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "nabulesi_2": {
+  "ship": "那不勒斯",
+  "pinyin": "nabulesi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "naximofu_2": {
+  "ship": "纳希莫夫",
+  "pinyin": "naximofu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "nengdai_2": {
+  "ship": "能代",
+  "pinyin": "nengdai",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "nengdai_3": {
+  "ship": "能代",
+  "pinyin": "nengdai",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "ninghai_4": {
+  "ship": "宁海",
+  "pinyin": "ninghai",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "ougen_5": {
+  "ship": "欧根亲王",
+  "pinyin": "ougen",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "ougen_6": {
+  "ship": "欧根亲王",
+  "pinyin": "ougen",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "ougen_6_hx": {
+  "ship": "欧根亲王",
+  "pinyin": "ougen",
+  "variant": "6",
+  "variantName": null,
+  "hx": true
+ },
+ "ougen_8": {
+  "ship": "欧根亲王",
+  "pinyin": "ougen",
+  "variant": "8",
+  "variantName": null,
+  "hx": false
+ },
+ "ouruola_4": {
+  "ship": "欧若拉",
+  "pinyin": "ouruola",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "pinghai_4": {
+  "ship": "平海",
+  "pinyin": "pinghai",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "pinghai_6": {
+  "ship": "平海",
+  "pinyin": "pinghai",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "pizibao_2": {
+  "ship": "匹兹堡",
+  "pinyin": "pizibao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "pulimaosi_3": {
+  "ship": "普利茅斯",
+  "pinyin": "pulimaosi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "qianjian_2": {
+  "ship": "前卫",
+  "pinyin": "qianjian",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "qianwei_2": {
+  "ship": "前卫",
+  "pinyin": "qianwei",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "qibolin_2": {
+  "ship": "奇柏林",
+  "pinyin": "qibolin",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "qiershazhi_2": {
+  "ship": "齐尔沙治",
+  "pinyin": "qiershazhi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "qisheng_2": {
+  "ship": "棋圣",
+  "pinyin": "qisheng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "qiye_10": {
+  "ship": "企业",
+  "pinyin": "qiye",
+  "variant": "10",
+  "variantName": null,
+  "hx": false
+ },
+ "qiye_7": {
+  "ship": "企业",
+  "pinyin": "qiye",
+  "variant": "7",
+  "variantName": null,
+  "hx": false
+ },
+ "qiye_7_hx": {
+  "ship": "企业",
+  "pinyin": "qiye",
+  "variant": "7",
+  "variantName": null,
+  "hx": true
+ },
+ "qiye_9": {
+  "ship": "企业",
+  "pinyin": "qiye",
+  "variant": "9",
+  "variantName": null,
+  "hx": false
+ },
+ "rangbaer_3": {
+  "ship": "让巴尔",
+  "pinyin": "rangbaer",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "rangbaer_4": {
+  "ship": "让巴尔",
+  "pinyin": "rangbaer",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "rangbaer_5": {
+  "ship": "让巴尔",
+  "pinyin": "rangbaer",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "sebao_2": {
+  "ship": "sebao",
+  "pinyin": "sebao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "shengluyisi_2": {
+  "ship": "圣路易斯",
+  "pinyin": "shengluyisi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "shengluyisi_2_hx": {
+  "ship": "圣路易斯",
+  "pinyin": "shengluyisi",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "shengluyisi_3": {
+  "ship": "圣路易斯",
+  "pinyin": "shengluyisi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "shengluyisi_4": {
+  "ship": "圣路易斯",
+  "pinyin": "shengluyisi",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "shengluyisi_5": {
+  "ship": "圣路易斯",
+  "pinyin": "shengluyisi",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "shi_2": {
+  "ship": "狮",
+  "pinyin": "shi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "shi_3": {
+  "ship": "狮",
+  "pinyin": "shi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "shitelasai_2": {
+  "ship": "斯特拉斯赛",
+  "pinyin": "shitelasai",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "sipeibojue_5": {
+  "ship": "斯佩伯爵",
+  "pinyin": "sipeibojue",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "sitelasibao_2": {
+  "ship": "斯特拉斯堡",
+  "pinyin": "sitelasibao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "sitelasibao_2_hx": {
+  "ship": "斯特拉斯堡",
+  "pinyin": "sitelasibao",
+  "variant": "2",
+  "variantName": null,
+  "hx": true
+ },
+ "siwanshi_3": {
+  "ship": "四万十",
+  "pinyin": "siwanshi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "suweiaitongmeng_2": {
+  "ship": "苏维埃同盟",
+  "pinyin": "suweiaitongmeng",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "suweiaitongmeng_3": {
+  "ship": "苏维埃同盟",
+  "pinyin": "suweiaitongmeng",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "taiyuan_2": {
+  "ship": "太原",
+  "pinyin": "taiyuan",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "telafaerjia_2": {
+  "ship": "特拉法尔加",
+  "pinyin": "telafaerjia",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "tiancheng_3": {
+  "ship": "天城",
+  "pinyin": "tiancheng",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "tiancheng_cv_3": {
+  "ship": "天城",
+  "pinyin": "tiancheng",
+  "variant": "cv_3",
+  "variantName": null,
+  "hx": false
+ },
+ "tianlangxing_3": {
+  "ship": "天狼星",
+  "pinyin": "tianlangxing",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "tianlangxing_5": {
+  "ship": "天狼星",
+  "pinyin": "tianlangxing",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "tierbici_2": {
+  "ship": "提尔皮茨",
+  "pinyin": "tierbici",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "u2501_2": {
+  "ship": "U-2501",
+  "pinyin": "u2501",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "weineituo_2": {
+  "ship": "维内托",
+  "pinyin": "weineituo",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "weixi_2": {
+  "ship": "威悉",
+  "pinyin": "weixi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "weiyan_2": {
+  "ship": "畏岩",
+  "pinyin": "weiyan",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "weiyan_4": {
+  "ship": "畏岩",
+  "pinyin": "weiyan",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "weiyan_4_hx": {
+  "ship": "畏岩",
+  "pinyin": "weiyan",
+  "variant": "4",
+  "variantName": null,
+  "hx": true
+ },
+ "weiyan_6": {
+  "ship": "畏岩",
+  "pinyin": "weiyan",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "weizhang_3": {
+  "ship": "威尔士亲王",
+  "pinyin": "weizhang",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "wuerlixi_2": {
+  "ship": "乌尔里希·冯·胡滕",
+  "pinyin": "wuerlixi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "wuerlixi_3": {
+  "ship": "乌尔里希·冯·胡滕",
+  "pinyin": "wuerlixi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "wuqi_2": {
+  "ship": "武齐",
+  "pinyin": "wuqi",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "wuqi_3": {
+  "ship": "武齐",
+  "pinyin": "wuqi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "wuqi_3_hx": {
+  "ship": "武齐",
+  "pinyin": "wuqi",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "wuzang_3": {
+  "ship": "武藏",
+  "pinyin": "wuzang",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "wuzang_4": {
+  "ship": "武藏",
+  "pinyin": "wuzang",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "xiafei_4": {
+  "ship": "霞飞",
+  "pinyin": "xiafei",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "xianghe_2": {
+  "ship": "翔鹤",
+  "pinyin": "xianghe",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "xingdengbao_2": {
+  "ship": "兴登堡",
+  "pinyin": "xingdengbao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "xingdengbao_3": {
+  "ship": "兴登堡",
+  "pinyin": "xingdengbao",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "xinnong_3": {
+  "ship": "信浓",
+  "pinyin": "xinnong",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "xinnong_3_hx": {
+  "ship": "信浓",
+  "pinyin": "xinnong",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "xinnong_4": {
+  "ship": "信浓",
+  "pinyin": "xinnong",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "xinnong_5": {
+  "ship": "信浓",
+  "pinyin": "xinnong",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "xinnong_6": {
+  "ship": "信浓",
+  "pinyin": "xinnong",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "xinzexi_3": {
+  "ship": "信浓",
+  "pinyin": "xinzexi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "xinzexi_5": {
+  "ship": "信浓",
+  "pinyin": "xinzexi",
+  "variant": "5",
+  "variantName": null,
+  "hx": false
+ },
+ "xixuegui_4": {
+  "ship": "吸血鬼",
+  "pinyin": "xixuegui",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "xuefeng": {
+  "ship": "雪风",
+  "pinyin": "xuefeng",
+  "variant": null,
+  "variantName": null,
+  "hx": false
+ },
+ "xuefeng_3": {
+  "ship": "雪风",
+  "pinyin": "xuefeng",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "xukufu_2": {
+  "ship": "库库富",
+  "pinyin": "xukufu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "xukufu_3": {
+  "ship": "库库富",
+  "pinyin": "xukufu",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "xukufu_3_hx": {
+  "ship": "库库富",
+  "pinyin": "xukufu",
+  "variant": "3",
+  "variantName": null,
+  "hx": true
+ },
+ "yanusi_3": {
+  "ship": "雅努斯",
+  "pinyin": "yanusi",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yanusi_7": {
+  "ship": "雅努斯",
+  "pinyin": "yanusi",
+  "variant": "7",
+  "variantName": null,
+  "hx": false
+ },
+ "yibei_3": {
+  "ship": "伊贝",
+  "pinyin": "yibei",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yichui_2": {
+  "ship": "伊吹",
+  "pinyin": "yichui",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "yilishabai_6": {
+  "ship": "伊丽莎白",
+  "pinyin": "yilishabai",
+  "variant": "6",
+  "variantName": null,
+  "hx": false
+ },
+ "yingrui_3": {
+  "ship": "萤火虫",
+  "pinyin": "yingrui",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yingxianzuo_3": {
+  "ship": "应仙座",
+  "pinyin": "yingxianzuo",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yuanchou_3": {
+  "ship": "怨仇",
+  "pinyin": "yuanchou",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yuekechengii_3": {
+  "ship": "yuekechengii",
+  "pinyin": "yuekechengii",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "yunxian_2": {
+  "ship": "云仙",
+  "pinyin": "yunxian",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "yunxian_3": {
+  "ship": "云仙",
+  "pinyin": "yunxian",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "z13_2": {
+  "ship": "Z13",
+  "pinyin": "z13",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "z23": {
+  "ship": "Z23",
+  "pinyin": "z23",
+  "variant": null,
+  "variantName": null,
+  "hx": false
+ },
+ "z23_hx": {
+  "ship": "Z23",
+  "pinyin": "z23",
+  "variant": null,
+  "variantName": null,
+  "hx": true
+ },
+ "z46_2": {
+  "ship": "Z46",
+  "pinyin": "z46",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "z46_3": {
+  "ship": "Z46",
+  "pinyin": "z46",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "z46_4": {
+  "ship": "Z46",
+  "pinyin": "z46",
+  "variant": "4",
+  "variantName": null,
+  "hx": false
+ },
+ "zengkehaijunshangjiang_2": {
+  "ship": "曾克海军上将",
+  "pinyin": "zengkehaijunshangjiang",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "zhala_2": {
+  "ship": "扎拉",
+  "pinyin": "zhala",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "zhangwu_2": {
+  "ship": "张武",
+  "pinyin": "zhangwu",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ },
+ "zhaohe_3": {
+  "ship": "翔鹤",
+  "pinyin": "zhaohe",
+  "variant": "3",
+  "variantName": null,
+  "hx": false
+ },
+ "zhenzhuhao_2": {
+  "ship": "珍珠号",
+  "pinyin": "zhenzhuhao",
+  "variant": "2",
+  "variantName": null,
+  "hx": false
+ }
+}

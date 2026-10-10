@@ -345,6 +345,7 @@ const GAME_ROOTS = [
 	// specific "azurlane-chibi" must come before "azurlane" or every chibi
 	// model gets absorbed into the main Azur Lane bucket.
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
+	{ match: "azurlane-l2d", key: "azurlane-l2d", label: "Azur Lane — Live2D" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
@@ -2265,6 +2266,34 @@ function attachCharacters(models) {
 	}
 
 	if (azHits) console.log(`  azur lane : ${azHits} model diberi nama kapal`);
+
+	// --- Azur Lane Live2D: nama kapal (pinyin -> Tionghoa) + varian -------
+	// Folder = pinyin + "_<variant>" (+ "_hx" utk versi HQ/"harmoni").
+	// Nama asli dari data/azurlane-l2d-names.json (MrKLLM ship_name_map.py).
+	{
+		const azl = (() => {
+			try {
+				return JSON.parse(fs.readFileSync(path.join(DATA, "azurlane-l2d-names.json"), "utf8"));
+			} catch {
+				return {};
+			}
+		})();
+		let azlHits = 0;
+		for (const m of models) {
+			if ((m.game || "") !== "azurlane-l2d") continue;
+			const leaf = m.id.split("/").pop().split("#")[0];
+			const rec = azl[leaf];
+			if (!rec) continue;
+			const ship = (rec.ship || "").trim();
+			const variant = rec.variantName || (rec.variant ? `varian ${rec.variant}` : "");
+			const hx = rec.hx ? "HQ" : "";
+			const extra = [variant, hx].filter(Boolean).join(" · ");
+			m.character = { name: ship || rec.pinyin, source: "ship-name-map", skin: extra || null };
+			m.name = extra ? `${ship} — ${extra} (${leaf})` : `${ship || leaf} (${leaf})`;
+			azlHits++;
+		}
+		if (azlHits) console.log(`  azur-l2d  : ${azlHits} model diberi nama kapal`);
+	}
 
 	// --- イヴンタイト (IV-N-Tight): nama asli Jepang ------------------------
 	// Folder sengaja dibuat ASCII (mis. "1004_78c6e6") karena id model di-slug
