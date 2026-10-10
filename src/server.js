@@ -313,6 +313,16 @@ const GAME_ROOTS = [
 		key: "mecharashi",
 		label: "钢岚 (Mecharashi)",
 	},
+	// 白夜极光 / Alchemy Stars (com.tencent.baiyeint, v1.43.0). Assets live in FAT32
+	// disk images (`fat32lib`) shipped as main.obb + patch.obb inside the XAPK:
+	// mount both read-only, then read `*.bundle` (named `<md5>@<name>.bundle`).
+	// Spine (3.8.94/3.8.99) is unencrypted — `*_spine_idle` / `*_spine_cg_idle`
+	// bundles carry .skel + .atlas + Texture2D. See tools/alcherystars/.
+	{
+		match: "alcherystars",
+		key: "alcherystars",
+		label: "白夜极光 (Alchemy Stars)",
+	},
 	// 异世界后宫物语 (Isekai Harem Monogatari), com.luckystargame/18game build.
 	// Cocos Creator 2.4 again. Assets under assets/assets/<bundle>/, encrypted:
 	//   prefix "GenSanaSneG" + XOR (json/atlas) or XXTEA (png/jpg) with key
