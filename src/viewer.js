@@ -3601,7 +3601,20 @@ function initUpdateLog() {
 const NEW_KEY = "spine-stage:new-models";
 const NEW_TTL_MS = 7 * 24 * 60 * 60 * 1000; // seminggu
 
+/**
+ * In-memory mirror of the localStorage new-set.
+ *
+ * loadNewSet() used to JSON.parse localStorage on EVERY call — and the model
+ * list's sort comparator calls isNewModel() per comparison. Sorting 31k models
+ * fires ~930k localStorage reads, which is what made entering a game (and
+ * every render after a new download) visibly laggy. The set changes only via
+ * saveNewSet/markNew/markSeen, so caching it and invalidating on write keeps
+ * it exact. `null` means "not loaded yet".
+ */
+let newSetCache = null;
+
 function loadNewSet() {
+	if (newSetCache) return newSetCache;
 	try {
 		const raw = JSON.parse(localStorage.getItem(NEW_KEY) || "{}");
 		// { id: timestamp }
@@ -3610,15 +3623,18 @@ function loadNewSet() {
 		for (const [id, ts] of Object.entries(raw)) {
 			if (ts && ts > cutoff) out[id] = ts;
 		}
+		newSetCache = out;
 		return out;
 	} catch {
-		return {};
+		newSetCache = {};
+		return newSetCache;
 	}
 }
 
 function saveNewSet(set) {
+	newSetCache = set || {};
 	try {
-		localStorage.setItem(NEW_KEY, JSON.stringify(set));
+		localStorage.setItem(NEW_KEY, JSON.stringify(newSetCache));
 	} catch {
 		/* penyimpanan penuh — badge hanya hilang setelah muat ulang */
 	}
