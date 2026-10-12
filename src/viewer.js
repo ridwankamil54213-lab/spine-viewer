@@ -1357,26 +1357,24 @@ async function loadModel(model) {
 		const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/");
 		const skelUrl = `${base}/${encodeURIComponent(model.skeletonFile)}`;
 		const atlasUrl = `${base}/${encodeURIComponent(model.atlasFile)}`;
-		const isBinary = model.skeletonFile.toLowerCase().endsWith(".skel");
-
-		// Atlas text and skeleton JSON are fetched directly: the pixi-spine loader
-		// plugin would otherwise auto-infer a sibling "<name>.atlas" (wrong for
-		// files like "spineboy-pro.json") and double-parse the skeleton.
-		const [atlasText, rawSkeleton] = await Promise.all([
+		// Skeleton may be JSON or binary regardless of the file extension
+		// (Muv-Luv ships JSON inside ".skel"; Azur Lane ships binary ".skel").
+		// Sniff the first byte — '{\" (0x7b) or a UTF-8 BOM — instead of
+		// trusting the extension, or a JSON-in-.skel model is fed to the
+		// binary parser and dies with "Offset outside bounds of DataView".
+		const [atlasText, skelBuf] = await Promise.all([
 			fetch(atlasUrl).then((r) => {
 				if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.atlasFile}`);
 				return r.text();
 			}),
-			isBinary
-				? fetch(skelUrl).then((r) => {
-						if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
-						return r.arrayBuffer();
-					})
-				: fetch(skelUrl).then((r) => {
-						if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
-						return r.json();
-					}),
+			fetch(skelUrl).then((r) => {
+				if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
+				return r.arrayBuffer();
+			}),
 		]);
+		const skelHead = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
+		const isBinary = !(skelHead[0] === 0x7b || skelHead[0] === 0xef);
+		const rawSkeleton = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
 
 		if (typeof atlasText !== "string" || !atlasText.trim()) {
 			throw new Error(`Berkas atlas “${model.atlasFile}” kosong atau tidak bisa dibaca.`);
@@ -2425,7 +2423,6 @@ async function skeletonDataOf(model) {
 	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/");
 	const atlasUrl = `${base}/${encodeURIComponent(model.atlasFile)}`;
 	const skelUrl = `${base}/${encodeURIComponent(model.skeletonFile)}`;
-	const isBinary = model.skeletonFile.toLowerCase().endsWith(".skel");
 
 	const atlasText = await fetch(atlasUrl).then((r) => {
 		if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.atlasFile}`);
@@ -2435,9 +2432,14 @@ async function skeletonDataOf(model) {
 	const atlas = new TextureAtlas(atlasText, (line, cb) => {
 		cb({ width: 2048, height: 2048, valid: true, scaleMode: 1, setSize() {}, dispose() {} });
 	});
-	const raw = isBinary
-		? await fetch(skelUrl).then((r) => r.arrayBuffer())
-		: await fetch(skelUrl).then((r) => r.json());
+	const skelBuf = await fetch(skelUrl).then((r) => {
+		if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
+		return r.arrayBuffer();
+	});
+	// Sniff content (Muv-Luv ships JSON inside ".skel").
+	const head = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
+	const isBinary = !(head[0] === 0x7b || head[0] === 0xef);
+	const raw = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
 
 	// Route through the same version-aware dispatcher the stage uses. This
 	// path feeds the "compare" panel, and hard-coding the 4.1 runtime made

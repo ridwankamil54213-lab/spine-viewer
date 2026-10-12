@@ -347,6 +347,10 @@ const GAME_ROOTS = [
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane-l2d", key: "azurlane-l2d", label: "Azur Lane — Live2D" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
+	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
+	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
+	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
+	{ match: "muvluv", key: "muvluv", label: "マブラヴ ガールズガーデンX" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
