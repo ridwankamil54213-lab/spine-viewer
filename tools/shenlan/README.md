@@ -89,3 +89,40 @@ masih gagal parse skins (belum terpetakan).
 - URL APK harus yang **bertanda-tangan**; regex `\.apk` memotong query string —
   ambil sampai `Key-Pair-Id` ikut.
 - `slot.attachment` pindah ke `slot.pose.attachment` di runtime 4.2/4.3.
+
+## CG / illust (galeri gambar, bukan spine)
+
+Selain model spine, **APK yang sama** memuat art 2D biasa sebagai bundle
+UnityFS (`Sprite` + `Texture2D`, tanpa skeleton):
+
+```
+assets/art/texture/backgroud/  cg_avg_<ch>_<n>       CG cerita / H   (110)
+                               activity_avg_<n>_<n>  CG event        (9)
+                               main_avg_<ch>_<n>     BG cerita utama
+                               battle_* / bg_* / shopbg / trainingbg ...
+assets/art/texture/herobust/ill/  main_avg_*         CG cerita utama  (149, 1920x1080)
+                                  cgs_<ch>_<n>       **thumbnail** dari heroCG_<id>_<n>
+                                  bg_puzzle_*        puzzle
+```
+
+Ekstrak:
+
+```bash
+/srv/venv-spine/bin/python tools/shenlan/extract-shenlan-cg.py
+```
+
+Keluaran: **316 PNG** full-res di `assets/shenlan-cg/` (192× 1920x1080,
+116× 1280x720, sisanya 750x1624 / 2048x1143) — total ~620 MB.
+
+**Jebakan**: `cgs_<ch>_<n>` (herobust/ill) ternyata beresolusi **314x191** —
+itu thumbnail kecil, dan namanya sama persis dengan CG 1280x720 milik
+`backgroud/`. Kalau tidak dibuang, thumbnail menimpa CG full-res. Script
+menyaring `(159,287)` (bust) dan `(314,191)` (pratinjau). `cgs_*` sebenarnya
+pasangan kecil dari model spine `heroCG_*` yang sudah ada di game `shenlan`,
+jadi memang tidak perlu digandakan.
+
+Di viewer: game **`shenlan-cg`** ("深蓝终末录 — CG", entri GAME_ROOTS sebelum
+`shenlan`), dirender oleh jalur `format: "image"` (`src/image-stage.js`):
+overlay `<img>` menutupi canvas, kontrol animasi/skin/timeline dimatikan, HUD
+menampilkan ukuran piksel asli, tombol ekspor = unduh PNG. Kartu di library
+memakai gambarnya sendiri sebagai thumbnail.

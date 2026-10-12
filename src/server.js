@@ -445,6 +445,18 @@ const GAME_ROOTS = [
 	},
 	// 深蓝终末录 (Deep Blue). Unity 2021.3. APK (CloudFront signed URL) holds
 	// assets/prefab/hero/herospines/hero_<id>/*.unity3d; each bundle is a plain
+	// 深蓝终末录 — CG / illust gallery. The SAME APK also ships plain 2D art as
+	// UnityFS bundles: Sprite + Texture2D, no skeleton. `assets/art/texture/
+	// herobust/ill/` holds `cgs_<char>_<n>` (character CGs) + `main_avg_*`
+	// (story CGs); `assets/art/texture/backgroud/` holds `cg_avg_*` (story/H
+	// CGs) + `activity_avg_*` + battle/shop backgrounds. Extracted as flat PNGs
+	// by tools/shenlan/extract-shenlan-cg.py. Rendered by viewer.js's still-image
+	// path (format: "image"). Must precede "shenlan" (prefix match).
+	{
+		match: "shenlan-cg",
+		key: "shenlan-cg",
+		label: "深蓝终末录 (Deep Blue) — CG",
+	},
 	// UnityFS with a complete Spine (.skel + .atlas + 2048x2048 pages). All
 	// atlases carry `pma: true`. See tools/shenlan/.
 	{
@@ -1540,6 +1552,9 @@ function scanModels() {
 	walk(ASSETS, 0, null);
 	const sorted = models.sort((a, b) => a.name.localeCompare(b.name));
 	scanVideos(models);
+	// CG / illust galleries: flat PNG folders (a "<game>-cg" GAME_ROOTS entry)
+	// that no skeleton scan would surface. One entry per image, format "image".
+	scanImageGalleries(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -1603,6 +1618,89 @@ function scanVideos(models) {
 			animations: [],
 			skins: [],
 		});
+	}
+}
+
+/**
+ * CG / illust galleries. Some games ship their 2D still art as plain
+ * <game>-cg/ folders full of flat PNGs (no skeleton, no atlas) — e.g.
+ * 深蓝终末录's character/story CGs, extracted by tools/shenlan/. No skeleton
+ * scan would ever surface them, so add one entry per image with format
+ * "image"; the client draws it as a still on the stage (pan/zoom + export).
+ *
+ * A folder is treated as a gallery when its top-level name ends in "-cg" AND a
+ * GAME_ROOTS entry declares it (so it gets a proper game label) — that keeps
+ * this from swallowing unrelated PNGs elsewhere in the tree.
+ */
+function scanImageGalleries(models) {
+	let tops = [];
+	try {
+		tops = fs.readdirSync(ASSETS, { withFileTypes: true });
+	} catch {
+		return;
+	}
+	for (const t of tops) {
+		const top = t.name;
+		if (!/-cg$/i.test(top)) continue;
+		const dir = path.join(ASSETS, top);
+		let stat;
+		try {
+			stat = fs.statSync(dir);
+		} catch {
+			continue;
+		}
+		if (!stat.isDirectory()) continue;
+		const { game, gameLabel } = resolveGame(top, top);
+		const imgs = [];
+		const walkImg = (d, depth) => {
+			if (depth > 6) return;
+			let entries = [];
+			try {
+				entries = fs.readdirSync(d, { withFileTypes: true });
+			} catch {
+				return;
+			}
+			for (const e of entries) {
+				const full = path.join(d, e.name);
+				if (e.isDirectory()) walkImg(full, depth + 1);
+				else if (/\.(png|jpe?g|webp)$/i.test(e.name)) imgs.push(full);
+			}
+		};
+		walkImg(dir, 0);
+		imgs.sort();
+		const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+		for (const full of imgs) {
+			const rel = path.relative(dir, full).split(path.sep).join("/");
+			// id lives IN the gallery folder (e.g. shenlan-cg/cgs_11000101_1),
+			// so the client's id->URL mapping is identical to a spine model.
+			const id = top + "/" + rel.replace(/\.[^.]+$/, "");
+			let bytes = 0;
+			try {
+				bytes = fs.statSync(full).size;
+			} catch {
+				/* keep 0 */
+			}
+			const parts = rel.replace(/\.[^.]+$/, "").split("/");
+			models.push({
+				id,
+				game,
+				gameLabel,
+				format: "image",
+				subgroup: parts.slice(0, -1).join(" › "),
+				name: parts.map(title).join(" › "),
+				group: top + " / " + parts.slice(0, -1).join(" / "),
+				imageFile: `/assets/${top}/${rel.split("/").map(encodeURIComponent).join("/")}`,
+				files: [path.basename(full)],
+				bytes,
+				size: null,
+				spine: null,
+				runtime: null,
+				bones: null,
+				slots: null,
+				animations: [],
+				skins: [],
+			});
+		}
 	}
 }
 

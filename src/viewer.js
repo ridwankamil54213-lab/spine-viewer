@@ -46,6 +46,7 @@ import {
 } from "./spine-version.js";
 import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion, setLive2DExpression, live2DExpressions } from "./live2d.js";
 import { loadVideo, disposeVideo, videoElement, videoStageActive } from "./video-stage.js";
+import { loadImage, disposeImage, imageStageActive, imageElement } from "./image-stage.js";
 import { normalizeSpine2Json } from "./spine2-normalize.js";
 import {
 	loadSpine21Model,
@@ -1310,6 +1311,41 @@ async function loadVideoModel(model) {
 	el.loading.hidden = true;
 }
 
+/**
+ * CG / illust stills. No skeleton: mount the PNG on the stage, hide the
+ * timeline and disable the skeleton dropdowns. The play button is disabled
+ * too — there is nothing to animate.
+ */
+async function loadImageModel(model) {
+	await loadImage({ wrap: el.canvasWrap, url: model.imageFile });
+
+	current = model;
+	spine = null;
+	atlas = null;
+	atlasSaysPMA = false;
+
+	if (el.timeline && !el.timeline.hidden) el.timeline.hidden = true;
+	if (el.animSelect) {
+		el.animSelect.innerHTML = "";
+		el.animSelect.disabled = true;
+	}
+	if (el.skinSelect) {
+		el.skinSelect.innerHTML = "";
+		el.skinSelect.disabled = true;
+	}
+	el.playBtn.disabled = true;
+	if (el.timeCur) el.timeCur.textContent = "0.00s";
+	if (el.timeDur) el.timeDur.textContent = "CG";
+	if (el.scrub) el.scrub.value = "0";
+	renderVariants(model);
+	renderAudio(model);
+	el.empty.hidden = true;
+	setActive(model.id);
+	renderHud();
+	if (fps.on) fpsResetStats();
+	el.loading.hidden = true;
+}
+
 async function loadModel(model) {
 	showError(null);
 	// A previous video left the play button (and selects) disabled; a skeleton
@@ -1327,10 +1363,17 @@ async function loadModel(model) {
 		// before deciding how to render this one. Also drop a previous video.
 		teardownLegacyViewer();
 		disposeVideo();
+		disposeImage();
 
 		// Lost Sword cutscene movies are plain .mp4/.m4v files — no skeleton.
 		if (model.format === "video") {
 			return await loadVideoModel(model);
+		}
+
+		// CG / illust stills (deep-blue "-cg" galleries) are plain PNGs — no
+		// skeleton and no atlas either.
+		if (model.format === "image") {
+			return await loadImageModel(model);
 		}
 
 		// Live2D Cubism models (.moc3) take a completely different path —
@@ -2667,6 +2710,19 @@ function renderHud() {
 	el.gridLink.hidden = false;
 		return;
 	}
+	// CG / illust stills: report the pixel size the browser actually decoded.
+	if (current && current.format === "image") {
+		const mb = current.bytes ? (current.bytes / 1048576).toFixed(1) : "?";
+		const im = imageStageActive() ? imageElement() : null;
+		const dim = im && im.naturalWidth ? `<span><b>${im.naturalWidth}×${im.naturalHeight}</b></span>` : "";
+		el.hud.hidden = false;
+		$("#hud-model").textContent = current.name;
+		$("#hud-stats").innerHTML = `<span><b>${mb}</b> MB</span><span><b>CG</b></span>` + dim;
+		$("#title-model").textContent = current.name;
+		document.title = current.name + " — Spine Stage";
+		el.gridLink.hidden = false;
+		return;
+	}
 	if (!current || !spine) {
 		el.hud.hidden = true;
 		if (el.gridLink) el.gridLink.hidden = true;
@@ -3309,6 +3365,14 @@ function backToGames() {
 		el.hud.hidden = true;
 		el.playBtn.disabled = false;
 	}
+	if (imageStageActive()) {
+		disposeImage();
+		spine = null;
+		current = null;
+		el.empty.hidden = false;
+		el.hud.hidden = true;
+		el.playBtn.disabled = false;
+	}
 	renderLibrary();
 }
 
@@ -3379,7 +3443,9 @@ function renderModels() {
 		const thumbPath = file
 			? String(file).split("/").map(encodeURIComponent).join("/")
 			: "";
-		const art = file
+		const art = m.format === "image"
+			? `<img class="model-thumb" src="${escapeHtml(m.imageFile)}" alt="" loading="lazy" decoding="async" width="128" height="128" />`
+			: file
 			? `<img class="model-thumb" src="/thumbs/${thumbPath}" alt="" loading="lazy" decoding="async" width="128" height="128" />`
 			: `<span class="model-thumb model-thumb-none" aria-hidden="true">${escapeHtml(
 					initials(m)
@@ -4754,6 +4820,18 @@ function setExportProgress(done, total) {
 
 async function runExport() {
 	if (EXPORT_STATE.busy) return;
+	// CG / illust stills are not animated, so the frame-by-frame exporter is
+	// meaningless — just save the PNG itself.
+	if (current && current.format === "image") {
+		const a = document.createElement("a");
+		a.href = current.imageFile;
+		a.download = ((current.name || "cg").replace(/[^\w.-]+/g, "_") || "cg") + ".png";
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		toast("CG diunduh.");
+		return;
+	}
 	if (!spine) {
 		toast("Pilih model dulu sebelum mengekspor.");
 		return;
