@@ -350,6 +350,18 @@ const GAME_ROOTS = [
 	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
 	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
 	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
+	// マブラヴ ガールズガーデンX — CG / illust gallery. The game's CG art lives in
+	// the Addressables "ui_catalog" (one bundle per image), NOT the spine
+	// catalog: TMB (character CG), TCBX (explicit H CG), TFB (story CG), TMCB
+	// (episode photos), TMGIB (mecha art) at 1920x1080, and ICV (character
+	// portrait illust) at 360x640. Extracted as flat PNGs by
+	// tools/muvluv/extract-muvluv-cg.py. Rendered by viewer.js's image stage
+	// (format: "image"). Must precede "muvluv" (prefix match).
+	{
+		match: "muvluv-cg",
+		key: "muvluv-cg",
+		label: "マブラヴ ガールズガーデンX — CG",
+	},
 	{ match: "muvluv", key: "muvluv", label: "マブラヴ ガールズガーデンX" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },

@@ -51,3 +51,33 @@ Di viewer: root `muvluv`, label "マブラヴ ガールズガーデンX".
 - Skeleton = **JSON**, bukan `.skel` biner (viewer menanganinya; format 4.2).
 - Beberapa bundle tidak mengandung spine (particle/UI) — otomatis dilewati.
 - Bundle di-cache di `/opt/mlv/bundles`; hapus untuk memaksa unduh ulang.
+
+## CG / illust (galeri gambar, bukan spine)
+
+Gambar CG **TIDAK** ada di `spine_catalog.bin` — semuanya di `ui_catalog.bin`,
+satu bundle UnityFS per gambar berisi satu `Texture2D`. Keluarga yang dipakai:
+
+| Prefix | Isi | Resolusi | Jumlah |
+|---|---|---|---|
+| `TMB/` | CG karakter | 1920x1080 | 168 |
+| `TCBX/` | **CG H eksplisit** | 1920x1080 | 118 |
+| `TFB/` | CG cerita | 1920x1080 | 28 |
+| `TMCB/` | CG episode / foto (galeri ep.) | 1920x1080 | 76 |
+| `TMGIB/` | ilustrasi mecha / TSF | 1920x1080 | 26 |
+| `ICV/` | portrait illustrasi karakter | 360x640 | 754 |
+
+Ekstrak:
+
+```bash
+/srv/venv-spine/bin/python tools/muvluv/extract-muvluv-cg.py
+```
+
+Keluaran: **1170 PNG** di `assets/muvluv-cg/` (nama = `<tag>_<id>.png`, mis.
+`cg_h_c111302.png`). Hash bundle diambil dari dependency katalog
+(`rlp/<hash>.bundle`), URL unduh sama seperti model spine. Di viewer: game
+**`muvluv-cg`** ("マブラヴ ガールズガーデンX — CG", entri GAME_ROOTS sebelum
+`muvluv`), dirender oleh jalur `format: "image"`.
+
+Sisa prefix `ui_catalog` yang **bukan** CG (jangan dimasukkan): `ICS`/`TMET`/
+`TAIT`/`TII` = ikon item/karakter (188–300px), `TAB`/`TMGIT`/`TQTB` = background
+& banner, `TSST` = banner langganan, `TCNP` = kartu nama.
