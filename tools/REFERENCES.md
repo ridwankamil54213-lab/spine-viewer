@@ -51,3 +51,12 @@ Pengunduh + pemeriksa validitas URL — berguna kalau daftar URL sudah ada.
 ## Game di repo (39) yang belum ada di viewer
 CounterSide, DestinyChild, GirlCafeGun2, IronSaga, OmniHeroes, Starward,
 TheMoonlitOath, illusionConnectRe, dll. Kandidat kalau mau tambah game baru.
+
+## Sumber aset Nikke (updater)
+
+Repo **github.com/Nikke-db/Nikke-db.github.io** — mirror lengkap aset spine
+NIKKE (1544 .skel, 1544 .atlas, 3392 .png) yang layout-nya SAMA dengan viewer:
+`l2d/<folder>/<folder>_00.{skel,atlas,png}` + subfolder varian `aim/` & `cover/`.
+Dipakai oleh `tools/update-nikke.py` (`--check` = recursive tree, `--apply` =
+unduh berkas yang belum ada secara file-level). Viewer sudah memperlakukan
+`<folder>/aim` & `<folder>/cover` sebagai varian (aturan family lama).
