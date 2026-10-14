@@ -321,6 +321,7 @@ const el = {
 	slotList: $("#slot-list"),
 	slotSearch: $("#slot-search"),
 	slotSkin: $("#slot-skin"),
+	slotToggleAll: $("#slot-toggle-all"),
 	slotCount: $("#slot-count"),
 	cmpA: $("#cmp-a"),
 	cmpB: $("#cmp-b"),
@@ -533,6 +534,11 @@ app.ticker.add(() => {
 
 	// dt = 0: we already positioned the track, this only applies + renders it.
 	spine.update(0);
+
+	// pixi-spine membuat ulang mesh saat animasi berganti attachment; container
+	// per-slot kita biarkan tapi pastikan visibility-nya tetap sesuai pilihan
+	// pengguna (murah, dan hanya saat ada yang disembunyikan).
+	if (insp.hidden.size) applySlotVisibility();
 
 	updateScrubUI();
 	// Keep the timeline playhead in sync, but only when it's actually on
@@ -1681,6 +1687,8 @@ async function loadModel(model) {
 
 		// refresh the slot inspector for the new skeleton
 		insp.skin = "default";
+		insp.hidden.clear(); // model baru = tanpa slot tersembunyi
+		insp.prevVisible.clear();
 		if (insp.open) {
 			renderSkinOptions();
 			renderSlots();
@@ -2319,7 +2327,52 @@ const insp = {
 	tab: "slots",
 	skin: "default",
 	query: "",
+	// Slot yang disembunyikan (indeks slot) — "isolasi bagian". Indeks, bukan
+	// nama, supaya tahan terhadap slot bernama duplikat. Di-reset tiap model.
+	hidden: new Set(),
+	// Nilai `visible` ASLI container sebelum kita sembunyikan, supaya saat
+	// ditampilkan lagi kita pulihkan apa adanya. PENTING: pixi-spine sendiri
+	// menyetel sebagian container `visible=false` (slot tanpa mesh), jadi
+	// menimpanya dengan `true` akan memunculkan 100+ container kosong.
+	prevVisible: new Map(),
 };
+
+/**
+ * Sembunyikan/tampilkan SATU slot.
+ *
+ * pixi-spine membuat satu Container per slot di `spine.slotContainers[i]`
+ * (slot bermesh menaruh `SpineMesh` di dalamnya). Menyetel `.visible=false`
+ * menyembunyikan seluruh isi slot tanpa mengubah data skeleton, jadi urutan
+ * gambar, warna, dan animasi tetap utuh.
+ *
+ * Kita HANYA menyentuh slot yang diminta: nilai asli `visible` disimpan agar
+ * slot yang memang sudah tersembunyi oleh pixi-spine (slot kosong) tidak ikut
+ * "menyala" saat pengguna menampilkan kembali slot lain.
+ */
+function setSlotHidden(i, hide) {
+	const c = spine && spine.slotContainers ? spine.slotContainers[i] : null;
+	if (!c) return;
+	if (hide) {
+		if (!insp.hidden.has(i)) {
+			insp.prevVisible.set(i, c.visible);
+			insp.hidden.add(i);
+		}
+		c.visible = false;
+	} else if (insp.hidden.has(i)) {
+		c.visible = insp.prevVisible.has(i) ? insp.prevVisible.get(i) : true;
+		insp.prevVisible.delete(i);
+		insp.hidden.delete(i);
+	}
+}
+
+/** Tegakkan kembali slot yang tersembunyi (dipanggil tiap frame, murah). */
+function applySlotVisibility() {
+	if (!spine || !spine.slotContainers) return;
+	for (const i of insp.hidden) {
+		const c = spine.slotContainers[i];
+		if (c) c.visible = false;
+	}
+}
 
 /** Every attachment name a slot can show, across all skins + the setup pose. */
 function attachmentsForSlot(data, slotIndex, skinName) {
@@ -2389,6 +2442,32 @@ function renderSlots() {
 		att.title = current || "tidak ada attachment aktif";
 
 		li.append(nm, att);
+
+		// Tombol mata: sembunyikan/tampilkan slot ini (isolasi bagian). Tidak
+		// memanggil renderSlots() — itu akan membangun ulang daftar dan
+		// menutup dropdown <select> yang mungkin sedang dibuka, padahal
+		// visibility-nya cukup diterapkan langsung + ganti kelas barisnya.
+		const eye = document.createElement("button");
+		eye.type = "button";
+		eye.className = "slot-eye";
+		const hidden0 = insp.hidden.has(i);
+		eye.dataset.off = String(hidden0);
+		eye.textContent = hidden0 ? "◌" : "◉";
+		eye.title = hidden0 ? "Tampilkan bagian ini" : "Sembunyikan bagian ini";
+		eye.setAttribute("aria-pressed", String(hidden0));
+		eye.addEventListener("click", (ev) => {
+			ev.stopPropagation();
+			const off = !insp.hidden.has(i);
+			setSlotHidden(i, off);
+			eye.dataset.off = String(off);
+			eye.textContent = off ? "◌" : "◉";
+			eye.title = off ? "Tampilkan bagian ini" : "Sembunyikan bagian ini";
+			eye.setAttribute("aria-pressed", String(off));
+			li.classList.toggle("is-hidden", off);
+			spine.update(0);
+		});
+		if (hidden0) li.classList.add("is-hidden");
+		li.append(eye);
 
 		// per-slot picker — lets you try an attachment without touching skin
 		const opts = attachmentsForSlot(data, i, insp.skin);
@@ -2656,6 +2735,20 @@ function initInspector() {
 		// "(tanpa skin)" resets to the setup pose
 		setSkin(insp.skin === "(tanpa skin)" ? null : insp.skin);
 		renderSlots();
+	});
+	// Sembunyikan/tampilkan SEMUA bagian sekaligus. Kalau ada yang masih
+	// tampil -> sembunyikan semua; kalau semua sudah sembunyi -> tampilkan.
+	el.slotToggleAll?.addEventListener("click", () => {
+		if (!spine) return;
+		const total = spine.skeleton.slots.length;
+		const allHidden = insp.hidden.size >= total;
+		if (allHidden) {
+			for (const i of [...insp.hidden]) setSlotHidden(i, false);
+		} else {
+			for (let i = 0; i < total; i++) setSlotHidden(i, true);
+		}
+		renderSlots();
+		spine.update(0);
 	});
 	el.cmpRun?.addEventListener("click", runCompare);
 }

@@ -661,6 +661,29 @@ body {
 }
 .slot:hover { background: var(--ink-750); }
 .slot.is-empty { opacity: 0.45; }
+/* Baris slot yang disembunyikan: redup + coret nama, tapi tetap bisa diklik
+ * supaya mudah ditampilkan lagi. */
+.slot.is-hidden { opacity: 0.5; }
+.slot.is-hidden .slot-name,
+.slot.is-hidden .slot-att { text-decoration: line-through; }
+.slot-eye {
+	flex: 0 0 auto;
+	width: 20px;
+	height: 20px;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	color: var(--fg-dim);
+	font-size: 12px;
+	cursor: pointer;
+	padding: 0;
+}
+.slot-eye:hover { color: var(--fg); background: var(--ink-750); border-color: var(--line); }
+.slot-eye[data-off="true"] { color: var(--fg-mute); }
 .slot-name {
 	flex: 1 1 auto;
 	font-family: var(--font-mono);
