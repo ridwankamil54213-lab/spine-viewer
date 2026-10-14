@@ -202,7 +202,9 @@ function currentAlphaMode() {
 /** Collect the atlas page baseTextures currently in use. */
 function atlasBaseTextures() {
 	const out = [];
-	if (!spine) return out;
+	// Live2D/Cubism models have no spine.skeleton — bail out, or a PMA toggle
+	// (which calls applyPMA for every model type) dies on `undefined.slots`.
+	if (!spine?.skeleton) return out;
 	const seen = new Set();
 	const add = (bt) => {
 		if (bt && !seen.has(bt.uid)) {
@@ -244,7 +246,10 @@ function applyPMA() {
 
 /** Route every slot's rendered sprite/mesh through the matching blend mode. */
 function applyBlendMode() {
-	if (!spine) return;
+	// Only Spine models have `skeleton.slots`. A Live2D model reaches here via a
+	// PMA toggle (applyPMA runs for every model type), where `spine.skeleton` is
+	// undefined → "Cannot read properties of undefined (reading 'slots')".
+	if (!spine?.skeleton) return;
 	// "upload" premultiplies the texture but still wants the straight-alpha
 	// (NPM) blend, and it is not a real PMA state — keep it out of pmaActive()
 	// so the HUD keeps reading it as straight. Same for a game default of
@@ -431,6 +436,51 @@ let animName = null;
 let duration = 0;
 /** Tears down the previous Cubism model (Live2DModel needs its own cleanup). */
 let live2dDispose = null;
+/**
+ * Destroy the model currently on the stage exactly once and forget it.
+ *
+ * A Live2D model is reachable through BOTH `spine` and `live2dDispose`, and
+ * pixi-live2d-display's InternalModel.destroy() is NOT idempotent (a second
+ * call dereferences its already-nulled motionManager → "Cannot read properties
+ * of undefined (reading 'destroy')"). Routing EVERY teardown through here — and
+ * clearing both refs BEFORE destroying — makes disposal single-shot whichever
+ * path gets there first (load, eject, game switch, delete). Never call
+ * spine.destroy()/live2dDispose() directly.
+ */
+function destroyCurrent({ removeFromStage = true } = {}) {
+	const s = spine;
+	const d = live2dDispose;
+	// Clear both referents FIRST so a re-entrant teardown is a no-op.
+	spine = null;
+	live2dDispose = null;
+	if (s && removeFromStage) {
+		try {
+			stageRoot.removeChild(s);
+		} catch {
+			/* not a child */
+		}
+	}
+	if (s) {
+		try {
+			// Guard: a Cubism model that never finished loading has no
+			// internalModel, and the plugin's destroy() dereferences it blindly.
+			if (!s.internalModel || s.internalModel.destroyed !== true) {
+				s.destroy?.(true);
+			}
+		} catch {
+			/* already gone / half-built */
+		}
+	}
+	// The wrapper's dispose() is idempotent, so even when the same model is both
+	// `s` and `d` it can only be destroyed once.
+	if (typeof d === "function") {
+		try {
+			d();
+		} catch {
+			/* already gone */
+		}
+	}
+}
 /** Cached centring offset for the current Cubism model (see fitModel). */
 let live2dCentre = null;
 
@@ -479,7 +529,9 @@ stageRoot.addChild(bonesGfx);
 
 function drawBones() {
 	bonesGfx.clear();
-	if (!spine || !state.showBones) return;
+	// Live2D has no bones; guard so a bones-overlay toggle cannot dereference
+	// `undefined.bones` while a Cubism model is on the stage.
+	if (!spine?.skeleton || !state.showBones) return;
 	const s = 1 / state.zoom;
 	bonesGfx.lineStyle(2 * s, 0xff8a5c, 0.95);
 	for (const b of spine.skeleton.bones) {
@@ -974,15 +1026,7 @@ async function loadLegacyModel(model) {
 	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
 
 	// Tear down any pixi-spine model currently on the stage.
-	if (spine) {
-		try {
-			app.stage.removeChild(spine);
-			spine.destroy?.();
-		} catch {
-			/* already gone */
-		}
-		spine = null;
-	}
+	destroyCurrent();
 	teardownSpine21();
 	current = model;
 
@@ -1201,13 +1245,13 @@ async function loadLive2DModel(model) {
 		expressionFiles: model.expressions || [],
 	});
 
-	// Drop any previous model before putting this one on the stage.
-	if (spine) {
-		stageRoot.removeChild(spine);
-		spine.destroy(true);
-		spine = null;
-	}
-	live2dDispose?.();
+	// Drop any previous model before putting this one on the stage. This single
+	// call also disposes the previous Cubism model — a Live2D model is `spine`
+	// AND `live2dDispose`, and destroying each handle separately is what threw
+	// "Cannot read properties of undefined (reading 'destroy')".
+	destroyCurrent();
+	// Remember the (idempotent) disposer so the NEXT teardown can release
+	// this Cubism model even if it is reached without going through load.
 	live2dDispose = dispose;
 	// New model, so its centring offset must be measured afresh.
 	live2dCentre = null;
@@ -1262,8 +1306,10 @@ async function loadVideoModel(model) {
 	const vid = loadVideo({ wrap: el.canvasWrap, url: model.videoFile });
 	if (!vid) throw new Error("Tidak bisa menyiapkan pemutar video.");
 
+	// A previous Spine/Live2D model must be released, not orphaned — setting
+	// `spine = null` here used to leak it (still on the stage, no handle).
+	destroyCurrent();
 	current = model;
-	spine = null;
 	atlas = null;
 	atlasSaysPMA = false;
 
@@ -1325,8 +1371,9 @@ async function loadVideoModel(model) {
 async function loadImageModel(model) {
 	await loadImage({ wrap: el.canvasWrap, url: model.imageFile });
 
+	// Release the previous Spine/Live2D model instead of orphaning it.
+	destroyCurrent();
 	current = model;
-	spine = null;
 	atlas = null;
 	atlasSaysPMA = false;
 
@@ -1641,10 +1688,9 @@ async function loadModel(model) {
 		const next = makeSpine(spineRuntime, skeletonData);
 		next.autoUpdate = false;
 
-		if (spine) {
-			stageRoot.removeChild(spine);
-			spine.destroy(true);
-		}
+		// Dispose the previous model (Spine OR Cubism) through the single-shot
+		// path, then mount the new one.
+		destroyCurrent();
 		spine = next;
 		stageRoot.addChildAt(spine, 0);
 		bonesGfx.visible = state.showBones;
@@ -1652,8 +1698,6 @@ async function loadModel(model) {
 
 		// A Spine model must not inherit a Cubism centring offset.
 		live2dCentre = null;
-		live2dDispose?.();
-		live2dDispose = null;
 
 		current = model;
 
@@ -2412,7 +2456,7 @@ function slotAttachmentName(slot) {
 }
 
 function renderSlots() {
-	if (!el.slotList || !spine) return;
+	if (!el.slotList || !spine?.skeleton) return;
 	const data = spine.skeleton.data;
 	const q = insp.query.trim().toLowerCase();
 	const slots = spine.skeleton.slots;
@@ -2505,7 +2549,10 @@ function renderSlots() {
 }
 
 function renderSkinOptions() {
-	if (!el.slotSkin || !spine) return;
+	// Live2D models have no `spine.skeleton.data` (their Skin dropdown holds
+	// expressions, rendered elsewhere) — guard so opening the inspector on one
+	// does not throw "Cannot read properties of undefined (reading 'data')".
+	if (!el.slotSkin || !spine?.skeleton?.data) return;
 	const names = (spine.skeleton.data.skins || []).map((s) => s.name);
 	// Not every game ships a skin called "default" (Lost Sword uses "Daily" /
 	// "None"), so offer whatever exists plus a no-skin entry.
@@ -2739,7 +2786,7 @@ function initInspector() {
 	// Sembunyikan/tampilkan SEMUA bagian sekaligus. Kalau ada yang masih
 	// tampil -> sembunyikan semua; kalau semua sudah sembunyi -> tampilkan.
 	el.slotToggleAll?.addEventListener("click", () => {
-		if (!spine) return;
+		if (!spine?.skeleton) return;
 		const total = spine.skeleton.slots.length;
 		const allHidden = insp.hidden.size >= total;
 		if (allHidden) {
@@ -2754,7 +2801,7 @@ function initInspector() {
 }
 
 function setSkin(name) {
-	if (!spine) return;
+	if (!spine?.skeleton) return;
 	try {
 		if (name) spine.skeleton.setSkinByName(name);
 		else spine.skeleton.setSkin(null); // back to the setup pose
@@ -3452,7 +3499,7 @@ function backToGames() {
 	// and decoding off-screen, which stalls the library render.
 	if (videoStageActive()) {
 		disposeVideo();
-		spine = null;
+		destroyCurrent({ removeFromStage: false });
 		current = null;
 		el.empty.hidden = false;
 		el.hud.hidden = true;
@@ -3460,7 +3507,7 @@ function backToGames() {
 	}
 	if (imageStageActive()) {
 		disposeImage();
-		spine = null;
+		destroyCurrent({ removeFromStage: false });
 		current = null;
 		el.empty.hidden = false;
 		el.hud.hidden = true;
@@ -4291,7 +4338,7 @@ el.prevBtn.addEventListener("click", () => stepAnimation(-1));
 el.nextBtn.addEventListener("click", () => stepAnimation(1));
 
 function stepAnimation(dir) {
-	if (!spine) return;
+	if (!spine?.skeleton) return;
 	const anims = spine.skeleton.data.animations.map((a) => a.name);
 	if (!anims.length) return;
 	const i = anims.indexOf(animName);
@@ -5619,11 +5666,7 @@ el.delBtn.addEventListener("click", async () => {
 		const res = await fetch("/api/models/" + encodeURIComponent(current.id), { method: "DELETE" });
 		const data = await res.json();
 		if (!res.ok) throw new Error(data.error || "Gagal menghapus");
-		if (spine) {
-			stageRoot.removeChild(spine);
-			spine.destroy(true);
-			spine = null;
-		}
+		destroyCurrent();
 		current = null;
 		animName = null;
 		duration = 0;

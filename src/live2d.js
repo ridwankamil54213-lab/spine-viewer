@@ -156,13 +156,22 @@ export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, exp
 	// AnimationClips we do not reconstruct. Force them visible for a static view.
 	forcePartsVisible(model);
 
+	// InternalModel.destroy() (pixi-live2d-display) is NOT idempotent — it calls
+	// this.motionManager.destroy() and only THEN nulls motionManager, so a
+	// SECOND destroy of the same model throws "Cannot read properties of
+	// undefined (reading 'destroy')". Make disposal single-shot here, and skip a
+	// model that never finished loading (internalModel is undefined until the
+	// "modelLoaded" event and the plugin's destroy() dereferences it blindly).
+	let disposed = false;
 	return {
 		model,
 		dispose() {
+			if (disposed) return;
+			disposed = true;
 			try {
-				model.destroy?.();
+				if (model?.internalModel) model.destroy?.();
 			} catch {
-				/* already gone */
+				/* already gone / half-built */
 			}
 		},
 	};
