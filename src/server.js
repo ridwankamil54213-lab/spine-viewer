@@ -2767,6 +2767,10 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-azurlane.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	nikke: {
+		script: path.join(ROOT, "tools", "update-nikke.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 	ivntight: {
 		script: path.join(ROOT, "tools", "update-ivntight.py"),
 		py: "/srv/venv-spine/bin/python",
