@@ -46,11 +46,19 @@ Tiap bundle = **Cubism SDK for Unity**, bukan file Cubism lepas:
 
 Mengeluarkan per model: `<nama>.moc3` (potong dari offset `MOC3` di raw
 MonoBehaviour), `<nama>.physics3.json`, `texture_NN.png`, dan
-`<nama>.model3.json` (sintetis).
+`<nama>.model3.json` (sintetis). Lalu konversi motion-nya:
 
-Hasil: **263 model**, ~3.8 GB. Viewer mendeteksi ini sebagai `format: "live2d"`
-/ `runtime: "cubism4"` (folder berisi `.moc3`) dan merendernya lewat
-`pixi-live2d-display`.
+```bash
+/srv/venv-spine/bin/python tools/azurlane/extract-azurlane-motions.py \
+  /opt/games/azurlane/ClientAssets/JP/AssetBundles/live2d \
+  /opt/spine-viewer/assets/azurlane-l2d
+# -> <nama>/motions/<clip>.motion3.json   (14–137 motion per model)
+```
+
+Hasil: **263 model**, ~4.5 GB, **8.033 motion3.json**. Viewer mendeteksi ini
+sebagai `format: "live2d"` / `runtime: "cubism4"` dan merendernya lewat
+`pixi-live2d-display`. Server membaca motion dari `motions/`, jadi dropdown
+animasi berisi semua clip (idle/main_*/touch_*/home/wedding/…).
 
 Di viewer: `assets/azurlane-l2d/<nama>/`, root `azurlane-l2d`
 (label "Azur Lane — Live2D").
@@ -71,8 +79,7 @@ disintesis ulang tiap scan, jadi tak perlu disunting.
 
 ## Catatan / TODO
 
-- **Motion** (`idle`, `touch_*`, …) belum dikonversi: klip animasi ada di bundle
-  sebagai `AnimationClip` Unity dan perlu dipetakan ke `motion3.json` (lihat
-  `extract_motions.py` di repo MrKLLM — mapping berbasis crc32 genericBindings).
-  Saat ini model tampil statis (tetap bisa di-zoom/geser), dropdown animasi kosong.
 - 3 bundle tanpa `MOC3` (bukan Live2D) dilewati.
+- 39 model `dotabyss-l2d` belum punya motion (sumber DotAbyss berbeda; belum
+  dikonversi). 154/193 sudah punya.
+- Beberapa model `girlwars-l2d` (19) belum punya motion.
