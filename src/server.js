@@ -363,6 +363,11 @@ const GAME_ROOTS = [
 		label: "マブラヴ ガールズガーデンX — CG",
 	},
 	{ match: "muvluv", key: "muvluv", label: "マブラヴ ガールズガーデンX" },
+	// Stellar Valkyries. Cocos Creator; spine assets are plain .skel/.atlas/.png
+	// under assets/res/spine/<id>[/<scene>]/ in the APK (no decryption). Spine
+	// binary 4.1.24. A few characters ship several CG scenes as subfolders
+	// (family rule in attachFamilies). See tools/stellar/.
+	{ match: "stellar", key: "stellar", label: "Stellar Valkyries" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
@@ -1090,8 +1095,44 @@ function attachFamilies(models) {
 	}
 
 
+	// Stellar Valkyries (stellar): a handful of characters ship their CG scenes
+	// as SUBFOLDERS rather than files directly in the model folder, e.g.
+	//   stellar/10501/cg2_spine1 … cg2_spine4
+	// The container folder (10501) is NOT itself a model, so rootOf() finds no
+	// parent and each CG would surface as a separate top-level card. Group
+	// them: container = one family, first scene (sorted) = "Utama".
+	const svGroups = new Map();
 	for (const m of models) {
-		// Already grouped by the Echocalypse rule above — the generic
+		if ((m.game || "") !== "stellar") continue;
+		const parts = m.id.split("/");
+		if (parts.length < 3) continue; // stellar/<container>/<scene>
+		const container = parts.slice(0, -1).join("/");
+		if (ids.has(container)) continue; // container is itself a model
+		if (!svGroups.has(container)) svGroups.set(container, []);
+		svGroups.get(container).push(m.id);
+	}
+	for (const [, membersRaw] of svGroups) {
+		const members = [...membersRaw].sort();
+		if (members.length < 2) continue;
+		const root = members[0];
+		const labelFor = (id) => {
+			if (id === root) return "Utama";
+			const seg = id.split("/").pop() || id;
+			return title(seg);
+		};
+		for (const id of members) {
+			const m = models.find((mm) => mm.id === id);
+			if (!m) continue;
+			m.family = {
+				root,
+				label: labelFor(id),
+				members: members.map((y) => ({ id: y, label: labelFor(y) })),
+			};
+		}
+	}
+
+	for (const m of models) {
+		// Already grouped by the Echocalypse / Stellar rules above — the generic
 		// folder-prefix rule would overwrite it with null.
 		if (m.family) continue;
 		const root = rootOf(m.id);
