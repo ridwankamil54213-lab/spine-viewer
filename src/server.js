@@ -368,6 +368,11 @@ const GAME_ROOTS = [
 	// binary 4.1.24. A few characters ship several CG scenes as subfolders
 	// (family rule in attachFamilies). See tools/stellar/.
 	{ match: "stellar", key: "stellar", label: "Stellar Valkyries" },
+	// Peachhan (蜜桃) — diekstrak dari CDN TERBUKA asset.peachhan.com (game
+	// m1productionasset) via tools/peachhan/. Bundle = TextAsset *.skel/*.atlas
+	// + Texture2D; banyak karakter punya varian CG (`<id>_CG1`, `_CG2`).
+	// Sumber CDN ditemukan dari bongkaran '二游资源工具.exe' (tools/game-cdn-list.md).
+	{ match: "peachhan", key: "peachhan", label: "Peachhan (蜜桃)" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
