@@ -5,8 +5,12 @@ node_modules/
 public/dist/
 
 # Cached thumbnails (large, fetched at runtime)
-public/thumbs/
 public/exports/
+
+# Thumbnails are cached at runtime — ignore their CONTENTS but keep descending.
+# Rule: never ignore a directory we need to un-ignore inside; trailing "/*" only
+# ignores the files directly under it, so a later "!.../_game/**" still works.
+public/thumbs/*
 
 # ...but the game icons are small, hand-curated art that cannot be regenerated
 # by fetching, so they are tracked. Only this subdirectory is un-ignored.
