@@ -1,8 +1,10 @@
-# Peachhan (蜜桃) — CDN terbuka `asset.peachhan.com`
+# FREYA 夢姬 / Dream of Freya — CDN terbuka `asset.peachhan.com`
 
-Game Unity dari CDN **`asset.peachhan.com`**. Sumber CDN ditemukan dari hasil
-bongkar `二游资源工具.exe` (lihat `tools/game-cdn-list.md`). **CDN-nya TERBUKA** —
-tanpa login, tanpa signed URL — jadi bisa diekstrak langsung.
+Game **FREYA 夢姬 / Dream of Freya** (developer **LSJGAME**, genre Bishōjo RPG
+ADV). Alias yang dipakai tool: `梦娘 \ 幻姬 \ 梦姬 \ 少女总裁 \ Dream of Freya`.
+Diambil dari CDN **`asset.peachhan.com`** — sumber CDN + alias game ditemukan dari
+hasil bongkar `二游资源工具.exe` (lihat `tools/game-cdn-list.md`). **CDN-nya
+TERBUKA** — tanpa login, tanpa signed URL.
 
 ## Manifest
 ```
@@ -42,5 +44,7 @@ menoleransi) tetapi GAGAL render di browser karena skeletonnya korup.
 ## Catatan
 - 2 bundle pertama sempat `http 000` (transient) — jalankan ulang dengan prefix
   spesifik (`extract-peachhan.py herospine/78 herospine/8`) untuk melengkapinya.
-- Nama game final belum dipastikan (banner tak memuat logo); didaftarkan sebagai
-  `peachhan / "Peachhan (蜜桃)"`. Atlas berisi karakter bertema kemonomimi.
+- Nama game dikonfirmasi dari (a) blok alias UTF-16 di `二游资源工具.exe`
+  (`梦娘\幻姬\梦姬\少女总裁\Dream of Freya`) yang letaknya TEPAT sebelum URL
+  peachhan, dan (b) ikon `EventIcon_FreyaHub` di bundle. Nama resmi (QooApp):
+  **FREYA 夢姬**, developer **LSJGAME**.

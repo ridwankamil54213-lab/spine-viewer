@@ -368,11 +368,12 @@ const GAME_ROOTS = [
 	// binary 4.1.24. A few characters ship several CG scenes as subfolders
 	// (family rule in attachFamilies). See tools/stellar/.
 	{ match: "stellar", key: "stellar", label: "Stellar Valkyries" },
-	// Peachhan (蜜桃) — diekstrak dari CDN TERBUKA asset.peachhan.com (game
-	// m1productionasset) via tools/peachhan/. Bundle = TextAsset *.skel/*.atlas
-	// + Texture2D; banyak karakter punya varian CG (`<id>_CG1`, `_CG2`).
-	// Sumber CDN ditemukan dari bongkaran '二游资源工具.exe' (tools/game-cdn-list.md).
-	{ match: "peachhan", key: "peachhan", label: "Peachhan (蜜桃)" },
+	// FREYA 夢姬 / Dream of Freya (developer LSJGAME, Bishōjo RPG ADV) — CDN
+	// TERBUKA asset.peachhan.com (bucket m1productionasset) via tools/peachhan/.
+	// Bundle = TextAsset *.skel/*.atlas + Texture2D; banyak karakter punya
+	// varian CG (`<id>_CG1`, `_CG2`). CDN + alias game (梦娘\幻姬\梦姬\少女总裁\
+	// Dream of Freya) ditemukan dari bongkaran '二游资源工具.exe' (tools/game-cdn-list.md).
+	{ match: "peachhan", key: "peachhan", label: "FREYA 夢姬 (Dream of Freya)" },
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
