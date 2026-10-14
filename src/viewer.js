@@ -44,7 +44,17 @@ import {
 	detectSpineVersion,
 	pickRuntime,
 } from "./spine-version.js";
-import { isLive2D, loadLive2D, live2DAnimations, playLive2DMotion, setLive2DExpression, live2DExpressions } from "./live2d.js";
+import {
+	isLive2D,
+	loadLive2D,
+	live2DAnimations,
+	playLive2DMotion,
+	setLive2DExpression,
+	live2DExpressions,
+	setLive2DLive,
+	live2DMotionGroups,
+	live2DMotionFinished,
+} from "./live2d.js";
 import { loadVideo, disposeVideo, videoElement, videoStageActive } from "./video-stage.js";
 import { loadImage, disposeImage, imageStageActive, imageElement } from "./image-stage.js";
 import { normalizeSpine2Json } from "./spine2-normalize.js";
@@ -381,6 +391,13 @@ const el = {
 	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
 
+	// Live2D extras (hidden for non-Cubism models)
+	l2dExtra: $("#l2d-extra"),
+	l2dLiveBtn: $("#l2d-live-btn"),
+	l2dRandomBtn: $("#l2d-random-btn"),
+	l2dAutoBtn: $("#l2d-auto-btn"),
+	l2dTouchBtn: $("#l2d-touch-btn"),
+
 	// FPS meter
 	fpsBtn: $("#fps-btn"),
 	fpsMeter: $("#fps-meter"),
@@ -483,6 +500,137 @@ function destroyCurrent({ removeFromStage = true } = {}) {
 }
 /** Cached centring offset for the current Cubism model (see fitModel). */
 let live2dCentre = null;
+
+/* --- Live2D "living" extras: blink/breath/physics, random, auto-advance ---- */
+/** Master switch for auto-blink + breath + physics on Cubism models. */
+let live2dLiveOn = true;
+/** Random motion every few seconds while it sits on an idle clip. */
+let live2dRandomOn = false;
+/** Advance to the next motion once the current one finishes. */
+let live2dAutoNext = false;
+let live2dAutoNextAt = 0;
+/** Extra touch motions layered ON TOP of the base animation (Cubism motions
+ *  play additively via the motion queue), so a tap animates the tapped part
+ *  without losing the idle movement. */
+let live2dTouchOn = true;
+const live2dTouchRecent = [];
+/** Smallest interval between two touch reactions, so a spam of taps on a
+ *  hundred-motion model does not queue up minutes of animation. */
+const LIVE2D_TOUCH_COOLDOWN = 350;
+
+/** Apply the current "living" switch to whichever Cubism model is on stage. */
+function live2dLiveApply(m) {
+	if (!m || !m.internalModel) return;
+	setLive2DLive(m, live2dLiveOn);
+}
+
+/** Play a touch reaction: pick the best matching motion for a hit zone.
+ *  Most models have touch_head/touch_body; a few (girlwars) use tapHead/tapXiong
+ *  and tapPigu, so a tap in the lower third rotates through the "rods". */
+function live2dTouchPlay(part, xFrac) {
+	if (!isLive2D(current) || !spine) return false;
+	const names = (current.animations || []).filter(Boolean);
+	if (!names.length) return false;
+	const has = (n) => names.find((v) => v.toLowerCase() === n.toLowerCase());
+	const startWith = (pre) => names.filter((n) => n.toLowerCase().startsWith(pre));
+	let pick = null;
+	if (part === "head") {
+		pick = has("touch_head") || has("taphead") || startWith("touch_head")[0] || startWith("taphead")[0];
+	} else if (part === "body") {
+		pick = has("touch_body") || has("tapxiong") || startWith("touch_body")[0];
+	} else {
+		// lower third: boy/girl models many, girlwars per-part taps
+		const parts = ["tapxiong", "tappigu", "tapleg", "tapsiwa", "tapyifu", "tapmaojin", "tapkou"]
+			.map((p) => startWith(p)[0])
+			.filter(Boolean);
+		pick = startWith("touch_drag")[0] || (parts.length ? parts[Math.floor((xFrac || 0.5) * parts.length)] : null);
+	}
+	if (!pick) pick = startWith("touch_")[0] || startWith("tap")[0];
+	if (!pick) return false;
+	return playLive2DMotion(spine, pick);
+}
+
+/** Touch handling on the model: translate the click into the model's own
+ *  coordinate space, then pick a zone by the hit height (upper third = head,
+ *  middle = body, lower = legs/rods). Physics shifts with a small kick. */
+function live2dTouchAt(ev) {
+	if (!live2dTouchOn || !isLive2D(current) || !spine) return;
+	const now = performance.now();
+	if (now - (live2dTouchRecent[live2dTouchRecent.length - 1] || 0) < LIVE2D_TOUCH_COOLDOWN) return;
+	live2dTouchRecent.push(now);
+	if (live2dTouchRecent.length > 10) live2dTouchRecent.shift();
+	// Map the pointer into the model's vertical span (0 = feet, 1 = crown), so a
+	// tap high on the body hits "head" and a low tap hits the legs.
+	let frac = 0.5;
+	try {
+		const p = toStagePoint(ev.clientX, ev.clientY);
+		const b = spine.getBounds(); // model AABB in stage pixels
+		if (b && b.height > 0) {
+			frac = Math.min(1, Math.max(0, 1 - (p.y - b.y) / b.height));
+		}
+	} catch {
+		/* fall back to the middle zone */
+	}
+	const part = frac > 0.62 ? "head" : frac > 0.33 ? "body" : "lower";
+	const played = live2dTouchPlay(part, frac);
+	// Reflect the reaction in the dropdown so it is clear what just played.
+	if (played && el.animSelect && current && current.animations) {
+		const names = current.animations;
+		const hit = names.find((n) => /^(touch|tap)/i.test(n) && (part === "head" ? /head/i : part === "body" ? /(body|xiong)/i : /(drag|leg|pigu|siwa|yifu)/i).test(n));
+		const pick = hit || names.find((n) => /^(touch|tap)/i.test(n));
+		if (pick) {
+			animName = pick;
+			el.animSelect.value = pick;
+		}
+	}
+	// A tap plays a real touch motion (real reaction); no synthetic kick — the
+	// plugin overwrites these parameters every frame anyway.
+}
+
+/** Nudge the head/body angle parameters so a tap visibly registers even with
+ *  no free touch motion available. */
+function live2dHeadKick(part) {
+	const core = spine?.internalModel?.coreModel;
+	if (!core) return;
+	try {
+		const t = part === "head" ? 1 : 0.5;
+		const dir = Math.random() < 0.5 ? -1 : 1;
+		const set = (id, v) => {
+			try {
+				core.setParameterValueById(id, v);
+			} catch {
+				/* not every model has these */
+			}
+		};
+		set("ParamAngleZ", 10 * t * dir);
+		set("ParamBodyAngleZ", 4 * t * dir);
+	} catch {
+		/* ignore */
+	}
+}
+
+
+/** True once the currently playing Cubism motion has ended (or nothing plays). */
+function live2dMotionDone() {
+	if (!isLive2D(current) || !spine) return true;
+	return live2DMotionFinished(spine);
+}
+
+// Debug hook: the headless harness needs to read the live-effect state and to
+// drive one update explicitly (the plugin's own update is internal).
+window.__l2d = {
+	touchAt: (x, y) => live2dTouchAt({ clientX: x, clientY: y, button: 0 }),
+	state: () => ({
+		live: live2dLiveOn,
+		random: live2dRandomOn,
+		autoNext: live2dAutoNext,
+		touch: live2dTouchOn,
+		anim: animName,
+		isLive2D: isLive2D(current),
+	}),
+};
+
+
 
 const state = {
 	playing: true,
@@ -1243,6 +1391,7 @@ async function loadLive2DModel(model) {
 		textureFiles,
 		motionFiles: model.motionFiles || [],
 		expressionFiles: model.expressions || [],
+		physicsFile: (model.files || []).find((f) => /\.physics3\.json$/i.test(f)) || null,
 	});
 
 	// Drop any previous model before putting this one on the stage. This single
@@ -1256,6 +1405,15 @@ async function loadLive2DModel(model) {
 	// New model, so its centring offset must be measured afresh.
 	live2dCentre = null;
 
+	// Auto blink / breath / physics from the moment it appears ("living" look).
+	live2dLiveApply(live2d);
+	if (el.l2dExtra) el.l2dExtra.hidden = false;
+	if (el.l2dLiveBtn) el.l2dLiveBtn.dataset.on = String(live2dLiveOn);
+	if (el.l2dRandomBtn) el.l2dRandomBtn.dataset.on = String(live2dRandomOn);
+	if (el.l2dAutoBtn) el.l2dAutoBtn.dataset.on = String(live2dAutoNext);
+	if (el.l2dTouchBtn) el.l2dTouchBtn.dataset.on = String(live2dTouchOn);
+	live2dAutoNextAt = performance.now() + 3000;
+
 	spine = live2d;
 	stageRoot.addChildAt(live2d, 0);
 	bonesGfx.visible = false;
@@ -1266,10 +1424,14 @@ async function loadLive2DModel(model) {
 	atlasSaysPMA = false;
 	current.atlasPagesFlags = [];
 
-	// Cubism has no Spine tracks; each motion is an independent clip.
+	// Cubism has no Spine tracks; each motion is an independent clip. Group the
+	// list into categories so a 30–140 entry dropdown stays usable, and start on
+	// an idle clip (the natural resting motion) rather than whatever sorts first.
 	const anims = model.animations && model.animations.length ? model.animations : ["(diam)"];
-	fillSelect(el.animSelect, anims, anims[0]);
-	animName = anims[0];
+	fillLive2DAnimSelect(anims);
+	const start = anims.find((n) => /^idle/i.test(n)) || anims[0];
+	el.animSelect.value = start;
+	animName = start;
 	duration = 0;
 	el.timeDur.textContent = "0.00s";
 
@@ -1410,6 +1572,8 @@ async function loadModel(model) {
 	markSeen(model.id);
 	el.loading.hidden = false;
 	el.loading.textContent = "Memuat " + model.name + "…";
+	// Live2D-only controls; each loader turns them back on as needed.
+	if (el.l2dExtra) el.l2dExtra.hidden = true;
 
 	try {
 		// Any previous Spine 2.x model left an iframe over the stage; clear it
@@ -1773,6 +1937,38 @@ function fillSelect(sel, values, preferred) {
 		sel.appendChild(o);
 	}
 	sel.value = values.includes(preferred) ? preferred : values[0];
+}
+
+/**
+ * Live2D motion dropdown with <optgroup> categories. A model can ship 100+
+ * motions; grouping keeps the list navigable without changing how the value is
+ * read elsewhere (option.value stays the bare motion name).
+ */
+function fillLive2DAnimSelect(names) {
+	const sel = el.animSelect;
+	if (!sel) return;
+	sel.innerHTML = "";
+	const list = (names || []).filter(Boolean);
+	if (!list.length) {
+		sel.innerHTML = '<option value="">—</option>';
+		sel.disabled = true;
+		return;
+	}
+	sel.disabled = false;
+	const groups = live2DMotionGroups(spine, list);
+	// Degenerate case (no category matched): flat list.
+	const source = groups.length ? groups : [{ label: "Gerakan", names: list }];
+	for (const g of source) {
+		const og = document.createElement("optgroup");
+		og.label = g.label;
+		for (const n of g.names) {
+			const o = document.createElement("option");
+			o.value = n;
+			o.textContent = n;
+			og.appendChild(o);
+		}
+		sel.appendChild(og);
+	}
 }
 
 function setAnimation(name, restart = false) {
@@ -3295,6 +3491,41 @@ function initFps() {
  * — the meter should still read even on an empty stage. */
 app.ticker.add(() => fpsSample(app.ticker.deltaMS));
 
+// Live2D sit-and-watch tick: the Spine tick above bails for Cubism models, so
+// the auto-advance / random-clip behaviour runs here instead.
+app.ticker.add(() => {
+	if (!isLive2D(current) || !spine) return;
+	if (document.hidden) return; // no busywork in a background tab
+	if (!live2dRandomOn && !live2dAutoNext) return;
+	const now = performance.now();
+	if (now < live2dAutoNextAt) return;
+	const names = (current.animations || []).filter(Boolean);
+	// Auto-advance waits until the current clip actually ends; random fires on a
+	// timer but never cuts a clip short (it also waits for "done").
+	const done = live2dMotionDone();
+	if (!done && !live2dRandomOn) return;
+	if (!names.length) return;
+	let next = animName;
+	if (live2dRandomOn) {
+		// Prefer resting poses, then anything: random purely across 100+ touch
+		// clips feels chaotic, so weight towards idle when idle exists.
+		const idle = names.filter((n) => /^idle/i.test(n));
+		const pool = Math.random() < 0.6 && idle.length ? idle : names;
+		next = pool[Math.floor(Math.random() * pool.length)];
+	} else {
+		const i = names.indexOf(animName);
+		next = names[(i + 1) % names.length];
+	}
+	if (next) {
+		playLive2DMotion(spine, next);
+		animName = next;
+		if (el.animSelect) el.animSelect.value = next;
+	}
+	// Random: pause a few seconds between clips. Auto: check again shortly; the
+	// next clip starts as soon as the current one finishes.
+	live2dAutoNextAt = now + (live2dRandomOn ? 4000 + Math.random() * 4000 : 700);
+});
+
 window.addEventListener("resize", () => {
 	if (!fps.on) return;
 	fps.ctx = null; // force a fresh backing store at the new size
@@ -4353,12 +4584,56 @@ el.animSelect.addEventListener("change", () => {
 	// AnimationState. Cubism models must never reach setAnimation() — they
 	// have no spine.state, so it would throw.
 	if (isLive2D(current)) {
-		playLive2DMotion(spine, el.animSelect.value);
+		animName = el.animSelect.value;
+		playLive2DMotion(spine, animName);
+		// A full clip now owns the stage; hold off the random/auto-advance timer.
+		live2dAutoNextAt = performance.now() + 10000;
 		return;
 	}
 	setAnimation(el.animSelect.value, true);
 	renderTimeline();
 });
+
+// --- Live2D extras: living effects, random clip, auto-advance, touch --------
+function l2dToggle(btn, get, set) {
+	if (!btn) return;
+	btn.dataset.on = String(get());
+	btn.addEventListener("click", () => {
+		set(!get());
+		btn.dataset.on = String(get());
+	});
+}
+l2dToggle(
+	el.l2dLiveBtn,
+	() => live2dLiveOn,
+	(v) => {
+		live2dLiveOn = v;
+		live2dLiveApply(spine);
+	},
+);
+l2dToggle(
+	el.l2dRandomBtn,
+	() => live2dRandomOn,
+	(v) => {
+		live2dRandomOn = v;
+		live2dAutoNextAt = performance.now() + 2000;
+	},
+);
+l2dToggle(
+	el.l2dAutoBtn,
+	() => live2dAutoNext,
+	(v) => {
+		live2dAutoNext = v;
+		live2dAutoNextAt = performance.now() + 1500;
+	},
+);
+l2dToggle(
+	el.l2dTouchBtn,
+	() => live2dTouchOn,
+	(v) => {
+		live2dTouchOn = v;
+	},
+);
 el.skinSelect.addEventListener("change", () => {
 	// Live2D Cubism has no Spine skins; the dropdown drives expressions.
 	if (isLive2D(current)) {
@@ -4432,6 +4707,22 @@ el.canvasWrap.addEventListener("pointermove", (e) => {
 });
 
 el.canvasWrap.addEventListener("pointerdown", (e) => {
+	// Live2D "Sentuh": a TAP (not a drag/pan) on the model triggers a touch
+	// motion for the tapped height. Track press/release so panning never fires it.
+	if (isLive2D(current) && live2dTouchOn && e.button === 0) {
+		const sx = e.clientX;
+		const sy = e.clientY;
+		const t0 = performance.now();
+		const up = (ue) => {
+			el.canvasWrap.removeEventListener("pointerup", up);
+			if (ue.button !== 0) return;
+			if (performance.now() - t0 > 450) return; // held = drag, not tap
+			if (Math.hypot(ue.clientX - sx, ue.clientY - sy) > 12) return; // moved = pan
+			live2dTouchAt(ue);
+		};
+		el.canvasWrap.addEventListener("pointerup", up);
+		return;
+	}
 	if (!parts.on || !spine) return;
 	if (e.button !== 0) return;
 	const p = toStagePoint(e.clientX, e.clientY);

@@ -1,5 +1,5 @@
 diff --git a/node_modules/pixi-live2d-display/dist/cubism4.es.js b/node_modules/pixi-live2d-display/dist/cubism4.es.js
-index a272bc8..5dbf21f 100644
+index a272bc8..c780f98 100644
 --- a/node_modules/pixi-live2d-display/dist/cubism4.es.js
 +++ b/node_modules/pixi-live2d-display/dist/cubism4.es.js
 @@ -10249,8 +10249,10 @@ class Cubism4InternalModel extends InternalModel {
@@ -15,8 +15,19 @@ index a272bc8..5dbf21f 100644
      CubismShader_WebGL.getInstance()._shaderSets = [];
    }
    bindTexture(index, texture) {
+@@ -10297,9 +10299,7 @@ class Cubism4InternalModel extends InternalModel {
+     this.emit("afterMotionUpdate");
+     model.saveParameters();
+     (_a = this.motionManager.expressionManager) == null ? void 0 : _a.update(model, now);
+-    if (!motionUpdated) {
+-      (_b = this.eyeBlink) == null ? void 0 : _b.updateParameters(model, dt);
+-    }
++    (_b = this.eyeBlink) == null ? void 0 : _b.updateParameters(model, dt);
+     this.updateFocus();
+     this.updateNaturalMovements(dt * 1e3, now * 1e3);
+     (_c = this.physics) == null ? void 0 : _c.evaluate(model, dt);
 diff --git a/node_modules/pixi-live2d-display/dist/index.es.js b/node_modules/pixi-live2d-display/dist/index.es.js
-index 28d58c4..ab12e1a 100644
+index 28d58c4..bd67764 100644
 --- a/node_modules/pixi-live2d-display/dist/index.es.js
 +++ b/node_modules/pixi-live2d-display/dist/index.es.js
 @@ -8005,8 +8005,10 @@ class Cubism4InternalModel extends InternalModel {
@@ -32,3 +43,14 @@ index 28d58c4..ab12e1a 100644
      CubismShader_WebGL.getInstance()._shaderSets = [];
    }
    bindTexture(index, texture) {
+@@ -8053,9 +8055,7 @@ class Cubism4InternalModel extends InternalModel {
+     this.emit("afterMotionUpdate");
+     model.saveParameters();
+     (_a = this.motionManager.expressionManager) == null ? void 0 : _a.update(model, now);
+-    if (!motionUpdated) {
+-      (_b = this.eyeBlink) == null ? void 0 : _b.updateParameters(model, dt);
+-    }
++    (_b = this.eyeBlink) == null ? void 0 : _b.updateParameters(model, dt);
+     this.updateFocus();
+     this.updateNaturalMovements(dt * 1e3, now * 1e3);
+     (_c = this.physics) == null ? void 0 : _c.evaluate(model, dt);

@@ -78,7 +78,7 @@ function orderTextures(coreModel, textureUrls) {
  * Load a Cubism model from a folder.
  * Resolves to { model, dispose }.
  */
-export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, expressionFiles, onProgress }) {
+export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, expressionFiles, physicsFile, onProgress }) {
 	const mocUrl = base + encodeURIComponent(mocFile);
 
 	// The game never ships a .model3.json, so build the settings ourselves.
@@ -90,9 +90,19 @@ export async function loadLive2D({ base, mocFile, textureFiles, motionFiles, exp
 			Moc: mocUrl,
 			Textures: textureFiles.map((t) => base + encodeURIComponent(t)),
 		},
-		Groups: [],
+		// Declaring the EyeBlink group is what makes the plugin create its
+		// auto-blink manager (idle blinking + occasional double-blink). The ids
+		// are the Cubism standard; a model without them simply ignores the setter.
+		Groups: [{ Name: "EyeBlink", Ids: ["ParamEyeLOpen", "ParamEyeROpen"] }],
 		HitAreas: [],
 	};
+
+	// Physics (hair/clothes sway) is only loaded when the settings point at a
+	// file; the plugin then evaluates it every frame. Without this the model
+	// looks like a stiff poster even though a physics3.json ships next to it.
+	if (physicsFile) {
+		settings.FileReferences.Physics = base + encodeURIComponent(physicsFile);
+	}
 
 	// Register the expression set. Cubism only creates its ExpressionManager
 	// when Expressions are declared up front, so without this the Skin dropdown
@@ -262,6 +272,98 @@ export function live2DExpressions(model, fallback) {
 		return fallback.filter((n) => n && n !== "(diam)");
 	}
 	return [];
+}
+
+/**
+ * Turn the model's built-in "living" effects on or off.
+ *
+ *  - eyeBlink — auto blink (only exists when the EyeBlink group was declared).
+ *  - physics  — hair/cloth sway (only exists when a physics3.json was loaded).
+ *  - breath   — head/shoulder natural sway + chest breath.
+ *
+ * The plugin's per-frame `update()` calls these via optional chaining and does
+ * NOT check any enable flag, so "off" means detaching the operator (null) while
+ * keeping the original to restore. Returns which effects this model actually has.
+ */
+export function setLive2DLive(model, on) {
+	const im = model?.internalModel;
+	if (!im) return { eyeBlink: false, physics: false, breath: false };
+	const have = {
+		eyeBlink: !!(im.eyeBlink || im._savedEyeBlink),
+		physics: !!(im.physics || im._savedPhysics),
+		breath: !!(im.breath || im._savedBreath),
+	};
+	const detach = (key) => {
+		if (im[key]) {
+			im["_saved" + key[0].toUpperCase() + key.slice(1)] = im[key];
+			im[key] = null;
+		}
+	};
+	const restore = (key) => {
+		const saved = "_saved" + key[0].toUpperCase() + key.slice(1);
+		if (im[saved] !== undefined && im[saved] !== null) {
+			im[key] = im[saved];
+			im[saved] = undefined;
+		}
+	};
+	for (const key of ["eyeBlink", "physics", "breath"]) {
+		if (on) restore(key);
+		else detach(key);
+	}
+	return have;
+}
+
+/**
+ * Group the model's motion names into categories so a 30–140 entry dropdown
+ * stays usable. Purely name-based and game-agnostic:
+ *   touch_*  -> "Sentuhan"   idle* -> "Diam"     main_* -> "Utama"   drag -> ...
+ *   home/login/mail/mission/wedding/effect/... -> its own category
+ * Anything unrecognised falls into "Lain". Returns [{ label, names }], in a
+ * sensible display order, and [] when there are no motions.
+ */
+export function live2DMotionGroups(model, names) {
+	const list = Array.isArray(names) ? names.filter(Boolean) : [];
+	if (!list.length) return [];
+
+	const CATS = [
+		["idle", "Diam", (n) => /^idle/i.test(n) || /^change_?idle/i.test(n)],
+		["touch", "Sentuhan", (n) => /^(touch|tap)/i.test(n)],
+		["drag", "Geser", (n) => /drag/i.test(n)],
+		["main", "Utama", (n) => /^main/i.test(n)],
+		["special", "Spesial", (n) => /^(wedding|special|login|home|complete|mission|mail|effect|win|lose)/i.test(n)],
+	];
+	const used = new Set();
+	const out = [];
+	for (const [key, label, test] of CATS) {
+		const hit = list.filter((n) => !used.has(n) && test(n));
+		hit.forEach((n) => used.add(n));
+		if (hit.length) out.push({ key, label, names: hit });
+	}
+	const rest = list.filter((n) => !used.has(n));
+	if (rest.length) out.push({ key: "other", label: "Lain", names: rest });
+	return out;
+}
+
+/** True once the model's currently-playing motion has run to the end. */
+export function live2DMotionFinished(model) {
+	const mm = model?.internalModel?.motionManager;
+	if (!mm || typeof mm.isFinished !== "function") return false;
+	try {
+		return mm.isFinished();
+	} catch {
+		return false;
+	}
+}
+
+/** True while a motion is still playing (so auto-advance can wait its turn). */
+export function live2DMotionBusy(model) {
+	const mm = model?.internalModel?.motionManager;
+	if (!mm || typeof mm.isFinishedByHandle !== "function") return false;
+	try {
+		return !mm.isFinished();
+	} catch {
+		return false;
+	}
 }
 
 /** Cubism models have no Spine animations; expose a single idle entry. */

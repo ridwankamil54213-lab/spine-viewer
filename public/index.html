@@ -317,6 +317,18 @@
 							<option value="upload">Upload PMA</option>
 						</select>
 					</label>
+					<!-- Live2D only: auto blink/breath/physics, random motion, and
+					     touch-to-react. Hidden for Spine/video/CG. -->
+					<label class="field-inline" id="l2d-extra" hidden>
+						<button id="l2d-live-btn" class="btn btn-toggle" data-on="true"
+							title="Kedip mata, napas, dan fisika rambut/baju otomatis">Hidup</button>
+						<button id="l2d-random-btn" class="btn btn-toggle" data-on="false"
+							title="Putar gerakan acak dari waktu ke waktu">Acak</button>
+						<button id="l2d-auto-btn" class="btn btn-toggle" data-on="false"
+							title="Lanjut ke gerakan berikutnya saat animasi selesai">Auto</button>
+						<button id="l2d-touch-btn" class="btn btn-toggle" data-on="true"
+							title="Klik model untuk memicu gerakan sentuhan (kepala/badan/kaki)">Sentuh</button>
+					</label>
 				</div>
 
 				<div class="spacer"></div>
