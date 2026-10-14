@@ -14,7 +14,12 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 HEADERS = {"User-Agent": UA}
 
-OUT = "/srv/spine-viewer/public/thumbs/_game"
+# Repo-relative: dulu hardcoded "/srv/spine-viewer/..." — path itu TIDAK ada,
+# jadi skrip ini tak pernah menulis icon ke tempat yang dibaca server
+# (THUMBS = <root>/public/thumbs). Server hanya menangkap LOKASI BARU karena
+# cache-nya memakai mtime; jangan andalkan itu, tulis ke root repo.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, "public", "thumbs", "_game")
 SIZE = 128
 
 GAMES = [
@@ -48,6 +53,20 @@ GAMES = [
     # the candidates before picking, size alone picks the wrong one.
 ]
 
+# Game yang PUNYA model tapi BELUM punya icon (2026-10-14). Isi URL-nya ke GAMES
+# di atas, lalu jalankan ulang. Rincian + kandidat sumber: tools/game-icons-pending.md
+PENDING_GAMES = [
+    "alcherystars", "angelica", "blissful", "bluearchive",
+    "chaoszero", "crosscore", "demo", "dotabyss", "dotabyss-l2d",
+    "dragontravelers",
+    "epic7", "everlusting", "girlwars", "girlwars-l2d", "goddessparadise",
+    "idleangels", "isekaislowlife", "ivntight", "juezhan", "kink",
+    "mecharashi", "mengqi", "mitao-utopia", "muvluv",
+    "muvluv-cg", "orisries", "peachhan", "riichicity", "shenlan", "shenlan-cg",
+    "starlust", "stellar", "talesofangels", "tenkei", "throne", "wuhua",
+    "xingjie", "ysjh",
+]
+
 
 def main():
     os.makedirs(OUT, exist_ok=True)
@@ -67,6 +86,12 @@ def main():
             print(f"  OK  {key:16} {w}x{h} -> {SIZE}x{SIZE}  ({os.path.getsize(dest)//1024} KB)")
         except Exception as e:
             print(f"  FAIL {key:16} {str(e)[:70]}")
+
+    have = {f[:-4] for f in os.listdir(OUT) if f.endswith(".png")}
+    todo = [k for k in PENDING_GAMES if k not in have]
+    print(f"\n  icon ada: {len(have)} | game tanpa icon: {len(todo)}")
+    if todo:
+        print("  belum ada icon: " + ", ".join(todo))
 
 
 if __name__ == "__main__":
