@@ -5095,6 +5095,22 @@ function toggleFullscreen() {
 	else requestFullscreen();
 }
 
+/* Fullscreen toolbar reveal: the bar is fully hidden (max-height 0). A mousemove
+   in the bottom zone (or onto the bar itself) adds .fs-peek to slide it up; a
+   move back into the stage removes it. Keeps the Chrome-like "move to the edge"
+   gesture while showing no chrome at rest. */
+function fsPointerZone(ev) {
+	if (!fsEl()) return;
+	const t = document.querySelector(".transport");
+	if (!t) return;
+	const zone = Math.min(110, window.innerHeight * 0.2);
+	const inZone = ev.clientY >= window.innerHeight - zone;
+	// Keep it open while the pointer is over the (now tall) bar itself, so
+	// clicking a control does not yank the bar away mid-interaction.
+	const overBar = t.getBoundingClientRect().height > 4 && ev.target && t.contains(ev.target);
+	t.classList.toggle("fs-peek", inZone || overBar);
+}
+
 function syncFullscreenUI() {
 	const on = !!fsEl();
 	if (el.fullscreenBtn) {
@@ -5103,9 +5119,10 @@ function syncFullscreenUI() {
 		el.fullscreenBtn.setAttribute("aria-label", label);
 		el.fullscreenBtn.setAttribute("title", `${label} (F)`);
 	}
-	// The transport (which holds the toggle) auto-hides in true fullscreen, so
-	// show the floating exit button as the way out.
+	// Show the floating exit button only while fullscreen.
 	if (el.fsExit) el.fsExit.hidden = !on;
+	// Drop the reveal state when leaving fullscreen, or the bar stays slid up.
+	if (!on) document.querySelector(".transport")?.classList.remove("fs-peek");
 	// The stage just changed size; let the model settle into the new frame.
 	// Re-fit twice: the grid/flex reflow (topbar + sidebar removed) is not always
 	// reflected in the very next frame, so a single fit can measure the old box
@@ -5140,6 +5157,8 @@ function initFullscreen() {
 	document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 	el.fullscreenBtn?.addEventListener("click", toggleFullscreen);
 	el.fsExit?.addEventListener("click", exitFullscreen);
+	// Reveal/hide the toolbar as the pointer moves toward the bottom edge.
+	window.addEventListener("mousemove", fsPointerZone, { passive: true });
 	syncFullscreenUI();
 }
 

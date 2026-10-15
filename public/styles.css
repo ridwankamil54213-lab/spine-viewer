@@ -69,7 +69,8 @@ html, body { height: 100%; }
 /* TRUE fullscreen: drop the topbar and the sidebar so the canvas fills the
    screen, and reveal the transport only when the pointer reaches the bottom.
    The toolbar is the ONLY way to drive the model (play/seek/animation), so it
-   must stay reachable — hidden it owns zero height, revealed it slides back. */
+   must stay reachable — hidden it is pushed OFF-SCREEN (translateY) rather than
+   height-clamped, which left its padding+border as a visible sliver. */
 :root:fullscreen .topbar,
 :root:-webkit-full-screen .topbar { display: none; }
 
@@ -93,18 +94,23 @@ html, body { height: 100%; }
 	bottom: 0;
 	margin: 0;
 	z-index: 40;
-	/* Peek: a thin strip stays visible so the resting bar is easy to grab;
-	   hovering it (or tabbing into it) slides the whole toolbar up. */
-	max-height: 22px;
-	overflow: hidden;
-	transition: max-height 0.22s var(--ease), box-shadow 0.22s var(--ease);
+	/* Hidden = slid fully below the viewport AND non-interactive, so it neither
+	   shows nor swallows clicks meant for the canvas. Revealed on .fs-peek
+	   (pointer reached the bottom zone) or when focus is inside it. */
+	transform: translateY(105%);
+	visibility: hidden;
+	pointer-events: none;
+	transition: transform 0.22s var(--ease), visibility 0.22s;
 	box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.4);
 }
-:root:fullscreen .transport:hover,
+:root:fullscreen .transport.fs-peek,
 :root:fullscreen .transport:focus-within,
-:root:-webkit-full-screen .transport:hover,
+:root:-webkit-full-screen .transport.fs-peek,
 :root:-webkit-full-screen .transport:focus-within {
-	max-height: 70vh;
+	transform: translateY(0);
+	visibility: visible;
+	pointer-events: auto;
+	max-height: 90vh;
 	overflow-y: auto;
 }
 
