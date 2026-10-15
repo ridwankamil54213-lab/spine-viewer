@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""魔竞革命 (euwv.0577ai.com) — ekstrak model Spine dari bundle hot-update.
+"""贤者同盟 / Alliance Sages (euwv.0577ai.com) — ekstrak model Spine
+dari bundle hot-update.
 
 Sumber: CDN game TERBUKA
     https://euwv.0577ai.com/ob/update/android/filelist          (daftar berkas)
     https://euwv.0577ai.com/ob/update/android/<filename>       (bundle, UnityFS)
 Ditemukan dari daftar CDN hasil bongkar '二游资源工具.exe' (tools/game-cdn-list.md),
-alias di tool: 魔竞革命.
+alias di tool: 贤者同盟 (URL euwv.0577ai.com).
 
 Tiap bundle = UnityFS berisi N model Spine, satu model = 3 objek berbagi nama:
     TextAsset "<id>"        -> skeleton JSON (Spine 3.8.99)
@@ -13,7 +14,7 @@ Tiap bundle = UnityFS berisi N model Spine, satu model = 3 objek berbagi nama:
     Texture2D "<id>"        -> halaman tekstur
 Keluaran: <out>/<id>/{<id>.json,<id>.atlas,<id>.png}
 
-Pakai: /srv/venv-spine/bin/python tools/mojinggeming/extract-mojinggeming.py
+Pemakaian: /srv/venv-spine/bin/python tools/alliancesages/extract-alliancesages.py
 """
 import json
 import os
@@ -27,8 +28,8 @@ import UnityPy
 UnityPy.config.FALLBACK_UNITY_VERSION = "6000.0.58f2"
 
 BASE = "https://euwv.0577ai.com/ob/update/android"
-OUT = "/opt/spine-viewer/assets/mojinggeming"
-CACHE = "/opt/mojinggeming/bundles"
+OUT = "/opt/spine-viewer/assets/alliancesages"
+CACHE = "/opt/alliancesages/bundles"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 

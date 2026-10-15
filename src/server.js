@@ -347,16 +347,6 @@ const GAME_ROOTS = [
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane-l2d", key: "azurlane-l2d", label: "Azur Lane — Live2D" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
-	// 魔竞革命 — diekstrak dari CDN hot-update TERBUKA euwv.0577ai.com
-	// (ob/update/android/filelist), dari bongkaran 二游资源工具.exe.
-	// Bundle UnityFS berisi N model Spine 3.8.99 (JSON) + atlas + Texture2D.
-	// Lihat tools/mojinggeming/.
-	{
-		match: "mojinggeming",
-		key: "mojinggeming",
-		label: "魔竞革命",
-		pmaDefault: false,
-	},
 	// 禁果便利店 / 群交避难所 / 我的便利店竟成了美少女的避难所 (ERO LABS).
 	// Addressables terbuka mcs18-client-resource-tw.1uhg.com; bundle
 	// character* (arts/animation + spine_assets + storyanimation) berisi
@@ -569,6 +559,9 @@ const GAME_ROOTS = [
 	// pmaDefault: these atlases carry no `pma:` line but their textures ARE
 	// premultiplied, so "Auto" has to assume PMA instead of falling back to
 	// straight alpha (which shows as dark fringes around every sprite).
+	// Model baru (22) di-refresh dari CDN hot-update TERBUKA euwv.0577ai.com
+	// (dari bongkaran 二游资源工具.exe; alias di tool: 贤者同盟). Updater:
+	// tools/update-alliancesages.py. (Alias "魔竞革命" di tool = game LAIN.)
 	{
 		match: "alliancesages-cg",
 		key: "alliancesages-cg",
@@ -2795,11 +2788,12 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-nikke.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
-	// 魔竞革命: CDN hot-update terbuka (euwv.0577ai.com/ob/update/android).
-	// --check cukup baca `filelist`; --apply unduh hanya bundle spine yang
-	// ukurannya berubah. Lihat tools/update-mojinggeming.py.
-	mojinggeming: {
-		script: path.join(ROOT, "tools", "update-mojinggeming.py"),
+	// 贤者同盟 / Alliance Sages: CDN hot-update terbuka
+	// (euwv.0577ai.com/ob/update/android). --check cukup baca `filelist`;
+	// --apply unduh hanya bundle spine yang ukurannya berubah.
+	// Lihat tools/update-alliancesages.py.
+	alliancesages: {
+		script: path.join(ROOT, "tools", "update-alliancesages.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 	// 禁果便利店 (mcs18): Addressables terbuka, bundle karakter spine.

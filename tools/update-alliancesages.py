@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Perbarui model Spine 魔竞革命 (CDN euwv.0577ai.com).
+"""Perbarui model Spine 贤者同盟 / Alliance Sages (CDN euwv.0577ai.com).
 
 Game ini memakai hot-update polos: satu berkas `filelist` JSON di CDN
 menyebut SETIAP paket aset beserta ukuran + crc, mis.
@@ -15,14 +15,14 @@ Alur:
                 bundle dengan state terakhir. Laporkan bundle baru/berubah +
                 perkiraan unduhan. Tidak mengunduh bundle. Murah (1 request).
     * --apply : seperti --check, lalu unduh HANYA bundle yang baru/berubah,
-                ekstrak ulang isinya ke assets/mojinggeming (timpa model yang
+                ekstrak ulang isinya ke assets/alliancesages (timpa model yang
                 berubah), simpan state. Model lama yang tidak tersentuh tetap.
 
-Dipakai server lewat GET /api/update/mojinggeming (tombol "Perbarui aset").
+Dipakai server lewat GET /api/update/alliancesages (tombol "Perbarui aset").
 
 Pemakaian langsung:
-    /srv/venv-spine/bin/python tools/update-mojinggeming.py --check
-    /srv/venv-spine/bin/python tools/update-mojinggeming.py --apply
+    /srv/venv-spine/bin/python tools/update-alliancesages.py --check
+    /srv/venv-spine/bin/python tools/update-alliancesages.py --apply
 """
 import argparse
 import importlib.util
@@ -35,14 +35,16 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # Muat ekstraktor (nama berkasnya bertanda hubung, jadi lewat importlib).
+MJG_STATE_DEFAULT = "/opt/alliancesages"
+
 _spec = importlib.util.spec_from_file_location(
-    "extract_mojinggeming",
-    os.path.join(HERE, "mojinggeming", "extract-mojinggeming.py"),
+    "extract_alliancesages",
+    os.path.join(HERE, "alliancesages", "extract-alliancesages.py"),
 )
 ex = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(ex)
 
-STATE_DIR = os.environ.get("MJG_STATE", "/opt/mojinggeming")
+STATE_DIR = os.environ.get("ALLIANCESAGES_STATE", MJG_STATE_DEFAULT)
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
 OUT = ex.OUT
 CACHE = ex.CACHE
