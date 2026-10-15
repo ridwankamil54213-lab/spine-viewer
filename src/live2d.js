@@ -355,6 +355,46 @@ export function live2DMotionFinished(model) {
 	}
 }
 
+/** The motion queue entry currently playing (or null). */
+function live2DEntry(model) {
+	const mm = model?.internalModel?.motionManager;
+	const q = mm?.queueManager?._motions;
+	return Array.isArray(q) ? q.find(Boolean) : null;
+}
+
+/**
+ * Playback position (seconds) of the Cubism motion on stage.
+ *
+ * The Cubism motion manager has no getter for this: an entry stores only its
+ * start time (`_startTimeSeconds`, in the SAME second-scale as performance.now()
+ * divided by 1000), so the elapsed position is the difference. That is also how
+ * the plugin decides the current frame — which makes seeking trivial (below).
+ * Returns null when nothing is playing.
+ */
+export function live2DMotionTime(model) {
+	const e = live2DEntry(model);
+	if (!e || typeof e._startTimeSeconds !== "number") return null;
+	return performance.now() / 1000 - e._startTimeSeconds;
+}
+
+/** Length (seconds) of the motion on stage — its loop length, else 0. */
+export function live2DMotionDuration(model) {
+	const e = live2DEntry(model);
+	const m = e?._motion;
+	if (!m) return 0;
+	let d = typeof m.getLoopDuration === "function" ? m.getLoopDuration() : m._loopDurationSeconds;
+	if (!(typeof d === "number" && d > 0)) d = typeof m.getDuration === "function" ? m.getDuration() : 0;
+	return typeof d === "number" && d > 0 ? d : 0;
+}
+
+/** Seek the playing motion to `t` seconds by shifting its start time. */
+export function live2DSeekMotion(model, t) {
+	const e = live2DEntry(model);
+	if (!e || typeof e._startTimeSeconds !== "number") return false;
+	e._startTimeSeconds = performance.now() / 1000 - Math.max(0, t);
+	return true;
+}
+
 /** True while a motion is still playing (so auto-advance can wait its turn). */
 export function live2DMotionBusy(model) {
 	const mm = model?.internalModel?.motionManager;

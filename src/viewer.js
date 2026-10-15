@@ -54,6 +54,9 @@ import {
 	setLive2DLive,
 	live2DMotionGroups,
 	live2DMotionFinished,
+	live2DMotionTime,
+	live2DMotionDuration,
+	live2DSeekMotion,
 } from "./live2d.js";
 import { loadVideo, disposeVideo, videoElement, videoStageActive } from "./video-stage.js";
 import { loadImage, disposeImage, imageStageActive, imageElement } from "./image-stage.js";
@@ -573,6 +576,7 @@ function live2dTouchAt(ev) {
 	}
 	const part = frac > 0.62 ? "head" : frac > 0.33 ? "body" : "lower";
 	const played = live2dTouchPlay(part, frac);
+	if (played) live2dUpdateDuration();
 	// Reflect the reaction in the dropdown so it is clear what just played.
 	if (played && el.animSelect && current && current.animations) {
 		const names = current.animations;
@@ -616,6 +620,16 @@ function live2dMotionDone() {
 	return live2DMotionFinished(spine);
 }
 
+/** Read the on-stage motion's length (seconds) into the shared duration + label.
+ *  Called after any motion starts, since the Cubism manager knows the length
+ *  only once a motion is queued. */
+function live2dUpdateDuration() {
+	if (!isLive2D(current) || !spine) return;
+	const d = live2DMotionDuration(spine);
+	duration = d > 0 ? d : 0;
+	if (el.timeDur) el.timeDur.textContent = d > 0 ? d.toFixed(2) + "s" : "—";
+}
+
 // Debug hook: the headless harness needs to read the live-effect state and to
 // drive one update explicitly (the plugin's own update is internal).
 window.__l2d = {
@@ -627,6 +641,8 @@ window.__l2d = {
 		touch: live2dTouchOn,
 		anim: animName,
 		isLive2D: isLive2D(current),
+		time: isLive2D(current) ? live2DMotionTime(spine) : null,
+		duration: isLive2D(current) ? live2DMotionDuration(spine) : null,
 	}),
 };
 
@@ -751,6 +767,23 @@ app.ticker.add(() => {
 });
 
 function updateScrubUI() {
+	// Live2D: the motion manager owns the clock, so read it back instead of the
+	// (absent) Spine track. The bar and the "current" readout then advance.
+	if (isLive2D(current) && spine) {
+		// Backfill the length once the (asynchronously queued) motion is known,
+		// otherwise the very first clip shows "—" until a manual switch.
+		if (!duration) live2dUpdateDuration();
+		const t = live2DMotionTime(spine);
+		if (t === null) return;
+		// A looping clip keeps counting past its length, so wrap the readout into
+		// [0, duration]; without this the bar pins at 100% and "cur" exceeds "dur".
+		let tt = Math.max(0, t);
+		if (duration > 0 && tt > duration) tt = tt % duration;
+		if (!state.scrubbing) state.trackTime = tt;
+		el.scrub.value = String(duration ? Math.min(1, tt / duration) * 1000 : 0);
+		el.timeCur.textContent = tt.toFixed(2) + "s";
+		return;
+	}
 	const track = spine?.state?.tracks?.[0];
 	if (!track) return;
 	const t = Math.min(track.trackTime, duration);
@@ -1434,6 +1467,15 @@ async function loadLive2DModel(model) {
 	animName = start;
 	duration = 0;
 	el.timeDur.textContent = "0.00s";
+	// Start the resting motion so the timeline/scrubber have something to show,
+	// then read its length back from the Cubism motion manager.
+	playLive2DMotion(spine, start);
+	// The motion is queued asynchronously (the manager loads the json), so its
+	// length is not known this tick — poll briefly until it is, then set the
+	// label. Otherwise the readout stays "—" until the first manual switch.
+	live2dUpdateDuration();
+	setTimeout(live2dUpdateDuration, 400);
+	setTimeout(live2dUpdateDuration, 1500);
 
 	// Cubism has no Spine skins — what the Skin dropdown should offer is the
 	// expression set. `(diam)` resets to the neutral expression.
@@ -3496,6 +3538,9 @@ app.ticker.add(() => fpsSample(app.ticker.deltaMS));
 app.ticker.add(() => {
 	if (!isLive2D(current) || !spine) return;
 	if (document.hidden) return; // no busywork in a background tab
+	// The time readout belongs to the Cubism motion manager; keep it fresh even
+	// when the random/auto features are off (the Spine tick above bails here).
+	updateScrubUI();
 	if (!live2dRandomOn && !live2dAutoNext) return;
 	const now = performance.now();
 	if (now < live2dAutoNextAt) return;
@@ -3519,6 +3564,7 @@ app.ticker.add(() => {
 	if (next) {
 		playLive2DMotion(spine, next);
 		animName = next;
+		live2dUpdateDuration();
 		if (el.animSelect) el.animSelect.value = next;
 	}
 	// Random: pause a few seconds between clips. Auto: check again shortly; the
@@ -4586,6 +4632,7 @@ el.animSelect.addEventListener("change", () => {
 	if (isLive2D(current)) {
 		animName = el.animSelect.value;
 		playLive2DMotion(spine, animName);
+		live2dUpdateDuration();
 		// A full clip now owns the stage; hold off the random/auto-advance timer.
 		live2dAutoNextAt = performance.now() + 10000;
 		return;
@@ -4662,6 +4709,14 @@ window.addEventListener("pointerup", () => (state.scrubbing = false));
 el.scrub.addEventListener("input", () => {
 	if (!duration || !spine) return;
 	state.trackTime = (parseFloat(el.scrub.value) / 1000) * duration;
+	// Live2D: the motion manager has no trackTime, so seek by shifting the
+	// playing entry's start time. Reading it back on the next frame confirms it.
+	if (isLive2D(current)) {
+		if (live2DSeekMotion(spine, state.trackTime)) {
+			el.timeCur.textContent = state.trackTime.toFixed(2) + "s";
+			return;
+		}
+	}
 	const track = spine.state?.tracks?.[0];
 	if (track) track.trackTime = state.trackTime;
 	el.timeCur.textContent = state.trackTime.toFixed(2) + "s";
