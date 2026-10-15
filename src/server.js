@@ -347,6 +347,16 @@ const GAME_ROOTS = [
 	{ match: "azurlane-chibi", key: "azurlane-chibi", label: "Azur Lane — Chibi" },
 	{ match: "azurlane-l2d", key: "azurlane-l2d", label: "Azur Lane — Live2D" },
 	{ match: "azurlane", key: "azurlane", label: "Azur Lane" },
+	// 魔竞革命 — diekstrak dari CDN hot-update TERBUKA euwv.0577ai.com
+	// (ob/update/android/filelist), dari bongkaran 二游资源工具.exe.
+	// Bundle UnityFS berisi N model Spine 3.8.99 (JSON) + atlas + Texture2D.
+	// Lihat tools/mojinggeming/.
+	{
+		match: "mojinggeming",
+		key: "mojinggeming",
+		label: "魔竞革命",
+		pmaDefault: false,
+	},
 	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
 	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
 	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
@@ -2773,6 +2783,13 @@ const UPDATERS = {
 	},
 	nikke: {
 		script: path.join(ROOT, "tools", "update-nikke.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	// 魔竞革命: CDN hot-update terbuka (euwv.0577ai.com/ob/update/android).
+	// --check cukup baca `filelist`; --apply unduh hanya bundle spine yang
+	// ukurannya berubah. Lihat tools/update-mojinggeming.py.
+	mojinggeming: {
+		script: path.join(ROOT, "tools", "update-mojinggeming.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 	ivntight: {
