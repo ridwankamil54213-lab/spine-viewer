@@ -684,19 +684,17 @@ const GAME_ROOTS = [
 	},
 	// Project QT.
 	//
-	// Modelnya diambil utuh dari gdrive (1863 folder, 1833 di antaranya
-	// lengkap), bukan hasil ekstraksi sendiri. Alasannya: versi di sana
-	// sebagian besar sudah 3.8.99, jadi bisa dimuat langsung runtime 4.1 —
-	// tanpa konversi, tanpa jalur 2.1, tanpa iframe penampil legacy.
+	// Model diambil utuh dari gdrive (folder id 1HmKSMyHrXmkIvQqwevDmtjVM8n3FR0Kz;
+	// 1863 folder, 5627 berkas: <nama>.json + .atlas + .png). Sebagian besar
+	// sudah dikonversi ke 3.8.99 (1795 model) sehingga dimuat langsung oleh
+	// pixi-spine — tanpa iframe legacy.
 	//
-	// Pun yang lama (1323 model murni .skel biner) sudah dihapus beserta
-	// folder hasil konversinya. Ia menuntut konversi dulu, dan hasilnya
-	// (2.1.27) tidak bisa dirender runtime 3.8/4.x.
-	//
-	// Masih ada 38 model berlabel 2.1.27 dan 68 folder yang hanya berisi
-	// .skel. Deteksi versi per berkas yang menanganinya: yang terbaca 2.x
-	// diarahkan ke renderer kanvas 2.1, sisanya ke pixi-spine. Karena itu
-	// entri ini TIDAK memaksa spineRuntime — biarkan deteksi bekerja.
+	// Sisa 68 folder masih berisi JSON 2.1.27 (karena Drive menyertakan .json
+	// 2.1 + .skel): 38 punya sibling .json dan dirender jalur kanvas 2.1
+	// (viewer memakai .json sibling itu — lihat loadLegacyModel), 29 hanya
+	// berisi .skel biner dan belum dikonversi (tampil error yang memandu, bukan
+	// crash). Deteksi versi per berkas: 2.x -> kanvas 2.1, sisanya -> pixi-spine.
+	// Karena itu entri ini TIDAK memaksa spineRuntime — biarkan deteksi bekerja.
 	{
 		match: "projectqt",
 		key: "projectqt",

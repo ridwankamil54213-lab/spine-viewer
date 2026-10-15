@@ -1215,6 +1215,14 @@ async function loadLegacyModel(model) {
 
 	// Cari skeleton JSON dan atlas di direktori model.
 	let json = model.skeletonFile;
+	// Sebagian folder menyimpan ekspor JSON 2.x DI SEBELAH .skel biner (pairer
+	// server memilih .skel). Renderer legacy 2.1 butuh JSON-nya, jadi pakai
+	// sibling itu bila ada sebelum menyerah.
+	if (json && !json.toLowerCase().endsWith(".json")) {
+		const stem = json.replace(/\.(skel|json)$/i, "");
+		const sib = (model.files || []).find((f) => f.toLowerCase() === (stem + ".json").toLowerCase());
+		if (sib) json = sib;
+	}
 	if (!json || !json.toLowerCase().endsWith(".json")) {
 		// Model 2.x murni .skel belum dikonversi: tidak bisa dirender di sini.
 		showError(
