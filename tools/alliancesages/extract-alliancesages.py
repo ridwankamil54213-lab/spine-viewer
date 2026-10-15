@@ -29,6 +29,7 @@ UnityPy.config.FALLBACK_UNITY_VERSION = "6000.0.58f2"
 
 BASE = "https://euwv.0577ai.com/ob/update/android"
 OUT = "/opt/spine-viewer/assets/alliancesages"
+OUT_CG = "/opt/spine-viewer/assets/alliancesages-cg"
 CACHE = "/opt/alliancesages/bundles"
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
@@ -41,10 +42,33 @@ def http(url, dest=None, timeout=300):
     return subprocess.run(cmd + [url], capture_output=True).stdout
 
 
-def list_bundles():
+def _file_list():
     raw = http(BASE + "/filelist", timeout=120)
-    data = json.loads(raw)
-    return [e for e in data if "spine" in e["filename"].lower() or "memorycardspine" in e["filename"].lower()]
+    return json.loads(raw)
+
+
+def list_bundles(kind="char"):
+    """Entri `filelist` untuk model:
+      * kind="char" -> bundle karakter (spinechar[NN], spinecharb/m, spineskinNN)
+      * kind="cg"   -> bundle CG spine (hscene[NN], cgNN, memorycardspineNN)
+    Entri bertanggal (`2026/0922/x`) adalah rilis lama; yang tanpa tanggal adalah
+    versi terkini, jadi hanya nama-dasar itu yang dipakai.
+    """
+    data = _file_list()
+    out, seen = [], set()
+    for e in data:
+        fn = e["filename"]
+        if "/" in fn:            # rilis bertanggal -> lewati (versi lama)
+            continue
+        low = fn.lower()
+        if kind == "cg":
+            ok = low.startswith(("hscene", "cg0", "memorycardspine"))
+        else:
+            ok = ("spine" in low and not low.startswith(("hscene", "memorycardspine")))
+        if ok and fn not in seen:
+            seen.add(fn)
+            out.append(e)
+    return out
 
 
 def parse_text_asset(raw):
@@ -61,6 +85,12 @@ def parse_text_asset(raw):
         return name, raw[q + 4:q + 4 + size]
     except Exception:
         return None, None
+
+
+def norm_stem(name):
+    """Normalisasi nama model: buang spasi (beberapa TextAsset punya spasi liar
+    seperti "1096_ cg1")."""
+    return name.replace(" ", "")
 
 
 def extract_bundle(path, out_root):
@@ -91,10 +121,17 @@ def extract_bundle(path, out_root):
             pass
 
     n = 0
-    for stem, skel in skels.items():
-        at = atlases.get(stem)
+    for stem_raw, skel in skels.items():
+        # Beberapa TextAsset punya spasi liar di namanya ("1096_ cg1") yang
+        # sebetulnya model yang sama dengan versi tanpa spasi. Normalisasi
+        # (buang semua spasi) supaya tidak jadi folder duplikat; atlas ikut
+        # ditulis ulang agar nama halaman tetap cocok.
+        stem = norm_stem(stem_raw)
+        at = atlases.get(stem_raw)
         if not at:
             continue
+        if stem != stem_raw:
+            at = at.replace(stem_raw.encode("utf-8"), stem.encode("utf-8"))
         dest = os.path.join(out_root, stem)
         os.makedirs(dest, exist_ok=True)
         with open(os.path.join(dest, stem + ".json"), "wb") as f:
@@ -104,15 +141,19 @@ def extract_bundle(path, out_root):
         # Satu model bisa memakai >1 halaman tekstur: objek Texture2D bernama
         # <stem>, <stem>2, <stem>3, ... Atlas merujuknya lewat nama berkas
         # ("1101.png", "11012.png", "11013.png").
-        for tname, r in texs.items():
-            rest = tname[len(stem):] if tname.startswith(stem) else None
-            if tname == stem or (rest and rest.isdigit()):
-                try:
-                    img = r.image
-                    if img is not None:
-                        img.convert("RGBA").save(os.path.join(dest, tname + ".png"), "PNG")
-                except Exception:
-                    pass
+        for tname_raw, r in texs.items():
+            if not tname_raw.startswith(stem_raw):
+                continue
+            rest = tname_raw[len(stem_raw):]
+            if rest and not rest.isdigit():
+                continue
+            tname = stem + rest
+            try:
+                img = r.image
+                if img is not None:
+                    img.convert("RGBA").save(os.path.join(dest, tname + ".png"), "PNG")
+            except Exception:
+                pass
         n += 1
     return n
 

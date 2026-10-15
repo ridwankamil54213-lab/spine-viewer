@@ -4014,6 +4014,10 @@ const UPDATABLE = {
 	lostsword: "/api/update/lostsword",
 	"lostsword-video": "/api/update/lostsword-video",
 	dragontravelers: "/api/update/dragontravelers",
+	// 贤者同盟 / Alliance Sages: model karakter + CG dari CDN euwv.0577ai.com.
+	alliancesages: "/api/update/alliancesages",
+	// 禁果便利店 (mcs18): bundle karakter spine dari Addressables terbuka.
+	mcs18: "/api/update/mcs18",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -4377,7 +4381,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.
