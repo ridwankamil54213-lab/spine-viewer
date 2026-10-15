@@ -363,6 +363,7 @@ const el = {
 	zoomReset: $("#zoom-reset"),
 	zoomLabel: $("#zoom-label"),
 	fullscreenBtn: $("#fullscreen-btn"),
+	fsExit: $("#fs-exit"),
 	exportBtn: $("#export-btn"),
 	exportPng: $("#export-png"),
 	exportPngNote: $("#export-png-note"),
@@ -5102,11 +5103,22 @@ function syncFullscreenUI() {
 		el.fullscreenBtn.setAttribute("aria-label", label);
 		el.fullscreenBtn.setAttribute("title", `${label} (F)`);
 	}
+	// The transport (which holds the toggle) auto-hides in true fullscreen, so
+	// show the floating exit button as the way out.
+	if (el.fsExit) el.fsExit.hidden = !on;
 	// The stage just changed size; let the model settle into the new frame.
+	// Re-fit twice: the grid/flex reflow (topbar + sidebar removed) is not always
+	// reflected in the very next frame, so a single fit can measure the old box
+	// and leave the model off-centre.
 	clearTimeout(fsFitTimer);
 	fsFitTimer = setTimeout(() => {
 		fsFitTimer = 0;
+		resizeRenderer();
 		if (spine) fitModel();
+		setTimeout(() => {
+			resizeRenderer();
+			if (spine) fitModel();
+		}, 220);
 	}, 120);
 }
 
@@ -5127,6 +5139,7 @@ function initFullscreen() {
 	document.addEventListener("fullscreenchange", onFullscreenChange);
 	document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 	el.fullscreenBtn?.addEventListener("click", toggleFullscreen);
+	el.fsExit?.addEventListener("click", exitFullscreen);
 	syncFullscreenUI();
 }
 

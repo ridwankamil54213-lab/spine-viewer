@@ -480,6 +480,13 @@
 	</div>
 </div>
 
+<!-- Floating exit button: only visible in true fullscreen, where the normal
+     transport (which holds the fullscreen toggle) is auto-hidden. -->
+<button id="fs-exit" class="fs-exit" hidden aria-label="Keluar layar penuh" title="Keluar layar penuh (Esc)">
+	<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M5 16h3v3h2v-5H5zm3-8H5v2h5V5H8zm6 11h2v-3h3v-2h-5zm2-11V5h-2v5h5V8z"/></svg>
+	<span>Keluar</span>
+</button>
+
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <!-- Dialog tautan: URL permalink yang mengembalikan tampilan sekarang. -->

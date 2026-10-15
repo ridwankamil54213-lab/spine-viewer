@@ -66,6 +66,73 @@ html, body { height: 100%; }
 :root:fullscreen .bloom,
 :root:-webkit-full-screen .bloom { display: none; }
 
+/* TRUE fullscreen: drop the topbar and the sidebar so the canvas fills the
+   screen, and reveal the transport only when the pointer reaches the bottom.
+   The toolbar is the ONLY way to drive the model (play/seek/animation), so it
+   must stay reachable — hidden it owns zero height, revealed it slides back. */
+:root:fullscreen .topbar,
+:root:-webkit-full-screen .topbar { display: none; }
+
+:root:fullscreen .sidebar,
+:root:-webkit-full-screen .sidebar { display: none; }
+
+:root:fullscreen .layout,
+:root:-webkit-full-screen .layout {
+	height: 100vh;
+	grid-template-columns: 1fr;
+}
+
+:root:fullscreen .stage,
+:root:-webkit-full-screen .stage { height: 100vh; }
+
+:root:fullscreen .transport,
+:root:-webkit-full-screen .transport {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: 0;
+	z-index: 40;
+	/* Peek: a thin strip stays visible so the resting bar is easy to grab;
+	   hovering it (or tabbing into it) slides the whole toolbar up. */
+	max-height: 22px;
+	overflow: hidden;
+	transition: max-height 0.22s var(--ease), box-shadow 0.22s var(--ease);
+	box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.4);
+}
+:root:fullscreen .transport:hover,
+:root:fullscreen .transport:focus-within,
+:root:-webkit-full-screen .transport:hover,
+:root:-webkit-full-screen .transport:focus-within {
+	max-height: 70vh;
+	overflow-y: auto;
+}
+
+/* Floating exit button (only rendered in true fullscreen). */
+.fs-exit {
+	position: fixed;
+	top: 14px;
+	right: 14px;
+	z-index: 41;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 12px;
+	border: 1px solid var(--line);
+	border-radius: 10px;
+	background: rgba(18, 18, 30, 0.72);
+	backdrop-filter: blur(8px);
+	color: var(--fg-dim);
+	font: inherit;
+	cursor: pointer;
+	transition: opacity 0.2s var(--ease), color 0.15s;
+}
+.fs-exit:hover { color: var(--fg); }
+.fs-exit .icon { width: 18px; height: 18px; fill: currentColor; }
+/* Fade it out while the user is interacting, so it doesn't sit over the art. */
+:root:fullscreen .fs-exit.is-idle { opacity: 0.25; }
+:root:-webkit-full-screen .fs-exit.is-idle { opacity: 0.25; }
+
 body {
 	margin: 0;
 	background: var(--ink-900);
