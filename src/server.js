@@ -357,6 +357,16 @@ const GAME_ROOTS = [
 		label: "魔竞革命",
 		pmaDefault: false,
 	},
+	// 禁果便利店 / 群交避难所 / 我的便利店竟成了美少女的避难所 (ERO LABS).
+	// Addressables terbuka mcs18-client-resource-tw.1uhg.com; bundle
+	// character* (arts/animation + spine_assets + storyanimation) berisi
+	// .skel/.atlas/Texture2D. Lihat tools/mcs18/.
+	{
+		match: "mcs18",
+		key: "mcs18",
+		label: "禁果便利店",
+		pmaDefault: false,
+	},
 	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
 	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
 	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
@@ -2790,6 +2800,11 @@ const UPDATERS = {
 	// ukurannya berubah. Lihat tools/update-mojinggeming.py.
 	mojinggeming: {
 		script: path.join(ROOT, "tools", "update-mojinggeming.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	// 禁果便利店 (mcs18): Addressables terbuka, bundle karakter spine.
+	mcs18: {
+		script: path.join(ROOT, "tools", "update-mcs18.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 	ivntight: {
