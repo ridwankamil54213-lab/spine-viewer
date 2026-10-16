@@ -357,6 +357,18 @@ const GAME_ROOTS = [
 		label: "禁果便利店",
 		pmaDefault: false,
 	},
+	// Azure Taboo (EroLabs / pinkcore, NuTaku). Unity IL2CPP; the shipped APK
+	// carries 15 hero Spine bundles (assets/prefab/hero/herospines/hero_<id>/
+	// hero_<id>1.unity3d) plus 3 chouka_* UI Spine sets, all Spine 4.3.39-beta
+	// with `pma:true`. Bundles are plain UnityFS (no fake header). Extracted via
+	// tools/resdown.py; the rest of the catalogue streams from bb-download.pinkcore.net.
+	{
+		match: "azuretaboo",
+		key: "azuretaboo",
+		label: "Azure Taboo",
+		spineRuntime: "4.3",
+		pmaDefault: true,
+	},
 	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
 	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
 	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
