@@ -76,6 +76,22 @@ rather than `portrait 1003 front`, and a `character:{name,source,skin}` link is
 attached. Names come straight from the library's `index.json`
 (`1056_01`->Rei, `30075_01`->Sereniel, `1003_fhd`->Nia, …).
 
+## Variants ("live event & skin")
+`attachCznFamilies()` folds each character's rigs into ONE card whose **root is
+the plain character model** (`model_<id>`), with every other rig as a dropdown
+variant. Applies to `czn-rigs`. Example — Rei:
+```
+model_1056            -> "Rei"   (Utama)
+1056_01                          Skin
+liveevent_1056                   Live Event
+model_1056_battle_ready          Battle Ready
+portrait_1056                    Portrait
+portrait_1056_01                 Portrait 01
+portrait_1056_front              Portrait Front
+```
+283 of 1143 rigs are grouped this way (69 named characters with >1 rig); the
+rest (NPCs/monsters/effects without a `model_<id>` sibling) stay standalone.
+
 ## Final state
 - `czn-rigs` 1143 models (Spine 3.8.79, render-verified) + `czn-cutins-cg` 951
   images → **2094 cards**; viewer total **39911 models**.

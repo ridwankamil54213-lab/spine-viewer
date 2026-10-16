@@ -1661,6 +1661,9 @@ function scanModels() {
 	// CZN rigs/cutins come from a community model library; label each model with
 	// its character name (slug -> name from assets/<game>/_names.json).
 	applyCznNames(models);
+	// Fold each CZN character's rigs (model / portrait / live event / skin /
+	// battle) into ONE card with a variant dropdown.
+	attachCznFamilies(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -1751,6 +1754,61 @@ function applyCznNames(models) {
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
 			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
 		}
+	}
+}
+
+/**
+ * Chaos Zero Nightmare rig variants. One character ships as several rigs, all
+ * carrying the same display name (e.g. Rei = model_1056, portrait_1056,
+ * liveevent_1056, 1056_01, model_1056_battle_ready …). Group them into one
+ * family whose ROOT is the plain character model (`model_<id>`, else the first
+ * rig), with every other rig as a dropdown variant — so "Rei" is one card, not
+ * seven. Applies to czn-rigs only (cut-ins stay a gallery).
+ */
+function attachCznFamilies(models) {
+	const czn = models.filter((m) => (m.game || "") === "czn-rigs" && m.character?.name);
+	if (czn.length < 2) return;
+	const byChar = new Map();
+	for (const m of czn) {
+		const key = m.character.name;
+		if (!byChar.has(key)) byChar.set(key, []);
+		byChar.get(key).push(m);
+	}
+	const cap = (s) => s.replace(/[-_]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
+	const baseLabel = (slug, charId) => {
+		if (/^\d+_\d+$/.test(slug)) return "Skin";
+		if (slug === `portrait_${charId}`) return "Portrait";
+		if (slug === `battle_${charId}` || /_battle_ready$/.test(slug)) return "Battle Ready";
+		let m;
+		if (slug.startsWith("liveevent_")) return "Live Event";
+		if ((m = slug.match(/^portrait_(?:.*?)_(\w+)$/))) return `Portrait ${cap(m[1])}`;
+		if ((m = slug.match(/^model_.*?_(\w+)$/))) return cap(m[1]);
+		if (slug.startsWith("npc_")) return "NPC";
+		if (slug.startsWith("god_")) return "God";
+		return cap(slug.replace(/^[a-z]+_/, ""));
+	};
+	const charIdOf = (slug) => (slug.match(/(\d+)/) || [])[1] || "";
+	for (const [, members] of byChar) {
+		if (members.length < 2) continue;
+		const root =
+			members.find((m) => /(^|\/)model_\d+$/.test(m.id) && !/battle_ready/.test(m.id)) ||
+			members.find((m) => m.kind === "model") ||
+			members[0];
+		const ordered = [root, ...members.filter((m) => m !== root)];
+		const used = new Map();
+		const membersList = ordered.map((m) => {
+			if (m.id === root.id) return { id: m.id, label: "Utama" };
+			const slug = String(m.id).split("/").pop();
+			const b = baseLabel(slug, charIdOf(slug)) || "Varian";
+			const n = (used.get(b) || 0) + 1;
+			used.set(b, n);
+			return { id: m.id, label: n === 1 ? b : `${b} ${n}` };
+		});
+		const byId = new Map(membersList.map((x) => [x.id, x.label]));
+		for (const m of members) {
+			m.family = { root: root.id, label: byId.get(m.id) || "Utama", members: membersList };
+		}
+		root.name = root.character.name; // the card reads just the character name
 	}
 }
 
