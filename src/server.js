@@ -369,7 +369,7 @@ const GAME_ROOTS = [
 		spineRuntime: "4.3",
 		pmaDefault: true,
 	},
-	// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
+		// マブラヴ ガールズガーデンX (Muv-Luv Girls Garden X). Unity WebGL; spine
 	// models live in the Addressables "spine_catalog" (BundleAssets/X/WebGL/
 	// ASTC/<hash>.bundle). Extract via tools/muvluv/. Spine JSON 4.2.33.
 	// マブラヴ ガールズガーデンX — CG / illust gallery. The game's CG art lives in
