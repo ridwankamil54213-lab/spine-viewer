@@ -24,6 +24,12 @@ rewrites each rig to the folder slug and gunzips the skeleton:
 rigs/<slug>/{skeleton.json,skeleton.atlas,<slug>.webp}
    ->  assets/czn-rigs/<slug>/{<slug>.json,<slug>.atlas,<slug>.webp}
 ```
+**Texture page name matters:** the atlas declares the page by its ORIGINAL
+name (`1001001.webp`, `fate_scene_caligo_body.webp`), NOT after the folder slug.
+An early version wrote `<slug>.webp` and the viewer then failed to resolve the
+texture for 1094 of 1143 rigs; `tools/czn-rigs.py` now names the page as the
+atlas says (and `tools/czn-fix-webp.py` repairs an existing tree).
+
 It also writes `assets/czn-rigs/_names.json` (slug -> {name, kind, subtype}) from
 the repo catalog (e.g. `1056_01` -> "Rei", `30075_01` -> "Sereniel").
 
