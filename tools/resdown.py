@@ -291,6 +291,52 @@ def cmd_fetch(args):
 # --------------------------------------------------------------------------- #
 # extract (delegates to the battle-tested tools/extract-unity-spine.py)
 # --------------------------------------------------------------------------- #
+def cmd_nutaku_apk(args):
+    """Download a Nutaku title's APK, unzip it, and extract Spine from it."""
+    import zipfile
+    from nutaku import apk_url
+
+    url, ver = apk_url(args.slug, ua=args.ua, timeout=args.timeout,
+                       opener=make_opener(args.insecure))
+    print(f"# {args.slug}: version {ver}")
+    print(f"# {url}")
+    apk_dir = os.path.join(args.out, "apk")
+    os.makedirs(apk_dir, exist_ok=True)
+    apk_path = os.path.join(args.out, f"{args.slug}_{ver}.apk")
+    if not os.path.exists(apk_path) or args.force:
+        # stream (APKs are hundreds of MB)
+        req = urllib.request.Request(url, headers={"User-Agent": args.ua})
+        with (make_opener(args.insecure)).open(req, timeout=args.timeout) as r, \
+                open(apk_path, "wb") as f:
+            n = 0
+            while True:
+                chunk = r.read(1 << 20)
+                if not chunk:
+                    break
+                f.write(chunk)
+                n += len(chunk)
+        print(f"# downloaded {n:,} bytes -> {apk_path}")
+    else:
+        print(f"# cached {apk_path}")
+
+    print(f"# unzipping -> {apk_dir}")
+    with zipfile.ZipFile(apk_path) as z:
+        z.extractall(apk_dir)
+
+    # where the Spine bundles usually live in these Unity clients
+    roots = []
+    for sub in ("assets", "assets/aa", "assets/art", "assets/prefab"):
+        p = os.path.join(apk_dir, sub)
+        if os.path.isdir(p):
+            roots.append(p)
+    if not roots:
+        print("! no assets/ dir found; inspect the APK manually")
+        return
+    for root in roots[:2]:
+        cmd_extract(argparse.Namespace(dir=root, out=os.path.join(args.out, "spine"),
+                                       bundles=[], unity_version=args.unity_version))
+
+
 def cmd_extract(args):
     bundles = list(args.bundles or [])
     if args.dir:
@@ -418,6 +464,17 @@ def main(argv=None):
     pl.add_argument("--dry-run", action="store_true")
     pl.add_argument("--unity-version", default=None)
     pl.set_defaults(func=cmd_pipeline)
+
+    na = sub.add_parser("nutaku-apk",
+                        help="download a Nutaku title's APK and extract its Spine")
+    na.add_argument("slug", help="Nutaku url slug, e.g. aeons-echo")
+    na.add_argument("--out", required=True)
+    na.add_argument("--force", action="store_true")
+    na.add_argument("--unity-version", default=None)
+    na.add_argument("--ua", default=UA_DEFAULT)
+    na.add_argument("--timeout", type=int, default=1800)
+    na.add_argument("--insecure", action="store_true")
+    na.set_defaults(func=cmd_nutaku_apk)
 
     args = ap.parse_args(argv)
     args.func(args)
