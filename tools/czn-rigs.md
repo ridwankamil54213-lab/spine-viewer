@@ -118,7 +118,18 @@ branches"). A partial clone fetches only commit/tree metadata, so deepening stay
 cheap. First `--check` on a fresh install bootstraps the baseline from the local
 `index.json` so it does not report all 1143 rigs as new.
 
+## Replacing the old game-side extraction
+The viewer previously carried a game-side CZN extraction as game key
+`chaoszero` (Smilegate Yuna engine `.scsp`/`.sct`, converted by
+`tools/chaoszero/`) — 1527 models, ~9.3 GB. It has been **removed**: the assets
+were deleted, both `chaoszero` GAME_ROOTS entries are gone, and the game icons
+moved to the new keys (`czn-rigs` / `czn-cutins-cg`, derived from the same Play
+listing via `DERIVED` in tools/fetch-icons-web.py). The old pipeline files stay
+in `tools/chaoszero/` as provenance only. Chaos Zero Nightmare now carries the
+plain game label (`czn-rigs`), with `czn-cutins-cg` as "— Cut-ins".
+
 ## Final state
-- `czn-rigs` 1143 models (Spine 3.8.79, render-verified) + `czn-cutins-cg` 951
-  images → **2094 cards**; viewer total **39911 models**.
+- Game **Chaos Zero Nightmare** = `czn-rigs` (1143 rigs → 893 cards + 250
+  variants) plus `czn-cutins-cg` (951 cut-in stills) as a second sub-library.
+- Viewer total after dropping the old `chaoszero` game: **38384 models**.
 - Thumb API serves 174 rig + 951 cutin thumbnails (all HTTP 200).

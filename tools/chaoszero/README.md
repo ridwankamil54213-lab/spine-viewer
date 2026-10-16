@@ -1,5 +1,12 @@
 # Chaos Zero Nightmare (卡厄斯梦境) — Yuna engine extraction
 
+> **Digantikan (2026-10-16).** Model Chaos Zero Nightmare sekarang datang dari
+> pustaka komunitas `BenNoSleep/czn-animation-viewer` (game key `czn-rigs` +
+> `czn-cutins-cg`; lihat `tools/czn-rigs.md` dan `tools/update-czn.py`).
+> Ekstraksi game-side `.scsp`/`.sct` di bawah sudah **dilepas dari viewer**;
+> folder ini disimpan hanya sebagai catatan provenance. Game key `chaoszero`
+> tidak ada lagi di `GAME_ROOTS`.
+
 Smilegate **Yuna engine** (sama seperti 第七史诗 / Epic Seven), bukan Unity/Cocos.
 Aset Android ada di dalam **SSRArchive** — bukan `data.pack` (itu versi PC):
 

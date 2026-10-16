@@ -10,7 +10,7 @@ OPTS=(--drive-root-folder-id "$ID" --ignore-existing
       --transfers 8 --checkers 16 --drive-chunk-size 64M
       --retries 5 --low-level-retries 20 --stats 60s --stats-one-line)
 
-roots="alcherystars angelica azurlane-l2d blissful chaoszero everlusting girlwars
+roots="alcherystars angelica azurlane-l2d blissful everlusting girlwars
 girlwars-l2d ivntight juezhan kink lostsword-video mecharashi mengqi mitao-utopia
 shenlan tenkei throne wuhua xingjie ysjh"
 

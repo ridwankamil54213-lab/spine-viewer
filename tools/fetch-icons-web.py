@@ -69,6 +69,10 @@ DERIVED = {
     "girlwars-l2d": "girlwars",
     "muvluv-cg": "muvluv",
     "shenlan-cg": "shenlan",
+    # CZN's game keys (czn-rigs / czn-cutins-cg) share the Play listing's icon;
+    # the old "chaoszero" key is gone (see src/server.js).
+    "czn-rigs": "chaoszero",
+    "czn-cutins-cg": "chaoszero",
 }
 
 

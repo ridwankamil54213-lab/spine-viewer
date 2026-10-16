@@ -433,28 +433,20 @@ const GAME_ROOTS = [
 		key: "xingjie",
 		label: "性界大战",
 	},
-	// Chaos Zero Nightmare (卡厄斯梦境). Smilegate Yuna engine (same engine as
-	// Epic Seven). Assets ship in a multi-GB `manifest.ssra` + `chunks/*.ssrc`
-	// SSRArchive inside the game's files dir. The spine files use Yuna's custom
-	// `.scsp` (LZ4-wrapped binary skeleton), NOT Spine's own format, and the
-	// texture pages are `.sct` (LZ4 + ASTC/ETC2), NOT PNG. Both are converted
-	// offline by tools/chaoszero/ (SCSPParser C++ -> JSON, SCT -> PNG), so the
-	// viewer only ever sees plain .json + .atlas + .png.
-	{
-		match: "chaoszero",
-		key: "chaoszero",
-		label: "Chaos Zero Nightmare",
-	},
 	// Chaos Zero Nightmare — portraits / standees from the community model
 	// library BenNoSleep/czn-animation-viewer. 1143 rigs, each a plain Spine
 	// 3.8.79 JSON skeleton + .atlas + a .webp page (converted by tools/czn-rigs.py:
 	// skeleton.json(gzip)-> <slug>.json, skeleton.atlas-> <slug>.atlas). The
 	// repo's index.json names live in assets/czn-rigs/_names.json (slug -> name,
 	// kind, subtype).
+	//
+	// This REPLACES the older game-side extraction (game key "chaoszero", the
+	// Yuna .scsp/.sct pipeline in tools/chaoszero/) which has been removed from
+	// the viewer — so Chaos Zero Nightmare now carries the plain game label.
 	{
 		match: "czn-rigs",
 		key: "czn-rigs",
-		label: "Chaos Zero Nightmare — Rigs",
+		label: "Chaos Zero Nightmare",
 		spineRuntime: "3.8",
 		pmaDefault: false,
 	},
@@ -992,30 +984,6 @@ const GAME_ROOTS = [
 		match: "dotabyss-l2d",
 		key: "dotabyss-l2d",
 		label: "DotAbyss Live2D",
-	},
-	// Chaos Zero Nightmare (com.smilegate.chaoszero.stove.google, SmileGate).
-	//
-	// Same publisher and same asset pipeline as Epic Seven, so read the E7
-	// notes above first: skeletons ship as .scsp (SCSP v2 = Spine 2.1.27) and
-	// textures as .sct, needing the legacy runtime + E7SpineAssetConverter.
-	//
-	// STATUS: NOT EXTRACTED YET.
-	// The base APK only carries 7 UI/backdrop skeletons (assets/pre/effect:
-	// logo_yuna, lobby_bg, 20035, ui_bi_logo_*). The real character models
-	// live in assets/sdata/*, which is empty until the game finishes its
-	// in-game download. Re-check once the device has pulled the data:
-	//     adb shell du -sh /sdcard/Android/data/com.smilegate.chaoszero.stove.google
-	// (it was 12K at the time of writing — nothing downloaded yet).
-	//
-	// pmaDefault: false — E7's converter strips the `pma:` line and we keep
-	// E7's own choice rather than guessing before a single model exists.
-	// Flip it once real models can be inspected.
-	{
-		match: "chaoszero",
-		key: "chaoszero",
-		label: "Chaos Zero Nightmare",
-		spineRuntime: "2.1.27",
-		pmaDefault: false,
 	},
 	// Bundled sample models. They live directly under assets/ and are not from
 	// any game — grouping them keeps "Lainnya" from meaning "demo".
