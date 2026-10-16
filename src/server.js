@@ -445,6 +445,19 @@ const GAME_ROOTS = [
 		key: "chaoszero",
 		label: "Chaos Zero Nightmare",
 	},
+	// Chaos Zero Nightmare — portraits / standees from the community model
+	// library BenNoSleep/czn-animation-viewer. 1143 rigs, each a plain Spine
+	// 3.8.79 JSON skeleton + .atlas + a .webp page (converted by tools/czn-rigs.py:
+	// skeleton.json(gzip)-> <slug>.json, skeleton.atlas-> <slug>.atlas). The
+	// repo's index.json names live in assets/czn-rigs/_names.json (slug -> name,
+	// kind, subtype).
+	{
+		match: "czn-rigs",
+		key: "czn-rigs",
+		label: "Chaos Zero Nightmare — Rigs",
+		spineRuntime: "3.8",
+		pmaDefault: false,
+	},
 	// Divine Throne: Idle RPG (com.luckystargame.jdxy.gp). Cocos Creator 2.x
 	// again, but the spine data rides inside a Play Asset Delivery pack
 	// (`split_install_time_asset_pack.apk`). Skeleton = the Cocos custom ".bin"
