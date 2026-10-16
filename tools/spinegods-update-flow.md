@@ -97,6 +97,23 @@ Found via the module's PyMethodDef tables in memory (name ptr → func ptr):
 Ghidra's ImageBase for the rebuilt image is the ASLR base `0x7ff9ff870000`
 (i.e. decompile at `0x7ff9ff870000 + (VA - 0x180000000)`).
 
+## 5b. Verified function → owning class (from code, capstone)
+Each function embeds its Cython qualified name in the code stream, so we can bind
+the address to its owner exactly:
+
+| function addr | qualified name (from code) | what it does |
+|---|---|---|
+| 0x180a0e220 | `loader.checkself_for_update.is_newer_version` | nested comparator, calls `.parse` |
+| 0x180077b30 | `loader.mndownloader.main` | per-game main loop |
+| 0x1800763d0 | `loader.mndownloader.generate_download_urls` | calls `save_to_file`, `get_version_json` |
+| 0x180070cf0 | `loader.wydownloader.update_download_list` | builds the download list |
+| 0x18003dab0 | `loader.tianxiabumodownloder.getversion` | game "version" fetch |
+| 0x1803b71b0 | `loader.megaharedownloaderpc.getCatalogversion` | nested `xor` / `parse` / `encrypt` |
+| 0x1806bb310 | `loader.nsallinloginntk.fetch_secret_data` | → `save_secret_hash`, `fileshash`, `urlslist` |
+
+The shared download tail (`main`) does: `get_version_json` → `generate_download_urls`
+→ `save_to_file` (aria2c input) → download → `*autounpack*`.
+
 ## 6. Per-game downloader classes (222 total, one per game/variant)
 Each class exposes the same shape, e.g. `mjgmdownloader{and,web}`,
 `yljldownloader`, `Muvluvdownloader`, `Passion_Baydownload`, `HaremFantasydownloader`,
