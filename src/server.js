@@ -1738,6 +1738,18 @@ function scanVideos(models) {
  * "Nia" instead of "portrait 1003 front".
  */
 function applyCznNames(models) {
+	const prettyRigName = (slug) =>
+		slug
+			.replace(/^liveevent_/, "Live Event ")
+			.replace(/_battle_ready$/, " Battle Ready")
+			.replace(/^model_/, "Model ")
+			.replace(/^portrait_/, "Portrait ")
+			.replace(/^battle_/, "Battle ")
+			.replace(/^npc_/, "NPC ")
+			.replace(/^god_/, "God ")
+			.replace(/_/g, " ")
+			.replace(/\b\w/g, (c) => c.toUpperCase())
+			.trim();
 	for (const game of ["czn-rigs", "czn-cutins-cg"]) {
 		let map;
 		try {
@@ -1749,7 +1761,12 @@ function applyCznNames(models) {
 			if (m.game !== game) continue;
 			const slug = String(m.id || "").slice(game.length + 1);
 			const rec = map[slug] || map[slug.replace(/^.*\//, "")];
-			if (!rec || !rec.name) continue;
+			if (!rec || !rec.name) {
+				// No catalog name (monsters / effects / unnamed events): still tidy
+				// the slug so the card never reads "Liveevent 9999".
+				if (game === "czn-rigs") m.name = prettyRigName(slug);
+				continue;
+			}
 			const kind = rec.kind || "";
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
 			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
@@ -1766,40 +1783,55 @@ function applyCznNames(models) {
  * seven. Applies to czn-rigs only (cut-ins stay a gallery).
  */
 function attachCznFamilies(models) {
-	const czn = models.filter((m) => (m.game || "") === "czn-rigs" && m.character?.name);
+	const czn = models.filter((m) => (m.game || "") === "czn-rigs");
 	if (czn.length < 2) return;
+	// Group by the character's numeric id parsed from the slug (portrait_1056,
+	// liveevent_1028, model_1001002 … all share their id). The name catalog only
+	// covers ~107 characters; grouping by id folds the other ~1000 rigs too.
+	const idOf = (m) => {
+		const slug = String(m.id).split("/").pop();
+		const mm = slug.match(/(\d{3,})/);
+		return mm ? mm[1] : (m.character?.name || null);
+	};
 	const byChar = new Map();
 	for (const m of czn) {
-		const key = m.character.name;
+		const key = idOf(m);
+		if (!key) continue;
 		if (!byChar.has(key)) byChar.set(key, []);
 		byChar.get(key).push(m);
 	}
 	const cap = (s) => s.replace(/[-_]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
-	const baseLabel = (slug, charId) => {
+	const baseLabel = (slug) => {
 		if (/^\d+_\d+$/.test(slug)) return "Skin";
-		if (slug === `portrait_${charId}`) return "Portrait";
-		if (slug === `battle_${charId}` || /_battle_ready$/.test(slug)) return "Battle Ready";
+		if (/^liveevent_/.test(slug)) return "Live Event";
+		if (/_battle_ready$/.test(slug)) return "Battle Ready";
 		let m;
-		if (slug.startsWith("liveevent_")) return "Live Event";
 		if ((m = slug.match(/^portrait_(?:.*?)_(\w+)$/))) return `Portrait ${cap(m[1])}`;
+		if (/^portrait_/.test(slug)) return "Portrait";
 		if ((m = slug.match(/^model_.*?_(\w+)$/))) return cap(m[1]);
-		if (slug.startsWith("npc_")) return "NPC";
-		if (slug.startsWith("god_")) return "God";
-		return cap(slug.replace(/^[a-z]+_/, ""));
+		if (/_battle$/.test(slug)) return "Battle";
+		if (/^npc_/.test(slug)) return "NPC";
+		if (/^god_/.test(slug)) return "God";
+		return cap(slug.replace(/^[a-z]+_/, "")) || "Varian";
 	};
-	const charIdOf = (slug) => (slug.match(/(\d+)/) || [])[1] || "";
+	const rootRank = (m) => {
+		const slug = String(m.id).split("/").pop();
+		if (/^model_\d+$/.test(slug)) return 0;
+		if (m.kind === "model" && !/_battle_ready$/.test(slug)) return 1;
+		if (/^battle_/.test(slug)) return 2;
+		if (/^model_/.test(slug)) return 3;
+		if (/^liveevent_/.test(slug)) return 4;
+		if (/^portrait_/.test(slug)) return 5;
+		return 6;
+	};
 	for (const [, members] of byChar) {
 		if (members.length < 2) continue;
-		const root =
-			members.find((m) => /(^|\/)model_\d+$/.test(m.id) && !/battle_ready/.test(m.id)) ||
-			members.find((m) => m.kind === "model") ||
-			members[0];
+		const root = [...members].sort((a, b) => rootRank(a) - rootRank(b) || String(a.id).localeCompare(b.id))[0];
 		const ordered = [root, ...members.filter((m) => m !== root)];
 		const used = new Map();
 		const membersList = ordered.map((m) => {
 			if (m.id === root.id) return { id: m.id, label: "Utama" };
-			const slug = String(m.id).split("/").pop();
-			const b = baseLabel(slug, charIdOf(slug)) || "Varian";
+			const b = baseLabel(String(m.id).split("/").pop());
 			const n = (used.get(b) || 0) + 1;
 			used.set(b, n);
 			return { id: m.id, label: n === 1 ? b : `${b} ${n}` };
@@ -1808,7 +1840,8 @@ function attachCznFamilies(models) {
 		for (const m of members) {
 			m.family = { root: root.id, label: byId.get(m.id) || "Utama", members: membersList };
 		}
-		root.name = root.character.name; // the card reads just the character name
+		// The card reads just the character name when the catalog has one.
+		if (root.character?.name) root.name = root.character.name;
 	}
 }
 

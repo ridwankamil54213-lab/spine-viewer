@@ -77,20 +77,29 @@ attached. Names come straight from the library's `index.json`
 (`1056_01`->Rei, `30075_01`->Sereniel, `1003_fhd`->Nia, …).
 
 ## Variants ("live event & skin")
-`attachCznFamilies()` folds each character's rigs into ONE card whose **root is
-the plain character model** (`model_<id>`), with every other rig as a dropdown
-variant. Applies to `czn-rigs`. Example — Rei:
+`attachCznFamilies()` folds each character's rigs into ONE card. Grouping is by
+the **numeric id parsed from the slug** (not by catalog name — the name catalog
+only covers ~107 characters, so name-only grouping left ~1000 rigs standalone:
+`liveevent_1028` and `model_1028` share the id `1028`). Root = the plain
+character model, chosen by rank: `model_<id>` → `kind:model` → `battle_<id>` →
+`model_<id>_*` → `liveevent_` → `portrait_`. Applies to `czn-rigs`. Example —
+id 1028 (un-named, so the card reads the slug; named ones read the character):
 ```
-model_1056            -> "Rei"   (Utama)
-1056_01                          Skin
-liveevent_1056                   Live Event
-model_1056_battle_ready          Battle Ready
-portrait_1056                    Portrait
-portrait_1056_01                 Portrait 01
-portrait_1056_front              Portrait Front
+model_1028            -> card (Utama)
+liveevent_1028                   Live Event
+model_1028_battle_ready          Battle Ready
+portrait_1028                    Portrait
+portrait_1028_front              Portrait Front
+portrait_1028_secred             Portrait Secred
 ```
-283 of 1143 rigs are grouped this way (69 named characters with >1 rig); the
-rest (NPCs/monsters/effects without a `model_<id>` sibling) stay standalone.
+Result: **893 cards** from 1143 rigs (250 folded as variants; the rest — monsters
+/effect rigs with no same-id sibling — stay standalone). Rig names that have no
+catalog entry are prettied from the slug (`liveevent_9999` → "Live Event 9999")
+so no card reads "Liveevent 9999".
+
+Client-verified: search `1028` yields exactly one card; opening it renders
+(root draw calls 237), the `#variant-select` lists all six, and picking "Live
+Event" re-renders the sibling (draw calls 569), no console errors.
 
 ## Final state
 - `czn-rigs` 1143 models (Spine 3.8.79, render-verified) + `czn-cutins-cg` 951
