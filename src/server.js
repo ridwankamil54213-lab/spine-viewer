@@ -458,6 +458,18 @@ const GAME_ROOTS = [
 		key: "czn-cutins-cg",
 		label: "Chaos Zero Nightmare — Cut-ins",
 	},
+	// Make Drama (MAD) — standing / affection / desire / pleasure rigs from the
+	// anyabot/MAD-Viewer community library. Each skin is a folder of loose files
+	// (binary .skel + .atlas + PNG pages) fetched from the MAD-assets-1/2 GitHub
+	// buckets and rewritten to assets/mad-drama/<unit>/ by tools/extract-mad-viewer.py.
+	// Spine 4.2 (4.2.37) — the viewer has a dedicated 4.2 stack. Names come from
+	// assets/mad-drama/_names.json (character name + kind).
+	{
+		match: "mad-drama",
+		key: "mad-drama",
+		label: "Make Drama",
+		pmaDefault: false,
+	},
 	// Divine Throne: Idle RPG (com.luckystargame.jdxy.gp). Cocos Creator 2.x
 	// again, but the spine data rides inside a Play Asset Delivery pack
 	// (`split_install_time_asset_pack.apk`). Skeleton = the Cocos custom ".bin"
@@ -1632,6 +1644,9 @@ function scanModels() {
 	// Fold each CZN character's rigs (model / portrait / live event / skin /
 	// battle) into ONE card with a variant dropdown.
 	attachCznFamilies(models);
+	// Make Drama: name each skin from the library catalog and fold a character's
+	// standing/affection/desire rigs into one card with a variant dropdown.
+	applyMadNames(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -1738,6 +1753,72 @@ function applyCznNames(models) {
 			const kind = rec.kind || "";
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
 			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
+		}
+	}
+}
+
+/**
+ * Make Drama (MAD) names + variants.
+ *
+ * Names come from assets/mad-drama/_names.json (unit -> {name, kind, store,
+ * character}), built by tools/extract-mad-viewer.py out of the library's
+ * characters.json. One character ships as several rigs (a standing rig plus an
+ * affection / desire / pleasure scene, and often a google + onestore build of
+ * the same art), all carrying the same `character` code. Fold them into one
+ * card whose root is the standing rig, with the scenes as dropdown variants.
+ */
+function applyMadNames(models) {
+	const mad = models.filter((m) => (m.game || "") === "mad-drama");
+	if (!mad.length) return;
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(ASSETS, "mad-drama", "_names.json"), "utf8"));
+	} catch {
+		return;
+	}
+	const cap = (s) => String(s || "").replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()).trim();
+	for (const m of mad) {
+		const unit = String(m.id).split("/").pop();
+		const rec = map[unit];
+		if (!rec) continue;
+		const kind = cap(rec.kind);
+		m.name = `${rec.name} — ${kind}`;
+		m.character = { name: rec.name, plain: rec.name, source: "anyabot/MAD-Viewer", skin: rec.kind, code: rec.character };
+		m.store = rec.store || null;
+	}
+	// Group per character; the standing rig is the card, scenes its variants.
+	const byChar = new Map();
+	for (const m of mad) {
+		if (!m.character?.code) continue;
+		if (!byChar.has(m.character.code)) byChar.set(m.character.code, []);
+		byChar.get(m.character.code).push(m);
+	}
+	const rank = (m) => ({ standing: 0, affection: 1, desire: 2, pleasure: 3, drama: 4 }[m.character?.skin] ?? 5);
+	const label = (m) => {
+		const k = cap(m.character.skin);
+		return m.store === "onestore" ? `${k} (ONE)` : m.store === "google" ? `${k} (GP)` : k;
+	};
+	for (const [, members] of byChar) {
+		if (members.length < 2) {
+			// Standalone (a character with a single scene): keep the kind in the
+			// card name so "Desire" doesn't read as the standing art.
+			members[0].character.name = `${members[0].character.plain} — ${cap(members[0].character.skin)}`;
+			continue;
+		}
+		const root = [...members].sort((a, b) => rank(a) - rank(b) || String(a.id).localeCompare(b.id))[0];
+		const ordered = [root, ...members.filter((m) => m !== root)];
+		const used = new Map();
+		const membersList = ordered.map((m) => {
+			if (m.id === root.id) return { id: m.id, label: "Utama" };
+			const b = label(m);
+			const n = (used.get(b) || 0) + 1;
+			used.set(b, n);
+			return { id: m.id, label: n === 1 ? b : `${b} ${n}` };
+		});
+		const byId = new Map(membersList.map((x) => [x.id, x.label]));
+		for (const m of members) {
+			m.family = { root: root.id, label: byId.get(m.id) || "Utama", members: membersList };
+			m.character.name = m.character.plain; // the card reads just the character
 		}
 	}
 }
@@ -2961,6 +3042,12 @@ const UPDATERS = {
 	},
 	"czn-cutins-cg": {
 		script: path.join(ROOT, "tools", "update-czn.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	// Make Drama: source is the community MAD-Viewer catalogue repo; --check
+	// diffs skin keys, --apply pulls and extracts the new skins. See update-mad.py.
+	"mad-drama": {
+		script: path.join(ROOT, "tools", "update-mad.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
 };

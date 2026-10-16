@@ -4022,6 +4022,8 @@ const UPDATABLE = {
 	// (satu pembaru melayani czn-rigs + czn-cutins-cg).
 	"czn-rigs": "/api/update/czn-rigs",
 	"czn-cutins-cg": "/api/update/czn-cutins-cg",
+	// Make Drama: pustaka komunitas anyabot/MAD-Viewer.
+	"mad-drama": "/api/update/mad-drama",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
