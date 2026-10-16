@@ -39,6 +39,7 @@ SOURCES = {
     "goddessparadise": ("og", "https://play.google.com/store/apps/details?id=com.asikagames.paradise.googleplay&hl=en"),
     "idleangels":      ("og", "https://play.google.com/store/apps/details?id=com.mujoysg.hxbb&hl=en"),
     "isekaislowlife":  ("og", "https://play.google.com/store/apps/details?id=com.iskslowtest.mislen&hl=en"),
+    "mad-drama":       ("og", "https://play.google.com/store/apps/details?id=com.wemadeconnect.aos.makedrama.google&hl=en"),
     "mecharashi":      ("og", "https://play.google.com/store/apps/details?id=com.tentree.gp.mecharashi&hl=en"),
     "orisries":        ("og", "https://play.google.com/store/apps/details?id=com.megagames.orisries&hl=en"),
     "riichicity":      ("og", "https://play.google.com/store/apps/details?id=com.riichicity.happywoods&hl=en"),
