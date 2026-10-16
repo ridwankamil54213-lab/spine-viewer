@@ -57,6 +57,12 @@ def main():
 
     n_ok = n_skip = 0
     names = {}
+    # Preserve names already written (czn-rigs.py runs before czn-thumbs.py, but a
+    # plain dump of only the new rigs would wipe the catalog).
+    try:
+        names = json.load(open(os.path.join(OUT, "_names.json"), encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        names = {}
     for slug in sorted(os.listdir(SRC)):
         d = os.path.join(SRC, slug)
         if not os.path.isdir(d):

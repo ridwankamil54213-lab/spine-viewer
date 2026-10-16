@@ -2982,6 +2982,19 @@ const UPDATERS = {
 		noCheck: true,
 		applyArgs: ["--pull"],
 	},
+	// Chaos Zero Nightmare: the source is the community model library
+	// BenNoSleep/czn-animation-viewer, not a game CDN. --check = git fetch +
+	// diff index.json; --apply = git pull, convert the new rigs, copy new
+	// cut-ins + thumbnails. One updater serves both czn-rigs and czn-cutins-cg.
+	// See tools/update-czn.py.
+	"czn-rigs": {
+		script: path.join(ROOT, "tools", "update-czn.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
+	"czn-cutins-cg": {
+		script: path.join(ROOT, "tools", "update-czn.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }

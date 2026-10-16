@@ -4018,6 +4018,10 @@ const UPDATABLE = {
 	alliancesages: "/api/update/alliancesages",
 	// 禁果便利店 (mcs18): bundle karakter spine dari Addressables terbuka.
 	mcs18: "/api/update/mcs18",
+	// Chaos Zero Nightmare: pustaka komunitas BenNoSleep/czn-animation-viewer
+	// (satu pembaru melayani czn-rigs + czn-cutins-cg).
+	"czn-rigs": "/api/update/czn-rigs",
+	"czn-cutins-cg": "/api/update/czn-cutins-cg",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */

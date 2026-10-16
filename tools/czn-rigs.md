@@ -101,6 +101,23 @@ Client-verified: search `1028` yields exactly one card; opening it renders
 (root draw calls 237), the `#variant-select` lists all six, and picking "Live
 Event" re-renders the sibling (draw calls 569), no console errors.
 
+## Updater
+`tools/update-czn.py` drives both games (registered as `czn-rigs` / `czn-cutins-cg`
+in `UPDATERS`). The source is the community library, so the flow is git, not a
+game CDN:
+* `--check` — `git fetch` + `git show FETCH_HEAD:index.json`, diff the rig/cutin
+  slug sets against the last state (`/opt/czn/state.json`), report new ids.
+* `--apply` — `git merge --ff-only FETCH_HEAD`, run `czn-rigs.py` (converts only
+  the new rig dirs; it merges `_names.json` so the catalog survives), run
+  `czn-thumbs.py` (thumbnails + `_names.json` + `_manifest.json`), save state.
+
+Notes: the repo is a shallow `blob:none` sparse checkout, so the fetch is done
+**without `--depth`** and the merge is `--ff-only FETCH_HEAD` — a `--depth 1`
+fetch grafts a shallow root and git then refuses the fast-forward ("diverging
+branches"). A partial clone fetches only commit/tree metadata, so deepening stays
+cheap. First `--check` on a fresh install bootstraps the baseline from the local
+`index.json` so it does not report all 1143 rigs as new.
+
 ## Final state
 - `czn-rigs` 1143 models (Spine 3.8.79, render-verified) + `czn-cutins-cg` 951
   images → **2094 cards**; viewer total **39911 models**.

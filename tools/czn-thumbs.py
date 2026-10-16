@@ -20,6 +20,11 @@ repo_thumbs = os.path.join(REPO, "thumbs")
 cutin_thumbs = os.path.join(REPO, "cutins", "thumbs")
 index = json.load(open(os.path.join(REPO, "index.json"), encoding="utf-8"))
 
+# The name maps live next to the assets; make sure both exist even when the
+# viewer tree is fresh (an updater re-run on a partial tree, a test view, …).
+os.makedirs(os.path.join(VIEW, "assets", "czn-rigs"), exist_ok=True)
+os.makedirs(os.path.join(VIEW, "assets", "czn-cutins-cg"), exist_ok=True)
+
 # ---- czn-rigs: copy repo thumbs, map rig slug -> thumb file ----
 t1 = os.path.join(VIEW, "public", "thumbs", "czn-rigs")
 os.makedirs(t1, exist_ok=True)
