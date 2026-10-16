@@ -42,7 +42,35 @@ spineRuntime:"3.8", pmaDefault:false}`.
 `30084_01` calls=253 verts=1020192.
 
 ## Not (yet) integrated
-- `cutins/` is 951 WebP stills (raster), not Spine — the viewer draws Spine only,
-  so these would need the existing `<game>-cg` image-gallery path to show up.
-- `_names.json` is written but the scan still labels models by slug; wiring the
-  names into the model title would need a server-side mapping hook.
+- (all three initial gaps are now done — see below)
+
+## Cut-ins gallery ("a")
+`cutins/` (951 WebP stills: `<id>_fhd`, `<id>_ux`, `ci_collapse_<id>_NN`) is not
+Spine, so it rides the viewer's existing **image-gallery** path: the folder is
+named `czn-cutins-cg` (the `-cg` suffix is the trigger) and declared in
+`GAME_ROOTS` as `{match:"czn-cutins-cg", key:"czn-cutins-cg",
+label:"Chaos Zero Nightmare — Cut-ins"}`. Rendered as stills (pan/zoom/export)
+via `format:"image"`; `imageFile` = `/assets/czn-cutins-cg/<slug>.webp`.
+
+## Thumbnails ("thumbs")
+`tools/czn-thumbs.py` copies the library's thumbnail PNGs into
+`public/thumbs/<game>/` and writes the per-game `_manifest.json` (model id ->
+file), which is how the server already discovers thumbnails:
+```
+public/thumbs/czn-rigs/      174 png  + _manifest.json  (399 rig ids)
+public/thumbs/czn-cutins-cg/ 951 png  + _manifest.json  (951 cutin ids)
+```
+(The rig thumbs are shared across a character's many rigs, so 174 files cover
+399 entries.)
+
+## Character names ("b")
+Both games' models are relabelled from `assets/<game>/_names.json` by
+`applyCznNames()` in `scanModels()`: the card name becomes e.g. `Rei — skin`
+rather than `portrait 1003 front`, and a `character:{name,source,skin}` link is
+attached. Names come straight from the library's `index.json`
+(`1056_01`->Rei, `30075_01`->Sereniel, `1003_fhd`->Nia, …).
+
+## Final state
+- `czn-rigs` 1143 models (Spine 3.8.79, render-verified) + `czn-cutins-cg` 951
+  images → **2094 cards**; viewer total **39911 models**.
+- Thumb API serves 174 rig + 951 cutin thumbnails (all HTTP 200).

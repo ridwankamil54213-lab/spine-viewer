@@ -458,6 +458,14 @@ const GAME_ROOTS = [
 		spineRuntime: "3.8",
 		pmaDefault: false,
 	},
+	// CZN cut-ins (FHD / collapse / UX) — 951 WebP stills from the same library.
+	// A "-cg" folder, so it renders through the image-gallery path; thumbnails
+	// live in public/thumbs/czn-cutins-cg.
+	{
+		match: "czn-cutins-cg",
+		key: "czn-cutins-cg",
+		label: "Chaos Zero Nightmare — Cut-ins",
+	},
 	// Divine Throne: Idle RPG (com.luckystargame.jdxy.gp). Cocos Creator 2.x
 	// again, but the spine data rides inside a Play Asset Delivery pack
 	// (`split_install_time_asset_pack.apk`). Skeleton = the Cocos custom ".bin"
@@ -1650,6 +1658,9 @@ function scanModels() {
 	// CG / illust galleries: flat PNG folders (a "<game>-cg" GAME_ROOTS entry)
 	// that no skeleton scan would surface. One entry per image, format "image".
 	scanImageGalleries(models);
+	// CZN rigs/cutins come from a community model library; label each model with
+	// its character name (slug -> name from assets/<game>/_names.json).
+	applyCznNames(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -1713,6 +1724,33 @@ function scanVideos(models) {
 			animations: [],
 			skins: [],
 		});
+	}
+}
+
+/**
+ * CZN (Chaos Zero Nightmare) rigs and cut-in galleries come from the community
+ * library BenNoSleep/czn-animation-viewer, which provides a name catalog written
+ * to assets/<game>/_names.json (slug -> {name,kind,subtype}). Fold that name
+ * into each model's `name` and add a `character` link so the card reads
+ * "Nia" instead of "portrait 1003 front".
+ */
+function applyCznNames(models) {
+	for (const game of ["czn-rigs", "czn-cutins-cg"]) {
+		let map;
+		try {
+			map = JSON.parse(fs.readFileSync(path.join(ASSETS, game, "_names.json"), "utf8"));
+		} catch {
+			continue;
+		}
+		for (const m of models) {
+			if (m.game !== game) continue;
+			const slug = String(m.id || "").slice(game.length + 1);
+			const rec = map[slug] || map[slug.replace(/^.*\//, "")];
+			if (!rec || !rec.name) continue;
+			const kind = rec.kind || "";
+			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
+			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
+		}
 	}
 }
 
