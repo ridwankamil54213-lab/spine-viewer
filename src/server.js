@@ -3176,7 +3176,15 @@ const storage = multer.diskStorage({
 	destination: async (req, file, cb) => {
 		try {
 			const folder = slug(req.body.folder || path.basename(file.originalname, path.extname(file.originalname)));
-			const dest = path.join(ASSETS, folder);
+			// slug() mempertahankan titik, jadi slug("..") === ".." dan
+			// path.join(ASSETS, "..") KELUAR dari assets/ — file bisa jatuh ke
+			// root aplikasi (package.json dsb., yang berarti kode berjalan di
+			// npm install berikutnya). Basename "...skel" pun menghasilkan
+			// folder ".." tanpa perlu field folder sama sekali.
+			const dest = path.resolve(ASSETS, folder);
+			if (folder === "." || folder === ".." || !dest.startsWith(ASSETS + path.sep)) {
+				return cb(new Error("Nama folder tidak valid."));
+			}
 			await fsp.mkdir(dest, { recursive: true });
 			req.uploadFolder = folder;
 			cb(null, dest);
@@ -3206,20 +3214,49 @@ app.post("/api/upload", (req, res) => {
 					: err.message || "Unggahan gagal.";
 			return res.status(400).json({ error: msg });
 		}
+		// Aset bertambah: buang memo scan supaya daftar model ikut segar
+		// sekarang, bukan setelah TTL.
+		invalidateScan();
 		res.json({ ok: true, folder: req.uploadFolder || null });
 	});
 });
 
 app.delete("/api/models/:id", async (req, res) => {
-	const id = path.basename(req.params.id);
-	if (!id || id === "." || id === "..") return res.status(400).json({ error: "Nama model tidak valid." });
-	const dir = path.join(ASSETS, id);
-	if (!dir.startsWith(ASSETS + path.sep)) return res.status(400).json({ error: "Nama model tidak valid." });
+	/* Id model selalu "game/model" (variannya "game/model#varian"), dan yang
+	 * dihapus adalah foldernya.
+	 *
+	 * Versi lama memanggil path.basename() lebih dulu, jadi "orisries/0000"
+	 * berujung ke assets/0000 — direktori yang tidak pernah ada. rm -rf
+	 * dengan force pada path yang tidak ada tetap dianggap berhasil, jadi
+	 * tombol hapus di UI melapor sukses tanpa pernah menghapus apa pun.
+	 * Sekarang id dicari di peta id->folder milik scan; kalau id itu bukan
+	 * sebuah folder aset (mis. entri galeri per-file), jawabannya 404 yang
+	 * jujur, bukan sukses palsu. */
+	const models = getModels(); // memastikan peta id->folder sudah terisi
+	const id = String(req.params.id).split("#")[0];
+	if (!id || id === "." || id === ".." || /[\0-\x1f\\]/.test(id)) {
+		return res.status(400).json({ error: "Nama model tidak valid." });
+	}
+	/* Peta id->folder berisi SETIAP folder di bawah assets/, termasuk induk
+	 * sebuah game ("nikke" adalah induk ribuan model). Tanpa penjaga ini satu
+	 * request bisa membuang seluruh game. Jadi id-nya harus benar-benar
+	 * milik sebuah model — varian "#..." dianggap satu model yang sama. */
+	if (!models.some((m) => m.id.split("#")[0] === id)) {
+		return res.status(404).json({ error: "Id itu bukan sebuah model." });
+	}
+	const dir = modelDirs.get(id);
+	if (!dir || !dir.startsWith(ASSETS + path.sep)) {
+		// Id model yang bukan folder (entri galeri per-file) tidak punya
+		// direktori untuk dibuang; bilang apa adanya, jangan pura-pura sukses.
+		return res.status(404).json({ error: "Model ini berupa file individual, bukan sebuah folder." });
+	}
 	try {
 		await fsp.rm(dir, { recursive: true, force: true });
-		res.json({ ok: true });
+		invalidateScan();
+		res.json({ ok: true, removed: id });
 	} catch (err) {
-		res.status(500).json({ error: "Gagal menghapus model: " + err.message });
+		console.error("[delete] gagal menghapus", dir, err);
+		res.status(500).json({ error: "Gagal menghapus model." });
 	}
 });
 
@@ -3243,6 +3280,47 @@ const EXPORT_TMP = path.join(DATA, "exports");
 const EXPORT_DIR = path.join(ROOT, "public", "exports");
 const EXPORT_MAX_MB = Number(process.env.EXPORT_MAX_MB) || 96;
 const EXPORT_MAX_FRAMES = Number(process.env.EXPORT_MAX_FRAMES) || 600;
+
+/* Batas kumulatif per job.
+ *
+ * Dulu EXPORT_MAX_MB dideklarasikan tapi tidak pernah dipakai, dan indeks
+ * bingkai hanya dicek >= 0 — satu job dengan n=1 menerima file frame
+ * sebanyak yang diinginkan (terukur: i=500 dengan n=1 tetap diterima), dan
+ * rate limit 3000/menit x 24 MB berarti ~72 GB/menit bisa ditulis ke disk.
+ * Direktori sisa juga tidak pernah dibersihkan: hanya /finish dan /cancel
+ * yang menghapusnya, jadi ekspor yang ditinggalkan menumpuk selamanya. */
+const exportJobs = new Map(); // job -> { bytes, files, count }
+const EXPORT_TMP_TTL_MS = Number(process.env.EXPORT_TMP_TTL_HOURS || 2) * 60 * 60 * 1000;
+// Video hasil sengaja diberi umur panjang: ini artefak yang dibuat
+// pengguna, bukan sampah. Yang dibatasi cuma pertumbuhannya tanpa batas.
+const EXPORT_OUT_TTL_MS = Number(process.env.EXPORT_OUT_TTL_HOURS || 168) * 60 * 60 * 1000;
+
+const exportSweeper = setInterval(() => {
+	const now = Date.now();
+	const sweep = (root, ttl, rm) => {
+		let names = [];
+		try {
+			names = fs.readdirSync(root);
+		} catch {
+			return;
+		}
+		for (const name of names) {
+			if (name.startsWith(".") || (!/^[a-z0-9]{6,32}$/.test(name) && root === EXPORT_TMP)) continue;
+			const target = path.join(root, name);
+			try {
+				if (now - fs.statSync(target).mtimeMs > ttl) rm(target);
+			} catch {
+				/* antre */
+			}
+		}
+	};
+	sweep(EXPORT_TMP, EXPORT_TMP_TTL_MS, (p) => {
+		fs.rmSync(p, { recursive: true, force: true });
+		exportJobs.delete(path.basename(p));
+	});
+	sweep(EXPORT_DIR, EXPORT_OUT_TTL_MS, (p) => fs.rmSync(p, { force: true }));
+}, 10 * 60 * 1000);
+if (exportSweeper.unref) exportSweeper.unref();
 
 const ALLOWED_BG = new Set(["transparent", "black", "white", "#1a1620"]);
 
@@ -3353,6 +3431,18 @@ app.post("/api/export/frame",
 	}
 	if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: "Bingkai kosong." });
 
+	const jobState = exportJobs.get(job) || { bytes: 0, files: 0, count };
+	if (jobState.count !== count) {
+		return res.status(400).json({ error: "Jumlah bingkai berubah di tengah ekspor." });
+	}
+	if (index >= count) return res.status(400).json({ error: "Indeks bingkai melebihi jumlah bingkai." });
+	if (jobState.files >= EXPORT_MAX_FRAMES) {
+		return res.status(413).json({ error: `Ekspor melebihi ${EXPORT_MAX_FRAMES} bingkai.` });
+	}
+	if (jobState.bytes + req.body.length > EXPORT_MAX_MB * 1024 * 1024) {
+		return res.status(413).json({ error: `Ekspor melebihi batas ${EXPORT_MAX_MB} MB.` });
+	}
+
 	// Trust the magic bytes, not the client's Content-Type.
 	const isJpeg = req.body[0] === 0xff && req.body[1] === 0xd8;
 	const isPng = req.body[0] === 0x89 && req.body[1] === 0x50;
@@ -3363,6 +3453,7 @@ app.post("/api/export/frame",
 		await fsp.mkdir(dir, { recursive: true });
 		const ext = isJpeg ? "jpg" : "png";
 		await fsp.writeFile(path.join(dir, `f${String(index).padStart(5, "0")}.${ext}`), req.body);
+		exportJobs.set(job, { bytes: jobState.bytes + req.body.length, files: jobState.files + 1, count });
 		res.json({ ok: true, index, count });
 	} catch (err) {
 		res.status(500).json({ error: "Gagal menyimpan bingkai: " + err.message });
@@ -3409,7 +3500,16 @@ app.post("/api/export/finish", express.json({ limit: "1mb" }), async (req, res) 
 	if (outFmt === "gif" && !caps.gif) return res.status(500).json({ error: "Encoder GIF tidak tersedia." });
 	if (outFmt === "webm" && !caps.webm) return res.status(500).json({ error: "Encoder VP9 tidak tersedia." });
 
-	await fsp.mkdir(EXPORT_DIR, { recursive: true });
+	// Di luar try/catch yang ada di bawah: Express 4 tidak meneruskan
+	// rejected promise ke middleware error, jadi kegagalan di sini dulu
+	// berujung unhandledRejection dan proses mati (disk penuh cukup untuk
+	// memicunya).
+	try {
+		await fsp.mkdir(EXPORT_DIR, { recursive: true });
+	} catch (err) {
+		console.error("[export] gagal menyiapkan folder hasil:", err);
+		return res.status(500).json({ error: "Folder hasil ekspor tidak bisa dibuat." });
+	}
 	const safeName = slug(String(name || "wallpaper")).slice(0, 48) || "wallpaper";
 	const file = `${safeName}-${job}.${outFmt}`;
 	const out = path.join(EXPORT_DIR, file);
@@ -3458,6 +3558,7 @@ app.post("/api/export/finish", express.json({ limit: "1mb" }), async (req, res) 
 		return res.status(500).json({ error: "Gagal membuat video: " + err.message });
 	} finally {
 		fsp.rm(dir, { recursive: true, force: true }).catch(() => {});
+		exportJobs.delete(String(job));
 	}
 });
 
@@ -3466,11 +3567,17 @@ app.post("/api/export/cancel", express.json({ limit: "1kb" }), async (req, res) 
 	const job = String(req.body?.job || "");
 	if (!/^[a-z0-9]{6,32}$/.test(job)) return res.status(400).json({ error: "Id ekspor tidak valid." });
 	await fsp.rm(path.join(EXPORT_TMP, job), { recursive: true, force: true }).catch(() => {});
+	exportJobs.delete(job);
 	res.json({ ok: true });
 });
 
 // --- static ---
-app.use("/assets", express.static(ASSETS, { fallthrough: false }));
+// Tekstur jarang berubah (hanya saat sebuah model di-ekstrak ulang), tapi
+// tanpa Cache-Control setiap file di-revalidate: satu RTT per tekstur untuk
+// 38 ribu file. 1 hari cukup untuk pemakaian harian dan tetap pulih cepat
+// setelah aset diganti — sengaja tidak immutable, karena ekstrak ulang
+// menimpa nama file yang sama.
+app.use("/assets", express.static(ASSETS, { fallthrough: false, maxAge: "1d" }));
 app.use(
 	"/thumbs",
 	express.static(THUMBS, { fallthrough: false, maxAge: "7d", immutable: true })
@@ -3547,6 +3654,19 @@ app.use((err, req, res, next) => {
 	}
 	console.error("[spine-stage] unhandled route error:", err);
 	res.status(500).json({ error: "Kesalahan internal server." });
+});
+
+/* Penjaga tingkat proses. Tanpa ini satu rejected promise dari handler async
+ * (Express 4 tidak meneruskannya ke middleware error) cukup untuk mematikan
+ * service — pernah terbukti pada /api/export/finish yang mkdir-nya gagal. */
+process.on("unhandledRejection", (err) => {
+	console.error("[spine-stage] unhandledRejection:", err);
+});
+process.on("uncaughtException", (err) => {
+	// Keadaan proses sudah tidak bisa dipercaya: keluar rapi dan biarkan
+	// systemd (Restart=on-failure) yang menyalakan ulang.
+	console.error("[spine-stage] uncaughtException, mematikan proses:", err);
+	process.exit(1);
 });
 
 app.listen(PORT, HOST, () => {
