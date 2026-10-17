@@ -1847,3 +1847,41 @@ input:focus-visible {
 	background: rgba(242, 204, 96, 0.2);
 	color: #f2cc60;
 }
+
+/* ------------------------------------------------------------------ *
+ * Mode A/B: dua kanvas terpisah
+ * ------------------------------------------------------------------ */
+.ab-split {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 2px;
+	background: rgba(255, 255, 255, 0.08);
+}
+.ab-split[hidden] { display: none; }
+.ab-pane {
+	position: relative;
+	overflow: hidden;
+	background: transparent;
+}
+.ab-pane canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+/* Label sudut: memperjelas panel mana A dan mana B saat dua model tampil. */
+.ab-tag {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	z-index: 3;
+	padding: 2px 7px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	background: rgba(0, 0, 0, 0.55);
+	color: #cfe6ff;
+	pointer-events: none;
+}
+/* Tata letak tumpang tindih: satu panel penuh, labelnya tetap tampil. */
+.ab-split.is-overlay { grid-template-columns: 1fr; }
+.ab-split.is-overlay #ab-pane-a { display: none; }

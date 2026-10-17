@@ -72,7 +72,14 @@ langsung dimuat dan diputar.
 - **Live2D** — model Cubism (`.moc3`) juga didukung selain Spine.
 - **Banding A/B di panggung** — di tab inspektor *Bandingkan*, tombol
   **"A/B di panggung"** memuat model B di sebelah model A yang sedang
-  dibuka. Keduanya digerakkan oleh **satu clock**, dan seek-nya memakai
+  dibuka. **Keduanya memakai kanvas terpisah**, jadi tiap panel punya
+  kamera sendiri (scroll untuk zoom panel B tidak menyentuh panel A) —
+  perlu karena ukuran kanvas Spine sangat bervariasi (3839×6715 vs
+  1136×2260 pada satu pasang yang diuji; median pustaka 947×1334).
+  Geser model B dengan **tombol kanan** (kiri tetap menggeser kamera A),
+  pakai **Reset posisi** untuk mengembalikan, dan **Kunci** bila ingin
+  A ikut bergerak supaya hanya posisi relatifnya yang berubah.
+  Klik-kanan sebuah kartu model menggantikan B saat mode A/B aktif. Keduanya digerakkan oleh **satu clock**, dan seek-nya memakai
   *proporsi siklus* bukan detik mentah — durasi A dan B hampir selalu beda
   (mis. 5,33 s vs 2,5 s), jadi meneruskan detik yang sama membuat B berputar
   dua kali lebih cepat dan perbandingannya menyesatkan. Pilih tata letak

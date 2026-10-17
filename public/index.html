@@ -102,6 +102,12 @@
 	<!-- ================= STAGE ================= -->
 	<section class="stage">
 		<div id="canvas-wrap" class="canvas-wrap">
+			<!-- Mode A/B: panggung dibagi dua, masing-masing panel kanvas
+			     sendiri supaya A dan B punya kamera (zoom/pan) terpisah. -->
+			<div id="ab-split" class="ab-split" hidden>
+				<div id="ab-pane-a" class="ab-pane"><span class="ab-tag">A</span></div>
+				<div id="ab-pane-b" class="ab-pane"><span class="ab-tag">B</span></div>
+			</div>
 			<div id="stage-bg" class="stage-bg" data-bg="dark" aria-hidden="true"></div>
 			<div id="grid" class="grid" aria-hidden="true"></div>
 
@@ -300,6 +306,20 @@
 						<select id="ab-layout" class="select select-sm">
 							<option value="split">Berdampingan</option>
 							<option value="overlay">Tumpang tindih</option>
+						</select>
+					</label>
+					<button id="ab-reset" class="btn btn-sm btn-ghost" title="Kembalikan model B ke posisi semula">Reset posisi</button>
+					<span id="ab-offset" class="cmp-empty"></span>
+					<label class="field-inline">
+						<span>Kunci</span>
+						<input id="ab-lock" type="checkbox" />
+					</label>
+					<label class="field-inline">
+						<span>Skala</span>
+						<select id="ab-scale" class="select select-sm">
+							<option value="fit">Samakan tinggi</option>
+							<option value="canvas">Samakan kanvas</option>
+							<option value="native">Apa adanya</option>
 						</select>
 					</label>
 					<label class="field-inline">

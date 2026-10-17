@@ -349,6 +349,10 @@ const el = {
 	abBar: $("#ab-bar"),
 	abLayout: $("#ab-layout"),
 	abOnion: $("#ab-onion"),
+	abReset: $("#ab-reset"),
+	abLock: $("#ab-lock"),
+	abOffset: $("#ab-offset"),
+	abScale: $("#ab-scale"),
 	cmpNote: $("#cmp-note"),
 	cmpResult: $("#cmp-result"),
 	playBtn: $("#play-btn"),
@@ -457,6 +461,16 @@ const stageRoot = new Container();
 world.addChild(stageRoot);
 app.stage.addChild(world);
 
+/* Renderer kedua untuk panel B.
+ *
+ * Kenapa renderer terpisah, bukan satu renderer yang dibagi dua: satu kanvas
+ * berarti satu kamera, jadi zoom/pan langsung berlaku untuk A dan B sekaligus.
+ * Canvas Spine beda-beda besar (3839x6715 vs 1136x2260 pada pengujian), dan
+ * tanpa kamera sendiri per panel, salah satu model pasti tampil melenceng. */
+let appB = null;
+/** Kamera panel B — terpisah dari `state` milik A. */
+const camB = { zoom: 1, panX: 0, panY: 0, flip: false };
+
 let spine = null;
 let current = null;
 let animName = null;
@@ -496,6 +510,17 @@ const AB = {
 	anim: { A: null, B: null },
 	dur: { A: 0, B: 0 },
 	layout: "split",   // "split" (berdampingan) | "overlay" (tumpang tindih)
+	offset: { x: 0, y: 0 },   // geseran manual model B, dalam piksel layar
+	// Kunci sinkron: kalau true, model A ikut bergerak saat B digeser, jadi
+	// yang berubah hanya posisi relatifnya. Kalau false, geser B menjauh dari A.
+	lock: false,
+	// Cara menyamakan ukuran saat canvas kedua model berbeda.
+	//   "fit"       -> tiap model diskalakan agar tingginya sama (default;
+	//                  membuat karakter seukuran, bukan kanvasnya)
+	//   "canvas"    -> tiap model diskalakan agar KANVAS deklaratifnya sama
+	//                  besar, jadi perbandingan 1:1 seperti aslinya
+	//   "native"    -> tanpa penyesuaian, zoom yang sama persis (yang lama)
+	scaleMode: "fit",
 	onion: 0,          // jumlah bayangan ke belakang (0 = mati)
 	opacity: 0.3,
 	seq: 0,
@@ -504,6 +529,84 @@ const AB = {
 	ghostRoot: null,
 	ghosts: [],
 };
+
+/** Seretan posisi model B. null = tidak sedang menyeret. */
+let abDrag = null;
+/** Container model B — hidup di luar `world` supaya posisinya piksel layar. */
+let abSecondRoot = null;
+
+/**
+ * Akhiri seretan A/B.
+ *
+ * Terpasang di `window`, bukan di #canvas-wrap: seretan tombol kanan tidak
+ * mengisi map gesture `pointers`, dan tanpa setPointerCapture yang berhasil
+ * pointerup-nya bisa mendarat di mana saja — jadi endDrag yang lama tidak
+ * pernah membersihkan abDrag dan seretan "menempel" setelah mouse dilepas.
+ */
+function abEndDrag() {
+	if (!abDrag) return;
+	abDrag = null;
+	el.canvasWrap.classList.remove("is-dragging");
+	schedulePermalinkWrite?.();
+}
+window.addEventListener("pointerup", abEndDrag);
+window.addEventListener("pointercancel", abEndDrag);
+
+/**
+ * Apakah titik layar ini jatuh di panel B (sisi kanan saat split)?
+ * Dipakai supaya seretan kiri/kanan tidak perlu modifier terus-menerus.
+ */
+function abHitB(clientX) {
+	if (!AB.on || !AB.second) return false;
+	if (AB.layout === "overlay") return true;   // tumpang tindih: selalu B
+	const r = el.canvasWrap.getBoundingClientRect();
+	return clientX - r.left > r.width / 2;
+}
+
+/** Buat renderer panel B kalau belum ada; pasang kanvasnya di panel B. */
+function ensureAppB() {
+	const pane = document.getElementById("ab-pane-b");
+	if (!pane) return null;
+	if (appB) {
+		try {
+			const w = pane.clientWidth || 1;
+			const h = pane.clientHeight || 1;
+			appB.renderer.resize(w, h);
+		} catch {
+			/* renderer belum siap */
+		}
+		return appB;
+	}
+	try {
+		appB = new Application({
+			backgroundAlpha: 0,
+			antialias: true,
+			resolution: Math.min(window.devicePixelRatio || 1, 2),
+			autoDensity: true,
+			powerPreference: "high-performance",
+			width: Math.max(1, pane.clientWidth || 1),
+			height: Math.max(1, pane.clientHeight || 1),
+		});
+		pane.appendChild(appB.view);
+		return appB;
+	} catch (err) {
+		// Dua konteks WebGL bisa gagal di GPU terbatas; A/B jatuh ke satu
+		// panggung daripada tidak bisa dipakai sama sekali.
+		console.error("[ab] renderer kedua gagal dibuat:", err);
+		return null;
+	}
+}
+
+/** Tutup renderer panel B dan lepas kanvasnya. */
+function destroyAppB() {
+	if (!appB) return;
+	try {
+		appB.destroy(true, { children: true, texture: false, baseTexture: false });
+	} catch {
+		/* sudah hilang */
+	}
+	appB = null;
+}
 
 /** Instance yang digerakkan ticker: `spine`, plus model B saat A/B aktif. */
 function drivenSpines() {
@@ -832,6 +935,10 @@ app.ticker.add(() => {
 	// dt = 0: we already positioned the track, this only applies + renders it.
 	spine.update(0);
 
+	// Panel B punya renderer sendiri, jadi harus digambar sendiri juga —
+	// ticker utama hanya menggambar `app`.
+	if (appB && AB.on && AB.second) appB.renderer.render(appB.stage);
+
 	// pixi-spine membuat ulang mesh saat animasi berganti attachment; container
 	// per-slot kita biarkan tapi pastikan visibility-nya tetap sesuai pilihan
 	// pengguna (murah, dan hanya saat ada yang disembunyikan).
@@ -876,10 +983,46 @@ function updateScrubUI() {
 /* ------------------------------------------------------------------ *
  * Viewport
  * ------------------------------------------------------------------ */
+/** Pusatkan dan sesuaikan zoom panel B berdasarkan kanvas modelnya. */
+function fitModelB() {
+	const inst = AB.second;
+	if (!inst) return;
+	const pane = document.getElementById("ab-pane-b");
+	const w = AB.layout === "split" ? (pane?.clientWidth || el.canvasWrap.clientWidth / 2) : (pane?.clientWidth || el.canvasWrap.clientWidth);
+	const h = pane?.clientHeight || el.canvasWrap.clientHeight;
+	let bw = 512;
+	let bh = 512;
+	try {
+		const d = inst.skeleton?.data;
+		if (d) {
+			bw = d.width || d.height || 512;
+			bh = d.height || d.width || 512;
+		} else if (inst.width) {
+			bw = inst.width;
+			bh = inst.height || inst.width;
+		}
+	} catch {
+		/* pakai default */
+	}
+	camB.zoom = Math.min((w * 0.82) / bw, (h * 0.82) / bh);
+	camB.panX = 0;
+	camB.panY = 0;
+}
+
 function fitModel() {
 	if (!spine) return;
 	const w = el.canvasWrap.clientWidth;
 	const h = el.canvasWrap.clientHeight;
+	// Saat A/B aktif, tiap panel hanya separuh lebar panggung. Tanpa ini
+	// fitModel() menghitung zoom untuk lebar PENUH, lalu applyTransform()
+	// mengecilkannya 0,5 lagi — dan karena fitModel() dipanggil berulang
+	// (setiap selesai memuat, tiap resize, tiap "Pas"), state.zoom menyusut
+	// terus sampai model tinggal setitik.
+	const half = !!(AB.on && AB.second && AB.layout === "split");
+	const fitW = half ? w * 0.5 : w;
+	// Tanda bahwa zoom ini SUDAH dihitung untuk lebar panel. applyTransform()
+	// memakainya supaya tidak menskalakan dua kali.
+	AB.zoomForHalf = half;
 	// Cubism models expose width/height directly and have no SkeletonData.
 	// Their declared size is the canvas the artist worked on, which can be far
 	// larger than the artwork itself, and their anchor is (0,0) rather than
@@ -890,7 +1033,7 @@ function fitModel() {
 		const data = spine.skeleton.data;
 		const bw = data.width || data.height || 512;
 		const bh = data.height || data.width || 512;
-		state.zoom = Math.min((w * 0.82) / bw, (h * 0.82) / bh);
+		state.zoom = Math.min((fitW * 0.82) / bw, (h * 0.82) / bh);
 		state.panX = 0;
 		state.panY = 0;
 		applyTransform();
@@ -944,7 +1087,19 @@ function resizeRenderer() {
 	} catch {
 		/* renderer may not allow live resolution on some backends */
 	}
-	app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
+	// Saat A/B aktif, panel A hanya separuh lebar panggung.
+	const w = AB.on && AB.second && AB.layout === "split"
+		? el.canvasWrap.clientWidth / 2
+		: el.canvasWrap.clientWidth;
+	app.renderer.resize(w, el.canvasWrap.clientHeight);
+	const pane = document.getElementById("ab-pane-b");
+	if (appB && pane) {
+		try {
+			appB.renderer.resize(Math.max(1, pane.clientWidth), Math.max(1, pane.clientHeight));
+		} catch {
+			/* belum siap */
+		}
+	}
 }
 
 function applyTransform() {
@@ -955,12 +1110,39 @@ function applyTransform() {
 	// Mode A/B: panggung dibagi dua. Skala diperkecil supaya model tidak
 	// meluber ke panel sebelahnya, dan B digeser ke kanan.
 	if (AB.on && AB.second) {
-		world.scale.set(world.scale.x * 0.5, world.scale.y * 0.5);
-		if (AB.layout === "split") {
-			world.position.x -= w / 4;
-			AB.second.position.set(w / 2, 0);
-		} else {
-			AB.second.position.set(0, 0);
+		const half = AB.layout === "split";
+		// Dua kanvas: tiap panel punya lebar sendiri, jadi A dipusatkan di
+		// panel kirinya dan B memakai kamera B (bukan kamera A).
+		const aw = half ? w / 2 : w;
+		world.position.set(aw / 2 + state.panX, h / 2 + state.panY);
+		// Skala A murni dari state — tidak ada faktor 0,5 yang bisa
+		// menumpuk, karena applyTransform() dipanggil berulang saat menyeret.
+		world.scale.set(state.zoom * (state.flip ? -1 : 1), state.zoom);
+
+		// B: kamera dan ukurannya sendiri.
+		if (abSecondRoot) {
+			const inst = AB.second;
+			const bw = half ? w / 2 : w;
+			const paneW = bw;
+			const paneH = h;
+			abSecondRoot.position.set(paneW / 2 + camB.panX + AB.offset.x, paneH / 2 + camB.panY + AB.offset.y);
+			abSecondRoot.scale.set(camB.zoom * (camB.flip ? -1 : 1), camB.zoom);
+			// Geseran terasa sama berapa pun zoom panel B.
+			void inst;
+		}
+		// Label di sini, bukan cuma di abSyncUI(): seretan memanggil
+		// applyTransform() berkali-kali dan abSyncUI() tidak ikut jalan, jadi
+		// angka geserannya akan tetap "0, 0" selama mouse bergerak.
+		if (el.abOffset) {
+			el.abOffset.textContent = AB.offset.x || AB.offset.y
+				? `geser ${Math.round(AB.offset.x)}, ${Math.round(AB.offset.y)}`
+				: "";
+		}
+		// Kunci: A ikut bergerak, jadi yang berubah hanya posisi RELATIF
+		// A-B — berguna untuk menyejajarkan tanpa mengubah framing.
+		if (AB.lock) {
+			world.position.x += AB.offset.x;
+			world.position.y += AB.offset.y;
 		}
 	}
 	// The trailing "%" is drawn by CSS (.zoom-label::after) so the number here
@@ -3197,10 +3379,29 @@ function abSyncUI() {
 	if (el.abBar) el.abBar.hidden = !on;
 	if (el.abLayout) el.abLayout.value = AB.layout;
 	if (el.abOnion) el.abOnion.value = String(AB.onion);
+	if (el.abLock) el.abLock.checked = !!AB.lock;
+	// Tampilkan geseran saat ini: tanpa angka, posisi tidak bisa
+	// direproduksi dan "reset" terasa seperti menebak.
+	if (el.abOffset) {
+		el.abOffset.textContent = AB.on && (AB.offset.x || AB.offset.y)
+			? `geser ${Math.round(AB.offset.x)}, ${Math.round(AB.offset.y)}`
+			: "";
+	}
 	if (el.abLabel) {
 		el.abLabel.textContent = on
 			? `A: ${modelLabel(AB.model.A)} · B: ${modelLabel(AB.model.B)}`
 			: "";
+	}
+	// Panel kedua hanya tampil saat A/B aktif.
+	const split = document.getElementById("ab-split");
+	if (split) {
+		split.hidden = !on;
+		split.classList.toggle("is-overlay", on && AB.layout === "overlay");
+	}
+	if (on) {
+		ensureAppB();
+	} else {
+		destroyAppB();
 	}
 	applyTransform();
 }
@@ -3219,10 +3420,29 @@ function abTeardown() {
 	}
 	AB.ghostRoot = null;
 	AB.ghosts = [];
+	AB.offset = { x: 0, y: 0 };
+	abDrag = null;
 	const s = AB.second;
+	const sr = abSecondRoot;
 	AB.second = null;
+	abSecondRoot = null;
 	AB.model = { A: null, B: null };
+	if (sr) {
+		try {
+			// children:false karena `s` dihancurkan sendiri di bawah;
+			// texture:false supaya atlas milik A tidak ikut terbuang.
+			sr.destroy({ children: false, texture: false, baseTexture: false });
+		} catch {
+			/* sudah hilang */
+		}
+	}
 	if (s) {
+		try {
+			app.stage.removeChild(s);
+		} catch {
+			/* bukan anak */
+		}
+	} else if (s) {
 		try {
 			stageRoot.removeChild(s);
 		} catch {
@@ -3234,9 +3454,11 @@ function abTeardown() {
 			/* sudah hilang */
 		}
 	}
-	// Panggung kembali memakai satu viewport penuh.
-	applyTransform();
-	abSyncUI();
+	// Panggung kembali memakai satu viewport penuh — hitung ulang zoom-nya,
+	// atau model A tetap berukuran setengah setelah B dibuang.
+	fitModel();
+	abSyncUI();   // ini juga menutup renderer panel B
+	destroyAppB();
 }
 
 /**
@@ -3261,10 +3483,32 @@ async function abStart(modelB) {
 		if (seq !== AB.seq) return;
 		if (!parsed?.data?.bones?.length) throw new Error("Data skeleton tidak berisi tulang.");
 
+		// Simpan dulu: abTeardown() menolkan offset, dan kalau A/B dipulihkan
+		// dari permalink, offset yang baru saja dibaca akan hilang begitu saja
+		// (terukur: setelah reload, geseran kembali ke 0,0 walau URL
+		// membawanya).
+		const keepOffset = { ...AB.offset };
+		const keepLayout = AB.layout;
+		const keepOnion = AB.onion;
+		const keepLock = AB.lock;
 		abTeardown();
+		AB.offset = keepOffset;
+		AB.layout = keepLayout;
+		AB.onion = keepOnion;
+		AB.lock = keepLock;
 		AB.second = makeSpine(parsed.runtime, parsed.data);
 		AB.second.autoUpdate = false;
-		stageRoot.addChild(AB.second);
+		// B hidup di container SENDIRI yang dipasang di app.stage — BUKAN di
+		// dalam stageRoot. stageRoot adalah anak `world`, jadi kalau B
+		// ditaruh di situ, posisinya ikut kena transform world dan offset
+		// yang kita atur jadi dobel (model B justru melenceng jauh).
+		abSecondRoot = new Container();
+		abSecondRoot.addChild(AB.second);
+		// Masuk ke renderer panel B kalau ada; kalau tidak, ke panggung utama
+		// sebagai jatuh-balik.
+		const targetB = ensureAppB();
+		if (targetB) targetB.stage.addChild(abSecondRoot);
+		else app.stage.addChildAt(abSecondRoot, 0);
 
 		AB.model = { A: current, B: modelB };
 		AB.runtime = parsed.runtime;
@@ -3283,6 +3527,10 @@ async function abStart(modelB) {
 		AB.ghostRoot = new Container();
 		stageRoot.addChild(AB.ghostRoot);
 
+		// Dua panel berarti zoom yang pas berubah: hitung ulang supaya kedua
+		// model muat di panel masing-masing.
+		fitModel();
+		fitModelB();
 		abSyncUI();
 		toast(`A/B: ${modelLabel(AB.model.A)} ⟷ ${modelLabel(modelB)}`);
 	} catch (err) {
@@ -3450,7 +3698,25 @@ el.abToggle?.addEventListener("click", () => {
 });
 el.abLayout?.addEventListener("change", () => {
 	AB.layout = el.abLayout.value === "overlay" ? "overlay" : "split";
+	// Posisi yang disimpan untuk tata letak lama tidak masuk akal di tata
+	// letak baru (offset setengah layar di split = jauh sekali di overlay).
+	AB.offset = { x: 0, y: 0 };
 	applyTransform();
+});
+el.abReset?.addEventListener("click", () => {
+	AB.offset = { x: 0, y: 0 };
+	applyTransform();
+	toast("Posisi B dikembalikan.");
+});
+el.abLock?.addEventListener("change", () => {
+	AB.lock = !!el.abLock.checked;
+	applyTransform();
+});
+// Klik-kanan di panggung dipakai untuk menyeret model B, jadi menu
+// konteks browser harus diblokir — tanpa ini seretan berakhir dengan menu
+// yang menutupi panggung.
+el.canvasWrap?.addEventListener("contextmenu", (e) => {
+	if (AB.on && AB.second) e.preventDefault();
 });
 el.abOnion?.addEventListener("change", () => {
 	AB.onion = Number(el.abOnion.value) || 0;
@@ -5361,6 +5627,22 @@ el.canvasWrap.addEventListener(
 		// cursor happened to be over the overlay is never what was meant.
 		if (e.target instanceof Element && e.target.closest(".fps-meter")) return;
 		e.preventDefault();
+		// Kursor di atas panel B -> yang berubah kamera B, bukan kamera A.
+		// Dua kanvas ada justru supaya keduanya bisa di-zoom sendiri-sendiri.
+		const paneB = document.getElementById("ab-pane-b");
+		if (AB.on && AB.second && paneB && !paneB.hidden && AB.layout === "split") {
+			const rb = paneB.getBoundingClientRect();
+			const inB =
+				e.clientX >= rb.left && e.clientX <= rb.right &&
+				e.clientY >= rb.top && e.clientY <= rb.bottom;
+			if (inB) {
+				const f = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+				camB.zoom = Math.min(12, Math.max(0.05, camB.zoom * f));
+				applyTransform();
+				schedulePermalinkWrite?.();
+				return;
+			}
+		}
 		const r = el.canvasWrap.getBoundingClientRect();
 		zoomBy(e.deltaY < 0 ? 1.12 : 1 / 1.12, e.clientX - r.left, e.clientY - r.top);
 	},
@@ -5387,6 +5669,20 @@ const pinchCenter = () => {
 };
 
 el.canvasWrap.addEventListener("pointerdown", (e) => {
+	// Mode A/B: seret posisi model B. Tombol KANAN (atau Alt) dipakai supaya
+	// geser kamera yang sudah ada tidak berubah — kalau tidak, pengguna tidak
+	// bisa lagi memindahkan kamera saat dua model tampil.
+	if (AB.on && AB.second && e.button === 2) {
+		e.preventDefault();
+		abDrag = { x: e.clientX, y: e.clientY };
+		el.canvasWrap.classList.add("is-dragging");
+		try {
+			el.canvasWrap.setPointerCapture(e.pointerId);
+		} catch {
+			/* pointer sudah hilang */
+		}
+		return;
+	}
 	// Overlays inside the stage (the FPS meter, the HUD) own their own clicks.
 	// Capturing the pointer here would swallow their mouseup, so a button
 	// inside them would receive mousedown and never a click.
@@ -5414,6 +5710,17 @@ el.canvasWrap.addEventListener("pointerdown", (e) => {
 });
 
 el.canvasWrap.addEventListener("pointermove", (e) => {
+	// Seretan A/B harus diperiksa SEBELUM pemeriksaan pointers: handler
+	// pointerdown A/B return sebelum mencatat pointerId ke map (tombol kanan
+	// sengaja tidak ikut gesture pan/pinch), jadi `pointers.has()` selalu
+	// false dan gerakan mouse diabaikan — offset tidak pernah berubah.
+	if (abDrag) {
+		AB.offset.x += e.clientX - abDrag.x;
+		AB.offset.y += e.clientY - abDrag.y;
+		abDrag = { x: e.clientX, y: e.clientY };
+		applyTransform();
+		return;
+	}
 	if (!pointers.has(e.pointerId)) return;
 	pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
@@ -6620,6 +6927,10 @@ window.spineStage = {
 			dur: { ...AB.dur },
 			layout: AB.layout,
 			onion: AB.onion,
+			offset: { ...AB.offset },
+			lock: AB.lock,
+			camB: { ...camB },
+			appB: !!appB,
 			ghosts: AB.ghosts,
 			model: { A: AB.model.A, B: AB.model.B },
 		};
@@ -6741,6 +7052,19 @@ function permalinkState() {
 	if (!el.timeline?.hidden) s.tl = 1;
 	if (!el.inspector?.hidden) s.insp = insp.tab;
 	if (document.querySelector(".layout")?.classList.contains("sidebar-hidden")) s.sb = 0;
+	// Mode A/B: model B, tata letak, onion skin, dan geserannya. Offset
+	// ikut tersimpan supaya hasil penyejajaran bisa dibagikan, bukan cuma
+	// terlihat di layar sendiri.
+	if (AB.on && AB.model.B) {
+		s.ab = AB.model.B.id;
+		if (AB.layout !== "split") s.abl = AB.layout;
+		if (AB.onion) s.abo = AB.onion;
+		if (AB.lock) s.abk = 1;
+		if (AB.offset.x || AB.offset.y) {
+			s.abx = round2(AB.offset.x);
+			s.aby = round2(AB.offset.y);
+		}
+	}
 	// Skip zoom/pan when the camera is at its untouched defaults — the restore
 	// side treats a missing pair as "run fitModel()".
 	if (Math.abs(state.zoom - 1) > 1e-4 || Math.abs(state.panX) > 0.5 || Math.abs(state.panY) > 0.5) {
@@ -6941,6 +7265,21 @@ async function applyPermalink(s) {
 			updateTimelinePlayhead();
 		}
 		if (s.p === 0 || s.p === false || s.p === "0") setPlaying(false);
+		// A/B terakhir: model A sudah dimuat, jadi B bisa menyusul.
+		if (typeof s.ab === "string") {
+			const mB = models.find((m) => m.id === s.ab);
+			if (mB) {
+				if (s.abl) AB.layout = s.abl === "overlay" ? "overlay" : "split";
+				if (Number.isFinite(Number(s.abo))) AB.onion = Number(s.abo);
+				AB.lock = !!s.abk;
+				AB.offset = {
+					x: Number(s.abx) || 0,
+					y: Number(s.aby) || 0,
+				};
+				await abStart(mB);
+				abSyncUI();
+			}
+		}
 	} else if (s.m) {
 		toast(`Model “${s.m}” dari tautan tidak ada di pustaka.`);
 	}
