@@ -2133,56 +2133,98 @@ const SCAN_CONFIG = JSON.stringify(
 	GAME_ROOTS.map((g) => [g.match, g.key, g.label, g.spineRuntime ?? null, g.pmaDefault ?? null]),
 );
 
-function configHash(s) {
-	let h = 5381;
-	for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
-	return h.toString(36);
+
+/* Hasil walk di-memo sementara.
+ *
+ * scanTree() me-walk seluruh assets/ — 141.266 file / ~100 GB di-stat di
+ * host ini — dan semuanya SYNCHRONOUS. Dulu ia dipanggil di SETIAP request
+ * /api/models, jadi satu request daftar model menahan event loop ~2,4 detik
+ * dan file PNG yang biasanya dijawab 304 dalam <1 ms ikut melambat sampai
+ * ~2 detik selama request itu berjalan (terukur). TTL membuat walk hanya
+ * terjadi paling cepat tiap SCAN_TREE_TTL_MS, dan handler yang benar-benar
+ * mengubah isi assets/ memanggil invalidateScan() supaya tidak perlu
+ * menunggu TTL. */
+let scanTreeMemo = { signature: "", sizes: null, at: 0 };
+/* Peta id model -> folder fisiknya di disk.
+ *
+ * Id model BUKAN path foldernya: scanModels() membangun id dari
+ * path.relative() lalu mengganti semua karakter di luar [\w.-/] dengan
+ * tanda minus ("hazereverb/dongzuo_yuanzui_chongji1--"). Transformasi itu
+ * tidak bisa dibalik, jadi DELETE /api/models/:id tidak bisa menebak
+ * foldernya dari id. Peta ini diisi di dalam walk scanTree yang memang
+ * sudah melewati setiap folder — tanpa I/O tambahan — memakai regex yang
+ * sama persis dengan milik scanModels(). */
+let modelDirs = new Map();
+const SCAN_TREE_TTL_MS = Number(process.env.SCAN_TREE_TTL_MS) || 15000;
+
+function invalidateScan() {
+	/* Tandai basi, jangan dibuang: isinya tetap dipakai sampai worker
+	 * membawa yang baru. Menghapusnya akan memaksa jalur sinkron di request
+	 * berikutnya dan membekukan event loop ~2 detik (dulu: setiap upload
+	 * atau hapus model langsung memicu walk + pindai penuh di dalam
+	 * request). */
+	scanTreeMemo = { ...scanTreeMemo, at: 0 };
+	refreshScanTree();
 }
 
-function scanTree() {
-	let newest = 0;
-	const sizes = new Map();
-	const walk = (d, depth) => {
-		if (depth > 8) return 0;
-		let entries;
-		try {
-			entries = fs.readdirSync(d, { withFileTypes: true });
-		} catch {
-			return 0;
-		}
-		let total = 0;
-		for (const e of entries) {
-			if (e.name === ".git") continue;
-			const p = path.join(d, e.name);
-			try {
-				if (e.isDirectory()) {
-					total += walk(p, depth + 1);
-				} else if (e.isSymbolicLink()) {
-					// follow symlinked asset folders
-					const st = fs.statSync(p);
-					if (st.isDirectory()) total += walk(p, depth + 1);
-					else {
-						total += st.size;
-						newest = Math.max(newest, st.mtimeMs);
-					}
-				} else {
-					const st = fs.statSync(p);
-					total += st.size;
-					newest = Math.max(newest, st.mtimeMs);
-				}
-			} catch {
-				/* skip unreadable entries */
-			}
-		}
-		sizes.set(d, total);
-		return total;
-	};
-	walk(ASSETS, 0);
-	return { signature: `${newest}:${configHash(SCAN_CONFIG)}`, sizes };
+function scanTree({ fresh = false } = {}) {
+	const now = Date.now();
+	const has = !!scanTreeMemo.sizes;
+	const age = has ? now - scanTreeMemo.at : Infinity;
+
+	if (!fresh && has && age < SCAN_TREE_TTL_MS) {
+		return { signature: scanTreeMemo.signature, sizes: scanTreeMemo.sizes };
+	}
+	if (!fresh && has && age < SCAN_TREE_TTL_MS * 10) {
+		/* Memo basi tapi masih layak dipakai: hasilnya dipakai dulu untuk
+		 * request ini lalu diganti worker di latar. Di sinilah letak
+		 * perbaikan terbesarnya — jalan menyusuri 141 ribu file memakai
+		 * ~2,2 detik sinkron dan membekukan semua request lain (termasuk
+		 * pemuatan tekstur) selama itu. Kalau memo kosong (boot) atau
+		 * memang diminta segar (?refresh=1), barulah jalan sinkron. */
+		refreshScanTree();
+		return { signature: scanTreeMemo.signature, sizes: scanTreeMemo.sizes };
+	}
+	const res = walkAssets(ASSETS, SCAN_CONFIG);
+	applyScanResult(res);
+	return { signature: res.signature, sizes: res.sizes };
 }
+
+/** Terapkan hasil jalan menyusuri (dari worker maupun jalur sinkron). */
+function applyScanResult(res) {
+	scanTreeMemo = { signature: res.signature, sizes: res.sizes, at: Date.now() };
+	modelDirs = new Map(res.dirs);
+}
+
+let scanWorkerBusy = false;
+
+/** Jalankan pemeriksaan ulang assets/ di thread terpisah. */
+function refreshScanTree() {
+	if (scanWorkerBusy) return;
+	scanWorkerBusy = true;
+	let w;
+	try {
+		w = new Worker(path.join(__dirname, "scan-tree-worker.js"), {
+			workerData: { assets: ASSETS, scanConfig: SCAN_CONFIG },
+		});
+	} catch (err) {
+		scanWorkerBusy = false;
+		console.error("[scan] worker tidak bisa dijalankan:", err.message);
+		return;
+	}
+	w.on("message", applyScanResult);
+	w.on("error", (err) => console.error("[scan] worker gagal:", err.message));
+	// 'exit' dipakai untuk melepas kunci, apa pun hasilnya, supaya satu
+	// kegagalan tidak mengunci pemeriksaan berikutnya selamanya.
+	w.on("exit", () => {
+		scanWorkerBusy = false;
+	});
+	w.unref();
+}
+
 
 function getModels({ force = false } = {}) {
-	const { signature: sig, sizes } = scanTree();
+	const { signature: sig, sizes } = scanTree({ fresh: force });
 
 	// Memory cache first — it is free and always current within a run.
 	if (!force && cache.models && cache.signature === sig) return cache.models;
@@ -2204,6 +2246,40 @@ function getModels({ force = false } = {}) {
 		}
 	}
 
+	// Signature berbeda dari cache (assets/ berubah) atau ada paksaan.
+	if (!force && cache.models) {
+		/* Ada daftar lama yang masih bisa ditampilkan, jadi pindainya di
+		 * latar. scanModels() makan ~3,4 detik sinkron (67 ribu parse memo);
+		 * dijalankan di dalam request, semua request lain berhenti selama
+		 * itu — termasuk pemuatan tekstur. Konsekuensinya: klien menerima
+		 * daftar yang telat beberapa detik, yang jauh lebih baik daripada
+		 * server yang membeku. */
+		scheduleScan(sig, sizes);
+		return cache.models;
+	}
+	// Boot atau ?refresh=1: memang harus sinkron karena belum ada apa pun
+	// yang bisa ditampilkan (jalur boot) atau pengguna meminta hasil segar
+	// sekarang juga (jalur admin, sudah masuk rate limit).
+	return runScan(sig, sizes);
+}
+
+let scanBusy = false;
+
+/** Jadwalkan pindai penuh di luar jalur request, satu dalam satu waktu. */
+function scheduleScan(sig, sizes) {
+	if (scanBusy) return;
+	scanBusy = true;
+	setImmediate(() => {
+		try {
+			runScan(sig, sizes);
+		} catch (err) {
+			console.error("[scan] gagal memindai ulang:", err);
+		}
+		scanBusy = false;
+	});
+}
+
+function runScan(sig, sizes) {
 	// The tree changed, so cached folder sizes are stale too. scanModels()
 	// reads dirBytes(), so publish the fresh sizes before it runs.
 	dirBytesCache.clear();
@@ -2985,7 +3061,9 @@ function audioForModel(m) {
  * viewer exposes them as a game-level soundtrack instead of per-model
  * voices: /api/orisries-audio lists everything, grouped by kind.
  */
-const OR_AUDIO_DIR = "/srv/spine-assets/orisries/audio";
+// Bisa dialihkan seperti BD2_MEDIA; path default mengikuti konvensi
+// /srv/spine-assets yang dipakai tools/ ekstraksi di repo ini.
+const OR_AUDIO_DIR = process.env.OR_AUDIO_DIR || "/srv/spine-assets/orisries/audio";
 
 let orAudioCache = { list: null, mtime: 0 };
 
@@ -3021,6 +3099,9 @@ app.get("/api/bd2-audio", (req, res) => {
 	const id = String(req.query.id || "");
 	if (!id) return res.json({ tracks: [] });
 	const m = getModels().find((x) => x.id === id);
+	// Id yang sudah tidak ada (model dihapus atau diganti nama) dulunya
+	// membuat audioForModel melempar TypeError -> 500 + tumpukan di journal.
+	if (!m) return res.json({ tracks: [] });
 	res.json(audioForModel(m) || { tracks: [] });
 });
 
@@ -3132,6 +3213,10 @@ const UPDATERS = {
 
 let updateJob = null; // { game, running, result, log, startedAt }
 const UPDATE_LOG_MAX = 400; // baris yang disimpan per job
+// stdout pembaru ditahan utuh lalu di-JSON.parse; pembaru yang nyangkut dan
+// terus menulis akan menggembungkan heap tanpa batas.
+const UPDATE_STDOUT_MAX = 4 * 1024 * 1024;
+const UPDATE_TIMEOUT_MS = Number(process.env.UPDATE_TIMEOUT_MS) || 30 * 60 * 1000;
 
 function runUpdater(game, args, onLog) {
 	const cfg = UPDATERS[game];
@@ -3153,6 +3238,7 @@ function runUpdater(game, args, onLog) {
 		// that is just "{" / "[") so the pretty-printed result doesn't flood
 		// the log.
 		let stdout = "";
+		let stdoutFull = false;
 		let jsonStarted = false;
 		const emit = (chunk, isStdout) => {
 			for (const line of String(chunk).split(/\r?\n/)) {
@@ -3175,8 +3261,25 @@ function runUpdater(game, args, onLog) {
 			resolve(value);
 		};
 		child.on("error", (err) => finish({ error: `Pembaru tidak bisa dijalankan: ${err.message}` }));
+		// Pembaru yang tidak pernah selesai jangan menahan job selamanya.
+		const timer = setTimeout(() => {
+			try {
+				child.kill("SIGKILL");
+			} catch {
+				/* sudah mati */
+			}
+			finish({ error: `Pembaru melebihi batas waktu ${Math.round(UPDATE_TIMEOUT_MS / 60000)} menit.` });
+		}, UPDATE_TIMEOUT_MS);
+		if (timer.unref) timer.unref();
+		child.on("close", () => clearTimeout(timer));
 		child.stdout.on("data", (d) => {
-			stdout += d;
+			if (!stdoutFull) {
+				stdout += d;
+				if (stdout.length >= UPDATE_STDOUT_MAX) {
+					stdoutFull = true;
+					stdout = stdout.slice(0, UPDATE_STDOUT_MAX);
+				}
+			}
 			emit(d, true);
 		});
 		child.stderr.on("data", (d) => emit(d, false));
@@ -3478,12 +3581,18 @@ function ffmpegHas(encoder) {
 }
 
 /** Which output formats this machine can actually produce. */
+let capsCache = null;
 function exportCapabilities() {
-	return {
+	// Tiap panggilan menjalankan spawnSync ffmpeg 2x, ~41 ms memblokir event
+	// loop (terukur), dan hasilnya tidak berubah selama binarnya tidak
+	// ganti. Cukup sekali.
+	if (capsCache) return capsCache;
+	capsCache = {
 		ffmpeg: ffmpegHas("libvpx-vp9"),
 		webm: ffmpegHas("libvpx-vp9"),
 		gif: ffmpegHas("gif"),
 	};
+	return capsCache;
 }
 
 app.get("/api/export/capabilities", (req, res) => {
@@ -3709,9 +3818,14 @@ app.use(express.static(path.join(ROOT, "public")));
 
 app.use((req, res) => res.status(404).json({ error: "Endpoint tidak ditemukan." }));
 
-/* Safety net: an exception that escapes a route must not take the process
- * down with it (an uncaught throw inside an async handler is now a rejected
- * promise, and Express 4 forwards it here). Log it and answer 500 instead. */
+/* Safety net: an exception that escapes a synchronous route must not take
+ * the process down with it. Log it and answer 500 instead.
+ *
+ * Catatan jujur: handler async yang melempar rejected promise TIDAK
+ * diteruskan Express 4 ke middleware empat argumen ini — ia jadi
+ * unhandledRejection, dan di Node 20+ itu mengakhiri proses. Itulah gunanya
+ * penjaga tingkat proses di bawah, sekaligus alasan setiap handler async
+ * di file ini tetap dibungkus try/catch sendiri. */
 // eslint-disable-next-line no-unused-vars -- Express identifies error middleware by arity (4 args).
 app.use((err, req, res, next) => {
 	if (res.headersSent) return next(err);
