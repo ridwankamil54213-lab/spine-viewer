@@ -31,8 +31,24 @@ Semua lewat environment variable, semuanya opsional:
 | `HOST` | `0.0.0.0` | Interface bind. Set `127.0.0.1` kalau cuma mau akses lokal |
 | `MAX_UPLOAD_MB` | `64` | Batas upload lewat `/api/upload` |
 | `FFMPEG_PATH` | `ffmpeg` di `$PATH` | Untuk export video |
-| `EXPORT_MAX_FRAMES` | — | Batas jumlah frame sekali export |
-| `EXPORT_MAX_MB` | — | Batas ukuran hasil export |
+| `EXPORT_MAX_FRAMES` | `600` | Batas jumlah frame sekali export |
+| `EXPORT_MAX_MB` | `96` | Batas ukuran total frame per job export |
+| `EXPORT_TMP_TTL_HOURS` | `2` | Sisa frame (`data/exports/`) yang ditinggalkan dibersihkan otomatis |
+| `EXPORT_OUT_TTL_HOURS` | `168` | Umur video hasil export sebelum dibersihkan |
+| `UPLOAD_LIMIT_MAX` | `6` | Unggahan per menit per IP |
+| `RATE_LIMIT_MAX` | `30` | Permintaan ketat (`/api/models`, `/api/update`, `/finish`) per menit per IP |
+| `FRAME_LIMIT_MAX` | `3000` | Frame export per menit (satu request per frame, jadi langkahnya sendiri) |
+| `SCAN_TREE_TTL_MS` | `15000` | Seberapa sering isi `assets/` dicek ulang (di worker thread) |
+| `UPDATE_TIMEOUT_MS` | `1800000` | Batas waktu satu pembaruan game |
+| `BD2_MEDIA` | `/srv/spine-assets/bd2-media` | Audio/ikon BD2 |
+| `OR_AUDIO_DIR` | `/srv/spine-assets/orisries/audio` | Soundtrack OrisRies |
+
+> **Keamanan.** Server ini tidak punya akun sama sekali: siapa pun yang
+> bisa menembus port-nya bisa mengunggah, menghapus model, menjalankan
+> pembaruan (spawn proses), dan memakai export. Ada rate limit per IP
+> dan penjaga path, tapi itu menahan *hammering*, bukan pengunjung yang
+> sengaja. Untuk akses dari luar, taruh di belakang reverse proxy
+> bertoken — atau set `HOST=127.0.0.1`.
 
 ## Cara pakai
 
@@ -54,6 +70,17 @@ langsung dimuat dan diputar.
   hover buat highlight, klik buat inspect.
 - **FPS meter** — rate live + min/avg + grafik.
 - **Live2D** — model Cubism (`.moc3`) juga didukung selain Spine.
+- **Banding A/B di panggung** — di tab inspektor *Bandingkan*, tombol
+  **"A/B di panggung"** memuat model B di sebelah model A yang sedang
+  dibuka. Keduanya digerakkan oleh **satu clock**, dan seek-nya memakai
+  *proporsi siklus* bukan detik mentah — durasi A dan B hampir selalu beda
+  (mis. 5,33 s vs 2,5 s), jadi meneruskan detik yang sama membuat B berputar
+  dua kali lebih cepat dan perbandingannya menyesatkan. Pilih tata letak
+  **Berdampingan** atau **Tumpang tindih**. Klik-kanan sebuah kartu model
+  (saat mode A/B aktif) menggantikan B dengan model itu.
+- **Onion skin** — di panel yang sama, 1–3 frame: pose N frame sebelumnya
+  digambar lebih redup di belakang pose saat ini, untuk memeriksa timing
+  antar frame. Hanya menyalin pose, bukan piksel.
 - **Tautan (permalink)** — tombol 🔗 di header (atau `Ctrl/Cmd-Shift-C`)
   menghasilkan URL yang memuat ulang persis tampilan sekarang: model, animasi,
   skin/varian, waktu di playhead, dan status play/pause, plus seluruh kamera
@@ -151,6 +178,19 @@ runtime asli (`spine-pixi-v7-42`), karena 4.1 lahir sebelum formatnya ada dan
 | `GET /api/update/:game` | Jalankan updater game |
 | `GET /api/update/:game/status` | Status updater |
 | `GET /api/bd2-audio`, `/api/orisries-audio` | Audio game tertentu |
+
+Catatan endpoint:
+
+- `GET /api/models` dikirim terkompresi (27 MB → ~2,3 MB) dan memakai ETag,
+  jadi muat-ulang yang tidak berubah dijawab `304` tanpa badan. `?game=`
+  mengembalikan satu game saja (lebih ringan kalau cuma butuh itu).
+  `?refresh=1` memaksa pindai ulang — masuk rate limit ketat, karena
+  pindai ulang penuh itu berat.
+- `DELETE /api/models/:id` menerima id persis seperti di daftar model
+  (`game/model`, variannya `game/model#varian`) dan menghapus **foldernya**.
+  Id yang bukan sebuah model dibalas `404`, bukan sukses palsu.
+- Upload menolak folder apa pun yang keluar dari `assets/`, dan dibatasi
+  6 per menit per IP.
 
 ## Smoke test
 
