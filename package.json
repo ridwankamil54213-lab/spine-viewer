@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@esotericsoftware/spine-pixi-v7": "^4.3.13",
+    "compression": "^1.8.2",
     "express": "^4.22.2",
     "multer": "^2.3.0",
     "pixi-live2d-display": "^0.5.0-beta",

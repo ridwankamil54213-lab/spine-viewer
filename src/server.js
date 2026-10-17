@@ -5,10 +5,18 @@ const fs = require("fs");
 const fsp = require("fs/promises");
 const express = require("express");
 const multer = require("multer");
+const compression = require("compression");
+const zlib = require("zlib");
+const crypto = require("crypto");
+const { promisify } = require("util");
 const { spawn, spawnSync } = require("child_process");
 const { SkeletonBinary, AtlasAttachmentLoader } = require("@pixi-spine/runtime-4.1");
 const { TextureAtlas } = require("@pixi-spine/base");
 const { detectFromBinary, detectFromJson, pickRuntime } = require("./spine-version.cjs");
+const { Worker } = require("worker_threads");
+// Jalan menyusuri assets/ dipindah ke modul terpisah supaya bisa dipakai
+// dari dua tempat: jalur sinkron di sini dan worker thread (lihat bawah).
+const { walkAssets } = require("./scan-tree");
 
 /** Same API surface across runtimes, so pick by detected version. */
 const RUNTIMES = {
@@ -1988,13 +1996,21 @@ app.use((req, res, next) => {
 	next();
 });
 
+/* Kompresi untuk semua respons teks. Terukur di host ini /api/models (27 MB)
+ * turun ke ~2,3 MB dan /dist/viewer.js (4 MB) ke ratusan KB kalau di-gzip.
+ * Tekstur PNG/JPEG tidak ikut — filter bawaan melewatkan tipe biner — jadi
+ * alur render model tidak berubah sama sekali. /api/models sendiri sudah
+ * membawa Buffer gzip hasil cache, dan middleware ini melewati respons yang
+ * sudah punya Content-Encoding. */
+app.use(compression());
+
 app.use(express.json({ limit: "2mb" }));
 
 /* The app has no accounts, so anyone who can reach the port can ask it to
  * spawn ffmpeg or a downloader. A tiny in-process rate limit keeps a public
  * deployment from being trivially turned into a CPU/disk hog. It is per-IP
  * and intentionally generous: it only stops hammering, not real use. */
-const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/finish", "/api/export/cancel"];
+const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/finish", "/api/export/cancel", "/api/models"];
 // Exporting a video POSTs ONE REQUEST PER FRAME, so /api/export/frame must not
 // share the 30/min ceiling meant to stop hammering: any export longer than ~1s
 // at 30fps tripped it with "Terlalu banyak permintaan" even though the user did
@@ -2003,17 +2019,21 @@ const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/finish", "/api/export
 // (ffmpeg in /finish, updater downloads) keep the strict one.
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 30;
 const FRAME_LIMIT_MAX = Number(process.env.FRAME_LIMIT_MAX) || 3000;
+// Unggah bisa menulis puluhan MB per panggilan ke disk yang sama, jadi
+// pantasnya punya langkah sendiri yang jauh lebih ketat daripada 30/menit.
+const UPLOAD_LIMIT_MAX = Number(process.env.UPLOAD_LIMIT_MAX) || 6;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const rateBuckets = new Map();
 
 function rateLimit(req, res, next) {
 	const isFrame = req.path.startsWith("/api/export/frame");
-	if (!isFrame && !RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
-	const max = isFrame ? FRAME_LIMIT_MAX : RATE_LIMIT_MAX;
+	const isUpload = req.path.startsWith("/api/upload");
+	if (!isFrame && !isUpload && !RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
+	const max = isFrame ? FRAME_LIMIT_MAX : isUpload ? UPLOAD_LIMIT_MAX : RATE_LIMIT_MAX;
 	const now = Date.now();
 	// Separate bucket per tier: otherwise a long export would burn the strict
 	// budget and then block /finish.
-	const key = (req.ip || req.socket?.remoteAddress || "unknown") + "|" + (isFrame ? "frame" : "strict");
+	const key = (req.ip || req.socket?.remoteAddress || "unknown") + "|" + (isFrame ? "frame" : isUpload ? "upload" : "strict");
 	let bucket = rateBuckets.get(key);
 	if (!bucket || now > bucket.resetAt) {
 		bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
@@ -2301,11 +2321,69 @@ app.post("/api/new-models/dismiss", (req, res) => {
 });
 
 // --- API ---
+/* Respons /api/models berbobot 27 MB untuk 38.515 model (terukur). Baik
+ * JSON.stringify (88 ms) maupun gzip (411 ms CPU) mahal kalau diulang tiap
+ * request, jadi keduanya dihitung SEKALI per signature dan hasilnya
+ * disimpan di memori. ETag-nya ikut dihitung sekali, sehingga muat-ulang
+ * yang tidak berubah dijawab 304 tanpa menyentuh body sama sekali. */
+const gzipAsync = promisify(zlib.gzip);
+let modelsPayload = { key: "", body: null, gzPromise: null, etag: "" };
+
+function buildModelsPayload(models) {
+	const key = `${cache.signature}:${models.length}`;
+	if (modelsPayload.key === key && modelsPayload.body) return modelsPayload;
+	const body = JSON.stringify({ models });
+	modelsPayload = {
+		key,
+		body,
+		gzPromise: null,
+		etag: `W/"${body.length.toString(36)}-${crypto.createHash("sha1").update(body).digest("base64url").slice(0, 27)}"`,
+	};
+	return modelsPayload;
+}
+
 app.get("/api/models", (req, res) => {
 	try {
-		res.json({ models: getModels({ force: req.query.refresh === "1" }) });
+		const models = getModels({ force: req.query.refresh === "1" });
+
+		// Filter per game. README sudah lama menjanjikan ?game=, tapi
+		// query-nya dilempar dan 38.515 model selalu dikirim utuh.
+		const game = typeof req.query.game === "string" ? req.query.game.trim() : "";
+		if (game) {
+			const sub = models.filter((m) => m.game === game || m.gameLabel === game);
+			return res.json({ models: sub, game, total: models.length });
+		}
+
+		const payload = buildModelsPayload(models);
+		res.setHeader("ETag", payload.etag);
+		res.setHeader("Cache-Control", "no-cache");
+		if (req.headers["if-none-match"] === payload.etag) return res.status(304).end();
+
+		const wantsGzip = /\bgzip\b/i.test(String(req.headers["accept-encoding"] || ""));
+		if (!wantsGzip) {
+			res.type("application/json");
+			return res.send(payload.body);
+		}
+		if (!payload.gzPromise) payload.gzPromise = gzipAsync(payload.body, { level: 6 });
+		payload.gzPromise.then(
+			(gz) => {
+				// Content-Encoding sudah diisi manual sehingga middleware
+				// compression melewati respons ini — gzip-nya memang hasil cache.
+				res.setHeader("Content-Encoding", "gzip");
+				res.setHeader("Vary", "Accept-Encoding");
+				res.type("application/json");
+				res.send(gz);
+			},
+			(err) => {
+				// Kompresi gagal bukan alasan mematahkan halaman.
+				console.error("[api] gagal mengompres /api/models:", err.message);
+				res.type("application/json");
+				res.send(payload.body);
+			},
+		);
 	} catch (err) {
-		res.status(500).json({ error: "Gagal memindai folder aset: " + err.message });
+		console.error("[api] gagal menyusun /api/models:", err);
+		res.status(500).json({ error: "Gagal memindai folder aset." });
 	}
 });
 
