@@ -76,7 +76,9 @@ langsung dimuat dan diputar.
   kamera sendiri (scroll untuk zoom panel B tidak menyentuh panel A) —
   perlu karena ukuran kanvas Spine sangat bervariasi (3839×6715 vs
   1136×2260 pada satu pasang yang diuji; median pustaka 947×1334).
-  Geser model B dengan **tombol kanan** (kiri tetap menggeser kamera A),
+  Geser model B dengan **tombol kanan**. Drag kiri dan roda di atas sebuah
+  panel menggerakkan kamera panel ITU (di mode tumpang tindih, keduanya
+  sekaligus), jadi A dan B bisa di-zoom dan dipan sendiri-sendiri.
   pakai **Reset posisi** untuk mengembalikan, dan **Kunci** bila ingin
   A ikut bergerak supaya hanya posisi relatifnya yang berubah.
   Klik-kanan sebuah kartu model menggantikan B saat mode A/B aktif. Keduanya digerakkan oleh **satu clock**, dan seek-nya memakai

@@ -532,6 +532,24 @@ const AB = {
 
 /** Seretan posisi model B. null = tidak sedang menyeret. */
 let abDrag = null;
+/** Panel yang kameranya sedang diseret: "A", "B", atau "BOTH" (overlay). */
+let dragPane = null;
+/** Panel yang sedang di-pinch, untuk zoom sentuh. */
+let pinchPane = "A";
+
+/** Panel mana yang berada di bawah titik layar ini. */
+function paneUnder(clientX, clientY) {
+	const paneB = document.getElementById("ab-pane-b");
+	if (!AB.on || !AB.second || !paneB || paneB.hidden) return "A";
+	// Mode tumpang tindih: panel B menutupi semuanya, jadi seretan
+	// menggerakkan KEDUA kamera supaya posisi relatifnya tidak berubah.
+	if (AB.layout === "overlay") return "BOTH";
+	const r = paneB.getBoundingClientRect();
+	const inB =
+		clientX >= r.left && clientX <= r.right &&
+		clientY >= r.top && clientY <= r.bottom;
+	return inB ? "B" : "A";
+}
 /** Container model B — hidup di luar `world` supaya posisinya piksel layar. */
 let abSecondRoot = null;
 
@@ -5699,10 +5717,12 @@ el.canvasWrap.addEventListener("pointerdown", (e) => {
 
 	if (pointers.size === 1) {
 		dragging = { x: e.clientX, y: e.clientY };
+		dragPane = paneUnder(e.clientX, e.clientY);
 		el.canvasWrap.classList.add("is-dragging");
 	} else if (pointers.size === 2) {
 		// second finger down: stop panning, start pinching
 		dragging = null;
+		pinchPane = paneUnder(e.clientX, e.clientY);
 		const r = el.canvasWrap.getBoundingClientRect();
 		const c = pinchCenter();
 		pinch = { dist: pinchDist(), cx: c.x - r.left, cy: c.y - r.top };
@@ -5727,15 +5747,34 @@ el.canvasWrap.addEventListener("pointermove", (e) => {
 	if (pointers.size >= 2 && pinch) {
 		const dist = pinchDist();
 		if (pinch.dist > 0 && dist > 0) {
-			zoomBy(dist / pinch.dist, pinch.cx, pinch.cy);
+			const f = dist / pinch.dist;
+			if (pinchPane === "B" || pinchPane === "BOTH") {
+				camB.zoom = Math.min(12, Math.max(0.05, camB.zoom * f));
+				applyTransform();
+			} else {
+				zoomBy(f, pinch.cx, pinch.cy);
+			}
 			pinch.dist = dist;
 		}
 		return;
 	}
 
 	if (!dragging) return;
-	state.panX += e.clientX - dragging.x;
-	state.panY += e.clientY - dragging.y;
+	const dx = e.clientX - dragging.x;
+	const dy = e.clientY - dragging.y;
+	const pane = dragPane || "A";
+	// Geser kamera panel yang diseret, bukan selalu kamera A. Dulu seretan
+	// di atas panel B tetap menggerakkan model A, jadi model B sama sekali
+	// tidak bisa dipindah dengan drag — yang jalan cuma zoom (roda), karena
+	// itu memang sudah diarahkan per panel.
+	if (pane === "B" || pane === "BOTH") {
+		camB.panX += dx;
+		camB.panY += dy;
+	}
+	if (pane === "A" || pane === "BOTH") {
+		state.panX += dx;
+		state.panY += dy;
+	}
 	dragging = { x: e.clientX, y: e.clientY };
 	applyTransform();
 });
@@ -5748,6 +5787,7 @@ const endDrag = (e) => {
 	}
 	if (pointers.size === 0) {
 		dragging = null;
+		dragPane = null;
 		el.canvasWrap.classList.remove("is-dragging");
 	} else if (pointers.size === 1) {
 		// lifted one finger of a pinch: resume panning from the survivor
@@ -7060,6 +7100,11 @@ function permalinkState() {
 		if (AB.layout !== "split") s.abl = AB.layout;
 		if (AB.onion) s.abo = AB.onion;
 		if (AB.lock) s.abk = 1;
+		if (Math.abs(camB.zoom - 1) > 1e-4) s.cbz = round2(camB.zoom);
+		if (camB.panX || camB.panY) {
+			s.cbx = round2(camB.panX);
+			s.cby = round2(camB.panY);
+		}
 		if (AB.offset.x || AB.offset.y) {
 			s.abx = round2(AB.offset.x);
 			s.aby = round2(AB.offset.y);
@@ -7277,6 +7322,12 @@ async function applyPermalink(s) {
 					y: Number(s.aby) || 0,
 				};
 				await abStart(mB);
+				// Kamera B di-set SETELAH abStart: fitModelB() di dalamnya
+				// menimpa zoom/pan B, jadi nilai dari tautan akan hilang
+				// kalau dipasang sebelumnya.
+				if (Number.isFinite(Number(s.cbz))) camB.zoom = Number(s.cbz);
+				camB.panX = Number(s.cbx) || 0;
+				camB.panY = Number(s.cby) || 0;
 				abSyncUI();
 			}
 		}
