@@ -344,6 +344,12 @@ const el = {
 	cmpA: $("#cmp-a"),
 	cmpB: $("#cmp-b"),
 	cmpRun: $("#cmp-run"),
+	abToggle: $("#ab-toggle"),
+	abLabel: $("#ab-label"),
+	abBar: $("#ab-bar"),
+	abLayout: $("#ab-layout"),
+	abOnion: $("#ab-onion"),
+	cmpNote: $("#cmp-note"),
 	cmpResult: $("#cmp-result"),
 	playBtn: $("#play-btn"),
 	prevBtn: $("#prev-btn"),
@@ -468,6 +474,60 @@ let live2dDispose = null;
  * path gets there first (load, eject, game switch, delete). Never call
  * spine.destroy()/live2dDispose() directly.
  */
+/* ------------------------------------------------------------------ *
+ * Banding A/B: dua model, satu jam
+ * ------------------------------------------------------------------ *
+ * Pilihan desain yang sengaja dibuat:
+ *
+ * - Model B hidup sebagai instance `AB.second` TERPISAH dari `spine`. Semua
+ *   jalur teardown, PMA, part picker, dan inspector sudah berputar di sekitar
+ *   `spine`; menaruh model kedua di variabel yang sama akan membuat separuh
+ *   kode mengira B itu model utama.
+ * - Keduanya digerakkan oleh SATU clock (`clock.tick`), bukan dua ticker,
+ *   sehingga A dan B tidak pernah melenceng satu sama lain.
+ * - Onion skin memakai snapshot pose (bukan salinan render), supaya biayanya
+ *   hanya update skeleton + sekali gambar per bayangan.
+ */
+const AB = {
+	on: false,
+	second: null,      // instance Spine model B
+	runtime: null,
+	model: { A: null, B: null },
+	anim: { A: null, B: null },
+	dur: { A: 0, B: 0 },
+	layout: "split",   // "split" (berdampingan) | "overlay" (tumpang tindih)
+	onion: 0,          // jumlah bayangan ke belakang (0 = mati)
+	opacity: 0.3,
+	seq: 0,
+	busy: false,
+	pending: null,
+	ghostRoot: null,
+	ghosts: [],
+};
+
+/** Instance yang digerakkan ticker: `spine`, plus model B saat A/B aktif. */
+function drivenSpines() {
+	return AB.on && AB.second?.skeleton ? [spine, AB.second] : [spine];
+}
+
+/** Seek instance ke detik `t` pada animasinya, lalu terapkan posenya. */
+function poseAt(inst, animName, t) {
+	if (!inst?.state || !inst?.skeleton || !animName) return;
+	let track = inst.state.tracks?.[0];
+	// Instance baru belum punya track sama sekali, dan track lama bisa saja
+	// memegang animasi lain — dua keadaan yang harus ditangani terpisah.
+	// (Hanya mengandalkan `track.animation.name !== animName` membuat model B
+	// diam di pose setup:-track-nya undefined, bukan beda nama.)
+	if (!track || !track.animation || track.animation.name !== animName) {
+		inst.state.setAnimation(0, animName, true);
+		track = inst.state.tracks?.[0];
+		if (!track) return;
+	}
+	track.trackTime = t;
+	// dt = 0: kita yang menempatkan track, update() hanya menerapkan + gambar.
+	inst.update?.(0);
+}
+
 function destroyCurrent({ removeFromStage = true } = {}) {
 	const s = spine;
 	const d = live2dDispose;
@@ -731,6 +791,26 @@ app.ticker.add(() => {
 	// the playhead is.
 	const dt = clock.tick(app.ticker.deltaMS);
 
+	// Mode A/B: seek KEDUA model dari SATU clock.
+	//
+	// Seek-nya memakai PROPORSI siklus, bukan detik mentah. Durasi A dan B
+	// nyaris selalu beda (5,33 s vs 2,5 s pada pengujian), jadi meneruskan
+	// detik yang sama membuat B berputar dua kali lebih cepat dari A —
+	// perbandingan jadi meaningless. Proporsi membuat keduanya selalu berada
+	// di titik siklus yang sama, dan satu clock menjamin mereka tidak pernah
+	// melenceng.
+	if (AB.on && AB.second?.skeleton) {
+		const dA = duration || 1;
+		const dB = AB.dur.B || 1;
+		const prop = (state.trackTime / dA) % 1;
+		poseAt(AB.second, AB.anim.B, prop * dB);
+	}
+
+	// Onion skin: tetap dipanggil walau nilainya 0, supaya bayangan yang
+	// sudah ada dibuang saat pengguna mematikannya (dulu early-return di
+	// dalam plus syarat onion>0 di sini membuat 3 bayangan menempel terus).
+	if (AB.on) updateOnionGhosts();
+
 	if (state.scrubbing) {
 		// The user is dragging: the track follows state.trackTime, and the
 		// clock follows the track so nothing else drifts away from it.
@@ -872,6 +952,17 @@ function applyTransform() {
 	const h = el.canvasWrap.clientHeight;
 	world.position.set(w / 2 + state.panX, h / 2 + state.panY);
 	world.scale.set(state.zoom * (state.flip ? -1 : 1), state.zoom);
+	// Mode A/B: panggung dibagi dua. Skala diperkecil supaya model tidak
+	// meluber ke panel sebelahnya, dan B digeser ke kanan.
+	if (AB.on && AB.second) {
+		world.scale.set(world.scale.x * 0.5, world.scale.y * 0.5);
+		if (AB.layout === "split") {
+			world.position.x -= w / 4;
+			AB.second.position.set(w / 2, 0);
+		} else {
+			AB.second.position.set(0, 0);
+		}
+	}
 	// The trailing "%" is drawn by CSS (.zoom-label::after) so the number here
 	// stays tabular and the box doesn't resize between "9%" and "100%".
 	el.zoomLabel.textContent = String(Math.round(state.zoom * 100));
@@ -1937,6 +2028,9 @@ async function loadModelBody(model) {
 	el.loading.textContent = "Memuat " + model.name + "…";
 	// Live2D-only controls; each loader turns them back on as needed.
 	if (el.l2dExtra) el.l2dExtra.hidden = true;
+	// Mode A/B tidak bisa bertahan lintas model: B adalah instance yang
+	// terikat pada model A saat ini.
+	if (AB.on || AB.second) abTeardown();
 
 	try {
 		// Any previous Spine 2.x model left an iframe over the stage; clear it
@@ -2906,25 +3000,59 @@ function renderSkinOptions() {
 }
 
 /** Fill the compare tab's model pickers with the current library listing. */
+/**
+ * Isi picker pembanding.
+ *
+ * Dulu kedua <select> diisi dengan SEMUA model di cakupan. Dibuka dari tampilan
+ * akar (tanpa game dipilih) itu berarti 34.698 <option> di masing-masing —
+ * 69.396 node dan 903 ms thread utama terblokir hanya untuk membuka sebuah tab.
+ * Sekarang: cakupannya dibatasi, dan daftar dibentuk dengan DocumentFragment
+ * sekali jalan.
+ */
+const CMP_LIMIT = 500;
+
+function cmpScope() {
+	// Satu game: daftar game itu. Tanpa game terpilih: hanya model yang
+	// cocok dengan kotak pencarian (kalau kosong, tampilkan peringatan).
+	if (browse.game) {
+		const list = models.filter((m) => (m.game || "lainnya") === browse.game);
+		return { list, note: "" };
+	}
+	const q = el.search.value.trim().toLowerCase();
+	if (!q) return { list: [], note: "Pilih sebuah game, atau ketik di kotak pencarian dulu." };
+	const list = models.filter(
+		(m) => m.id.toLowerCase().includes(q) || (m.name || "").toLowerCase().includes(q),
+	);
+	return { list: list.slice(0, CMP_LIMIT), note: list.length > CMP_LIMIT ? ` (${CMP_LIMIT} pertama)` : "" };
+}
+
 function renderCompareOptions() {
 	if (!el.cmpA || !el.cmpB) return;
-	const list = modelsInScope().map((m) => ({ value: m.id, text: modelLabel(m) + " · " + m.id }));
-	const opts = list.map((x) => x.value);
-	const texts = Object.fromEntries(list.map((x) => [x.value, x.text]));
-
+	const { list, note } = cmpScope();
 	const prevA = el.cmpA.value;
 	const prevB = el.cmpB.value;
+
 	for (const sel of [el.cmpA, el.cmpB]) {
-		sel.innerHTML = "";
-		for (const v of opts) {
+		const frag = document.createDocumentFragment();
+		if (!list.length) {
 			const o = document.createElement("option");
-			o.value = v;
-			o.textContent = texts[v];
-			sel.append(o);
+			o.value = "";
+			o.textContent = note || "—";
+			frag.append(o);
+		} else {
+			for (const m of list) {
+				const o = document.createElement("option");
+				o.value = m.id;
+				o.textContent = modelLabel(m) + " · " + m.id;
+				frag.append(o);
+			}
 		}
+		sel.replaceChildren(frag);
 	}
-	el.cmpA.value = opts.includes(prevA) ? prevA : opts[0];
-	el.cmpB.value = opts.includes(prevB) ? prevB : opts[Math.min(1, opts.length - 1)];
+	el.cmpNote && (el.cmpNote.textContent = note);
+	const opts = list.map((m) => m.id);
+	el.cmpA.value = opts.includes(prevA) ? prevA : opts[0] || "";
+	el.cmpB.value = opts.includes(prevB) ? prevB : opts[Math.min(1, opts.length - 1)] || "";
 }
 
 /** Load a model's skeleton data on demand, for comparison only. */
@@ -3011,6 +3139,167 @@ function cmpBlock(title, a, b, unit = "") {
 	return el;
 }
 
+/**
+ * Bayangan onion skin: pose N frame sebelumnya, digambar lebih redup.
+ *
+ * Hanya merekam pose (bukan piksel), jadi biayanya satu update skeleton per
+ * bayangan. Dipakai untuk melihat timing antar frame tanpa mengedit apa pun.
+ */
+function updateOnionGhosts() {
+	if (!AB.ghostRoot || !spine?.skeleton) return;
+	const want = AB.onion;
+	// Samakan jumlah bayangan dengan yang diminta.
+	while (AB.ghosts.length > want) {
+		const g = AB.ghosts.pop();
+		try {
+			// JANGAN destroy(true): bayangan berbagi atlas dengan model A,
+			// dan destroy(true) membuang base texture-nya — model utama lalu
+			// ikut rusak ("Cannot read properties of null (reading 'width')").
+			// Cukup lepas dari panggung.
+			AB.ghostRoot.removeChild(g);
+			g.destroy?.({ children: false, texture: false, baseTexture: false });
+		} catch {
+			/* sudah hilang */
+		}
+	}
+	while (AB.ghosts.length < want) {
+		const g = makeSpine(spineRuntime, spine.skeleton.data);
+		g.autoUpdate = false;
+		try {
+			g.alpha = AB.opacity;
+		} catch {
+			/* bukan DisplayObject yang punya alpha */
+		}
+		AB.ghostRoot.addChild(g);
+		AB.ghosts.push(g);
+	}
+	if (!want) return;   // daftar sudah dikosongkan di atas
+
+	const fps = Number(el.exportFps?.value) || 30;
+	const dur = duration || 1;
+	const step = 1 / Math.max(1, fps);
+	for (let i = 0; i < AB.ghosts.length; i++) {
+		const t = state.trackTime - step * (i + 1);
+		const wrapped = ((t % dur) + dur) % dur;
+		poseAt(AB.ghosts[i], animName, wrapped);
+		try {
+			AB.ghosts[i].alpha = AB.opacity * (1 - i / (AB.ghosts.length + 1));
+		} catch {
+			/* abaikan */
+		}
+	}
+}
+
+/** Samakan tampilan panel A/B dengan keadaan AB. */
+function abSyncUI() {
+	const on = AB.on;
+	if (el.abToggle) el.abToggle.dataset.on = String(on);
+	if (el.abBar) el.abBar.hidden = !on;
+	if (el.abLayout) el.abLayout.value = AB.layout;
+	if (el.abOnion) el.abOnion.value = String(AB.onion);
+	if (el.abLabel) {
+		el.abLabel.textContent = on
+			? `A: ${modelLabel(AB.model.A)} · B: ${modelLabel(AB.model.B)}`
+			: "";
+	}
+	applyTransform();
+}
+
+/** Matikan mode A/B dan buang instance model B. */
+function abTeardown() {
+	AB.on = false;
+	if (AB.ghostRoot) {
+		try {
+			// children:false + texture:false — bayangan memakai atlas milik
+			// model A, jadi menghancurkan teksturnya akan merusak model utama.
+			AB.ghostRoot.destroy({ children: false, texture: false, baseTexture: false });
+		} catch {
+			/* sudah hilang */
+		}
+	}
+	AB.ghostRoot = null;
+	AB.ghosts = [];
+	const s = AB.second;
+	AB.second = null;
+	AB.model = { A: null, B: null };
+	if (s) {
+		try {
+			stageRoot.removeChild(s);
+		} catch {
+			/* bukan anak */
+		}
+		try {
+			s.destroy?.(true);
+		} catch {
+			/* sudah hilang */
+		}
+	}
+	// Panggung kembali memakai satu viewport penuh.
+	applyTransform();
+	abSyncUI();
+}
+
+/**
+ * Muat model B dan nyalakan mode A/B.
+ *
+ * Diantre seperti loadModel: klik cepat pada dua model berurutan dulu
+ * memicu dua pemuatan bersamaan, dan yang paling lambat menang.
+ */
+async function abStart(modelB) {
+	if (!spine?.skeleton) {
+		toast("Buka model A dulu sebelum membandingkan.");
+		return;
+	}
+	if (AB.busy) {
+		AB.pending = modelB;
+		return;
+	}
+	AB.busy = true;
+	const seq = ++AB.seq;
+	try {
+		const parsed = await loadSkeletonDataFor(modelB);
+		if (seq !== AB.seq) return;
+		if (!parsed?.data?.bones?.length) throw new Error("Data skeleton tidak berisi tulang.");
+
+		abTeardown();
+		AB.second = makeSpine(parsed.runtime, parsed.data);
+		AB.second.autoUpdate = false;
+		stageRoot.addChild(AB.second);
+
+		AB.model = { A: current, B: modelB };
+		AB.runtime = parsed.runtime;
+		AB.on = true;
+
+		// Pilih animasi: pakai yang sama kalau ada di kedua model, supaya
+		// perbandingannya adil. Kalau tidak ada yang cocok, pakai milik B.
+		const animsB = (parsed.data.animations || []).map((a) => a.name);
+		const curA = AB.anim.A || animName;
+		const pick = (name) => (animsB.includes(name) ? name : animsB[0] || null);
+		AB.anim.A = curA;
+		AB.anim.B = pick(curA);
+		AB.dur.A = duration || 0;
+		AB.dur.B = parsed.data.animations?.find((a) => a.name === AB.anim.B)?.duration || 0;
+
+		AB.ghostRoot = new Container();
+		stageRoot.addChild(AB.ghostRoot);
+
+		abSyncUI();
+		toast(`A/B: ${modelLabel(AB.model.A)} ⟷ ${modelLabel(modelB)}`);
+	} catch (err) {
+		if (seq === AB.seq) {
+			console.error("[ab] gagal memuat model B:", err);
+			toast("Gagal memuat model B: " + (err?.message || err));
+		}
+	} finally {
+		AB.busy = false;
+		if (AB.pending) {
+			const next = AB.pending;
+			AB.pending = null;
+			abStart(next);
+		}
+	}
+}
+
 async function runCompare() {
 	if (!el.cmpResult) return;
 	const idA = el.cmpA.value;
@@ -3075,6 +3364,9 @@ function setInspectorTab(tab) {
 	}
 	el.slotList.closest(".insp-body").hidden = tab !== "slots";
 	el.cmpResult.closest(".insp-body").hidden = tab !== "compare";
+	// Panel A/B ikut tersinkron saat tabnya dibuka (mis. setelah reload
+	// permalink yang menyimpan mode A/B).
+	abSyncUI();
 	if (tab === "compare") renderCompareOptions();
 	if (tab === "slots") renderSlots();
 }
@@ -3142,6 +3434,30 @@ function initInspector() {
 		spine.update(0);
 	});
 	el.cmpRun?.addEventListener("click", runCompare);
+el.abToggle?.addEventListener("click", () => {
+	if (AB.on) {
+		abTeardown();
+		toast("Mode A/B dimatikan.");
+		return;
+	}
+	const idB = el.cmpB.value;
+	const mB = models.find((m) => m.id === idB);
+	if (!mB) {
+		toast("Pilih model B dulu di dropdown.");
+		return;
+	}
+	abStart(mB);
+});
+el.abLayout?.addEventListener("change", () => {
+	AB.layout = el.abLayout.value === "overlay" ? "overlay" : "split";
+	applyTransform();
+});
+el.abOnion?.addEventListener("change", () => {
+	AB.onion = Number(el.abOnion.value) || 0;
+	// Panggil sekarang juga: kalau mode A/B sedang dijeda, ticker tidak
+	// berjalan dan bayangan lama akan menempel.
+	updateOnionGhosts();
+});
 }
 
 function setSkin(name) {
@@ -3205,6 +3521,22 @@ function renderHud() {
 		$("#title-model").textContent = current.name;
 		document.title = current.name + " — Spine Stage";
 		el.gridLink.hidden = false;
+		return;
+	}
+	// Model 2.1 (Epic Seven, Project QT) tidak pernah mengisi `spine` — yang
+	// ada `spine21`. Tanpa cabang ini, renderHud (termasuk yang dipanggil dari
+	// dropdown PMA, yang berlaku untuk SEMUA model) menyembunyikan HUD yang
+	// barusan diisi loadLegacyModel, dan dia tidak pernah muncul lagi walau
+	// PMA dikembalikan ke "Otomatis".
+	if (spine21.active && spine21.state && current) {
+		el.hud.hidden = false;
+		$("#hud-model").textContent = current.name;
+		$("#hud-stats").innerHTML =
+			`<span><b>Spine ${current.spine || "2.1.27"}</b></span>` +
+			`<span><b>runtime 2.1</b></span>`;
+		$("#title-model").textContent = current.name;
+		document.title = current.name + " — Spine Stage";
+		if (el.gridLink) el.gridLink.hidden = false;
 		return;
 	}
 	if (!current || !spine) {
@@ -3988,6 +4320,12 @@ function renderModels() {
 		</span>
 		`;
 		btn.addEventListener("click", () => loadModel(m));
+	// Klik kanan (atau Alt+klik) memuat model ini sebagai B di panggung A/B.
+	btn.addEventListener("contextmenu", (e) => {
+		if (!AB.on && !e.altKey) return;   // hanya saat mode A/B sudah aktif
+		e.preventDefault();
+		abStart(m);
+	});
 
 		// Star toggle. Nested inside the card, but a separate button so
 		// clicking it doesn't also load the model.
@@ -5436,6 +5774,9 @@ function attachmentPixelScale(slot, attachment) {
  * Returns 0 when nothing measurable was found (caller falls back).
  */
 function sourcePixelScale(sp) {
+	// Model Cubism tidak punya .skeleton; dialog export memanggil ini untuk
+	// semua tipe model.
+	if (!sp?.skeleton) return 0;
 	const scales = [];
 	for (const slot of sp.skeleton.slots) {
 		const att = slotAttachment(slot);
@@ -5530,64 +5871,75 @@ async function runExport() {
 	// dimensions hard; WebM has no such problem.
 	const effHeight = transparent || format === "gif" ? Math.min(height, 360) : height;
 
-	EXPORT_STATE.busy = true;
-	EXPORT_STATE.cancel = false;
-	el.exportRun.disabled = true;
-	el.exportRun.textContent = "Mengekspor…";
-	el.exportProgress.hidden = false;
-	el.exportResult.hidden = true;
-	setExportProgress(0, frames);
-
-	// Freeze the live view so the user's playback state can't interfere and
-	// we can restore it exactly when we're done.
-	const wasPlaying = state.playing;
-	const wasTrackTime = spine.state?.tracks?.[0]?.trackTime ?? 0;
-	setPlaying(false);
-
-	// Stop the render ticker for the duration. Every await below yields to
-	// the event loop, which otherwise lets the ticker redraw the whole live
-	// stage between frames — pure waste, since we're rendering into our own
-	// RenderTexture, and it competes for the same GPU/CPU.
-	app.ticker.stop();
-
-	const job = exportJobId();
-	const bounds = modelBounds(spine);
-	const outH = Math.max(2, Math.round(effHeight / 2) * 2);
-	const outW = Math.max(2, Math.round((bounds.w / Math.max(bounds.h, 1)) * outH / 2) * 2);
-
-	const holder = new Container();
-	const snapshot = new Container();
-	holder.addChild(snapshot);
-
-	// Render into a RenderTexture sized to the OUTPUT, not to the model's
-	// native bounds. Extracting a full-size frame and downscaling costs a
-	// glReadPixels + CPU flip over the whole source (measured: ~2.7s/frame on
-	// a 2242x2239 model); rendering at target size is ~58ms/frame.
-	const rt = RenderTexture.create({ width: outW, height: outH });
-	const fit = Math.min(outW / Math.max(bounds.w, 1), outH / Math.max(bounds.h, 1)) * 0.97;
-
-	// Place the model with an explicit transform instead of composing two
-	// nested containers: this is the one place where getting the Y axis wrong
-	// silently produces an upside-down or cropped video.
-	//
-	// Verified empirically: app.renderer.extract() does NOT flip Y (a red
-	// square drawn at GL top-left stays top-left), and Pixi's Spine container
-	// already renders Y-up content the right way up. So the correct transform
-	// is a POSITIVE y scale — negating it produces an upside-down export.
-	//   screenX = (x - bounds.x) * fit + offX
-	//   screenY = (y - bounds.y) * fit + offY
-	const offX = (outW - bounds.w * fit) / 2;
-	const offY = (outH - bounds.h * fit) / 2;
-	const tx = offX - bounds.x * fit;
-	const ty = offY - bounds.y * fit;
-
-	const out = document.createElement("canvas");
-	out.width = outW;
-	out.height = outH;
-	const ctx = out.getContext("2d");
-
+	// Di-deklarasikan di LUAR try: catch/finally tidak bisa melihat binding
+	// yang dibuat di dalam blok try, sedangkan keduanya memakainya (finally
+	// bahkan akan melempar ReferenceError kalau tidak — dan ReferenceError di
+	// finally membatalkan pengembalian status busy/ticker-nya sendiri).
 	let ok = false;
+	let holder = null;
+	let rt = null;
+	let wasPlaying = false;
+	let wasTrackTime = 0;
+	// Ikut di-deklarasikan di luar try supaya blok catch bisa membatalkan
+	// job-nya; frame yang sudah terlanjur terunggah ditinggalkan begitu saja
+	// kalau ekspor gagal (dulu hanya dibersihkan sweeper 2 jam kemudian).
+	let job = "";
 	try {
+		EXPORT_STATE.busy = true;
+		EXPORT_STATE.cancel = false;
+		el.exportRun.disabled = true;
+		el.exportRun.textContent = "Mengekspor…";
+		el.exportProgress.hidden = false;
+		el.exportResult.hidden = true;
+		setExportProgress(0, frames);
+
+		// Freeze the live view so the user's playback state can't interfere and
+		// we can restore it exactly when we're done.
+	 wasPlaying = state.playing;
+	 wasTrackTime = spine.state?.tracks?.[0]?.trackTime ?? 0;
+		setPlaying(false);
+
+		// Stop the render ticker for the duration. Every await below yields to
+		// the event loop, which otherwise lets the ticker redraw the whole live
+		// stage between frames — pure waste, since we're rendering into our own
+		// RenderTexture, and it competes for the same GPU/CPU.
+		app.ticker.stop();
+
+		job = exportJobId();
+		const bounds = modelBounds(spine);
+		const outH = Math.max(2, Math.round(effHeight / 2) * 2);
+		const outW = Math.max(2, Math.round((bounds.w / Math.max(bounds.h, 1)) * outH / 2) * 2);
+
+	 holder = new Container();
+		const snapshot = new Container();
+		holder.addChild(snapshot);
+
+		// Render into a RenderTexture sized to the OUTPUT, not to the model's
+		// native bounds. Extracting a full-size frame and downscaling costs a
+		// glReadPixels + CPU flip over the whole source (measured: ~2.7s/frame on
+		// a 2242x2239 model); rendering at target size is ~58ms/frame.
+	 rt = RenderTexture.create({ width: outW, height: outH });
+		const fit = Math.min(outW / Math.max(bounds.w, 1), outH / Math.max(bounds.h, 1)) * 0.97;
+
+		// Place the model with an explicit transform instead of composing two
+		// nested containers: this is the one place where getting the Y axis wrong
+		// silently produces an upside-down or cropped video.
+		//
+		// Verified empirically: app.renderer.extract() does NOT flip Y (a red
+		// square drawn at GL top-left stays top-left), and Pixi's Spine container
+		// already renders Y-up content the right way up. So the correct transform
+		// is a POSITIVE y scale — negating it produces an upside-down export.
+		//   screenX = (x - bounds.x) * fit + offX
+		//   screenY = (y - bounds.y) * fit + offY
+		const offX = (outW - bounds.w * fit) / 2;
+		const offY = (outH - bounds.h * fit) / 2;
+		const tx = offX - bounds.x * fit;
+		const ty = offY - bounds.y * fit;
+
+		const out = document.createElement("canvas");
+		out.width = outW;
+		out.height = outH;
+		const ctx = out.getContext("2d");
 		for (let i = 0; i < frames; i++) {
 			if (EXPORT_STATE.cancel) break;
 
@@ -6019,12 +6371,22 @@ function initExport() {
 	});
 }
 
+/* Debounce pencarian.
+ *
+ * Tanpa jeda, SETIAP ketikan menyaring 38.515 model: filter per game, filter
+ * roots, sort dengan isNewModel() di tiap pembanding, plus sampai tiga kali
+ * gameBuckets(). Terukur 9-28 ms per ketikan (bisa lebih di katalog yang
+ * lebih besar) — di ponsel itu satu frame hilang untuk tiap huruf. */
+let searchTimer = 0;
 el.search.addEventListener("input", () => {
-	// Searching resets to page 1 — staying on page 7 of a 2-page result is a
-	// dead end the user has to notice and recover from.
-	browse.page = 1;
-	if (browse.view === "models" && browse.game) renderModels();
-	else renderGames(el.search.value);
+	clearTimeout(searchTimer);
+	searchTimer = setTimeout(() => {
+		// Searching resets to page 1 — staying on page 7 of a 2-page result is a
+		// dead end the user has to notice and recover from.
+		browse.page = 1;
+		if (browse.view === "models" && browse.game) renderModels();
+		else renderGames(el.search.value);
+	}, 140);
 });
 el.backBtn?.addEventListener("click", backToGames);
 
@@ -6142,11 +6504,13 @@ window.addEventListener("keydown", (e) => {
 			}
 			break;
 		case "Escape":
-			// The export dialog is the topmost thing on screen, so it gets
-			// first refusal on Escape.
-			if (!el.exportModal?.hidden) {
+			// Tiga dialog memakai judul tombol "Tutup (Esc)", jadi Escape harus
+			// benar-benar menutupnya — dan JANGAN jatuh ke cabang "keluar dari
+			// daftar model" di belakang dialog yang masih terbuka (dulu: Esc pada
+			// dialog tautan/log tidak menutup apa pun, malah pustaka pindah
+			// tampilan di belakangnya).
+			if (closeTopmostModal()) {
 				e.preventDefault();
-				closeExport();
 			} else if (browse.view === "models") {
 				// back out of a game's model list to the game picker
 				e.preventDefault();
@@ -6245,6 +6609,25 @@ window.spineStage = {
 			active: pmaActive(),
 			alphaMode: currentAlphaMode(),
 		};
+	},
+	// Mode A/B (dua model, satu jam) — diekspos supaya uji dan konsol bisa
+	// memastikan keadaannya tanpa menebak dari DOM.
+	get ab() {
+		return {
+			on: AB.on,
+			second: AB.second,
+			anim: { ...AB.anim },
+			dur: { ...AB.dur },
+			layout: AB.layout,
+			onion: AB.onion,
+			ghosts: AB.ghosts,
+			model: { A: AB.model.A, B: AB.model.B },
+		};
+	},
+	abStart,
+	abTeardown,
+	get stageRoot() {
+		return stageRoot;
 	},
 	// Voice playback is driven by a detached Audio() object, which page JS
 	// cannot find via document.querySelector — expose it so tests (and the

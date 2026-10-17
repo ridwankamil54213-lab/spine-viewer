@@ -66,7 +66,7 @@
 				</button>
 			</div>
 
-			<input id="search" class="search" type="search" placeholder="Cari model…" autocomplete="off" />
+			<input id="search" class="search" type="search" aria-label="Cari model" placeholder="Cari model…" autocomplete="off" />
 
 			<div class="lib-filters">
 				<button id="fav-filter" class="btn btn-sm btn-fav" type="button" aria-pressed="false"
@@ -110,7 +110,7 @@
 				<p class="empty-s">Pilih salah satu dari pustaka di kiri untuk mulai memutar animasi.</p>
 			</div>
 
-			<div id="loading" class="loading" hidden></div>
+			<div id="loading" class="loading" role="status" aria-live="polite" hidden></div>
 
 			<!-- Shown only for Spine 2.1.27 models, which are drawn by the
 			     vendored legacy viewer rather than pixi-spine. -->
@@ -118,7 +118,7 @@
 				Spine 2.1.27 — ditampilkan dengan penampil legacy
 			</div>
 
-			<div id="error" class="error" hidden>
+			<div id="error" class="error" role="alert" hidden>
 				<strong>Tidak bisa memuat model</strong>
 				<p></p>
 			</div>
@@ -290,6 +290,29 @@
 					</label>
 					<button id="cmp-run" class="btn btn-sm">Bandingkan</button>
 				</div>
+				<div class="insp-tools">
+					<button id="ab-toggle" class="btn btn-sm" data-on="false">A/B di panggung</button>
+					<span id="ab-label" class="cmp-empty"></span>
+				</div>
+				<div class="insp-tools" id="ab-bar" hidden>
+					<label class="field-inline">
+						<span>Tata letak</span>
+						<select id="ab-layout" class="select select-sm">
+							<option value="split">Berdampingan</option>
+							<option value="overlay">Tumpang tindih</option>
+						</select>
+					</label>
+					<label class="field-inline">
+						<span>Onion skin</span>
+						<select id="ab-onion" class="select select-sm">
+							<option value="0">Mati</option>
+							<option value="1">1 frame</option>
+							<option value="2">2 frame</option>
+							<option value="3">3 frame</option>
+						</select>
+					</label>
+				</div>
+				<div id="cmp-note" class="cmp-empty"></div>
 				<div id="cmp-result" class="cmp-result"></div>
 			</div>
 		</div>
