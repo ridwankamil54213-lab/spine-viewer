@@ -114,6 +114,50 @@ function makeTextureLoader(basePath, atlasParent) {
 }
 
 /**
+ * Perbaiki durasi animasi 2.1 yang NaN — kenapa ini perlu
+ * ------------------------------------------------------
+ * readAnimation() di vendor/spine21/spine.js menghitung durasi animasi
+ * dengan `Math.max(duration, timeline.frames[timeline.frameCount - 1])`
+ * (dan varian `frameCount * 3 - 3` untuk timeline tiga-slot). Tetapi
+ * timeline Spine 2.1 TIDAK punya properti `frameCount` — yang ada hanya
+ * getFrameCount() — jadi indeksnya NaN, hasilnya undefined, dan
+ * `Math.max(0, undefined)` = NaN. Terukur: SEMUA 17 animasi abigail (Epic
+ * Seven) berdurasi NaN.
+ *
+ * Bukan cuma angka jelek. Animation.apply menjalankan
+ * `if (loop && this.duration != 0) time %= this.duration;`, jadi dengan
+ * loop=true: `time %= NaN` = NaN. FfdTimeline.apply menerima time=NaN dan
+ * tak satu pun guard-nya cocok (NaN < x dan NaN >= x sama-sama false) →
+ * binarySearch1 balik nilai di luar panjang array → frameVertices[...]
+ * undefined → TypeError di frame PERTAMA → loop requestAnimationFrame mati
+ * → kanvas kosong total tanpa pesan apa pun (terukur: 0 piksel opaque,
+ * satu pageerror "Cannot read properties of undefined (reading '0')").
+ *
+ * Vendor tidak disentuh karena Spine Runtimes License melarang memodifikasi
+ * berkasnya. Durasi dihitung ulang dari JSON asli: semua keyframe punya
+ * bidang `time`, jadi maksimumnya adalah durasi sebenarnya.
+ */
+function fixAnimationDurations(skeletonData, skelJson) {
+	const walk = (node, max) => {
+		if (Array.isArray(node)) {
+			for (const x of node) max = walk(x, max);
+		} else if (node && typeof node === "object") {
+			if (typeof node.time === "number" && node.time > max) max = node.time;
+			for (const v of Object.values(node)) {
+				if (v && typeof v === "object") max = walk(v, max);
+			}
+		}
+		return max;
+	};
+	const byName = skelJson && skelJson.animations ? skelJson.animations : {};
+	for (const anim of skeletonData.animations || []) {
+		if (Number.isFinite(anim.duration) && anim.duration >= 0) continue;
+		const fromJson = walk(byName[anim.name], 0);
+		anim.duration = Number.isFinite(fromJson) ? fromJson : 0;
+	}
+}
+
+/**
  * Muat model 2.1 dan kembalikan negara yang bisa digambar berulang kali.
  *
  * @param {object} opts
@@ -164,10 +208,12 @@ export async function loadSpine21Model({ basePath, jsonFile, atlasFile }) {
 
 		const atlasLoader = new sp.AtlasAttachmentLoader(atlas);
 		const parser = new sp.SkeletonJson(atlasLoader);
-		const skeletonData = parser.readSkeletonData(JSON.parse(skelText));
+		const skelJson = JSON.parse(skelText);
+		const skeletonData = parser.readSkeletonData(skelJson);
 		if (!skeletonData?.bones?.length) {
 			throw new Error("Data skeleton tidak berisi tulang.");
 		}
+		fixAnimationDurations(skeletonData, skelJson);
 
 		const skeleton = new sp.Skeleton(skeletonData);
 		const stateData = new sp.AnimationStateData(skeletonData);

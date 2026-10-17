@@ -1207,14 +1207,10 @@ async function loadLegacyModel(model) {
 	const dirPath = String(model.id || "").split("#")[0];
 	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
 
-	// Tear down any pixi-spine model currently on the stage.
-	destroyCurrent();
-	teardownSpine21();
-	current = model;
-
-	el.loading.hidden = true;
-
 	// Cari skeleton JSON dan atlas di direktori model.
+	// Validasi DULU, tekan stage BELAKANGAN: dulu stage dihancurkan lebih dulu,
+	// jadi model .skel-yang-belum-dikonversi menghapus model lama lalu gagal —
+	// HUD masih menampilkan nama model yang sudah tidak ada di panggung.
 	let json = model.skeletonFile;
 	// Sebagian folder menyimpan ekspor JSON 2.x DI SEBELAH .skel biner (pairer
 	// server memilih .skel). Renderer legacy 2.1 butuh JSON-nya, jadi pakai
@@ -1240,6 +1236,11 @@ async function loadLegacyModel(model) {
 	// perpustakaan, bukan bagian path di disk.
 	const jsonFile = String(json).split("#")[0];
 	const atlasFile = String(atlasFileRaw).split("#")[0];
+
+	// Barulah sekarang model lama dilepas — file yang dibutuhkan sudah pasti ada.
+	destroyCurrent();
+	teardownSpine21();
+	current = model;
 
 	try {
 		spine21.state = await loadSpine21Model({
@@ -1350,39 +1351,60 @@ function teardownSpine21() {
 
 /** Loop gambar: satu rAF yang juga dipakai FPS meter. */
 function startSpine21Loop() {
+	// Hitung kegagalan per model: tanpa inisialisasi di sini, `undefined < 5`
+	// bernilai false dan frame pertama tidak akan pernah dijadwalkan.
+	spine21.errors = 0;
 	const frame = () => {
-		if (!spine21.active || !spine21.state) return;
-		const now = performance.now() / 1000;
-		// Batasi delta: tab yang kembali dari latar bisa lapor puluhan detik,
-		// yang melompatkan animasi jauh melewati akhirnya.
-		const delta = Math.min(now - spine21.lastTime, 0.1);
-		spine21.lastTime = now;
+		try {
+			if (!spine21.active || !spine21.state) return;
+			const now = performance.now() / 1000;
+			// Batasi delta: tab yang kembali dari latar bisa lapor puluhan detik,
+			// yang melompatkan animasi jauh melewati akhirnya.
+			const delta = Math.min(now - spine21.lastTime, 0.1);
+			spine21.lastTime = now;
 
-		spine21.time += state.playing ? delta * state.rate : 0;
-		advanceSpine21(spine21.state, state.playing ? delta * state.rate : 0);
+			spine21.time += state.playing ? delta * state.rate : 0;
+			advanceSpine21(spine21.state, state.playing ? delta * state.rate : 0);
 
-		const host = document.getElementById("canvas-wrap");
-		const w = host?.clientWidth || 1;
-		const h = host?.clientHeight || 1;
-		const canvas = spine21.canvas;
-		if (canvas && (canvas.width !== w || canvas.height !== h)) {
-			canvas.width = w;
-			canvas.height = h;
+			const host = document.getElementById("canvas-wrap");
+			const w = host?.clientWidth || 1;
+			const h = host?.clientHeight || 1;
+			const canvas = spine21.canvas;
+			if (canvas && (canvas.width !== w || canvas.height !== h)) {
+				canvas.width = w;
+				canvas.height = h;
+			}
+			if (canvas && spine21.ctx) {
+				drawSpine21(spine21.state, {
+					ctx: spine21.ctx,
+					width: w,
+					height: h,
+					zoom: state.zoom * (state.flip ? -1 : 1),
+					panX: state.panX,
+					// Kanvas 2.1 pakai y-up, jadi pan dibalik supaya searah Pixi.
+					panY: -state.panY,
+					bgColor: state.bg === "light" ? "#f4f4f6" : "#101014",
+				});
+			}
+			if (el.timeline && !el.timeline.hidden) updateTimelinePlayhead();
+		} catch (err) {
+			// Vendor runtime 2.1 bisa melempar pada data tertentu. Tanpa penjaga,
+			// satu throw mematikan loop rAF di frame PERTAMA: kanvas kosong, HUD
+			// tetap bilang model dimuat, dan tidak ada pesan apa pun (dulu: seluruh
+			// model Epic Seven begitu).
+			spine21.errors = (spine21.errors || 0) + 1;
+			if (spine21.errors === 1) console.error("[spine21] frame gagal:", err);
+			if (spine21.errors >= 5) {
+				console.error("[spine21] loop dihentikan setelah 5 kegagalan berturut-turut:", err);
+				showError("Model 2.1 gagal dirender: " + (err?.message || err));
+			}
+		} finally {
+			// Jadwalkan frame berikutnya DI SINI, bukan di akhir badan: itulah
+			// yang membuat loop tetap hidup walau ada kegagalan.
+			if (spine21.active && spine21.state && spine21.errors < 5) {
+				spine21.rafId = requestAnimationFrame(frame);
+			}
 		}
-		if (canvas && spine21.ctx) {
-			drawSpine21(spine21.state, {
-				ctx: spine21.ctx,
-				width: w,
-				height: h,
-				zoom: state.zoom * (state.flip ? -1 : 1),
-				panX: state.panX,
-				// Kanvas 2.1 pakai y-up, jadi pan dibalik supaya searah Pixi.
-				panY: -state.panY,
-				bgColor: state.bg === "light" ? "#f4f4f6" : "#101014",
-			});
-		}
-		if (el.timeline && !el.timeline.hidden) updateTimelinePlayhead();
-		spine21.rafId = requestAnimationFrame(frame);
 	};
 	spine21.rafId = requestAnimationFrame(frame);
 }
@@ -1612,7 +1634,297 @@ async function loadImageModel(model) {
 	el.loading.hidden = true;
 }
 
+/* Pemuatan dimasukkan antrean, bukan ditumpuk.
+ *
+ * Dulu dua klik cepat memicu dua `loadModel` yang berjalan bersamaan, dan
+ * modelnya saling menimpa — yang PALING LAMBAT selesai justru yang menang,
+ * jadi klik terakhir yang diabaikan (terukur: klik nikke/777 lalu
+ * nikke/absolute, enam detik kemudian yang tampil tetap nikke/777). Selain
+ * itu `finally` dari pemuatan pertama mematikan indikator "Memuat..." milik
+ * pemuatan kedua yang masih berjalan.
+ *
+ * Dengan antrean: satu pemuatan pada satu waktu, dan klik terakhir selalu
+ * jadi yang terakhir dijalankan.
+ */
+let loadBusy = false;
+let pendingModel = null;
+
 async function loadModel(model) {
+	if (loadBusy) {
+		pendingModel = model;
+		return;
+	}
+	loadBusy = true;
+	try {
+		await loadModelBody(model);
+	} finally {
+		loadBusy = false;
+		if (pendingModel) {
+			const next = pendingModel;
+			pendingModel = null;
+			loadModel(next);
+		}
+	}
+}
+
+/**
+ * Muat seluruh halaman atlas ke dalam cache BaseTexture.
+ *
+ * Dulu blok ini hanya hidup di dalam loadModelBody, jalur pembanding di
+ * panggung harus menulisnya ulang (atau memakai halaman stub yang tidak bisa
+ * digambar). Dipecah keluar supaya keduanya memakai jalur yang SAMA — termasuk
+ * semua pengamannya: deteksi halaman resolusi setengah (koordinat atlas penuh
+ * tapi file lebih kecil -> "frame does not fit"), uji overflow region per
+ * halaman, dan aturan aspect-ratio yang mencegah file salah jadi serpihan.
+ *
+ * @param {string} atlasText  isi berkas .atlas
+ * @param {string} atlasBase  URL dasar halaman (berakhir "/")
+ * @returns {Promise<Map<string, BaseTexture>>} per nama halaman
+ */
+async function loadAtlasPageCache(atlasText, atlasBase) {
+	// Load every atlas page UP FRONT and fail fast with a readable message.
+	// Letting the TextureAtlas loader discover pages lazily meant a missing
+	// page surfaced much later as "Cannot read properties of null (reading
+	// 'findRegion')" — a null region inside the runtime, with no hint that
+	// the real cause was one absent .png (multi-page atlases were the
+	// usual culprit).
+	// Parse each page's declared "size: W,H" so a page stored at a lower
+	// resolution can be detected (and scaled) before regions are resolved.
+	const declaredSizes = new Map();
+	let pendingPage = null;
+	for (const line of atlasText.split(/\r?\n/)) {
+		const s = line.trim();
+		if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) {
+			pendingPage = s;
+		} else if (pendingPage && !declaredSizes.has(pendingPage)) {
+			const m = s.match(/^size:\s*(\d+)\s*,\s*(\d+)/i);
+			if (m) {
+				declaredSizes.set(pendingPage, [Number(m[1]), Number(m[2])]);
+				pendingPage = null;
+			}
+		}
+	}
+
+	const pageNames = [];
+	for (const line of atlasText.split(/\r?\n/)) {
+		const s = line.trim();
+		if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) pageNames.push(s);
+	}
+
+	// Per page: does any region actually fall outside the file?
+	//
+	// Needed because "declared size differs from the file" is too weak a
+	// signal on its own — hundreds of pages differ by a percent or two
+	// from rounding and render perfectly. Only a region that escapes the
+	// loaded texture makes PIXI throw, so that is the real condition.
+	//
+	// Two parser traps:
+	//  - `rotate:` comes AFTER `bounds:` in a region block (name / bounds /
+	//    offsets / rotate). Reading rotation at the bounds line always
+	//    yields false, so each block has to be buffered and evaluated when
+	//    the NEXT region starts.
+	//  - a rotated region stores its ORIGINAL w,h in `bounds:`; the packed
+	//    rectangle in the page is the transpose. Without the swap every
+	//    rotate:90 region looks like it overflows.
+	const overflowsPage = (pageName, bt) => {
+		if (!bt) return false;
+		let current = null;
+		let pending = null;   // {x, y, w, h}
+		let rotated = false;
+		let seenRotate = false;   // format lama: `rotate:` muncul sebelum xy/size
+		const flush = () => {
+			if (current !== pageName || !pending) return false;
+			const { x, y, w, h } = pending;
+			const pw = rotated ? h : w;
+			const ph = rotated ? w : h;
+			return x + pw > bt.width || y + ph > bt.height;
+		};
+		for (const line of atlasText.split(/\r?\n/)) {
+			const s = line.trim();
+			if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) {
+				if (flush()) return true;
+				current = s;
+				pending = null;
+				rotated = false;
+				seenRotate = false;
+				continue;
+			}
+			const b = s.match(/^bounds:\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+			if (b) {
+				// Flush the PREVIOUS region before buffering this one. Skipping
+				// this meant only the last region of a page was ever tested: a
+				// page whose final region happens to fit reported no overflow
+				// even when 16 of its 24 regions sat outside the file, so the
+				// rescue path below never ran (DotAbyss AIBoss2018101_1).
+				if (flush()) return true;
+				// `rotate:` belongs to ONE region, so clear it on every new
+				// `bounds:`. Leaving it set leaked the first region's rotation
+				// onto every later one — an unrotated region then measured
+				// transposed and looked like it overflowed a healthy page,
+				// which blurred those pages by rescaling them for nothing.
+				rotated = false;
+				seenRotate = false;
+				const [, x, y, w, h] = b.map(Number);
+				pending = { x, y, w, h };
+				continue;
+			}
+			// Legacy atlas format: `xy:` + `size:` instead of `bounds:`, and
+			// `rotate:` comes BEFORE them. Roughly 74% of this collection
+			// (10.9k of 14.7k atlases) uses it, so without this branch the
+			// overflow test silently saw zero regions on most games.
+			const xy = s.match(/^xy:\s*(\d+)\s*,\s*(\d+)\s*$/i);
+			if (xy) {
+				if (flush()) return true;
+				rotated = seenRotate;
+				seenRotate = false;
+				pending = { x: Number(xy[1]), y: Number(xy[2]), w: 0, h: 0 };
+				continue;
+			}
+			// Only the region's `size:` completes a legacy block; the page's
+			// own `size:` sits directly under the page name, before any `xy:`.
+			const sz = s.match(/^size:\s*(\d+)\s*,\s*(\d+)\s*$/i);
+			if (sz && pending && pending.w === 0 && pending.h === 0) {
+				pending.w = Number(sz[1]);
+				pending.h = Number(sz[2]);
+				continue;
+			}
+			if (/^rotate:\s*(90|270|true)/i.test(s)) {
+				rotated = true;
+				seenRotate = true;
+			}
+		}
+		return flush();
+	};
+	const pageCache = new Map();
+	await Promise.all(
+		pageNames.map(async (pageName) => {
+			const tex = await Assets.load({
+				src: atlasBase + encodeURIComponent(pageName),
+				data: { alphaMode: ALPHA_MODES.NPM },
+			}).catch(() => null);
+			let bt = baseTextureFromPixiTexture(tex);
+			if (!bt) throw new Error(`Halaman atlas “${pageName}” tidak ditemukan.`);
+
+			// Some publishers ship half-resolution atlas pages while the atlas
+			// still declares full-res coordinates (this mirror has six such
+			// models). Pixi sizes the base texture from the file, so every
+			// region then lands outside it: "Texture Error: frame does not fit
+			// inside the base Texture dimensions". Scale the page up by the
+			// exact ratio so the declared coordinates are valid again — image
+			// is softer, but it renders instead of failing.
+			const declared = declaredSizes.get(pageName);
+			if (declared && bt.width > 0 && bt.height > 0) {
+				const rx = declared[0] / bt.width;
+				const ry = declared[1] / bt.height;
+				// Scale up whenever the file is smaller than what the atlas
+				// Take the LARGER axis ratio so every declared
+				// region fits: some pages ship at a different aspect (a
+				// 1920x1080 file for a 4096x4096 atlas), and scaling by
+				// one axis alone leaves regions outside the texture.
+				// Aspect is preserved — the extra area stays transparent.
+				// Only upscale when the page is a proportional downscale of
+				// what the atlas declares (rx ~= ry). A mismatched aspect
+				// means the wrong file was extracted, not a half-res page —
+				// scaling that just scatters every region and renders the
+				// model as scrambled shards, which is worse than failing.
+				//
+				// Not every downscale is proportional, though. DotAbyss
+				// ships pages squashed by Unity's per-axis texture
+				// downscaling (a 732x532 atlas whose page is 512x512), so
+				// rx and ry differ on purpose. Stretching such a page to
+				// the declared size is the correct inverse — verified
+				// against the raw bundle: the crops come back as clean
+				// body parts, where a uniform 1.43x scale leaves them
+				// visibly off.
+				//
+				// Gated on overflow because the gap alone is far too loose:
+				// hundreds of pages across every game differ by a few
+				// percent from rounding and still render fine, and
+				// rescaling those only softens them for nothing. Only
+				// pages whose regions genuinely fall outside the file need
+				// rescuing. gap < 0.45 then separates a squashed page from
+				// an outright wrong texture (DotAbyss's broken SpineSD
+				// pages sit at 0.83-2.95 and stay skipped).
+				const ratio = Math.max(rx, ry);
+				const aspectGap = Math.abs(Math.log(rx / ry));
+				const over = overflowsPage(pageName, bt);
+				if (ratio > 1.01 && ratio <= 8) {
+					if (aspectGap < 0.02) {
+						bt = upscaleBaseTexture(bt, ratio);
+					} else if (aspectGap < 0.45 && over) {
+						bt = upscaleBaseTexture(bt, rx, ry);
+					}
+				}
+			}
+
+			bt.scaleMode = SCALE_MODES.LINEAR;
+			bt.mipmap = MIPMAP_MODES.POW2;
+			bt.wrapMode = WRAP_MODES.CLAMP;
+			bt.alphaMode = ALPHA_MODES.NPM;
+			pageCache.set(pageName, bt);
+		})
+	);
+	return pageCache;
+}
+
+
+/**
+ * Ambil + parse satu model menjadi skeletonData, untuk panggung ATAU B.
+ *
+ * Ini jalur yang sama persis dengan yang menggerakkan panggung utama:
+ * mengendus isi file (JSON yang dikirim sebagai .skel membuat parser biner
+ * mati dengan "Offset outside bounds of DataView"), memuat semua halaman atlas
+ * dengan jaring pengaman resolusinya, lalu melewati dispatcher versi.
+ *
+ * @param {object} model  entri model dari /api/models
+ * @returns {Promise<{data, runtime, version, atlas}>}
+ */
+async function loadSkeletonDataFor(model) {
+	const dirPath = String(model.id || "").split("#")[0];
+	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
+	const skelUrl = `${base}/${encodeURIComponent(model.skeletonFile)}`;
+	const atlasUrl = `${base}/${encodeURIComponent(model.atlasFile)}`;
+
+	const [atlasText, skelBuf] = await Promise.all([
+		fetch(atlasUrl).then((r) => {
+			if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.atlasFile}`);
+			return r.text();
+		}),
+		fetch(skelUrl).then((r) => {
+			if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
+			return r.arrayBuffer();
+		}),
+	]);
+	const skelHead = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
+	const isBinary = !(skelHead[0] === 0x7b || skelHead[0] === 0xef);
+	const rawSkeleton = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
+
+	if (typeof atlasText !== "string" || !atlasText.trim()) {
+		throw new Error(`Berkas atlas “${model.atlasFile}” kosong atau tidak bisa dibaca.`);
+	}
+
+	// Resolve texture pages relative to the atlas URL.
+	const atlasBase = atlasUrl.slice(0, atlasUrl.lastIndexOf("/") + 1);
+
+	const pageCache = await loadAtlasPageCache(atlasText, atlasBase);
+
+	// The loader and ATLAS are built inside parseSkeletonData, per runtime
+	// attempt. Runtime 4.2 needs its own TextureAtlas whose pages are
+	// wrapped in SpineTexture — the official renderer reads
+	// `region.texture.texture` (the Pixi texture inside the wrapper) and
+	// silently draws nothing when handed a bare BaseTexture.
+	const parsed = await parseSkeletonData({
+		isBinary,
+		rawSkeleton,
+		atlasText,
+		pageCache,
+		scale: model.scale ?? 1,
+	});
+	return parsed;
+}
+
+
+async function loadModelBody(model) {
 	showError(null);
 	// A previous video left the play button (and selects) disabled; a skeleton
 	// model needs them live again.
@@ -1673,222 +1985,7 @@ async function loadModel(model) {
 		// Sniff the first byte — '{\" (0x7b) or a UTF-8 BOM — instead of
 		// trusting the extension, or a JSON-in-.skel model is fed to the
 		// binary parser and dies with "Offset outside bounds of DataView".
-		const [atlasText, skelBuf] = await Promise.all([
-			fetch(atlasUrl).then((r) => {
-				if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.atlasFile}`);
-				return r.text();
-			}),
-			fetch(skelUrl).then((r) => {
-				if (!r.ok) throw new Error(`HTTP ${r.status} untuk ${model.skeletonFile}`);
-				return r.arrayBuffer();
-			}),
-		]);
-		const skelHead = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
-		const isBinary = !(skelHead[0] === 0x7b || skelHead[0] === 0xef);
-		const rawSkeleton = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
-
-		if (typeof atlasText !== "string" || !atlasText.trim()) {
-			throw new Error(`Berkas atlas “${model.atlasFile}” kosong atau tidak bisa dibaca.`);
-		}
-
-		// Resolve texture pages relative to the atlas URL.
-		const atlasBase = atlasUrl.slice(0, atlasUrl.lastIndexOf("/") + 1);
-
-		// Load every atlas page UP FRONT and fail fast with a readable message.
-		// Letting the TextureAtlas loader discover pages lazily meant a missing
-		// page surfaced much later as "Cannot read properties of null (reading
-		// 'findRegion')" — a null region inside the runtime, with no hint that
-		// the real cause was one absent .png (multi-page atlases were the
-		// usual culprit).
-		// Parse each page's declared "size: W,H" so a page stored at a lower
-		// resolution can be detected (and scaled) before regions are resolved.
-		const declaredSizes = new Map();
-		let pendingPage = null;
-		for (const line of atlasText.split(/\r?\n/)) {
-			const s = line.trim();
-			if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) {
-				pendingPage = s;
-			} else if (pendingPage && !declaredSizes.has(pendingPage)) {
-				const m = s.match(/^size:\s*(\d+)\s*,\s*(\d+)/i);
-				if (m) {
-					declaredSizes.set(pendingPage, [Number(m[1]), Number(m[2])]);
-					pendingPage = null;
-				}
-			}
-		}
-
-		const pageNames = [];
-		for (const line of atlasText.split(/\r?\n/)) {
-			const s = line.trim();
-			if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) pageNames.push(s);
-		}
-
-		// Per page: does any region actually fall outside the file?
-		//
-		// Needed because "declared size differs from the file" is too weak a
-		// signal on its own — hundreds of pages differ by a percent or two
-		// from rounding and render perfectly. Only a region that escapes the
-		// loaded texture makes PIXI throw, so that is the real condition.
-		//
-		// Two parser traps:
-		//  - `rotate:` comes AFTER `bounds:` in a region block (name / bounds /
-		//    offsets / rotate). Reading rotation at the bounds line always
-		//    yields false, so each block has to be buffered and evaluated when
-		//    the NEXT region starts.
-		//  - a rotated region stores its ORIGINAL w,h in `bounds:`; the packed
-		//    rectangle in the page is the transpose. Without the swap every
-		//    rotate:90 region looks like it overflows.
-		const overflowsPage = (pageName, bt) => {
-			if (!bt) return false;
-			let current = null;
-			let pending = null;   // {x, y, w, h}
-			let rotated = false;
-			let seenRotate = false;   // format lama: `rotate:` muncul sebelum xy/size
-			const flush = () => {
-				if (current !== pageName || !pending) return false;
-				const { x, y, w, h } = pending;
-				const pw = rotated ? h : w;
-				const ph = rotated ? w : h;
-				return x + pw > bt.width || y + ph > bt.height;
-			};
-			for (const line of atlasText.split(/\r?\n/)) {
-				const s = line.trim();
-				if (/\.(png|jpe?g|webp)$/i.test(s) && !s.includes(" ")) {
-					if (flush()) return true;
-					current = s;
-					pending = null;
-					rotated = false;
-					seenRotate = false;
-					continue;
-				}
-				const b = s.match(/^bounds:\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
-				if (b) {
-					// Flush the PREVIOUS region before buffering this one. Skipping
-					// this meant only the last region of a page was ever tested: a
-					// page whose final region happens to fit reported no overflow
-					// even when 16 of its 24 regions sat outside the file, so the
-					// rescue path below never ran (DotAbyss AIBoss2018101_1).
-					if (flush()) return true;
-					// `rotate:` belongs to ONE region, so clear it on every new
-					// `bounds:`. Leaving it set leaked the first region's rotation
-					// onto every later one — an unrotated region then measured
-					// transposed and looked like it overflowed a healthy page,
-					// which blurred those pages by rescaling them for nothing.
-					rotated = false;
-					seenRotate = false;
-					const [, x, y, w, h] = b.map(Number);
-					pending = { x, y, w, h };
-					continue;
-				}
-				// Legacy atlas format: `xy:` + `size:` instead of `bounds:`, and
-				// `rotate:` comes BEFORE them. Roughly 74% of this collection
-				// (10.9k of 14.7k atlases) uses it, so without this branch the
-				// overflow test silently saw zero regions on most games.
-				const xy = s.match(/^xy:\s*(\d+)\s*,\s*(\d+)\s*$/i);
-				if (xy) {
-					if (flush()) return true;
-					rotated = seenRotate;
-					seenRotate = false;
-					pending = { x: Number(xy[1]), y: Number(xy[2]), w: 0, h: 0 };
-					continue;
-				}
-				// Only the region's `size:` completes a legacy block; the page's
-				// own `size:` sits directly under the page name, before any `xy:`.
-				const sz = s.match(/^size:\s*(\d+)\s*,\s*(\d+)\s*$/i);
-				if (sz && pending && pending.w === 0 && pending.h === 0) {
-					pending.w = Number(sz[1]);
-					pending.h = Number(sz[2]);
-					continue;
-				}
-				if (/^rotate:\s*(90|270|true)/i.test(s)) {
-					rotated = true;
-					seenRotate = true;
-				}
-			}
-			return flush();
-		};
-		const pageCache = new Map();
-		await Promise.all(
-			pageNames.map(async (pageName) => {
-				const tex = await Assets.load({
-					src: atlasBase + encodeURIComponent(pageName),
-					data: { alphaMode: ALPHA_MODES.NPM },
-				}).catch(() => null);
-				let bt = baseTextureFromPixiTexture(tex);
-				if (!bt) throw new Error(`Halaman atlas “${pageName}” tidak ditemukan.`);
-
-				// Some publishers ship half-resolution atlas pages while the atlas
-				// still declares full-res coordinates (this mirror has six such
-				// models). Pixi sizes the base texture from the file, so every
-				// region then lands outside it: "Texture Error: frame does not fit
-				// inside the base Texture dimensions". Scale the page up by the
-				// exact ratio so the declared coordinates are valid again — image
-				// is softer, but it renders instead of failing.
-				const declared = declaredSizes.get(pageName);
-				if (declared && bt.width > 0 && bt.height > 0) {
-					const rx = declared[0] / bt.width;
-					const ry = declared[1] / bt.height;
-					// Scale up whenever the file is smaller than what the atlas
-					// Take the LARGER axis ratio so every declared
-					// region fits: some pages ship at a different aspect (a
-					// 1920x1080 file for a 4096x4096 atlas), and scaling by
-					// one axis alone leaves regions outside the texture.
-					// Aspect is preserved — the extra area stays transparent.
-					// Only upscale when the page is a proportional downscale of
-					// what the atlas declares (rx ~= ry). A mismatched aspect
-					// means the wrong file was extracted, not a half-res page —
-					// scaling that just scatters every region and renders the
-					// model as scrambled shards, which is worse than failing.
-					//
-					// Not every downscale is proportional, though. DotAbyss
-					// ships pages squashed by Unity's per-axis texture
-					// downscaling (a 732x532 atlas whose page is 512x512), so
-					// rx and ry differ on purpose. Stretching such a page to
-					// the declared size is the correct inverse — verified
-					// against the raw bundle: the crops come back as clean
-					// body parts, where a uniform 1.43x scale leaves them
-					// visibly off.
-					//
-					// Gated on overflow because the gap alone is far too loose:
-					// hundreds of pages across every game differ by a few
-					// percent from rounding and still render fine, and
-					// rescaling those only softens them for nothing. Only
-					// pages whose regions genuinely fall outside the file need
-					// rescuing. gap < 0.45 then separates a squashed page from
-					// an outright wrong texture (DotAbyss's broken SpineSD
-					// pages sit at 0.83-2.95 and stay skipped).
-					const ratio = Math.max(rx, ry);
-					const aspectGap = Math.abs(Math.log(rx / ry));
-					const over = overflowsPage(pageName, bt);
-					if (ratio > 1.01 && ratio <= 8) {
-						if (aspectGap < 0.02) {
-							bt = upscaleBaseTexture(bt, ratio);
-						} else if (aspectGap < 0.45 && over) {
-							bt = upscaleBaseTexture(bt, rx, ry);
-						}
-					}
-				}
-
-				bt.scaleMode = SCALE_MODES.LINEAR;
-				bt.mipmap = MIPMAP_MODES.POW2;
-				bt.wrapMode = WRAP_MODES.CLAMP;
-				bt.alphaMode = ALPHA_MODES.NPM;
-				pageCache.set(pageName, bt);
-			})
-		);
-
-		// The loader and ATLAS are built inside parseSkeletonData, per runtime
-		// attempt. Runtime 4.2 needs its own TextureAtlas whose pages are
-		// wrapped in SpineTexture — the official renderer reads
-		// `region.texture.texture` (the Pixi texture inside the wrapper) and
-		// silently draws nothing when handed a bare BaseTexture.
-		const parsed = await parseSkeletonData({
-			isBinary,
-			rawSkeleton,
-			atlasText,
-			pageCache,
-			scale: model.scale ?? 1,
-		});
+		const parsed = await loadSkeletonDataFor(model);
 		const skeletonData = parsed.data;
 		spineRuntime = parsed.runtime;
 		spineVersion = parsed.version;
@@ -2995,7 +3092,7 @@ function setInspectorVisible(on) {
 	if (on) {
 		renderSkinOptions();
 		setInspectorTab(insp.tab);
-	} else if (spine) {
+	} else if (spine?.skeleton) {
 		// leaving the panel: drop any per-slot overrides so the model snaps back
 		spine.skeleton.setSlotsToSetupPose();
 		spine.update(0);
@@ -3239,7 +3336,7 @@ function partGraphics() {
 function drawParts() {
 	const gfx = partGraphics();
 	gfx.clear();
-	if (!parts.on || !spine) {
+	if (!parts.on || !spine?.skeleton) {
 		gfx.visible = false;
 		return;
 	}
@@ -4619,7 +4716,8 @@ el.playBtn.addEventListener("click", () => {
 el.loopBtn.addEventListener("click", () => {
 	state.loop = !state.loop;
 	el.loopBtn.dataset.on = String(state.loop);
-	const track = spine?.state.tracks[0];
+	// `spine` pada model Cubism ada, tetapi .state-nya tidak — tanpa ?.
+	const track = spine?.state?.tracks?.[0];
 	if (track) track.loop = state.loop;
 });
 el.audioBtn.addEventListener("click", () => playVoice());
@@ -4787,14 +4885,23 @@ el.canvasWrap.addEventListener("pointerdown", (e) => {
 		const sx = e.clientX;
 		const sy = e.clientY;
 		const t0 = performance.now();
-		const up = (ue) => {
+		// `up` dulu hanya dilepas dari dalam pointerup. pointercancel (gestur
+		// browser yang mengambil alih, ganti aplikasi, scroll) membiarkannya
+		// menumpuk, dan tiap sisa listener itu tetap menjalankan live2dTouchAt
+		// dengan t0/sx/sy lawas — muncul sentuhan hantu dari tekanan sebelumnya.
+		const cleanup = () => {
 			el.canvasWrap.removeEventListener("pointerup", up);
+			el.canvasWrap.removeEventListener("pointercancel", cleanup);
+		};
+		const up = (ue) => {
+			cleanup();
 			if (ue.button !== 0) return;
 			if (performance.now() - t0 > 450) return; // held = drag, not tap
 			if (Math.hypot(ue.clientX - sx, ue.clientY - sy) > 12) return; // moved = pan
 			live2dTouchAt(ue);
 		};
 		el.canvasWrap.addEventListener("pointerup", up);
+		el.canvasWrap.addEventListener("pointercancel", cleanup);
 		return;
 	}
 	if (!parts.on || !spine) return;
@@ -5039,6 +5146,11 @@ const SIDEBAR_KEY = "spine-stage:sidebar-hidden";
 function setSidebarHidden(hidden, { persist = true } = {}) {
 	document.querySelector(".layout")?.classList.toggle("sidebar-hidden", hidden);
 	el.sidebar?.setAttribute("aria-hidden", String(hidden));
+	// aria-hidden saja TIDAK mengeluarkan kontrol dari tab order: saat
+	// sidebar disembunyikan pakai transform, 195 tombol/kartu tetap bisa
+	// difokus keyboard (dan cincin fokusnya tergambar di luar layar).
+	// `inert` mematikan keduanya sekaligus.
+	if (el.sidebar) el.sidebar.inert = hidden;
 	if (el.sidebarToggle) {
 		el.sidebarToggle.setAttribute("aria-expanded", String(!hidden));
 		const label = hidden ? "Tampilkan pustaka" : "Sembunyikan pustaka";
@@ -5338,6 +5450,7 @@ function sourcePixelScale(sp) {
 
 /** Model bounds in skeleton units, from the setup pose + current animation. */
 function modelBounds(sp) {
+	if (!sp?.skeleton) return { x: 0, y: 0, w: 512, h: 512 };
 	sp.skeleton.setToSetupPose();
 	sp.skeleton.updateWorldTransform?.();
 	sp.update(0);
@@ -5371,6 +5484,16 @@ async function runExport() {
 	}
 	if (!spine) {
 		toast("Pilih model dulu sebelum mengekspor.");
+		return;
+	}
+	// Ekspor frame-by-frame membutuhkan skeleton Spine sungguhan. Pada model
+	// Cubism, `spine` ada tetapi spine.skeleton dan spine.state tidak ada,
+	// sehingga modelBounds() melempar SEBELUM blok try: status busy sudah
+	// terpasang, ticker sudah berhenti, dan tombol tutup menolak (EXPORT_STATE
+	// masih busy) — dialog terkunci sampai reload. Inilah satu-satunya
+	// unhandled promise rejection yang tercatat di seluruh audit frontend.
+	if (!spine?.skeleton) {
+		toast("Live wallpaper hanya bisa diekspor dari model Spine.");
 		return;
 	}
 
@@ -5572,6 +5695,13 @@ async function runExport() {
 		ok = true;
 		toast("Live wallpaper siap diunduh.");
 	} catch (err) {
+		if (job) {
+			fetch("/api/export/cancel", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ job }),
+			}).catch(() => {});
+		}
 		showExportNote("Ekspor gagal: " + err.message);
 		toast("Ekspor gagal.");
 	} finally {
@@ -5582,7 +5712,7 @@ async function runExport() {
 		el.exportRun.disabled = false;
 		el.exportRun.textContent = "Mulai ekspor";
 		// Put the playhead back exactly where we found it.
-		const track = spine?.state.tracks[0];
+		const track = spine?.state?.tracks?.[0];
 		if (track) track.trackTime = wasTrackTime;
 		if (spine) spine.update(0);
 		if (wasPlaying) setPlaying(true);
@@ -5909,6 +6039,25 @@ el.favFilter?.addEventListener("click", () => {
 		toast?.("Belum ada favorit — klik bintang pada model.");
 	}
 });
+
+/** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
+function closeTopmostModal() {
+	if (el.exportModal && !el.exportModal.hidden) {
+		closeExport();
+		return true;
+	}
+	const link = document.getElementById("link-modal");
+	if (link && !link.hidden) {
+		document.getElementById("link-close")?.click();
+		return true;
+	}
+	const log = document.getElementById("update-log-modal");
+	if (log && !log.hidden) {
+		document.getElementById("update-log-close")?.click();
+		return true;
+	}
+	return false;
+}
 
 window.addEventListener("keydown", (e) => {
 	if (e.target instanceof HTMLElement && e.target.matches("input, select, textarea")) return;
