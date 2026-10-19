@@ -2187,7 +2187,7 @@ async function loadSkeletonDataFor(model) {
 		}),
 	]);
 	const skelHead = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
-	const isBinary = !(skelHead[0] === 0x7b || skelHead[0] === 0xef);
+	const isBinary = skeletonIsBinary(skelHead);
 	const rawSkeleton = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
 
 	if (typeof atlasText !== "string" || !atlasText.trim()) {
@@ -3255,6 +3255,27 @@ function renderCompareOptions() {
 	el.cmpB.value = opts.includes(prevB) ? prevB : opts[Math.min(1, opts.length - 1)] || "";
 }
 
+/**
+ * Apakah buffer skeleton ini JSON atau biner Spine?
+ *
+ * Memeriksa byte pertama saja TIDAK cukup: skeleton biner Spine dimulai
+ * dengan hash string (panjang + byte acak), dan hash itu bisa kebetulan
+ * berawalan 0x7b ('{') — mis. A0374 Ark Re:Code. Model seperti itu lalu
+ * salah dianggap JSON dan mati dengan "Expected property name or '}' in
+ * JSON at position 1".
+ *
+ * JSON sungguhan selalu '{' diikuti whitespace, kutip, atau '}'. Biner
+ * tidak. Jadi periksa dua byte, bukan satu.
+ */
+function skeletonIsBinary(bytes) {
+	if (!bytes || bytes.length === 0) return false;
+	const b0 = bytes[0];
+	const b1 = bytes.length > 1 ? bytes[1] : 0;
+	if (b0 === 0xef && b1 === 0xbb) return false; // UTF-8 BOM -> teks
+	if (b0 !== 0x7b) return true; // bukan '{' -> pasti biner
+	return !(b1 === 0x20 || b1 === 0x09 || b1 === 0x0a || b1 === 0x0d || b1 === 0x22 || b1 === 0x7d);
+}
+
 /** Load a model's skeleton data on demand, for comparison only. */
 async function skeletonDataOf(model) {
 	if (current && model.id === current.id && spine) return spine.skeleton.data;
@@ -3279,7 +3300,7 @@ async function skeletonDataOf(model) {
 	});
 	// Sniff content (Muv-Luv ships JSON inside ".skel").
 	const head = new Uint8Array(skelBuf, 0, Math.min(4, skelBuf.byteLength));
-	const isBinary = !(head[0] === 0x7b || head[0] === 0xef);
+	const isBinary = skeletonIsBinary(head);
 	const raw = isBinary ? skelBuf : JSON.parse(new TextDecoder().decode(skelBuf));
 
 	// Route through the same version-aware dispatcher the stage uses. This
