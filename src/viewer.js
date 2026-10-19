@@ -402,6 +402,8 @@ const el = {
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
 	partsBtn: $("#parts-btn"),
+	boneEditBtn: $("#bone-edit-btn"),
+	bonePanel: $("#bone-panel"),
 	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
 
@@ -873,6 +875,242 @@ const bonesGfx = new Graphics();
 bonesGfx.visible = false;
 stageRoot.addChild(bonesGfx);
 
+/**
+ * Bone editor — putar bone dengan mouse, simpan pose, ekspor ke JSON.
+ *
+ * Kenapa di world space dan bukan local: runtime Spine menyimpan rotasi bone
+ * sebagai `rotation` (lokal, derajat) dan dunia diturunkan lewat
+ * updateWorldTransform(). Mengubah rotasi lokal satu bone akan menggeser
+ * SEMUA turunannya, yang justru yang diinginkan saat menggerakkan lengan.
+ * Sudut disetel dari vektor world (bone -> kursor), lalu dikonversi balik ke
+ * lokal dengan rotasi parent, supaya hasilnya tidak "melompat" saat bone
+ * induknya sudah diputar lebih dulu.
+ */
+const BONES = {
+	on: false,
+	selected: null,
+	dragging: false,
+	hover: null,
+	/**
+	 * Rotasi hasil edit, disimpan per nama bone.
+	 *
+	 * Animasi menulis ulang `bone.rotation` setiap frame, jadi nilai hasil
+	 * geser tidak bisa disimpan di bone itu sendiri — akan tertimpa. Map ini
+	 * dipasang ulang setelah spine.update() di render loop.
+	 */
+	edits: new Map(),
+	hitRadius: 18,
+};
+
+/** Pasang kembali semua rotasi hasil edit ke bone (dipanggil tiap frame). */
+function applyBoneEdits() {
+	if (!spine?.skeleton) return;
+	for (const b of spine.skeleton.bones) {
+		const r = BONES.edits.get(b.data.name);
+		if (r != null) b.rotation = r;
+	}
+}
+
+/** Semua bone yang bisa dipilih, urut dari yang paling dalam (anak dulu). */
+function editableBones() {
+	if (!spine?.skeleton) return [];
+	return spine.skeleton.bones || [];
+}
+
+/**
+ * Posisi & arah world sebuah bone.
+ *
+ * Runtime Spine 4.x TIDAK punya `worldX`/`worldY`/`a`/`b` (itu API 3.x).
+ * Yang tersedia `bone.matrix` (affine 2D) berisi {a,b,c,d,tx,ty}:
+ *   - (tx, ty)            = titik pangkal bone di world
+ *   - atan2(c, a)         = rotasi world
+ *   - normalize(a, b)     = sumbu X lokal (arah panjang bone)
+ * Semua kode bone memakai helper ini supaya tidak menebak properti.
+ */
+function boneWorld(b) {
+	const m = b.matrix;
+	if (!m) return null;
+	const x = m.tx;
+	const y = m.ty;
+	if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+	return {
+		x,
+		y,
+		angle: Math.atan2(m.c, m.a),
+		// sumbu X lokal yang sudah dinormalisasi (0..1)
+		ux: m.a,
+		uy: m.b,
+		len: b.data.length || 0,
+	};
+}
+
+/** Cari bone terdekat dari sebuah titik world. */
+function boneAt(x, y) {
+	const list = editableBones();
+	if (!list.length) return null;
+	const s = 1 / (state.zoom || 1);
+	let best = null;
+	let bestD = Infinity;
+	for (const b of list) {
+		const w = boneWorld(b);
+		if (!w) continue;
+		// Bone tanpa panjang tetap bisa dipilih lewat titik pangkalnya.
+		let d;
+		if (w.len > 0.01) {
+			const ex = w.x + Math.cos(w.angle) * w.len;
+			const ey = w.y + Math.sin(w.angle) * w.len;
+			d = distToSegment(x, y, w.x, w.y, ex, ey);
+		} else {
+			d = Math.hypot(x - w.x, y - w.y);
+		}
+		if (d < bestD) {
+			bestD = d;
+			best = b;
+		}
+	}
+	return bestD <= BONES.hitRadius * s ? best : null;
+}
+
+function distToSegment(px, py, x1, y1, x2, y2) {
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	const l2 = dx * dx + dy * dy;
+	if (l2 === 0) return Math.hypot(px - x1, py - y1);
+	let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+	t = Math.max(0, Math.min(1, t));
+	return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+}
+
+/** Rotasi world (radian) dari sebuah bone, dari matriks world-nya. */
+function boneWorldAngle(b) {
+	const w = boneWorld(b);
+	return w ? w.angle : 0;
+}
+
+/**
+ * Set rotasi bone supaya ujungnya menunjuk ke titik world (x, y).
+ * Menyimpan sebagai rotasi LOKAL (derajat), karena itu yang dibaca runtime.
+ */
+function aimBoneAt(b, x, y) {
+	const w = boneWorld(b);
+	if (!w) return;
+	const parent = b.parent;
+	// sudut world yang diinginkan, dari pangkal bone ke kursor
+	const worldAngle = Math.atan2(y - w.y, x - w.x);
+	// sudut world parent (0 kalau tidak ada parent)
+	const parentAngle = parent ? boneWorldAngle(parent) : 0;
+	// rotasi lokal = world - parent, dalam derajat
+	let deg = (worldAngle - parentAngle) * (180 / Math.PI);
+	deg = ((deg + 180) % 360 + 360) % 360 - 180; // normalisasi -180..180
+	b.rotation = deg;
+	BONES.edits.set(b.data.name, deg);
+}
+
+/** Reset semua rotasi bone ke pose setup animasi saat ini. */
+function resetBonePose() {
+	if (!spine?.skeleton) return;
+	BONES.edits.clear();
+	const skel = spine.skeleton;
+	// Setup pose = nilai dari data (bukan dari animasi yang sedang jalan).
+	for (const b of skel.bones) {
+		b.rotation = b.data.rotation;
+		b.x = b.data.x;
+		b.y = b.data.y;
+		b.scaleX = b.data.scaleX;
+		b.scaleY = b.data.scaleY;
+	}
+	skel.updateWorldTransform();
+	drawBones();
+	updateBoneUI();
+	toast("Pose bone direset ke setup pose.");
+}
+
+/** Ekspor pose sekarang (hanya bone yang diubah dari setup). */
+function exportBonePose() {
+	if (!spine?.skeleton || !current) return;
+	const out = { model: current.id, bones: {} };
+	for (const [name, rotation] of BONES.edits) {
+		out.bones[name] = { rotation: +rotation.toFixed(4) };
+	}
+	const n = Object.keys(out.bones).length;
+	if (!n) {
+		toast("Belum ada tulang yang diubah.");
+		return;
+	}
+	const blob = new Blob([JSON.stringify(out, null, 1)], { type: "application/json" });
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	a.download = `${String(current.id).replace(/[^\w.-]+/g, "_")}-pose.json`;
+	a.click();
+	URL.revokeObjectURL(a.href);
+	toast(`Pose diekspor: ${n} tulang.`);
+}
+
+/** Muat pose dari berkas JSON (hasil exportBonePose). */
+async function importBonePose(file) {
+	if (!spine?.skeleton) return;
+	let obj;
+	try {
+		obj = JSON.parse(await file.text());
+	} catch (e) {
+		toast("Berkas pose bukan JSON yang valid.");
+		return;
+	}
+	BONES.edits.clear();
+	const known = new Set(spine.skeleton.bones.map((b) => b.data.name));
+	let n = 0;
+	for (const [name, rec] of Object.entries(obj.bones || {})) {
+		if (!known.has(name)) continue;
+		const rot = typeof rec === "number" ? rec : rec?.rotation;
+		if (rot == null) continue;
+		BONES.edits.set(name, rot);
+		n++;
+	}
+	applyBoneEdits();
+	spine.skeleton.updateWorldTransform();
+	drawBones();
+	updateBoneUI();
+	toast(`Pose dimuat: ${n} tulang.`);
+}
+
+/** Nyalakan/matikan mode edit bone. */
+function setBoneEdit(on) {
+	BONES.on = !!on;
+	if (on) {
+		// Editor butuh overlay bones terlihat supaya bisa diklik.
+		if (!state.showBones) {
+			state.showBones = true;
+			bonesGfx.visible = true;
+			el.bonesBtn?.setAttribute("aria-pressed", "true");
+			if (el.bonesBtn) el.bonesBtn.dataset.on = "true";
+		}
+	} else {
+		BONES.selected = null;
+		BONES.hover = null;
+		BONES.dragging = false;
+		el.canvasWrap.style.cursor = "";
+	}
+	el.boneEditBtn?.setAttribute("aria-pressed", String(BONES.on));
+	if (el.boneEditBtn) el.boneEditBtn.dataset.on = String(BONES.on);
+	el.bonePanel?.toggleAttribute("hidden", !BONES.on);
+	drawBones();
+	updateBoneUI();
+}
+
+/** Segarkan panel editor (nama bone terpilih, jumlah yang berubah). */
+function updateBoneUI() {
+	if (!el.bonePanel) return;
+	const sel = BONES.selected;
+	const nameEl = el.bonePanel.querySelector("[data-bone-name]");
+	if (nameEl) {
+		nameEl.textContent = sel ? sel.data.name || `bone_${sel.data.index}` : "—";
+	}
+	const rotEl = el.bonePanel.querySelector("[data-bone-rot]");
+	if (rotEl) rotEl.textContent = sel ? `${sel.rotation.toFixed(1)}°` : "—";
+	const cntEl = el.bonePanel.querySelector("[data-bone-count]");
+	if (cntEl) cntEl.textContent = String(BONES.edits.size);
+}
+
 function drawBones() {
 	bonesGfx.clear();
 	// Live2D has no bones; guard so a bones-overlay toggle cannot dereference
@@ -881,12 +1119,39 @@ function drawBones() {
 	const s = 1 / state.zoom;
 	bonesGfx.lineStyle(2 * s, 0xff8a5c, 0.95);
 	for (const b of spine.skeleton.bones) {
-		const len = b.data.length || 12;
-		const ex = b.worldX + b.a * len;
-		const ey = b.worldY + b.b * len;
-		bonesGfx.moveTo(b.worldX, b.worldY);
-		bonesGfx.lineTo(ex, ey);
-		bonesGfx.drawCircle(b.worldX, b.worldY, 3 * s);
+		const w = boneWorld(b);
+		if (!w) continue;
+		// Bone tanpa panjang hanya digambar sebagai titik pangkal.
+		const len = w.len > 0.01 ? w.len : 0;
+		bonesGfx.moveTo(w.x, w.y);
+		if (len) bonesGfx.lineTo(w.x + Math.cos(w.angle) * len, w.y + Math.sin(w.angle) * len);
+		bonesGfx.drawCircle(w.x, w.y, 3 * s);
+	}
+	if (!BONES.on) return;
+	// Sorotan: hover tipis, terpilih tebal + titik ujung.
+	if (BONES.hover && BONES.hover !== BONES.selected) {
+		const w = boneWorld(BONES.hover);
+		if (w && w.len > 0.01) {
+			bonesGfx.lineStyle(3 * s, 0x7ad1ff, 0.85);
+			bonesGfx.moveTo(w.x, w.y);
+			bonesGfx.lineTo(w.x + Math.cos(w.angle) * w.len, w.y + Math.sin(w.angle) * w.len);
+		}
+	}
+	if (BONES.selected) {
+		const w = boneWorld(BONES.selected);
+		if (w) {
+			const len = w.len > 0.01 ? w.len : 0;
+			const ex = w.x + Math.cos(w.angle) * len;
+			const ey = w.y + Math.sin(w.angle) * len;
+			bonesGfx.lineStyle(4 * s, 0x33ff99, 1);
+			if (len) {
+				bonesGfx.moveTo(w.x, w.y);
+				bonesGfx.lineTo(ex, ey);
+			}
+			bonesGfx.beginFill(0x33ff99, 1);
+			bonesGfx.drawCircle(ex, ey, 5 * s);
+			bonesGfx.endFill();
+		}
 	}
 }
 
@@ -952,6 +1217,15 @@ app.ticker.add(() => {
 
 	// dt = 0: we already positioned the track, this only applies + renders it.
 	spine.update(0);
+
+	// Mode edit tulang: animasi baru saja menulis ulang SEMUA rotasi bone, jadi
+	// pose hasil edit harus dipasang SESUDAH update() — kalau tidak, rotasi
+	// yang digeser pengguna langsung kembali ke nilai animasi tiap frame.
+	if (BONES.on && BONES.edits.size) {
+		applyBoneEdits();
+		spine.skeleton.updateWorldTransform();
+		drawBones();
+	}
 
 	// Panel B punya renderer sendiri, jadi harus digambar sendiri juga —
 	// ticker utama hanya menggambar `app`.
@@ -5495,11 +5769,15 @@ function toStagePoint(clientX, clientY) {
 	const r = el.canvasWrap.getBoundingClientRect();
 	const sx = clientX - r.left;
 	const sy = clientY - r.top;
+	// world membawa zoom/pan/flip. Flip mencerminkan satu sumbu, dan
+	// mengabaikannya membuat hit-test benar di satu sisi model dan
+	// tercermin di sisi lain.
 	const wx = (sx - world.position.x) / (world.scale.x || 1);
 	const wy = (sy - world.position.y) / (world.scale.y || 1);
 	// spine sits inside stageRoot inside world; both are untransformed
 	// relative to world except for world's own transform, so this is enough
-	// for hit testing against the skeleton's own bounds.
+	// for hit testing against the skeleton's own bounds. bonesGfx lives in
+	// the SAME space as spine, so bone coordinates need no extra offset.
 	const p = { x: wx, y: wy };
 	if (spine) {
 		p.x -= spine.x;
@@ -5507,6 +5785,71 @@ function toStagePoint(clientX, clientY) {
 	}
 	return p;
 }
+
+/** Kebalikan dari toStagePoint: titik stage/skeleton -> koordinat viewport. */
+function fromStagePoint(x, y) {
+	const r = el.canvasWrap.getBoundingClientRect();
+	let px = x;
+	let py = y;
+	if (spine) {
+		px += spine.x;
+		py += spine.y;
+	}
+	return {
+		x: r.left + px * (world.scale.x || 1) + world.position.x,
+		y: r.top + py * (world.scale.y || 1) + world.position.y,
+	};
+}
+
+// Bone editor: hover + klik-pilih + drag untuk memutar bone. Hanya aktif saat
+// mode edit menyala, dan selalu mendahului pan kanvas supaya drag bone tidak
+// ikut menggeser kamera.
+el.canvasWrap.addEventListener("pointermove", (e) => {
+	if (!BONES.on || !spine || BONES.dragging) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	const b = boneAt(p.x, p.y);
+	if (b !== BONES.hover) {
+		BONES.hover = b;
+		el.canvasWrap.style.cursor = b ? "crosshair" : "";
+		drawBones();
+	}
+});
+
+el.canvasWrap.addEventListener(
+	"pointerdown",
+	(e) => {
+		if (!BONES.on || !spine || e.button !== 0) return;
+		const p = toStagePoint(e.clientX, e.clientY);
+		const b = boneAt(p.x, p.y);
+		if (!b) return;
+		// Tangkap pointer supaya drag tetap jalan walau kursor keluar kanvas.
+		BONES.selected = b;
+		BONES.dragging = true;
+		e.stopPropagation();
+		e.preventDefault();
+		el.canvasWrap.setPointerCapture?.(e.pointerId);
+		updateBoneUI();
+		drawBones();
+	},
+	true, // capture: menang atas handler pan di fase bubble
+);
+
+window.addEventListener("pointermove", (e) => {
+	if (!BONES.dragging || !BONES.selected || !spine) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	aimBoneAt(BONES.selected, p.x, p.y);
+	spine.skeleton.updateWorldTransform();
+	drawBones();
+	updateBoneUI();
+});
+
+function boneEndDrag() {
+	if (!BONES.dragging) return;
+	BONES.dragging = false;
+	updateBoneUI();
+}
+window.addEventListener("pointerup", boneEndDrag);
+window.addEventListener("pointercancel", boneEndDrag);
 
 // Part picker: hover highlights, click reports. Only bound while the overlay
 // is on — otherwise this would add a hit test to every mouse move for nothing.
@@ -5576,6 +5919,17 @@ el.fpsReset?.addEventListener("click", fpsResetStats);
 
 // Part picker toggle.
 el.partsBtn?.addEventListener("click", () => setPartsVisible(!parts.on));
+
+// Bone editor: toggle, reset, ekspor, impor.
+el.boneEditBtn?.addEventListener("click", () => setBoneEdit(!BONES.on));
+el.bonePanel?.querySelector("#bone-reset")?.addEventListener("click", resetBonePose);
+el.bonePanel?.querySelector("#bone-export")?.addEventListener("click", exportBonePose);
+const boneImportInput = el.bonePanel?.querySelector("#bone-import-file");
+boneImportInput?.addEventListener("change", () => {
+	const f = boneImportInput.files?.[0];
+	if (f) importBonePose(f);
+	boneImportInput.value = "";
+});
 
 // Render pixel density ("Tajam"). Higher = sharper on-screen render, at the
 // cost of GPU fill rate. The PNG export is unaffected (it always targets the
@@ -6857,6 +7211,11 @@ window.addEventListener("keydown", (e) => {
 		case "R":
 			e.preventDefault();
 			el.partsBtn?.click();
+			break;
+		case "e":
+		case "E":
+			e.preventDefault();
+			el.boneEditBtn?.click();
 			break;
 		case ",":
 			// step keyframes, but only when the timeline is open

@@ -1885,3 +1885,35 @@ input:focus-visible {
 /* Tata letak tumpang tindih: satu panel penuh, labelnya tetap tampil. */
 .ab-split.is-overlay { grid-template-columns: 1fr; }
 .ab-split.is-overlay #ab-pane-a { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * Bone editor panel
+ *
+ * Muncul di atas baris transport saat mode "Edit Tulang" menyala. Angka
+ * rotasi memakai tabular-nums supaya tidak bergoyang saat nilainya berubah
+ * tiap frame selama drag.
+ * ------------------------------------------------------------------ */
+.bone-panel {
+	margin: 6px 0 2px;
+	padding: 8px 10px;
+	border: 1px solid var(--line, #2b3242);
+	border-radius: 8px;
+	background: var(--panel, #151a23);
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.bone-panel[hidden] { display: none; }
+.bone-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bone-label { color: var(--fg-mute, #8a93a6); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.bone-panel code {
+	font-variant-numeric: tabular-nums;
+	font-size: 12px;
+	color: var(--fg, #e6e9ef);
+	background: rgba(255,255,255,.06);
+	padding: 2px 6px;
+	border-radius: 4px;
+	min-width: 34px;
+}
+.bone-import { position: relative; cursor: pointer; }
+.bone-hint { color: var(--fg-mute, #8a93a6); font-size: 11px; }

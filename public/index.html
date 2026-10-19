@@ -337,6 +337,26 @@
 			</div>
 		</div>
 
+		<div id="bone-panel" class="bone-panel" hidden>
+			<div class="bone-row">
+				<span class="bone-label">Tulang</span>
+				<code data-bone-name>—</code>
+				<span class="bone-label">Rotasi</span>
+				<code data-bone-rot>—</code>
+				<span class="bone-label">Diubah</span>
+				<code data-bone-count>0</code>
+			</div>
+			<div class="bone-row">
+				<button class="btn" id="bone-reset" type="button" title="Kembalikan semua tulang ke setup pose">Reset pose</button>
+				<button class="btn" id="bone-export" type="button" title="Unduh pose sebagai JSON">Ekspor pose</button>
+				<label class="btn bone-import" title="Muat pose dari JSON">
+					Muat pose
+					<input id="bone-import-file" type="file" accept="application/json,.json" hidden>
+				</label>
+				<span class="bone-hint">Klik tulang lalu geser untuk memutar.</span>
+			</div>
+		</div>
+
 		<div class="transport-row transport-row-2">
 				<div class="tgroup">
 					<label class="field-inline">
@@ -404,6 +424,7 @@
 					<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
 					<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
 					<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
+					<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
 					<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>
 					<select id="density-select" class="btn btn-select" aria-label="Kerapatan piksel render"
 						title="Kerapatan piksel render — makin tinggi makin tajam (beban GPU naik)">
