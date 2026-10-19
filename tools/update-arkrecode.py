@@ -32,22 +32,33 @@ import urllib3
 
 urllib3.disable_warnings()
 
-API_URL = "https://game-arkre-nu.ecchi.xxx//Router/RouterHandler.ashx"
-# The router hands back PatchDomain as a PLACEHOLDER ("http://PatchDomain/...")
-# inside the catalog, so every bundle URL needs its host substituted.
+# Dua router, dan keduanya TIDAK selalu sinkron. Yang dipakai menentukan
+# catalog mana yang dianggap "terbaru":
+#   game-arkre-nu   -> patch-arkre-nu.ecchi.xxx  (catalog tertinggal)
+#   game-arkre-labs -> erdpu.gzxhcjz.com         (catalog terdepan)
 #
-# Two hosts serve the same tree, and they do NOT have the same coverage:
-#   patch-arkre-nu...  (the router's own PathDomain) -> served 25/25 sampled
-#                      bundles, including every CG skeleton
-#   erdpu.gzxhcjz.com                               -> 23/25; it 403s on
-#                      several skeleton bundles (a0001, a0022, ...)
-# Earlier I concluded the router's host "never serves bundles" — that was
-# wrong: it was fine, I had only tried it before learning that bundle names
-# keep their slashed asset path. It is the better default, with the other
-# host kept as a fallback for the handful it misses.
+# Contoh nyata: 2026-10-19 router -nu masih menunjuk catalog_115575
+# (8 Okt, 25,4 MB) sementara -labs sudah catalog_115700 (15 Okt, 26,6 MB).
+# Karena itu SEMUA router ditanya dan yang catalog-nya paling baru dipakai;
+# hardcode satu router berarti updater diam-diam melewatkan build terbaru.
+ROUTER_URLS = [
+	"https://game-arkre-labs.ecchi.xxx/Router/RouterHandler.ashx",
+	"https://game-arkre-nu.ecchi.xxx//Router/RouterHandler.ashx",
+]
+API_URL = ROUTER_URLS[0]  # kompatibilitas untuk kode lama
+
+# Router memberi PatchDomain sebagai PLACEHOLDER ("http://PatchDomain/...")
+# di dalam catalog, jadi setiap URL bundle perlu host pengganti.
+#
+# Dua host melayani pohon yang sama, dan cakupannya TIDAK sama:
+#   erdpu.gzxhcjz.com  -> host router -labs, sudah diverifikasi 5.825/5.825
+#                         bundle 200 OK (0 gagal)
+#   patch-arkre-nu...  -> host router -nu; dulu jadi default, tapi catalog-nya
+#                         tertinggal dan 403 pada beberapa skeleton
+# Urutan: host dari router yang menang lebih dulu, sisanya jadi cadangan.
 CDN_HOSTS = [
-	"https://patch-arkre-nu.ecchi.xxx/GamePatch",
 	"https://erdpu.gzxhcjz.com/GamePatch",
+	"https://patch-arkre-nu.ecchi.xxx/GamePatch",
 ]
 HEADERS = {
 	"User-Agent": "UnityPlayer/2022.3.28f1 (UnityWebRequest/1.0, libcurl/8.5.0-DEV)",
@@ -204,19 +215,51 @@ def http_get(url: str, timeout: int = 60) -> bytes:
 
 
 def fetch_latest_catalog_meta() -> dict:
-	"""Tanya server: versi catalog aktif + domain aset."""
-	obj = http_json_put(API_URL, {"data": {}, "route": "GameServerDBSettingHandler.QueryBulletinInfoResult"})
-	info = obj.get("Info", {})
-	domain = info.get("PathDomain")
-	name = info.get("NewCatalogName")
-	if not domain or not name:
-		raise RuntimeError(f"respons tidak lengkap: {list(info)}")
-	return {
-		"domain": domain,
-		"catalog": name,
-		"url": f"{domain}/Android/{name}.json",
-		"versions": info.get("AvailableVersions", []),
-	}
+	"""Tanya SEMUA router, pilih catalog yang paling baru.
+
+	Router -nu dan -labs tidak selalu sinkron; memakai satu saja bisa
+	melewatkan build terbaru. Yang dipakai sebagai penentu: nomor catalog
+	tertinggi (format `catalog_<angka>`), karena nomor itu naik monoton
+	seiring build. Bila nomor tidak bisa dibaca, jatuh ke urutan router.
+	"""
+	results = []
+	for url in ROUTER_URLS:
+		try:
+			obj = http_json_put(
+				url, {"data": {}, "route": "GameServerDBSettingHandler.QueryBulletinInfoResult"}
+			)
+		except Exception as e:  # router bisa mati; coba yang lain
+			print(f"  router gagal {url}: {str(e)[:70]}", file=sys.stderr)
+			continue
+		info = obj.get("Info", {})
+		domain = info.get("PathDomain")
+		name = info.get("NewCatalogName")
+		if not domain or not name:
+			continue
+		m = re.search(r"(\d+)", str(name))
+		num = int(m.group(1)) if m else -1
+		results.append({
+			"domain": domain,
+			"catalog": name,
+			"url": f"{domain}/Android/{name}.json",
+			"versions": info.get("AvailableVersions", []),
+			"num": num,
+			"router": url,
+		})
+	if not results:
+		raise RuntimeError("semua router gagal / respons tidak lengkap")
+	results.sort(key=lambda r: r["num"], reverse=True)
+	best = results[0]
+	if len(results) > 1:
+		for r in results:
+			print(f"  router {r['router'].split('/')[2]:32s} -> {r['catalog']}", file=sys.stderr)
+		print(f"  dipakai: {best['catalog']} (nomor tertinggi)", file=sys.stderr)
+	# Pastikan host router yang menang dicoba lebih dulu saat unduh bundle.
+	host = best["domain"].rstrip("/")
+	if host in CDN_HOSTS:
+		CDN_HOSTS.remove(host)
+		CDN_HOSTS.insert(0, host)
+	return best
 
 
 def load_state() -> dict:
