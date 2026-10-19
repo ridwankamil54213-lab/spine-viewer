@@ -419,6 +419,18 @@ const GAME_ROOTS = [
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
 	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
+	// Ark Re:Code — H-scene (CG interaktif) dari updater resmi. 7 bundle
+	// "skeletondata" di catalog Addressables (erdpu.gzxhcjz.com/GamePatch/Android/
+	// catalog_112681.json) berisi TextAsset .skel + .atlas + Texture2D 2048².
+	// Semua Spine 4.1.23, atlas bertanda `pma:true`. Harus SEBELUM entri
+	// "arkrecode" di atas (prefix match: "arkrecode-h" juga mulai "arkrecode").
+	{
+		match: "arkrecode-h",
+		key: "arkrecode-h",
+		label: "Ark Re:Code — CG H-Scene",
+		spineRuntime: "4.1",
+		pmaDefault: true,
+	},
 	// 蜜桃乌托邦 (Peach Utopia). Atlases carry no `pma:` line and the textures
 	// are straight-alpha, BUT their fully-transparent texels still hold stale
 	// near-white colour, which leaks as solid WHITE patches when drawn with
