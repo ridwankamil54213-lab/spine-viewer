@@ -1236,6 +1236,9 @@ app.ticker.add(() => {
 	// per-slot kita biarkan tapi pastikan visibility-nya tetap sesuai pilihan
 	// pengguna (murah, dan hanya saat ada yang disembunyikan).
 	if (insp.hidden.size) applySlotVisibility();
+	// Sorotan slot ikut mesh yang bergerak, jadi harus digambar ulang tiap
+	// frame — posisinya bukan nilai tetap.
+	if (SLOTHILITE.index >= 0) drawSlotHilite();
 
 	updateScrubUI();
 	// Keep the timeline playhead in sync, but only when it's actually on
@@ -2614,6 +2617,11 @@ async function loadModelBody(model) {
 		insp.skin = "default";
 		insp.hidden.clear(); // model baru = tanpa slot tersembunyi
 		insp.prevVisible.clear();
+		// Indeks slot hanya bermakna untuk model sebelumnya — sorotan dan
+		// fokus harus ikut direset, kalau tidak baris slot nomor sama di
+		// model baru akan tersorot tanpa alasan.
+		insp.focus = -1;
+		hiliteSlot(-1);
 		if (insp.open) {
 			renderSkinOptions();
 			renderSlots();
@@ -3284,6 +3292,8 @@ const insp = {
 	tab: "slots",
 	skin: "default",
 	query: "",
+	/** Indeks slot yang barisnya sedang disorot dari klik di kanvas. */
+	focus: -1,
 	// Slot yang disembunyikan (indeks slot) — "isolasi bagian". Indeks, bukan
 	// nama, supaya tahan terhadap slot bernama duplikat. Di-reset tiap model.
 	hidden: new Set(),
@@ -3387,6 +3397,19 @@ function renderSlots() {
 
 		const li = document.createElement("li");
 		li.className = "slot" + (current ? "" : " is-empty");
+		// Dipakai focusSlot() untuk menemukan baris ini saat slot diklik di
+		// kanvas; atribut, bukan indeks array, supaya tahan terhadap filter
+		// pencarian yang mengubah urutan tampil.
+		li.dataset.slotIndex = String(i);
+		if (insp.focus === i) li.classList.add("is-focus");
+		li.addEventListener("click", (ev) => {
+			// Jangan rebut klik dari tombol mata / dropdown attachment.
+			if (ev.target.closest(".slot-eye, .slot-pick")) return;
+			insp.focus = i;
+			for (const r of el.slotList.querySelectorAll(".slot.is-focus")) r.classList.remove("is-focus");
+			li.classList.add("is-focus");
+			hiliteSlot(i);
+		});
 
 		const nm = document.createElement("span");
 		nm.className = "slot-name";
@@ -4468,6 +4491,112 @@ function tickSlotTip() {
 function scheduleSlotTip() {
 	if (SLOTTIP.raf) return;
 	SLOTTIP.raf = requestAnimationFrame(tickSlotTip);
+}
+
+/* ------------------------------------------------------------------ *
+ * Sorotan slot (dari klik / dari daftar inspector)
+ *
+ * Menggambar ulang garis tepi mesh slot terpilih ke Graphics tersendiri, di
+ * atas model. Dipakai untuk dua arah: klik slot di kanvas -> baris inspector
+ * tersorot, dan klik baris inspector -> mesh-nya tersorot di kanvas.
+ * ------------------------------------------------------------------ */
+const SLOTHILITE = { index: -1, gfx: null };
+
+function slotHiliteGfx() {
+	if (SLOTHILITE.gfx) return SLOTHILITE.gfx;
+	const g = new Graphics();
+	g.visible = false;
+	// Segaris dengan bonesGfx: sama-sama di stageRoot, jadi koordinat mesh
+	// world tidak perlu diterjemahkan lagi.
+	stageRoot.addChild(g);
+	SLOTHILITE.gfx = g;
+	return g;
+}
+
+/** Sorot satu slot (indeks), atau -1 untuk menghapus sorotan. */
+function hiliteSlot(index) {
+	SLOTHILITE.index = Number.isInteger(index) ? index : -1;
+	drawSlotHilite();
+}
+
+function drawSlotHilite() {
+	const g = slotHiliteGfx();
+	g.clear();
+	const i = SLOTHILITE.index;
+	const skel = spine?.skeleton;
+	if (i < 0 || !skel || !skel.slots?.[i]) {
+		g.visible = false;
+		return;
+	}
+	const slot = skel.slots[i];
+	const att = slot.attachment;
+	if (!att?.worldVerticesLength) {
+		g.visible = false;
+		return;
+	}
+	const verts = SLOTTIP.scratch || (SLOTTIP.scratch = new Float32Array(4096));
+	const n = att.worldVerticesLength;
+	if (n > verts.length) {
+		g.visible = false;
+		return;
+	}
+	try {
+		att.computeWorldVertices(slot, 0, n, verts, 0, 2);
+	} catch {
+		g.visible = false;
+		return;
+	}
+	const s = 1 / (state.zoom || 1);
+	const nv = n / 2;
+	// Garis tepi mengikuti triangles supaya bentuknya tepat, bukan sekadar
+	// kotak pembatas.
+	const tris = att.triangles;
+	g.lineStyle(1.5 * s, 0x33ff99, 0.9);
+	if (tris && tris.length >= 3) {
+		for (let t = 0; t + 2 < tris.length; t += 3) {
+			const i0 = tris[t];
+			const i1 = tris[t + 1];
+			const i2 = tris[t + 2];
+			if (i0 >= nv || i1 >= nv || i2 >= nv) continue;
+			g.moveTo(verts[i0 * 2], verts[i0 * 2 + 1]);
+			g.lineTo(verts[i1 * 2], verts[i1 * 2 + 1]);
+			g.lineTo(verts[i2 * 2], verts[i2 * 2 + 1]);
+			g.lineTo(verts[i0 * 2], verts[i0 * 2 + 1]);
+		}
+	} else {
+		let first = true;
+		for (let k = 0; k < nv; k++) {
+			if (first) {
+				g.moveTo(verts[k * 2], verts[k * 2 + 1]);
+				first = false;
+			} else {
+				g.lineTo(verts[k * 2], verts[k * 2 + 1]);
+			}
+		}
+		if (nv > 2) g.lineTo(verts[0], verts[1]);
+	}
+	g.visible = true;
+}
+
+/**
+ * Fokuskan satu slot: buka inspector (kalau perlu), pindah ke tab slot,
+ * gulir barisnya ke tengah, dan sorot baris + mesh-nya.
+ */
+function focusSlot(index) {
+	if (!spine?.skeleton) return;
+	const slot = spine.skeleton.slots?.[index];
+	if (!slot) return;
+	insp.focus = index;
+	hiliteSlot(index);
+	setInspectorVisible(true);
+	setInspectorTab("slots");
+	// renderSlots() baru saja dijalankan lewat setInspectorTab; tandai baris.
+	const row = el.slotList?.querySelector(`[data-slot-index="${index}"]`);
+	if (row) {
+		for (const r of el.slotList.querySelectorAll(".slot.is-focus")) r.classList.remove("is-focus");
+		row.classList.add("is-focus");
+		row.scrollIntoView({ block: "center", behavior: "smooth" });
+	}
 }
 
 
@@ -6110,6 +6239,23 @@ el.canvasWrap?.addEventListener("pointermove", (e) => {
 	scheduleSlotTip();
 });
 el.canvasWrap?.addEventListener("pointerleave", () => hideSlotTip());
+
+// Klik slot di kanvas -> fokus ke barisnya di inspector. Hanya saat tooltip
+// menyala, supaya klik untuk pan/zoom tidak tiba-tiba membuka panel.
+el.canvasWrap?.addEventListener(
+	"click",
+	(e) => {
+		if (!SLOTTIP.enabled || !spine?.skeleton) return;
+		// Jangan bentrok dengan mode edit tulang: di sana klik berarti pilih bone.
+		if (BONES.on) return;
+		if (e.button !== 0) return;
+		const hit = slotAtClient(e.clientX, e.clientY);
+		if (!hit) return;
+		const idx = spine.skeleton.slots.indexOf(hit.slot);
+		if (idx >= 0) focusSlot(idx);
+	},
+	false,
+);
 
 // Bone editor: toggle, reset, ekspor, impor.
 el.boneEditBtn?.addEventListener("click", () => setBoneEdit(!BONES.on));

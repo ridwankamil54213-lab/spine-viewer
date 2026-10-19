@@ -737,6 +737,13 @@ body {
 /* Baris slot yang disembunyikan: redup + coret nama, tapi tetap bisa diklik
  * supaya mudah ditampilkan lagi. */
 .slot.is-hidden { opacity: 0.5; }
+/* Baris slot yang difokuskan dari klik di kanvas. Outline, bukan border,
+   supaya lebar baris tidak berubah dan daftar tidak "melompat". */
+.slot.is-focus {
+	outline: 1px solid var(--accent, #33ff99);
+	outline-offset: -1px;
+	background: rgba(51, 255, 153, 0.10);
+}
 .slot.is-hidden .slot-name,
 .slot.is-hidden .slot-att { text-decoration: line-through; }
 .slot-eye {
