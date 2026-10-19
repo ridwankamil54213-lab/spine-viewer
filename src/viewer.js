@@ -404,6 +404,7 @@ const el = {
 	partsBtn: $("#parts-btn"),
 	boneEditBtn: $("#bone-edit-btn"),
 	bonePanel: $("#bone-panel"),
+	slotTipBtn: $("#slot-tip-btn"),
 	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
 
@@ -4299,6 +4300,177 @@ function partAt(x, y) {
 	}
 }
 
+/* ------------------------------------------------------------------ *
+ * Slot hover tooltip
+ *
+ * Menampilkan nama slot (dan nama attachment-nya) di dekat kursor untuk
+ * bagian model yang sedang ditunjuk. Berbeda dari mode "Bagian" yang
+ * memakai bounding-box: di sini yang diuji adalah MESH yang benar-benar
+ * digambar, lewat `spine.slotContainers[i]` — satu Container Pixi per slot,
+ * diurutkan sama dengan `skeleton.slots`.
+ *
+ * Urutan pencarian dibalik (slot terakhir dulu) karena slot yang digambar
+ * belakangan menutupi yang lebih awal — yang terlihat pengguna adalah yang
+ * paling atas, jadi itulah yang harus dilaporkan.
+ * ------------------------------------------------------------------ */
+const SLOTTIP = {
+	el: null,
+	slot: null,
+	clientX: 0,
+	clientY: 0,
+	raf: 0,
+};
+
+function slotTooltipEl() {
+	if (SLOTTIP.el) return SLOTTIP.el;
+	const d = document.createElement("div");
+	d.id = "slot-tip";
+	d.className = "slot-tip";
+	d.setAttribute("role", "status");
+	d.setAttribute("aria-live", "polite");
+	d.hidden = true;
+	document.body.appendChild(d);
+	SLOTTIP.el = d;
+	return d;
+}
+
+/**
+ * Slot mana yang ada di bawah titik viewport (clientX/clientY)?
+ * Mengembalikan {slot, attachment} atau null.
+ *
+ * Kenapa lewat triangle dan bukan `containsPoint`: Container Pixi yang dibuat
+ * pixi-spine untuk tiap slot TIDAK punya `containsPoint` (itu hanya ada di
+ * kelas Graphics/Sprite). Yang bisa dipercaya adalah geometri asli slot:
+ * `attachment.computeWorldVertices()` menghasilkan koordinat world dari mesh
+ * yang benar-benar digambar, lalu diuji dengan point-in-triangle memakai
+ * `attachment.triangles`. Hasilnya tepat mengikuti bentuk mesh, termasuk
+ * bagian transparan yang bukan bagian dari segitiga mana pun.
+ */
+function slotAtClient(clientX, clientY) {
+	if (!spine?.skeleton) return null;
+	const stage = toStagePoint(clientX, clientY);
+	const slots = spine.skeleton.slots;
+	const verts = SLOTTIP.scratch || (SLOTTIP.scratch = new Float32Array(4096));
+	// Slot terakhir dicari lebih dulu: slot yang digambar belakangan menutupi
+	// yang lebih awal, jadi yang terlihat pengguna adalah urutan teratas.
+	for (let i = slots.length - 1; i >= 0; i--) {
+		const slot = slots[i];
+		const att = slot?.attachment;
+		if (!att) continue;
+		const c = spine.slotContainers?.[i];
+		if (c && c.visible === false) continue;
+		try {
+			const n = att.worldVerticesLength || 0;
+			if (!n || n > verts.length) continue;
+			// Runtime 4.x: computeWorldVertices(slot, start, count, out, offset, stride)
+			att.computeWorldVertices(slot, 0, n, verts, 0, 2);
+			if (pointInAttachment(verts, n, att.triangles, stage.x, stage.y)) {
+				return { slot, attachment: att };
+			}
+		} catch {
+			/* attachment tanpa geometri — lewati */
+		}
+	}
+	return null;
+}
+
+/** Uji point-in-triangle terhadap mesh attachment (triangles = indeks vertex). */
+function pointInAttachment(verts, count, triangles, px, py) {
+	const nv = count / 2;
+	if (triangles && triangles.length >= 3) {
+		for (let t = 0; t + 2 < triangles.length; t += 3) {
+			const i0 = triangles[t];
+			const i1 = triangles[t + 1];
+			const i2 = triangles[t + 2];
+			if (i0 >= nv || i1 >= nv || i2 >= nv) continue;
+			if (
+				pointInTriangle(
+					px,
+					py,
+					verts[i0 * 2],
+					verts[i0 * 2 + 1],
+					verts[i1 * 2],
+					verts[i1 * 2 + 1],
+					verts[i2 * 2],
+					verts[i2 * 2 + 1],
+				)
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+	// Tanpa triangles (mis. region 4 titik): pakai kotak pembatas.
+	if (nv >= 4) {
+		let minX = Infinity,
+			minY = Infinity,
+			maxX = -Infinity,
+			maxY = -Infinity;
+		for (let i = 0; i < nv; i++) {
+			const x = verts[i * 2];
+			const y = verts[i * 2 + 1];
+			if (x < minX) minX = x;
+			if (x > maxX) maxX = x;
+			if (y < minY) minY = y;
+			if (y > maxY) maxY = y;
+		}
+		return px >= minX && px <= maxX && py >= minY && py <= maxY;
+	}
+	return false;
+}
+
+function pointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+	const d1 = (px - bx) * (ay - by) - (ax - bx) * (py - by);
+	const d2 = (px - cx) * (by - cy) - (bx - cx) * (py - cy);
+	const d3 = (px - ax) * (cy - ay) - (cx - ax) * (py - ay);
+	const hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
+	const hasPos = d1 > 0 || d2 > 0 || d3 > 0;
+	return !(hasNeg && hasPos);
+}
+
+function hideSlotTip() {
+	if (SLOTTIP.slot) {
+		SLOTTIP.slot = null;
+		const d = slotTooltipEl();
+		d.hidden = true;
+	}
+}
+
+function showSlotTip(hit, clientX, clientY) {
+	const d = slotTooltipEl();
+	const name = hit.slot?.data?.name || "?";
+	const att = hit.attachment;
+	const attName = att?.name || att?.constructor?.name || "";
+	d.textContent = attName && attName !== name ? `${name} · ${attName}` : name;
+	d.hidden = false;
+	// Geser 14px dari kursor, dan balik arah kalau mentok tepi kanan/bawah.
+	const pad = 14;
+	const w = d.offsetWidth;
+	const h = d.offsetHeight;
+	let x = clientX + pad;
+	let y = clientY + pad;
+	if (x + w > window.innerWidth - 6) x = clientX - w - pad;
+	if (y + h > window.innerHeight - 6) y = clientY - h - pad;
+	d.style.transform = `translate(${Math.max(4, x)}px, ${Math.max(4, y)}px)`;
+}
+
+/** Perbarui tooltip untuk posisi kursor terakhir (dipanggil per frame). */
+function tickSlotTip() {
+	SLOTTIP.raf = 0;
+	if (!SLOTTIP.enabled) return;
+	if (!spine?.skeleton) return hideSlotTip();
+	const hit = slotAtClient(SLOTTIP.clientX, SLOTTIP.clientY);
+	if (!hit) return hideSlotTip();
+	SLOTTIP.slot = hit.slot;
+	showSlotTip(hit, SLOTTIP.clientX, SLOTTIP.clientY);
+}
+
+function scheduleSlotTip() {
+	if (SLOTTIP.raf) return;
+	SLOTTIP.raf = requestAnimationFrame(tickSlotTip);
+}
+
+
 function setPartsVisible(on) {
 	parts.on = on;
 	parts.hover = null;
@@ -5920,6 +6092,25 @@ el.fpsReset?.addEventListener("click", fpsResetStats);
 // Part picker toggle.
 el.partsBtn?.addEventListener("click", () => setPartsVisible(!parts.on));
 
+// Tooltip nama slot: nyala/mati, plus pelacakan kursor.
+function setSlotTip(on) {
+	SLOTTIP.enabled = !!on;
+	el.slotTipBtn?.setAttribute("aria-pressed", String(SLOTTIP.enabled));
+	if (el.slotTipBtn) el.slotTipBtn.dataset.on = String(SLOTTIP.enabled);
+	if (!SLOTTIP.enabled) hideSlotTip();
+}
+el.slotTipBtn?.addEventListener("click", () => setSlotTip(!SLOTTIP.enabled));
+
+// Kursor bergerak -> jadwalkan pembaruan (dibatasi satu per frame, karena
+// hit-test menyapu seluruh slot dan itu terlalu mahal untuk tiap event).
+el.canvasWrap?.addEventListener("pointermove", (e) => {
+	if (!SLOTTIP.enabled) return;
+	SLOTTIP.clientX = e.clientX;
+	SLOTTIP.clientY = e.clientY;
+	scheduleSlotTip();
+});
+el.canvasWrap?.addEventListener("pointerleave", () => hideSlotTip());
+
 // Bone editor: toggle, reset, ekspor, impor.
 el.boneEditBtn?.addEventListener("click", () => setBoneEdit(!BONES.on));
 el.bonePanel?.querySelector("#bone-reset")?.addEventListener("click", resetBonePose);
@@ -7216,6 +7407,11 @@ window.addEventListener("keydown", (e) => {
 		case "E":
 			e.preventDefault();
 			el.boneEditBtn?.click();
+			break;
+		case "t":
+		case "T":
+			e.preventDefault();
+			el.slotTipBtn?.click();
 			break;
 		case ",":
 			// step keyframes, but only when the timeline is open

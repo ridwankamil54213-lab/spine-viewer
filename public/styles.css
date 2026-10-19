@@ -1917,3 +1917,25 @@ input:focus-visible {
 }
 .bone-import { position: relative; cursor: pointer; }
 .bone-hint { color: var(--fg-mute, #8a93a6); font-size: 11px; }
+
+/* Tooltip nama slot — mengikuti kursor, di luar alur layout. */
+.slot-tip {
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 9999;
+	pointer-events: none;
+	max-width: 320px;
+	padding: 4px 8px;
+	border-radius: 6px;
+	border: 1px solid rgba(122, 209, 255, 0.45);
+	background: rgba(12, 16, 24, 0.94);
+	color: #e8f4ff;
+	font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	will-change: transform;
+}
+.slot-tip[hidden] { display: none; }
