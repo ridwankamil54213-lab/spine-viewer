@@ -418,6 +418,7 @@ const GAME_ROOTS = [
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
+	{ match: "arkrecode-cg", key: "arkrecode-cg", label: "Ark Re:Code — Ilustrasi CG" },
 	{ match: "arkrecode", key: "arkrecode", label: "Ark Re:Code" },
 	// 蜜桃乌托邦 (Peach Utopia). Atlases carry no `pma:` line and the textures
 	// are straight-alpha, BUT their fully-transparent texels still hold stale
