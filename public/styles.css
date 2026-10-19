@@ -41,6 +41,8 @@
 	/* 372px fits two grid cells that still show ~14 characters of the model id
 	   beside the 38px thumbnail; 344px truncated ids to "azxservetii…". */
 	--sidebar-w: 372px;
+	/* Lebar sidebar saat mode galeri — tile persegi butuh ruang mendatar. */
+	--sidebar-w-gallery: 560px;
 
 	--ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -226,6 +228,12 @@ body {
 	grid-template-columns: var(--sidebar-w) 1fr;
 	transition: grid-template-columns 0.24s var(--ease);
 }
+
+/* Mode galeri: sidebar dilebarkan karena tile persegi butuh ruang mendatar.
+   Tanpa ini, menambah kolom justru MENGECILKAN tile (lebarnya tetap 372px),
+   jadi 4 kolom hanya menghasilkan kotak 67px — lebih buruk dari 3 kolom. */
+.layout.is-gallery { grid-template-columns: var(--sidebar-w-gallery) 1fr; }
+.layout.is-gallery.sidebar-hidden { grid-template-columns: 0 1fr; }
 
 /* collapsed: sidebar slides out and the stage takes the full width */
 .layout.sidebar-hidden { grid-template-columns: 0 1fr; }
@@ -1404,6 +1412,9 @@ input:focus-visible {
 		height: auto;
 		min-height: calc(100dvh - var(--topbar-h));
 	}
+	/* Di layar sempit sidebar jadi satu kolom penuh, jadi lebar galeri
+	   yang 560px akan mendorong kanvas keluar layar. */
+	.layout.is-gallery { grid-template-columns: 1fr; }
 	.sidebar { border-right: 0; border-bottom: 1px solid var(--line); overflow: visible; }
 	.brand-sub { display: none; }
 }
@@ -1946,3 +1957,104 @@ input:focus-visible {
 	will-change: transform;
 }
 .slot-tip[hidden] { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * Galeri model (layout "grid")
+ *
+ * Sidebar hanya 372px, jadi jumlah kolom ditentukan container query-ish
+ * lewat media query lebar sidebar: 2 kolom di layar sempit, 3 di sedang,
+ * 4 kalau sidebar dilebarkan. aspect-ratio menjaga kotak gambar tetap
+ * persegi tanpa perlu tinggi tetap.
+ * ------------------------------------------------------------------ */
+.view-switch { display: flex; gap: 2px; margin-left: auto; }
+.view-switch .btn-icon { width: 30px; height: 28px; padding: 0; display: grid; place-items: center; }
+.view-switch .btn-icon .icon { width: 15px; height: 15px; fill: currentColor; }
+.view-switch .btn-icon.is-on { background: var(--ink-700); color: var(--fg); }
+
+.model-grid.is-gallery {
+	display: grid;
+	/* auto-fill: jumlah kolom mengikuti lebar sidebar yang sebenarnya,
+	   bukan tebakan lewat media query lebar viewport. Sidebar melebar di
+	   mode galeri (lihat --sidebar-w-gallery), jadi di layar besar tile
+	   tetap besar dan kolomnya bertambah sendiri.
+
+	   150px minimum membuat tile tidak pernah mengecil sampai tak terbaca. */
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.gcard {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 5px;
+	background: var(--ink-800);
+	border: 1px solid transparent;
+	border-radius: var(--r);
+	cursor: pointer;
+	color: var(--fg);
+	font-family: var(--font-body);
+	min-width: 0;
+	transition: background 0.16s var(--ease), border-color 0.16s var(--ease), transform 0.1s var(--ease);
+}
+
+.gcard:hover { background: var(--ink-750); border-color: var(--line); }
+.gcard:active { transform: scale(0.985); }
+
+.gcard.is-active {
+	border-color: rgba(255, 176, 46, 0.55);
+	background: linear-gradient(160deg, rgba(255, 176, 46, 0.13), rgba(255, 176, 46, 0.02));
+}
+
+.gcard-art {
+	position: relative;
+	display: block;
+	width: 100%;
+	aspect-ratio: 1 / 1;
+	border-radius: 7px;
+	overflow: hidden;
+	background: linear-gradient(145deg, var(--ink-700), var(--ink-650));
+}
+
+.gcard-img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+/* Tanpa thumbnail: inisial besar di tengah, bukan kotak kosong. */
+.gcard-none {
+	display: grid;
+	place-items: center;
+	font-family: var(--font-mono);
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--fg-mute);
+	letter-spacing: 0.03em;
+}
+
+.gcard-name {
+	font-size: 11.5px;
+	line-height: 1.25;
+	text-align: center;
+	color: var(--fg);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 0 2px 1px;
+}
+
+/* Bintang favorit di pojok kanan-atas kotak gambar. */
+.model-grid.is-gallery li { position: relative; }
+.model-grid.is-gallery .model-fav {
+	top: 10px;
+	right: 10px;
+	transform: none;
+	width: 22px;
+	height: 22px;
+}
+.model-grid.is-gallery .model-fav:hover { transform: scale(1.12); }
+

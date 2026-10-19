@@ -309,6 +309,9 @@ const el = {
 
 	// favorites
 	favFilter: $("#fav-filter"),
+	viewListBtn: $("#view-list-btn"),
+	layoutEl: $(".layout"),
+	viewGridBtn: $("#view-grid-btn"),
 	favCount: $("#fav-count"),
 
 	animSelect: $("#anim-select"),
@@ -4910,7 +4913,13 @@ let gameIcons = {};
  * paginated grid of that game's models. With 2000+ models a single scrolling
  * list is unusable, and a <select> filter hides how big each library is. */
 const PAGE_SIZE = 60;
-const browse = { view: "games", game: null, page: 1, favOnly: false };
+/**
+ * Jumlah kartu per halaman saat mode galeri. Lebih besar dari mode daftar
+ * karena tiap kartu jauh lebih pendek (gambar + satu baris nama), jadi 120
+ * kartu galeri masih lebih ringkas daripada 60 baris daftar.
+ */
+const PAGE_SIZE_GRID = 120;
+const browse = { view: "games", game: null, page: 1, favOnly: false, layout: "list" };
 
 /**
  * Games, A→Z by display label.
@@ -5152,85 +5161,134 @@ function hiddenVariantCount() {
 
 function renderModels() {
 	const list = modelsInScope();
-	const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+	const perPage = browse.layout === "grid" ? PAGE_SIZE_GRID : PAGE_SIZE;
+	const pages = Math.max(1, Math.ceil(list.length / perPage));
 	// Clamp so deleting a model or narrowing a search can't strand us off-list.
 	if (browse.page > pages) browse.page = pages;
 	if (browse.page < 1) browse.page = 1;
 
-	const start = (browse.page - 1) * PAGE_SIZE;
-	const slice = list.slice(start, start + PAGE_SIZE);
+	const start = (browse.page - 1) * perPage;
+	const slice = list.slice(start, start + perPage);
+
+	// Bentuk wadah mengikuti layout: baris penuh untuk daftar, petak untuk
+	// galeri. Dipasang di <ul> supaya CSS tidak perlu tahu mode lewat kelas
+	// di elemen lain.
+	const gallery = browse.layout === "grid";
+	el.list.classList.toggle("is-gallery", gallery);
+	// Sidebar ikut melebar di mode galeri (lihat --sidebar-w-gallery).
+	el.layoutEl?.classList.toggle("is-gallery", gallery);
 
 	el.list.innerHTML = "";
 	if (!slice.length) {
 		el.list.innerHTML = `<li class="list-empty">Tidak ada model yang cocok.</li>`;
 	}
 	for (const m of slice) {
-		const li = document.createElement("li");
-		const btn = document.createElement("button");
-		btn.className = "model";
-		btn.dataset.id = m.id;
-		// Show the real asset id — with 2000+ models an auto-titlecased name
-		// ("Char000101") is far less useful than the id itself.
-		const file = thumbs[m.id];
-		// The manifest value is "<game>/<file>" (older Nikke entries ship a
-		// bare filename), so encode per segment: encoding the slash turned
-		// "azurlane/x.png" into one opaque segment and 404'd.
-		const thumbPath = file
-			? String(file).split("/").map(encodeURIComponent).join("/")
-			: "";
-		const art = m.format === "image"
-			? `<img class="model-thumb" src="${escapeHtml(m.imageFile)}" alt="" loading="lazy" decoding="async" width="128" height="128" />`
-			: file
-			? `<img class="model-thumb" src="/thumbs/${thumbPath}" alt="" loading="lazy" decoding="async" width="128" height="128" />`
-			: `<span class="model-thumb model-thumb-none" aria-hidden="true">${escapeHtml(
-					initials(m)
-			  )}</span>`;
-		// Tooltip carries the full id + character details; the card itself
-		// can only fit the short label.
-		const details = modelSubLabel(m);
-		btn.title = modelTooltip(m);
-		const newTag = isNewModel(m)
-			? `<span class="badge-new" title="Baru ditambahkan">NEW</span>`
-			: "";
-		btn.innerHTML = `
+		el.list.appendChild(browse.layout === "grid" ? galleryCard(m) : listCard(m));
+	}
+
+	el.count.textContent = String(list.length);
+	renderPager(pages, list.length, start, slice.length);
+	if (current) setActive(current.id);
+}
+
+/** Path thumbnail untuk sebuah model, atau "" kalau tidak ada. */
+function thumbPathOf(m) {
+	if (m.format === "image") return m.imageFile || "";
+	const file = thumbs[m.id];
+	if (!file) return "";
+	// The manifest value is "<game>/<file>" (older Nikke entries ship a
+	// bare filename), so encode per segment: encoding the slash turned
+	// "azurlane/x.png" into one opaque segment and 404'd.
+	return "/thumbs/" + String(file).split("/").map(encodeURIComponent).join("/");
+}
+
+/** Satu baris daftar (layout lama): gambar kecil + nama + meta. */
+function listCard(m) {
+	const li = document.createElement("li");
+	const btn = document.createElement("button");
+	btn.className = "model";
+	btn.dataset.id = m.id;
+	// Show the real asset id — with 2000+ models an auto-titlecased name
+	// ("Char000101") is far less useful than the id itself.
+	const src = thumbPathOf(m);
+	const art = src
+		? `<img class="model-thumb" src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" width="128" height="128" />`
+		: `<span class="model-thumb model-thumb-none" aria-hidden="true">${escapeHtml(initials(m))}</span>`;
+	// Tooltip carries the full id + character details; the card itself
+	// can only fit the short label.
+	const details = modelSubLabel(m);
+	btn.title = modelTooltip(m);
+	const newTag = isNewModel(m) ? `<span class="badge-new" title="Baru ditambahkan">NEW</span>` : "";
+	btn.innerHTML = `
 		${art}
 		<span class="model-text">
 			<span class="model-name">${escapeHtml(modelLabel(m))}${newTag}</span>
 			<span class="model-meta">${details ? escapeHtml(details) + " · " : ""}${m.animations.length ? m.animations.length + " animasi" : "—"}</span>
 		</span>
 		`;
-		btn.addEventListener("click", () => loadModel(m));
+	wireCard(btn, m);
+	li.appendChild(btn);
+	li.appendChild(favStar(m));
+	return li;
+}
+
+/**
+ * Satu kartu galeri: gambar besar, nama di bawahnya.
+ *
+ * Sengaja memakai <img> yang dimuat lazy milik browser, bukan canvas atau
+ * render ulang model: 120 kartu per halaman akan jauh terlalu berat kalau
+ * tiap kartu merender skeleton sungguhan.
+ */
+function galleryCard(m) {
+	const li = document.createElement("li");
+	const btn = document.createElement("button");
+	btn.className = "gcard";
+	btn.dataset.id = m.id;
+	btn.title = modelTooltip(m);
+	const src = thumbPathOf(m);
+	const art = src
+		? `<img class="gcard-img" src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" width="160" height="160" />`
+		: `<span class="gcard-img gcard-none" aria-hidden="true">${escapeHtml(initials(m))}</span>`;
+	const newTag = isNewModel(m) ? `<span class="badge-new" title="Baru ditambahkan">NEW</span>` : "";
+	btn.innerHTML = `
+		<span class="gcard-art">${art}${newTag}</span>
+		<span class="gcard-name">${escapeHtml(modelLabel(m))}</span>
+		`;
+	wireCard(btn, m);
+	li.appendChild(btn);
+	li.appendChild(favStar(m));
+	return li;
+}
+
+/** Pasang klik muat-model + klik kanan panggung A/B pada sebuah kartu. */
+function wireCard(btn, m) {
+	btn.addEventListener("click", () => loadModel(m));
 	// Klik kanan (atau Alt+klik) memuat model ini sebagai B di panggung A/B.
 	btn.addEventListener("contextmenu", (e) => {
-		if (!AB.on && !e.altKey) return;   // hanya saat mode A/B sudah aktif
+		if (!AB.on && !e.altKey) return; // hanya saat mode A/B sudah aktif
 		e.preventDefault();
 		abStart(m);
 	});
+}
 
-		// Star toggle. Nested inside the card, but a separate button so
-		// clicking it doesn't also load the model.
-		const star = document.createElement("button");
-		star.className = "model-fav" + (isFavorite(m.id) ? " is-on" : "");
-		star.type = "button";
-		star.setAttribute("aria-pressed", String(isFavorite(m.id)));
-		star.setAttribute("aria-label", isFavorite(m.id) ? "Hapus dari favorit" : "Tambah ke favorit");
-		star.title = isFavorite(m.id) ? "Hapus dari favorit" : "Tambah ke favorit";
-		// Build a real <svg> element — assigning the bare <path> markup from
-		// ICON.star renders nothing, because innerHTML parses it as an unknown
-		// top-level element instead of an SVG graphic.
-		star.innerHTML = `<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">${ICON.star}</svg>`;
-		star.addEventListener("click", (ev) => {
-			ev.stopPropagation();
-			toggleFavorite(m.id);
-		});
-		li.appendChild(btn);
-		li.appendChild(star);
-		el.list.appendChild(li);
-	}
-
-	el.count.textContent = String(list.length);
-	renderPager(pages, list.length, start, slice.length);
-	if (current) setActive(current.id);
+/** Tombol bintang favorit — saudara kartu, bukan anaknya, agar klik tidak memuat model. */
+function favStar(m) {
+	const star = document.createElement("button");
+	const on = isFavorite(m.id);
+	star.className = "model-fav" + (on ? " is-on" : "");
+	star.type = "button";
+	star.setAttribute("aria-pressed", String(on));
+	star.setAttribute("aria-label", on ? "Hapus dari favorit" : "Tambah ke favorit");
+	star.title = on ? "Hapus dari favorit" : "Tambah ke favorit";
+	// Build a real <svg> element — assigning the bare <path> markup from
+	// ICON.star renders nothing, because innerHTML parses it as an unknown
+	// top-level element instead of an SVG graphic.
+	star.innerHTML = `<svg viewBox="0 0 24 24" class="icon" aria-hidden="true">${ICON.star}</svg>`;
+	star.addEventListener("click", (ev) => {
+		ev.stopPropagation();
+		toggleFavorite(m.id);
+	});
+	return star;
 }
 
 /** Page buttons with a sliding window so 26 pages don't render 26 buttons. */
@@ -5751,7 +5809,10 @@ function renderLibrary() {
 }
 
 function setActive(id) {
-	for (const b of el.list.querySelectorAll(".model")) b.classList.toggle("is-active", b.dataset.id === id);
+	// .gcard ikut disertakan: mode galeri memakai kelas itu, dan tanpa ini
+	// kartu model yang sedang dimuat tidak pernah tersorot.
+	for (const b of el.list.querySelectorAll(".model, .gcard"))
+		b.classList.toggle("is-active", b.dataset.id === id);
 }
 
 async function refresh() {
@@ -5886,9 +5947,12 @@ function toggleFavorite(id) {
 	// Keep the grid in sync without a full refetch.
 	if (browse.favOnly) renderLibrary();
 	else {
-		const btn = el.list.querySelector(`.model[data-id="${CSS.escape(id)}"]`);
-		if (btn) {
-			const star = btn.parentElement.querySelector(".model-fav");
+		// Cari kartu lewat data-id, bukan kelas .model: mode galeri memakai
+		// .gcard, dan querySelector(".model") tidak akan menemukannya
+		// sehingga bintang tidak ikut berubah sampai render berikutnya.
+		const card = el.list.querySelector(`.model[data-id="${CSS.escape(id)}"], .gcard[data-id="${CSS.escape(id)}"]`);
+		if (card) {
+			const star = card.parentElement.querySelector(".model-fav");
 			if (star) {
 				star.classList.toggle("is-on", favorites.has(id));
 				star.setAttribute("aria-pressed", String(favorites.has(id)));
@@ -7461,6 +7525,49 @@ el.favFilter?.addEventListener("click", () => {
 	}
 });
 
+/* Bentuk tampilan daftar model: daftar (baris) atau galeri (petak). */
+const LAYOUT_KEY = "spine-stage:layout";
+
+function setLayout(layout) {
+	const next = layout === "grid" ? "grid" : "list";
+	if (browse.layout === next) return;
+	browse.layout = next;
+	// Nomor halaman menunjuk isi yang berbeda antar layout (120 vs 60 per
+	// halaman), jadi kembali ke halaman 1 daripada melompat ke posisi acak.
+	browse.page = 1;
+	try {
+		localStorage.setItem(LAYOUT_KEY, next);
+	} catch {
+		/* private mode */
+	}
+	syncLayoutButtons();
+	// Saat sedang di daftar game wadah model tersembunyi: jangan render.
+	// Kalau dipaksa, 40 ribu model masuk DOM tanpa terlihat — lambat dan
+	// boros, padahal renderModels() akan dipanggil lagi saat game dibuka.
+	if (browse.view === "models" && browse.game) renderModels();
+}
+
+function syncLayoutButtons() {
+	const grid = browse.layout === "grid";
+	el.viewGridBtn?.classList.toggle("is-on", grid);
+	el.viewGridBtn?.setAttribute("aria-pressed", String(grid));
+	el.viewListBtn?.classList.toggle("is-on", !grid);
+	el.viewListBtn?.setAttribute("aria-pressed", String(!grid));
+}
+
+el.viewListBtn?.addEventListener("click", () => setLayout("list"));
+el.viewGridBtn?.addEventListener("click", () => setLayout("grid"));
+
+// Pulihkan pilihan terakhir. Dibaca sekali saat mulai, sebelum render
+// pertama, supaya daftar tidak sempat tampil dalam bentuk yang salah.
+try {
+	const saved = localStorage.getItem(LAYOUT_KEY);
+	if (saved === "grid") browse.layout = "grid";
+} catch {
+	/* private mode */
+}
+syncLayoutButtons();
+
 /** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
 function closeTopmostModal() {
 	if (el.exportModal && !el.exportModal.hidden) {
@@ -7510,6 +7617,13 @@ window.addEventListener("keydown", (e) => {
 		case "g":
 		case "G":
 			el.gridBtn.click();
+			break;
+		case "v":
+		case "V":
+			// Ganti bentuk tampilan pustaka: daftar <-> galeri. G dan L sudah
+			// dipakai untuk kisi latar dan tombol latar.
+			e.preventDefault();
+			setLayout(browse.layout === "grid" ? "list" : "grid");
 			break;
 		case "l":
 		case "L":

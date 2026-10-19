@@ -75,6 +75,18 @@
 					<span>Favorit</span>
 					<span class="fav-count" id="fav-count">0</span>
 				</button>
+				<!-- Bentuk tampilan daftar model. Dua tombol, bukan satu
+				     tombol toggle, supaya mode aktif terlihat jelas. -->
+				<div class="view-switch" role="group" aria-label="Bentuk tampilan model">
+					<button id="view-list-btn" class="btn btn-icon btn-sm is-on" type="button"
+						aria-pressed="true" title="Tampilan daftar (V untuk ganti)">
+						<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M4 5h4v4H4zm6 0h10v4H10zM4 11h4v3H4zm6 0h10v3H10zM4 16h4v3H4zm6 0h10v3H10z"/></svg>
+					</button>
+					<button id="view-grid-btn" class="btn btn-icon btn-sm" type="button"
+						aria-pressed="false" title="Tampilan galeri (V untuk ganti)">
+						<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
+					</button>
+				</div>
 			</div>
 
 			<!-- view 1: games -->
