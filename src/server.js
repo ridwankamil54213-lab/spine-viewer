@@ -393,6 +393,17 @@ const GAME_ROOTS = [
 		label: "マブラヴ ガールズガーデンX — CG",
 	},
 	{ match: "muvluv", key: "muvluv", label: "マブラヴ ガールズガーデンX" },
+	// Sailor Girl (DMM, id 9970). YooAsset manifest + open Aliyun OSS bucket:
+	// sailor-dev-dmm-sp.oss-ap-southeast-1.aliyuncs.com/sailorgirl_unity/android_ex/v7.0/
+	// Bundles are fetched as "{md5}.bundle" (the bundle name itself 404s) and
+	// hold plain TextAsset *.json/*.atlas + Texture2D. Spine 4.0.64, 73-324
+	// bones, 107 models. Extractor: /opt/sailorgirl/extract.py.
+	{
+		match: "sailorgirl",
+		key: "sailorgirl",
+		label: "Sailor Girl (DMM)",
+		spineRuntime: "4.0",
+	},
 	// Stellar Valkyries. Cocos Creator; spine assets are plain .skel/.atlas/.png
 	// under assets/res/spine/<id>[/<scene>]/ in the APK (no decryption). Spine
 	// binary 4.1.24. A few characters ship several CG scenes as subfolders
