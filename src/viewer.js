@@ -1009,15 +1009,73 @@ async function openCards() {
 			const cap = document.createElement("figcaption");
 			// "unique_1056_01" -> "Unique 01", "start_1056_02" -> "Start 02"
 			const m = /^(start|unique)_\d+_(\d+)$/.exec(c.file.replace(/\.webp$/i, ""));
+			const isUnique = /^unique/i.test(c.file);
 			cap.textContent = m
 				? `${m[1] === "unique" ? "Unique" : "Start"} ${m[2]}`
 				: c.file.replace(/\.webp$/i, "");
-			fig.append(media, cap);
+			// Bingkai kartu: garis sisi kiri + ikon rarity + lapisan kilau.
+			// Semua hiasan: teks kartu (nama/efek/cost) tidak tersedia karena
+			// datanya terenkripsi di sumber.
+			//
+			// Urutan penting — `media.after()` hanya bekerja kalau media SUDAH
+			// jadi anak DOM. Versi pertama memanggilnya sebelum append,
+			// hasilnya elemen bingkai tidak pernah masuk pohon dan tidak
+			// terlihat sama sekali.
+			const frame = document.createElement("span");
+			frame.className = "ct-frame";
+			frame.style.backgroundImage = "url(/czn-frame/card_ego_creed.webp)";
+			const rar = document.createElement("img");
+			rar.className = "ct-rarity";
+			rar.src = `/czn-frame/card_rarity_${isUnique ? "unique" : "common"}.webp`;
+			rar.alt = "";
+			const shine = document.createElement("span");
+			shine.className = "ct-shine";
+			fig.append(media, frame, rar, shine, cap);
+			wireCardTilt(fig);
 			el.cardsGrid.append(fig);
 		}
 	} catch {
 		if (el.cardsNote) el.cardsNote.textContent = "Gagal memuat kartu.";
 	}
+}
+
+/**
+ * Efek kartu bergerak: tilt 3D + kilau mengikuti kursor.
+ *
+ * Meniru perilaku kartu di wiki: saat kursor bergerak di atas kartu, kartu
+ * dimiringkan pada sumbu X/Y (perspective) dan lapisan kilau bergeser
+ * mengikuti posisi kursor. Sudut dibatasi ±12° supaya tidak terlihat seperti
+ * kartu yang terpelintir.
+ *
+ * Nilai ditulis sebagai CSS custom property, bukan style transform langsung,
+ * supaya transisi halus saat kursor keluar (kartu kembali datar) tidak
+ * bertabrakan dengan pembaruan tiap gerakan.
+ */
+function wireCardTilt(el) {
+	const MAX = 12;
+	const onMove = (ev) => {
+		const r = el.getBoundingClientRect();
+		if (!r.width || !r.height) return;
+		// −1..1 dari tengah kartu
+		const px = (ev.clientX - r.left) / r.width;
+		const py = (ev.clientY - r.top) / r.height;
+		const rotY = (px - 0.5) * 2 * MAX;
+		const rotX = -(py - 0.5) * 2 * MAX;
+		el.style.setProperty("--tilt-x", `${rotX.toFixed(2)}deg`);
+		el.style.setProperty("--tilt-y", `${rotY.toFixed(2)}deg`);
+		el.style.setProperty("--glow-x", `${(px * 100).toFixed(1)}%`);
+		el.style.setProperty("--glow-y", `${(py * 100).toFixed(1)}%`);
+		el.classList.add("is-tilting");
+	};
+	const onLeave = () => {
+		el.classList.remove("is-tilting");
+		el.style.setProperty("--tilt-x", "0deg");
+		el.style.setProperty("--tilt-y", "0deg");
+	};
+	el.addEventListener("pointermove", onMove);
+	el.addEventListener("pointerleave", onLeave);
+	// Perangkat sentuh: kembalikan ke posisi datar setelah sentuhan berakhir.
+	el.addEventListener("pointercancel", onLeave);
 }
 
 el.cardsBtn?.addEventListener("click", openCards);

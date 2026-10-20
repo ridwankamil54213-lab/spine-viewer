@@ -2117,3 +2117,71 @@ input:focus-visible {
 	transform: translateY(-2px) scale(1.02);
 	border-color: var(--accent, #ffb02e);
 }
+
+/* ------------------------------------------------------------------ *
+ * Kartu skill bergerak (Chaos Zero Nightmare)
+ *
+ * Struktur per kartu: media (.webm atau .webp) + .ct-frame (garis sisi) +
+ * .ct-rarity (ikon) + .ct-shine (kilau) + figcaption.
+ *
+ * `--tilt-x/--tilt-y` diisi JavaScript saat kursor bergerak di atas kartu.
+ * Transisi hanya aktif saat TIDAK sedang miring (is-tilting) — kalau aktif
+ * terus, setiap gerakan kursor tertinggal satu frame dan terasa berat.
+ * ------------------------------------------------------------------ */
+.card-tile {
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform 0.28s var(--ease, ease-out);
+}
+
+.card-tile.is-tilting {
+	transition: none;
+	transform: perspective(760px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+	z-index: 2;
+}
+
+/* Garis bingkai sisi kiri, ditempel di atas ilustrasi. */
+.ct-frame {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 26%;
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	pointer-events: none;
+	border-radius: 8px 0 0 8px;
+	opacity: 0.95;
+}
+
+/* Ikon rarity di pojok kanan atas. */
+.ct-rarity {
+	position: absolute;
+	top: 3%;
+	right: 4%;
+	width: 26%;
+	height: auto;
+	pointer-events: none;
+	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
+}
+
+/* Kilau: gradien radial yang mengikuti kursor. */
+.ct-shine {
+	position: absolute;
+	inset: 0;
+	border-radius: 8px;
+	pointer-events: none;
+	opacity: 0;
+	background: radial-gradient(
+		60% 50% at var(--glow-x, 50%) var(--glow-y, 50%),
+		rgba(255, 255, 255, 0.42),
+		rgba(255, 255, 255, 0.06) 45%,
+		transparent 70%
+	);
+	transition: opacity 0.2s ease;
+	mix-blend-mode: screen;
+}
+
+.card-tile.is-tilting .ct-shine { opacity: 1; }
+
+/* Media kartu harus punya sudut membulat yang sama dengan bingkainya. */
+.card-tile img,
+.card-tile video { border-radius: 8px; }
