@@ -675,6 +675,21 @@ const GAME_ROOTS = [
 	// again and STILL scramble as of this check, even though its numbers look
 	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
 	// this back to pixi-spine on numeric evidence alone.
+	// Epic Seven — rig COMBAT (animasi skill), sumber assets.e7codex.com.
+	//
+	// Berkas terpisah dari rig lobby: host-nya assets.e7codex.com dan
+	// path-nya <id>/combat/<id>.{json,atlas,png} (bukan e7codex.com/assets/…,
+	// yang memberi 404). Isinya ~20 animasi per karakter (idle, run, skill1,
+	// skill2, skill3, attacked, down, …) versus hanya "idle" di rig lobby.
+	// Hanya 463 dari 848 model yang punya rig ini (flag has_combat).
+	// Entri "epic7-combat" harus mendahului "epic7" karena resolveGame
+	// memakai startsWith.
+	{
+		match: "epic7-combat",
+		key: "epic7-combat",
+		label: "Epic Seven — Combat",
+		pmaDefault: false,
+	},
 	// Epic Seven — sumber: e7codex.com (tools/download-e7codex.py).
 	//
 	// Model campuran: Spine 2.1.27 (217), 3.8.95 (30), dan 3.8.99 (601),
@@ -1803,6 +1818,71 @@ function applyEpic7Names(models) {
 		if (rec.released) m.released = rec.released;
 		m.kind = rec.kind || "unit";
 	}
+
+	// Rig combat memakai id yang sama di bawah game "epic7-combat", jadi
+	// katalognya dipakai ulang. Nama diberi akhiran "Combat" supaya jelas
+	// ini rig pertarungan (20 animasi skill), bukan pose lobby.
+	const combat = models.filter((m) => (m.game || "") === "epic7-combat");
+	for (const m of combat) {
+		const key = String(m.id || "").slice("epic7-combat/".length);
+		const rec = map[key];
+		if (!rec || !rec.name) continue;
+		m.name = `${rec.name} — Combat`;
+		m.character = {
+			name: rec.name,
+			plain: rec.name,
+			source: "e7codex.com",
+			rarity: rec.rarity || null,
+			class: rec.class || null,
+			element: rec.element || null,
+			code: key,
+			rig: "combat",
+		};
+		m.kind = rec.kind || "unit";
+	}
+
+	// Gabungkan rig combat ke kartu lobby sebagai VARIAN, bukan game
+	// terpisah: satu karakter muncul sekali di pustaka, dengan pilihan
+	// "Lobby" / "Combat" di dropdown varian. Tanpa ini daftar berisi dua
+	// entri untuk karakter yang sama (Ras dan Ras — Combat).
+	attachEpic7CombatFamilies(models);
+}
+
+/**
+ * Epic Seven: jadikan rig combat sebagai varian dari kartu lobby.
+ *
+ * Root-nya selalu model lobby (assets/epic7/<id>), karena itu yang punya
+ * thumbnail potret dan pose berdiri. Rig combat menjadi anggota kedua
+ * dengan label "Combat (20 animasi)".
+ *
+ * Model combat yang TIDAK punya pasangan lobby (mis. c1046_s02_1 yang hanya
+ * ada di rig combat) dibiarkan berdiri sendiri dengan nama "... — Combat",
+ * supaya tidak hilang dari daftar.
+ */
+function attachEpic7CombatFamilies(models) {
+	const lobby = new Map();
+	for (const m of models) {
+		if ((m.game || "") !== "epic7") continue;
+		lobby.set(String(m.id).slice("epic7/".length), m);
+	}
+	if (!lobby.size) return;
+	const paired = new Set();
+	for (const m of models) {
+		if ((m.game || "") !== "epic7-combat") continue;
+		const key = String(m.id).slice("epic7-combat/".length);
+		const root = lobby.get(key);
+		if (!root) continue; // combat tanpa lobby: biarkan berdiri sendiri
+		paired.add(root.id);
+		// Root menampung semua anggota; label dipakai di dropdown.
+		const members = [
+			{ id: root.id, label: "Lobby" },
+			{ id: m.id, label: `Combat (${m.animations?.length || 0} animasi)` },
+		];
+		root.family = { root: root.id, label: "Lobby", members };
+		m.family = { root: root.id, label: members[1].label, members };
+	}
+	// Root tanpa combat tetap tanpa family (biar label kartu apa adanya).
+	for (const id of paired) void id;
 }
 
 /**
