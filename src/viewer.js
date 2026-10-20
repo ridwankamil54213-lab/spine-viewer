@@ -1539,9 +1539,37 @@ function fitModel() {
 		const data = spine.skeleton.data;
 		const bw = data.width || data.height || 512;
 		const bh = data.height || data.width || 512;
-		state.zoom = Math.min((fitW * 0.82) / bw, (h * 0.82) / bh);
-		state.panX = 0;
-		state.panY = 0;
+
+		// Pusatkan berdasarkan KOTAK MODEL, bukan titik origin.
+		//
+		// applyTransform() menaruh world di (w/2, h/2), yaitu titik origin
+		// skeleton. Rangka Spine hampir selalu ber-origin di KAKI, jadi
+		// seluruh badan memanjang ke ATAS dari garis tengah dan kepalanya
+		// terpotong tepi atas panggung — sementara separuh bawah panggung
+		// kosong. Terukur pada 1440x900: CZN, Epic Seven, dan Ark Re:Code
+		// semuanya terpotong di atas; hanya Live2D yang tidak (anchor-nya
+		// memang di tengah).
+		//
+		// getLocalBounds() memberi kotak isi sebenarnya dalam satuan lokal,
+		// jadi zoom dihitung dari situ dan origin digeser sebesar pusat
+		// kotak dikali zoom.
+		let lb = null;
+		try {
+			lb = spine.getLocalBounds();
+		} catch {
+			lb = null;
+		}
+		if (lb && lb.width > 0 && lb.height > 0 && Number.isFinite(lb.width) && Number.isFinite(lb.height)) {
+			state.zoom = Math.min((fitW * 0.82) / lb.width, (h * 0.82) / lb.height);
+			state.panX = -(lb.x + lb.width / 2) * state.zoom;
+			state.panY = -(lb.y + lb.height / 2) * state.zoom;
+		} else {
+			// Cadangan: bounds isi tidak terbaca. Pusatkan KOTAK deklarasinya
+			// (bukan pojoknya) supaya model tidak terdorong ke satu sudut.
+			state.zoom = Math.min((fitW * 0.82) / bw, (h * 0.82) / bh);
+			state.panX = -(bw / 2) * state.zoom;
+			state.panY = -(bh / 2) * state.zoom;
+		}
 		applyTransform();
 		return;
 	}
@@ -1554,6 +1582,10 @@ function fitModel() {
 	// and driven parameters change, so recomputing them on every "Pas" click
 	// walks the model away from where it was centred on load.
 	let b = null;
+	// true = pusat ARTWORK sudah diketahui, jadi origin container sudah
+	// mewakili tengah model dan pan harus 0. false = hanya ukuran deklarasi
+	// yang kita punya, jadi kotaknya yang harus dipusatkan.
+	let artworkCentred = !!live2dCentre;
 	if (live2dCentre) {
 		spine.position.set(live2dCentre.x, live2dCentre.y);
 	} else {
@@ -1566,14 +1598,24 @@ function fitModel() {
 		if (b) {
 			live2dCentre = { x: -(b.x + b.width / 2), y: -(b.y + b.height / 2) };
 			spine.position.set(live2dCentre.x, live2dCentre.y);
+			artworkCentred = true;
 		}
 	}
 	// Fall back to the declared size when the artwork bounds are unavailable.
 	const bw = b?.width || spine.width || 512;
 	const bh = b?.height || spine.height || 512;
 	state.zoom = Math.min((w * 0.82) / bw, (h * 0.82) / bh);
-	state.panX = 0;
-	state.panY = 0;
+	if (artworkCentred) {
+		state.panX = 0;
+		state.panY = 0;
+	} else {
+		// Cubism memakai pojok kiri-atas sebagai origin, bukan tengah. Model
+		// yang bounds-nya gagal diukur (mis. dipanggil sebelum frame pertama
+		// dirender) jadi menggantung di kuadran kanan-bawah dan terpotong.
+		// Menggeser setengah kotak deklarasi menaruhnya di tengah panggung.
+		state.panX = -(bw / 2) * state.zoom;
+		state.panY = -(bh / 2) * state.zoom;
+	}
 	applyTransform();
 }
 
