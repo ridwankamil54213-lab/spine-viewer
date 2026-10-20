@@ -4936,12 +4936,19 @@ function gameBuckets() {
 		if (!seen.has(key)) seen.set(key, { key, label: m.gameLabel || "Lainnya", items: [] });
 		seen.get(key).items.push(m);
 	}
-	return [...seen.values()].sort((a, b) =>
-		(a.label || a.key).localeCompare(b.label || b.key, undefined, {
-			numeric: true,
-			sensitivity: "base",
-		})
-	);
+	// Game "pendamping" (Epic Seven — Combat / Skill / Wallpaper) tidak
+	// ditampilkan sebagai kartu sendiri: isinya sudah menempel sebagai varian
+	// di kartu induknya. Modelnya tetap ada di `models` supaya switchVariant()
+	// bisa menemukannya saat varian dipilih.
+	const buckets = [...seen.values()]
+		.filter((g) => !g.items.every((m) => m.hiddenGame))
+		.sort((a, b) =>
+			(a.label || a.key).localeCompare(b.label || b.key, undefined, {
+				numeric: true,
+				sensitivity: "base",
+			})
+		);
+	return buckets;
 }
 
 /** One or two letters to stand in for a game with no logo. */

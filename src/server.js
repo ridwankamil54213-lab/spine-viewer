@@ -680,12 +680,18 @@ const GAME_ROOTS = [
 		key: "epic7-wallpaper",
 		label: "Epic Seven — Wallpaper",
 		pmaDefault: false,
+		// Disembunyikan dari daftar Pustaka: isinya sudah menempel sebagai
+		// varian di kartu Epic Seven. Modelnya TETAP dikirim ke klien,
+		// karena switchVariant() mencari model berdasarkan id — kalau
+		// dihapus dari daftar, variannya tidak bisa dibuka.
+		hiddenGame: true,
 	},
 	{
 		match: "epic7-skill",
 		key: "epic7-skill",
 		label: "Epic Seven — Skill",
 		pmaDefault: false,
+		hiddenGame: true,
 	},
 	// Epic Seven — rig COMBAT (animasi skill), sumber assets.e7codex.com.
 	//
@@ -701,6 +707,9 @@ const GAME_ROOTS = [
 		key: "epic7-combat",
 		label: "Epic Seven — Combat",
 		pmaDefault: false,
+		// Lihat catatan epic7-wallpaper: disembunyikan dari Pustaka, tetap
+		// dikirim agar varian Combat bisa dibuka dari kartu Epic Seven.
+		hiddenGame: true,
 	},
 	// Epic Seven — sumber: e7codex.com (tools/download-e7codex.py).
 	//
@@ -1048,6 +1057,7 @@ function resolveGame(rootRel, id) {
 					? best.pmaDefault
 					: !!best.pmaDefault,
 			spineRuntime: best.spineRuntime || null,
+			hiddenGame: !!best.hiddenGame,
 		};
 	}
 	// Unrecognised roots (uploads, demo models) get a tidy label of their own.
@@ -1592,7 +1602,7 @@ function scanModels() {
 									parts[parts.length - 1]),
 						])
 				: parts;
-			const { game, gameLabel, pmaDefault, spineRuntime } = resolveGame(rootRel, id);
+			const { game, gameLabel, pmaDefault, spineRuntime, hiddenGame } = resolveGame(rootRel, id);
 			// Sub-category is what sits between the game root and the model. For
 			// nikke/c010/aim that's "c010" — a character, not a category, so it's
 			// exposed as `subgroup` and kept OUT of the game filter.
@@ -1619,6 +1629,7 @@ function scanModels() {
 					game,
 					gameLabel,
 					pmaDefault,
+					hiddenGame,
 					// Which renderer the browser must use. Non-null only for
 					// Project QT (2.1.27), which pixi-spine cannot draw.
 					spineRuntime,
@@ -1735,6 +1746,7 @@ function scanVideoFolder(models, game, label) {
 			id,
 			game,
 			gameLabel: label,
+			hiddenGame: !!resolveGame(game, game).hiddenGame,
 			format: "video",
 			subgroup: parts.slice(0, -1).join(" › "),
 			name: parts.map(title).join(" › "),
@@ -2251,7 +2263,7 @@ function scanImageGalleries(models) {
 			continue;
 		}
 		if (!stat.isDirectory()) continue;
-		const { game, gameLabel } = resolveGame(top, top);
+		const { game, gameLabel, hiddenGame } = resolveGame(top, top);
 		const imgs = [];
 		const walkImg = (d, depth) => {
 			if (depth > 6) return;
@@ -2286,6 +2298,7 @@ function scanImageGalleries(models) {
 				id,
 				game,
 				gameLabel,
+				hiddenGame,
 				format: "image",
 				subgroup: parts.slice(0, -1).join(" › "),
 				name: parts.map(title).join(" › "),
