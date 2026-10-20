@@ -1966,10 +1966,12 @@ function applyEpic7Wallpapers(models) {
 	}
 
 	for (const [unit, clips] of perChar) {
-		// Kumpulkan semua model milik karakter ini yang SUDAH punya family
-		// (lobby + combat + skill) atau model lobby/combat polos.
-		const lobby = byModelId.get(`epic7/${unit}`);
-		const combat = byModelId.get(`epic7-combat/${unit}`);
+		// Katalog wallpaper kadang menyebut id dasar ("c5147") padahal
+		// skeleton-nya terdaftar dengan sufiks ("c5147_1"). Tanpa cadangan
+		// ini klip "Epic Dash 2026 — Fumyr" tidak menempel ke kartu mana pun
+		// dan hanya muncul sebagai entri lepas di game Wallpaper.
+		const lobby = byModelId.get(`epic7/${unit}`) || byModelId.get(`epic7/${unit}_1`);
+		const combat = byModelId.get(`epic7-combat/${unit}`) || byModelId.get(`epic7-combat/${unit}_1`);
 		const root = lobby || combat;
 		if (!root) continue;
 
