@@ -676,6 +676,12 @@ const GAME_ROOTS = [
 	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
 	// this back to pixi-spine on numeric evidence alone.
 	{
+		match: "epic7-wallpaper",
+		key: "epic7-wallpaper",
+		label: "Epic Seven — Wallpaper",
+		pmaDefault: false,
+	},
+	{
 		match: "epic7-skill",
 		key: "epic7-skill",
 		label: "Epic Seven — Skill",
@@ -1681,7 +1687,22 @@ function scanModels() {
  * the viewer can list and play them; `bytes` gives the size for the badge.
  */
 function scanVideos(models) {
-	const root = path.join(ASSETS, "lostsword-video");
+	scanVideoFolder(models, "lostsword-video", "Lost Sword — Video");
+	// Epic Seven wallpaper animation (tools/download-e7wallpapers.py).
+	// Berkasnya .webm VP9 sampai 4K; metadata judul/units dibaca dari
+	// _lobby_anims.json yang disalin ke folder oleh skrip yang sama.
+	scanVideoFolder(models, "epic7-wallpaper", "Epic Seven — Wallpaper");
+}
+
+/**
+ * Daftarkan semua berkas video di assets/<game>/ sebagai model
+ * `format: "video"` (video stage memutarnya lewat <video>).
+ *
+ * @param {string} game  nama folder di bawah assets/ sekaligus nilai `game`
+ * @param {string} label label game yang tampil di pustaka
+ */
+function scanVideoFolder(models, game, label) {
+	const root = path.join(ASSETS, game);
 	if (!fs.existsSync(root)) return;
 	const files = [];
 	const walkV = (dir, depth) => {
@@ -1701,7 +1722,7 @@ function scanVideos(models) {
 	walkV(root, 0);
 	for (const full of files) {
 		const rel = path.relative(root, full).split(path.sep).join("/");
-		const id = "lostsword-video/" + rel.replace(/\.[^.]+$/, "");
+		const id = game + "/" + rel.replace(/\.[^.]+$/, "");
 		let bytes = 0;
 		try {
 			bytes = fs.statSync(full).size;
@@ -1712,13 +1733,13 @@ function scanVideos(models) {
 		const title = (s) => s.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 		models.push({
 			id,
-			game: "lostsword-video",
-			gameLabel: "Lost Sword — Video",
+			game,
+			gameLabel: label,
 			format: "video",
 			subgroup: parts.slice(0, -1).join(" › "),
 			name: parts.map(title).join(" › "),
-			group: "lostsword-video / " + parts.slice(0, -1).join(" / "),
-			videoFile: `/lostsword-video/${rel.split("/").map(encodeURIComponent).join("/")}`,
+			group: game + " / " + parts.slice(0, -1).join(" / "),
+			videoFile: `/${game}/${rel.split("/").map(encodeURIComponent).join("/")}`,
 			files: [path.basename(full)],
 			bytes,
 			size: null,
@@ -1885,6 +1906,89 @@ function applyEpic7Names(models) {
 	// loadModel(), yang sudah memilih jalur render sesuai model.format —
 	// jadi campuran skeleton + gambar aman dalam satu family.
 	attachEpic7SkillFamilies(models);
+
+	// Wallpaper animation (.webm) — judul dari _lobby_anims.json, lalu
+	// ditempelkan sebagai varian ke kartu karakter yang disebut di `units`.
+	applyEpic7Wallpapers(models);
+}
+
+/**
+ * Epic Seven: wallpaper animation (klip .webm) dari lobby_anims.json.
+ *
+ * Dua hal dikerjakan:
+ *   1. memberi judul yang enak dibaca (id mentah seperti
+ *      "vsu5aa_2_lobby" diganti judul dari katalog), dan
+ *   2. menjadikan klip itu VARIAN dari kartu karakter di field `units`.
+ *
+ * Satu klip bisa menyebut beberapa unit (vsu4aa2 punya 4), dan satu
+ * karakter bisa punya beberapa klip. Karena family hanya punya satu root,
+ * kelompokkan per karakter lalu bangun satu family berisi semua anggotanya
+ * (lobby, combat, skill, wallpaper). Karakter yang tidak punya model lain
+ * tetap mendapat family — root-nya wallpaper itu sendiri.
+ *
+ * Klip yang tidak menyebut unit mana pun (8 dari 24) dibiarkan berdiri
+ * sendiri di game "Epic Seven — Wallpaper".
+ */
+function applyEpic7Wallpapers(models) {
+	const wp = models.filter((m) => (m.game || "") === "epic7-wallpaper");
+	if (!wp.length) return;
+	let meta;
+	try {
+		meta = JSON.parse(fs.readFileSync(path.join(ASSETS, "epic7-wallpaper", "_lobby_anims.json"), "utf8"));
+	} catch {
+		return; // tanpa metadata: kartu tetap memakai id
+	}
+	const byId = new Map(meta.map((x) => [x.id, x]));
+	const byModelId = new Map(models.map((m) => [m.id, m]));
+
+	// 1) Judul + durasi.
+	for (const m of wp) {
+		// id berbentuk "epic7-wallpaper/<id>/<id>" (scanVideoFolder memakai
+		// path relatif termasuk nama berkas), jadi ambil segmen PERTAMA.
+		const key = String(m.id).slice("epic7-wallpaper/".length).split("/")[0];
+		const rec = byId.get(key);
+		if (!rec) continue;
+		m.name = rec.title || m.name;
+		if (rec.duration_s) m.duration = rec.duration_s;
+		if (rec.note) m.note = rec.note;
+		m.kind = "wallpaper";
+	}
+
+	// 2) Kelompokkan per karakter (dari field units).
+	const perChar = new Map();
+	for (const m of wp) {
+		const key = String(m.id).slice("epic7-wallpaper/".length).split("/")[0];
+		const rec = byId.get(key);
+		for (const unit of rec?.units || []) {
+			if (!perChar.has(unit)) perChar.set(unit, []);
+			perChar.get(unit).push(m);
+		}
+	}
+
+	for (const [unit, clips] of perChar) {
+		// Kumpulkan semua model milik karakter ini yang SUDAH punya family
+		// (lobby + combat + skill) atau model lobby/combat polos.
+		const lobby = byModelId.get(`epic7/${unit}`);
+		const combat = byModelId.get(`epic7-combat/${unit}`);
+		const root = lobby || combat;
+		if (!root) continue;
+
+		// Anggota awal: family yang sudah ada, atau root sendirian.
+		const members = root.family?.members
+			? [...root.family.members]
+			: [{ id: root.id, label: "Lobby" }];
+		const have = new Set(members.map((x) => x.id));
+		for (const c of clips) {
+			if (have.has(c.id)) continue;
+			have.add(c.id);
+			members.push({ id: c.id, label: c.name.length > 34 ? c.name.slice(0, 32) + "…" : c.name });
+		}
+		const family = { root: root.id, label: root.family?.label || "Lobby", members };
+		for (const mem of members) {
+			const target = byModelId.get(mem.id);
+			if (target) target.family = { root: root.id, label: mem.label, members };
+		}
+	}
 }
 
 /**
@@ -4023,6 +4127,16 @@ app.use(
 app.use(
 	"/lostsword-video",
 	express.static(path.join(ASSETS, "lostsword-video"), {
+		fallthrough: false,
+		maxAge: "7d",
+		immutable: true,
+	})
+);
+// Epic Seven wallpaper animation (.webm, sampai 186 MB per berkas).
+// Prefix sendiri, sama alasannya dengan lostsword-video di atas.
+app.use(
+	"/epic7-wallpaper",
+	express.static(path.join(ASSETS, "epic7-wallpaper"), {
 		fallthrough: false,
 		maxAge: "7d",
 		immutable: true,
