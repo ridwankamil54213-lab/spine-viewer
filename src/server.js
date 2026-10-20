@@ -1879,6 +1879,63 @@ function applyEpic7Names(models) {
 			skillNo: Number(mm[2]),
 		};
 	}
+
+	// Skill juga masuk dropdown varian, bukan game terpisah. Formatnya beda
+	// (image, bukan skeleton) tapi switchVariant() hanya memanggil
+	// loadModel(), yang sudah memilih jalur render sesuai model.format —
+	// jadi campuran skeleton + gambar aman dalam satu family.
+	attachEpic7SkillFamilies(models);
+}
+
+/**
+ * Epic Seven: jadikan animasi skill (WebP) varian dari kartu karakter.
+ *
+ * Kelompokkan per id karakter (bukan per berkas), lalu urutkan skill
+ * menaik (Skill 1, 2, 3). Karakter yang tidak punya rig lobby tetap
+ * dibiarkan berdiri sendiri supaya tidak hilang dari pustaka.
+ *
+ * Dipanggil SETELAH attachEpic7CombatFamilies(), yang sudah memasang
+ * family berisi Lobby + Combat untuk karakter yang punya keduanya. Di sini
+ * family itu DIPERLUAS, bukan ditimpa — kalau ditimpa, varian Combat
+ * hilang dari dropdown.
+ */
+function attachEpic7SkillFamilies(models) {
+	// Kumpulkan id karakter -> daftar model skill, urut nomor skill.
+	const byChar = new Map();
+	for (const m of models) {
+		if ((m.game || "") !== "epic7-skill") continue;
+		const code = m.character?.code;
+		if (!code) continue;
+		if (!byChar.has(code)) byChar.set(code, []);
+		byChar.get(code).push(m);
+	}
+	if (!byChar.size) return;
+
+	// Indeks model per id, supaya bisa menemukan root lobby maupun combat.
+	const byId = new Map(models.map((m) => [m.id, m]));
+
+	for (const [code, skills] of byChar) {
+		skills.sort((a, b) => (a.character?.skillNo || 0) - (b.character?.skillNo || 0));
+		const lobby = byId.get(`epic7/${code}`);
+		const combat = byId.get(`epic7-combat/${code}`);
+		// Root = lobby kalau ada (punya thumbnail potret), kalau tidak combat.
+		const root = lobby || combat;
+		if (!root) continue; // skill tanpa karakter: biarkan berdiri sendiri
+
+		// Ambil anggota family yang sudah ada (Lobby + Combat), lalu tambah skill.
+		const existing = root.family?.members || [{ id: root.id, label: "Lobby" }];
+		const members = [...existing];
+		for (const s of skills) {
+			const no = s.character?.skillNo || 0;
+			members.push({ id: s.id, label: `Skill ${no}` });
+		}
+		const family = { root: root.id, label: root.family?.label || "Lobby", members };
+		for (const mem of members) {
+			const target = byId.get(mem.id);
+			if (!target) continue;
+			target.family = { root: root.id, label: mem.label, members };
+		}
+	}
 }
 
 /**
