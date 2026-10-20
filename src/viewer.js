@@ -4390,8 +4390,8 @@ function renderHud() {
 		el.hud.hidden = false;
 		$("#hud-model").textContent = current.name;
 		$("#hud-stats").innerHTML =
-			`<span><b>Spine ${current.spine || "2.1.27"}</b></span>` +
-			`<span><b>runtime 2.1</b></span>`;
+			`<span class="hud-dbg"><b>Spine ${current.spine || "2.1.27"}</b></span>` +
+			`<span class="hud-dbg"><b>runtime 2.1</b></span>`;
 		$("#title-model").textContent = current.name;
 		document.title = current.name + " — Spine Stage";
 		if (el.gridLink) el.gridLink.hidden = false;
@@ -4414,7 +4414,7 @@ function renderHud() {
 			(d != null ? `<span><b>${d}</b> drawable</span>` : "") +
 			(p != null ? `<span><b>${p}</b> part</span>` : "") +
 			`<span><b>${tex}</b> tekstur</span>` +
-			`<span><b>Live2D Cubism 4</b></span>` +
+			`<span class="hud-dbg"><b>Live2D Cubism 4</b></span>` +
 			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
 		$("#title-model").textContent = current.name;
 	document.title = current.name + " — Spine Stage";
@@ -4429,7 +4429,7 @@ function renderHud() {
 		`<span><b>${slots}</b> slot</span>` +
 		`<span><b>${bones}</b> tulang</span>` +
 		`<span><b>${anims}</b> animasi</span>` +
-		`<span data-pma="${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "on" : "off"}"><b>PMA ${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
+		`<span class="hud-dbg" data-pma="${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "on" : "off"}"><b>PMA ${resolvedMode() === PMA_MODES.upload ? "upload" : pmaActive() ? "aktif" : "nonaktif"}</b></span>` +
 		// Show the variant count when there is a family, so it's obvious the
 		// model has siblings even before the dropdown is noticed.
 		(current.family
@@ -4439,10 +4439,10 @@ function renderHud() {
 		// disagree with what the file claims (older models), it's the fastest
 		// way to see why a model loaded — or didn't.
 		(spineVersion
-			? `<span><b>Spine ${spineVersion}</b></span>`
-			: current.spine ? `<span><b>${current.spine}</b></span>` : "") +
+			? `<span class="hud-dbg"><b>Spine ${spineVersion}</b></span>`
+			: current.spine ? `<span class="hud-dbg"><b>${current.spine}</b></span>` : "") +
 		(spineRuntime && spineRuntime !== "4.1"
-			? `<span><b>runtime ${spineRuntime}</b></span>`
+			? `<span class="hud-dbg"><b>runtime ${spineRuntime}</b></span>`
 			: "");
 	$("#title-model").textContent = current.name;
 	document.title = current.name + " — Spine Stage";

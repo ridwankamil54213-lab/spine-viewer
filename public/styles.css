@@ -1449,14 +1449,42 @@ input:focus-visible {
 		flex: 0 0 auto;
 	}
 
+	/* HUD di ponsel: SATU baris ringkas, statistik debug disembunyikan.
+	   Versi lama menumpuknya jadi kolom (flex-direction: column), sehingga
+	   "Rei - skin | 111 slot | 184 tulang | PMA | versi | runtime" menjadi
+	   dua-tiga baris dan menutupi kaki model. Nama model sudah tampil di
+	   topbar, jadi yang dipertahankan hanya angka yang berguna. */
 	.hud {
 		left: 10px;
+		right: 10px;
 		bottom: 8px;
-		flex-direction: column;
-		gap: 2px;
-		font-size: 10.5px;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: 8px;
+		font-size: 10px;
+		padding: 3px 8px;
+		border-radius: 999px;
+		background: rgba(8, 10, 16, 0.55);
+		backdrop-filter: blur(4px);
+		overflow: hidden;
 	}
-	.hud-stats { gap: 8px; }
+	.hud-model {
+		flex: 0 0 auto;
+		max-width: 42%;
+		font-size: 11px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	.hud-stats {
+		gap: 8px;
+		flex-wrap: nowrap;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+	/* PMA, versi Spine, runtime: hanya berguna saat mendiagnosis model. */
+	.hud-stats .hud-dbg { display: none; }
 
 	/* transport: scrub gets its own row, controls wrap underneath */
 	.transport {
