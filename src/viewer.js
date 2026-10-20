@@ -5588,6 +5588,9 @@ const UPDATABLE = {
 	catshinobi: "/api/update/catshinobi",
 	bd2: "/api/update/bd2",
 	azurlane: "/api/update/azurlane",
+	// Azur Lane Live2D: sumbernya CDN resmi lewat gate TCP game, bukan repo
+	// komunitas. Lihat tools/update-azurlane-l2d.py.
+	"azurlane-l2d": "/api/update/azurlane-l2d",
 	nikke: "/api/update/nikke",
 	ivntight: "/api/update/ivntight",
 	girlwars: "/api/update/girlwars",

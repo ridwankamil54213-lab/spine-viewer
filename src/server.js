@@ -3479,6 +3479,15 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-azurlane.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// Azur Lane Live2D: sumbernya CDN resmi lewat gate TCP game (azlassets),
+	// bukan repo komunitas seperti azurlane. --check = hubungi gate, ambil
+	// hashfile tipe L2D, diff dengan hashes-live2d.csv lokal (266 entri,
+	// selesai dalam detik). --apply = unduh bundle baru/berubah lalu ekstrak
+	// moc3 + tekstur + physics. Lihat tools/update-azurlane-l2d.py.
+	"azurlane-l2d": {
+		script: path.join(ROOT, "tools", "update-azurlane-l2d.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 	nikke: {
 		script: path.join(ROOT, "tools", "update-nikke.py"),
 		py: "/srv/venv-spine/bin/python",
