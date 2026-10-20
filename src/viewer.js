@@ -7860,6 +7860,15 @@ syncLayoutButtons();
 
 /** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
 function closeTopmostModal() {
+	// Menu Alat adalah lapisan paling atas secara visual, jadi ditutup dulu
+	// sebelum modal mana pun — Escape terasa seperti "tutup yang terdekat".
+	const toolsPop = document.getElementById("tools-pop");
+	const toolsBtn = document.getElementById("tools-btn");
+	if (toolsPop && !toolsPop.hidden) {
+		setToolsOpen(false);
+		toolsBtn?.focus();
+		return true;
+	}
 	if (el.cardsModal && !el.cardsModal.hidden) {
 		closeCards();
 		return true;
@@ -8551,6 +8560,54 @@ initFullscreen();
 initExport();
 initFavorites();
 initUpdateLog();
+/* --- Menu "Alat" ------------------------------------------------------
+ * Alat lanjutan (kisi, tulang, bagian, edit tulang, nama slot, FPS, waktu,
+ * periksa, PMA, tajam) dikumpulkan di satu popover supaya baris kontrol tidak
+ * penuh tombol kecil. Elemennya hanya dipindah di DOM, jadi semua id, data-on,
+ * dan pintasan papan-tik tetap bekerja tanpa perubahan.
+ */
+function setToolsOpen(open) {
+	const pop = document.getElementById("tools-pop");
+	const btn = document.getElementById("tools-btn");
+	if (!pop) return;
+	pop.hidden = !open;
+	if (btn) {
+		btn.dataset.on = String(open);
+		btn.setAttribute("aria-expanded", String(open));
+	}
+}
+
+function initToolsMenu() {
+	const pop = document.getElementById("tools-pop");
+	const btn = document.getElementById("tools-btn");
+	if (!pop || !btn) return;
+
+	btn.addEventListener("click", (ev) => {
+		ev.stopPropagation();
+		setToolsOpen(pop.hidden);
+	});
+
+	// Klik di luar menutup menu. Tombol di dalam popover tidak menutupnya,
+	// supaya beberapa alat bisa dinyalakan berturut-turut tanpa membuka ulang.
+	document.addEventListener("pointerdown", (ev) => {
+		if (pop.hidden) return;
+		if (pop.contains(ev.target) || btn.contains(ev.target)) return;
+		setToolsOpen(false);
+	});
+
+	// Toggle tampilan (Kisi/Tulang/Bagian/Nama Slot/FPS) TIDAK menutup menu:
+	// orang biasanya menyalakan beberapa berturut-turut. Hanya tombol yang
+	// membuka panel besar (Waktu, Periksa) yang menutupnya, karena panel itu
+	// tumbuh di bawah panggung dan akan tertutup popover.
+	pop.addEventListener("click", (ev) => {
+		const b = ev.target.closest("button");
+		if (!b) return;
+		if (b.id === "timeline-btn" || b.id === "inspector-btn") setToolsOpen(false);
+	});
+}
+
+initToolsMenu();
+
 initFps();
 initParts();
 initPermalink();

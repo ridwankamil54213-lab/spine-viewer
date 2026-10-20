@@ -2214,3 +2214,62 @@ input:focus-visible {
 .card-tile img,
 .card-tile video { border-radius: 8px; }
 
+
+/* ------------------------------------------------------------------ *
+ * Menu "Alat": wadah alat lanjutan
+ *
+ * Sebelumnya baris kontrol bawah memuat 15 tombol kecil sekaligus (Kisi,
+ * Tulang, Bagian, Edit Tulang, Nama Slot, FPS, Tajam, PMA, Waktu, Periksa).
+ * Sekarang semuanya duduk di satu popover yang dibuka dari tombol "Alat",
+ * jadi baris kontrol cukup memuat kontrol yang dipakai sehari-hari.
+ *
+ * Popover membuka ke ATAS karena transport menempel di dasar panggung.
+ * ------------------------------------------------------------------ */
+.tools-wrap { position: relative; display: inline-flex; }
+
+.tools-pop {
+	position: absolute;
+	bottom: calc(100% + 10px);
+	right: 0;
+	z-index: 40;
+	width: max-content;
+	max-width: min(92vw, 460px);
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 14px;
+	background: var(--ink-850, #12151d);
+	border: 1px solid var(--line, #262b36);
+	border-radius: var(--r-lg, 12px);
+	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+
+.tools-pop[hidden] { display: none; }
+
+.tools-sec { display: flex; flex-direction: column; gap: 7px; }
+.tools-sec-title {
+	font-size: 10.5px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--fg-mute, #8b93a3);
+}
+.tools-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+.tools-field {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--fg-mute, #8b93a3);
+}
+.tools-field .select { min-width: 84px; }
+
+/* Tombol "Alat" ikut menyala saat menunya terbuka. */
+#tools-btn[data-on="true"] {
+	border-color: var(--accent, #ffb02e);
+	color: var(--accent, #ffb02e);
+}

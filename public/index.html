@@ -209,10 +209,6 @@
 						title="Suara otomatis saat model dibuka">Auto suara</button>
 				</div>
 
-				<div class="tgroup">
-					<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
-					<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot & perbandingan (I)">Periksa</button>
-				</div>
 
 				<div class="tgroup">
 					<button id="fullscreen-btn" class="btn btn-toggle" data-on="false" aria-label="Layar penuh" title="Layar penuh (F)">
@@ -383,15 +379,6 @@
 						<span>Varian</span>
 						<select id="variant-select" class="select select-sm" title="Varian model ini (mis. Utama, Aim, Cover)"></select>
 					</label>
-					<label class="field-inline">
-						<span>PMA</span>
-						<select id="pma-select" class="select select-sm" title="Alpha pramultiplied: ikuti atlas, paksa aktif/nonaktif, atau pramultiply saat upload">
-							<option value="auto" selected>Otomatis</option>
-							<option value="on">Aktif</option>
-							<option value="off">Nonaktif</option>
-							<option value="upload">Upload PMA</option>
-						</select>
-					</label>
 					<!-- Live2D only: auto blink/breath/physics, random motion, and
 					     touch-to-react. Hidden for Spine/video/CG. -->
 					<label class="field-inline" id="l2d-extra" hidden>
@@ -433,22 +420,64 @@
 							<option value="green">Hijau</option>
 						</select>
 					</div>
-					<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
-					<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
-					<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
-					<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
-					<button id="slot-tip-btn" class="btn btn-toggle" data-on="false" title="Tampilkan nama slot di dekat kursor saat menunjuk model (T)">Nama Slot</button>
+					<!-- Kartu tetap terlihat: ini fitur tontonan, bukan alat diagnostik. -->
 					<button id="cards-btn" class="btn" type="button" title="Lihat kartu skill karakter ini (K)" hidden>Kartu</button>
-					<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>
-					<select id="density-select" class="btn btn-select" aria-label="Kerapatan piksel render"
-						title="Kerapatan piksel render — makin tinggi makin tajam (beban GPU naik)">
-						<option value="auto">Tajam: Auto</option>
-						<option value="1">Tajam: 1×</option>
-						<option value="1.5">Tajam: 1.5×</option>
-						<option value="2">Tajam: 2×</option>
-						<option value="3">Tajam: 3×</option>
-						<option value="4">Tajam: 4×</option>
-					</select>
+
+					<!-- Alat lanjutan: dikumpulkan di satu menu supaya baris kontrol
+					     tidak lagi berisi 15 tombol kecil. Elemennya TIDAK dihapus,
+					     hanya dipindah — semua id dan data-on tetap sama sehingga
+					     JS dan pintasan papan-tik tetap bekerja. -->
+					<div class="tools-wrap">
+						<button id="tools-btn" class="btn btn-toggle" data-on="false"
+							aria-expanded="false" aria-controls="tools-pop"
+							title="Alat lanjutan: tampilan, inspeksi, render">Alat</button>
+						<div class="tools-pop" id="tools-pop" hidden role="group" aria-label="Alat lanjutan">
+							<div class="tools-sec">
+								<span class="tools-sec-title">Tampilan</span>
+								<div class="tools-grid">
+									<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
+									<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
+									<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
+									<button id="slot-tip-btn" class="btn btn-toggle" data-on="false" title="Tampilkan nama slot di dekat kursor saat menunjuk model (T)">Nama Slot</button>
+								</div>
+							</div>
+							<div class="tools-sec">
+								<span class="tools-sec-title">Periksa &amp; sunting</span>
+								<div class="tools-grid">
+									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
+									<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
+									<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot &amp; perbandingan (I)">Periksa</button>
+									<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>
+								</div>
+							</div>
+							<div class="tools-sec">
+								<span class="tools-sec-title">Render</span>
+								<div class="tools-grid">
+									<label class="tools-field">
+										<span>PMA</span>
+										<select id="pma-select" class="select select-sm" title="Alpha pramultiplied: ikuti atlas, paksa aktif/nonaktif, atau pramultiply saat upload">
+											<option value="auto" selected>Otomatis</option>
+											<option value="on">Aktif</option>
+											<option value="off">Nonaktif</option>
+											<option value="upload">Upload PMA</option>
+										</select>
+									</label>
+									<label class="tools-field">
+										<span>Tajam</span>
+										<select id="density-select" class="select select-sm" aria-label="Kerapatan piksel render"
+											title="Kerapatan piksel render — makin tinggi makin tajam (beban GPU naik)">
+											<option value="auto">Auto</option>
+											<option value="1">1×</option>
+											<option value="1.5">1.5×</option>
+											<option value="2">2×</option>
+											<option value="3">3×</option>
+											<option value="4">4×</option>
+										</select>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
