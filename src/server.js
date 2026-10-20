@@ -675,6 +675,12 @@ const GAME_ROOTS = [
 	// again and STILL scramble as of this check, even though its numbers look
 	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
 	// this back to pixi-spine on numeric evidence alone.
+	{
+		match: "epic7-skill",
+		key: "epic7-skill",
+		label: "Epic Seven — Skill",
+		pmaDefault: false,
+	},
 	// Epic Seven — rig COMBAT (animasi skill), sumber assets.e7codex.com.
 	//
 	// Berkas terpisah dari rig lobby: host-nya assets.e7codex.com dan
@@ -1846,6 +1852,33 @@ function applyEpic7Names(models) {
 	// "Lobby" / "Combat" di dropdown varian. Tanpa ini daftar berisi dua
 	// entri untuk karakter yang sama (Ras dan Ras — Combat).
 	attachEpic7CombatFamilies(models);
+
+	// Animasi skill (animated WebP) — id berbentuk
+	// "epic7-skill/<karak>_skill<n>/<namaberkas>" karena scanImageGalleries
+	// memakai path relatif termasuk nama berkas. Ambil segmen PERTAMA saja,
+	// lalu beri nama karakter supaya kartunya terbaca "Elena — Skill 3",
+	// bukan "C1091 Skill3 › Skill Sk C1091 3".
+	for (const m of models) {
+		if ((m.game || "") !== "epic7-skill") continue;
+		const rel = String(m.id).slice("epic7-skill/".length);
+		const folder = rel.split("/")[0];
+		const mm = /^(.*)_skill(\d+)$/.exec(folder);
+		if (!mm) continue;
+		const rec = map[mm[1]];
+		const who = rec?.name || mm[1];
+		m.name = `${who} — Skill ${mm[2]}`;
+		m.character = {
+			name: who,
+			plain: who,
+			source: "e7codex.com",
+			rarity: rec?.rarity || null,
+			class: rec?.class || null,
+			element: rec?.element || null,
+			code: mm[1],
+			rig: "skill",
+			skillNo: Number(mm[2]),
+		};
+	}
 }
 
 /**
@@ -2042,7 +2075,11 @@ function scanImageGalleries(models) {
 	}
 	for (const t of tops) {
 		const top = t.name;
-		if (!/-cg$/i.test(top)) continue;
+		// "-cg" = galeri CG/ilustrasi; "-skill" = animasi skill (animated
+		// WebP) seperti Epic Seven. Keduanya sama-sama kumpulan berkas gambar
+		// tanpa skeleton, jadi jalur pemuatannya identik.
+		const isSkill = /-skill$/i.test(top);
+		if (!/-cg$/i.test(top) && !isSkill) continue;
 		const dir = path.join(ASSETS, top);
 		let stat;
 		try {
