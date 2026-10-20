@@ -411,8 +411,6 @@ const el = {
 	cardsBtn: $("#cards-btn"),
 	cardsModal: $("#cards-modal"),
 	cardsGrid: $("#cards-grid"),
-	cardsNote: $("#cards-note"),
-	cardsTitle: $("#cards-title"),
 	cardsClose: $("#cards-close"),
 	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
@@ -954,16 +952,10 @@ async function openCards() {
 	if (!id || !el.cardsModal) return;
 	el.cardsModal.hidden = false;
 	if (el.cardsGrid) el.cardsGrid.innerHTML = "";
-	if (el.cardsNote) el.cardsNote.textContent = "Memuat kartu…";
-	if (el.cardsTitle) el.cardsTitle.textContent = `Kartu skill — ${modelLabel(current)}`;
+	// Tidak ada teks status: panel ini hanya menampilkan ilustrasi.
 	try {
 		const data = await fetch(`/api/czn-cards/${id}`).then((r) => r.json());
 		const cards = data.cards || [];
-		if (el.cardsNote) {
-			el.cardsNote.textContent = cards.length
-				? `${cards.length} kartu untuk ${data.name || modelLabel(current)}.`
-				: "Belum ada kartu untuk karakter ini.";
-		}
 		if (!el.cardsGrid) return;
 		for (const c of cards) {
 			const fig = document.createElement("figure");
@@ -1006,16 +998,11 @@ async function openCards() {
 				img.height = 316;
 				media = img;
 			}
-			const cap = document.createElement("figcaption");
-			// "unique_1056_01" -> "Unique 01", "start_1056_02" -> "Start 02"
-			const m = /^(start|unique)_\d+_(\d+)$/.exec(c.file.replace(/\.webp$/i, ""));
 			const isUnique = /^unique/i.test(c.file);
-			cap.textContent = m
-				? `${m[1] === "unique" ? "Unique" : "Start"} ${m[2]}`
-				: c.file.replace(/\.webp$/i, "");
 			// Bingkai kartu: garis sisi kiri + ikon rarity + lapisan kilau.
-			// Semua hiasan: teks kartu (nama/efek/cost) tidak tersedia karena
-			// datanya terenkripsi di sumber.
+			// Panel ini sengaja TANPA TEKS sama sekali — hanya ilustrasi.
+			// Judul, caption, dan catatan status dibuang; label untuk pembaca
+			// layar tetap ada lewat atribut aria-label pada wadahnya.
 			//
 			// Urutan penting — `media.after()` hanya bekerja kalau media SUDAH
 			// jadi anak DOM. Versi pertama memanggilnya sebelum append,
@@ -1030,12 +1017,12 @@ async function openCards() {
 			rar.alt = "";
 			const shine = document.createElement("span");
 			shine.className = "ct-shine";
-			fig.append(media, frame, rar, shine, cap);
+			fig.append(media, frame, rar, shine);
 			wireCardTilt(fig);
 			el.cardsGrid.append(fig);
 		}
 	} catch {
-		if (el.cardsNote) el.cardsNote.textContent = "Gagal memuat kartu.";
+		// Gagal memuat: biarkan panel kosong, tanpa pesan teks.
 	}
 }
 

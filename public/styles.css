@@ -2065,22 +2065,42 @@ input:focus-visible {
  * Petak ilustrasi kartu. Lebar tile tetap supaya kartu terlihat seperti
  * kartu fisik dan tidak melar; grid mengisi lebar modal dan menggulir.
  * ------------------------------------------------------------------ */
-.cards-card { max-width: 980px; width: min(94vw, 980px); }
+.cards-card {
+	max-width: 1100px;
+	width: min(96vw, 1100px);
+	position: relative;
+	/* Tanpa header: gambar kartu langsung memenuhi panel. */
+	padding: 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+}
+/* Tombol tutup melayang di pojok panel, tetap terlihat di atas kartu. */
+.cards-close {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	z-index: 5;
+	background: rgba(12, 14, 20, 0.82);
+	backdrop-filter: blur(6px);
+}
+.cards-body { padding: 0; }
 .cards-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-	gap: 12px;
-	margin-top: 12px;
-	max-height: min(72vh, 720px);
+	/* Mirip adaptive-grid di wiki: kolom rapat, jarak kecil, kartu mengisi. */
+	grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+	gap: 10px;
+	margin: 0;
+	max-height: min(80vh, 820px);
 	overflow-y: auto;
-	padding-right: 4px;
+	padding: 4px;
 }
 .card-tile {
 	margin: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 5px;
-	align-items: center;
+	position: relative;
+	display: block;
+	/* Ruang untuk tilt: kartu yang miring tidak terpotong tepi grid. */
+	padding: 2px;
 }
 .card-tile img {
 	width: 100%;
@@ -2095,12 +2115,7 @@ input:focus-visible {
 	transform: translateY(-2px) scale(1.02);
 	border-color: var(--accent, #ffb02e);
 }
-.card-tile figcaption {
-	font-size: 11px;
-	color: var(--fg-mute);
-	text-align: center;
-	line-height: 1.3;
-}
+
 
 /* Kartu berupa <video> (animasi .webm) harus mengikuti ukuran tile yang sama
    dengan <img>, supaya grid tidak melompat saat sebagian kartu beranimasi. */
@@ -2140,11 +2155,17 @@ input:focus-visible {
 	z-index: 2;
 }
 
-/* Garis bingkai sisi kiri, ditempel di atas ilustrasi. */
+/* Garis bingkai sisi kiri, ditempel di atas ilustrasi.
+   Sumber aslinya 36x660 px (garis tipis setinggi kartu 632). Karena itu
+   lebarnya dihitung dari TINGGI kartu, bukan dari lebar: 36/660 = 5,5%
+   dari tinggi. Dulu dipasang 26% lebar sehingga garis tipis itu melar
+   tiga kali dan menutupi sepertiga ilustrasi. */
 .ct-frame {
 	position: absolute;
-	inset: 0 auto 0 0;
-	width: 26%;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 11%; /* ~5,5% dari tinggi kartu, dibulatkan agar terlihat */
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 	pointer-events: none;
@@ -2152,14 +2173,21 @@ input:focus-visible {
 	opacity: 0.95;
 }
 
-/* Ikon rarity di pojok kanan atas. */
-.ct-rarity {
+/* Ikon rarity di pojok kanan atas.
+   Selektornya HARUS menyertakan nama kelas dengan spesifisitas lebih tinggi
+   daripada `.card-tile img` (aturan umum untuk ilustrasi), kalau tidak
+   lebar 100% dari aturan itu yang menang dan ikon 48x96 melar menutupi
+   seluruh kartu. */
+.card-tile img.ct-rarity {
 	position: absolute;
 	top: 3%;
 	right: 4%;
-	width: 26%;
+	width: 17%;
 	height: auto;
 	pointer-events: none;
+	border: none;
+	background: none;
+	border-radius: 0;
 	filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
 
