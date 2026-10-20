@@ -5398,6 +5398,9 @@ const UPDATABLE = {
 	alliancesages: "/api/update/alliancesages",
 	// 禁果便利店 (mcs18): bundle karakter spine dari Addressables terbuka.
 	mcs18: "/api/update/mcs18",
+	// Epic Seven: satu pembaru untuk lobby + combat + skill + wallpaper
+	// (semua dari e7codex). Lihat tools/update-epic7.py.
+	epic7: "/api/update/epic7",
 	// Chaos Zero Nightmare: pustaka komunitas BenNoSleep/czn-animation-viewer
 	// (satu pembaru melayani czn-rigs + czn-cutins-cg).
 	"czn-rigs": "/api/update/czn-rigs",
@@ -5717,14 +5720,19 @@ async function checkUpdate() {
 	setUpdateDot(updatePending);
 
 	if (!hasNew) {
-		toast?.(`Sudah versi terbaru (${info.version ?? info.catalog}).`);
+		// Sebagian pembaru tidak punya nomor versi (Epic Seven memakai
+		// katalog daring, bukan versi rilis), jadi jangan tampilkan
+		// "undefined".
+		const v = info.version ?? info.catalog;
+		toast?.(v ? `Sudah versi terbaru (${v}).` : "Sudah versi terbaru.");
 		return;
 	}
 	// Ada yang baru: tanya dulu sebelum mengunduh (bisa ratusan MB).
 	const n = pendingCount(info);
 	const what = updaterGame === "shoujoukaisen" || updaterGame === "mitao-utopia" ? "model" : "berkas";
 	const detail = n > 0 ? `${n} ${what} baru` : "versi baru";
-	if (!confirm(`Versi ${info.version ?? info.catalog}: ${detail}. Unduh sekarang?`)) return;
+	const label = info.version ?? info.catalog;
+	if (!confirm(`${label ? `Versi ${label}: ` : ""}${detail}. Unduh sekarang?`)) return;
 	applyUpdate();
 }
 

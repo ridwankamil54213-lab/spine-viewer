@@ -3542,6 +3542,14 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-mad.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// Epic Seven — satu pembaru untuk EMPAT sumber e7codex (lobby, combat,
+	// skill, wallpaper) plus katalog nama + thumbnail, karena semuanya harus
+	// tetap sinkron. --check membandingkan katalog daring dengan isi disk,
+	// --apply mengunduh yang belum ada. Lihat tools/update-epic7.py.
+	epic7: {
+		script: path.join(ROOT, "tools", "update-epic7.py"),
+		py: "/srv/venv-spine/bin/python",
+	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }
