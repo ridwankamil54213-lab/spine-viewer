@@ -3697,6 +3697,26 @@ app.get("/api/thumbnails", (req, res) => {
  */
 let cznCardCache = { at: 0, data: null };
 
+// Daftar id karakter yang punya kartu — dipakai klien untuk memetakan id
+// model (portrait_1003_front, model_1003, 1056_01, ...) ke id karakter tanpa
+// menebak-nebak.
+app.get("/api/czn-cards", (_req, res) => {
+	if (!cznCardCache.data || Date.now() - cznCardCache.at > 30000) {
+		try {
+			const raw = fs.readFileSync(path.join(ASSETS, "czn-cards", "index.json"), "utf8");
+			cznCardCache = { at: Date.now(), data: JSON.parse(raw) };
+		} catch {
+			cznCardCache = { at: Date.now(), data: {} };
+		}
+	}
+	// Hanya id + jumlah kartu; daftar berkas tetap di endpoint per karakter.
+	const chars = {};
+	for (const [id, rec] of Object.entries(cznCardCache.data)) {
+		chars[id] = { name: rec.name || null, count: (rec.cards || []).length };
+	}
+	res.json({ chars });
+});
+
 app.get("/api/czn-cards/:charid", (req, res) => {
 	const id = String(req.params.charid || "");
 	// Hanya angka: nilainya dipakai untuk menyusun path berkas.

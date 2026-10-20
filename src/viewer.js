@@ -885,17 +885,56 @@ const spine21 = {
  * id karakter numerik. Kartu milik karakter itu diambil dari
  * /api/czn-cards/<charid> lalu ditampilkan sebagai petak ilustrasi.
  *
- * Pemetaan diambil dari id model: rig CZN berbentuk "czn-rigs/1056_01",
- * sedangkan berkas kartu bernama "unique_1056_01.webp" — angka 1056 itulah
- * id karakternya. Model seperti "god_caligo" tidak punya angka, jadi
- * tombolnya disembunyikan daripada menampilkan daftar kosong.
+ * Id rig CZN punya BANYAK bentuk, bukan hanya "1056_01":
+ *   portrait_1003_front, model_1003, liveevent_1003, battle_1004, 1056_01
+ * Karena itu angka karakter diambil dari MANA PUN di bagian akhir id, bukan
+ * hanya dari awalan. Versi pertama hanya membaca awalan, akibatnya tombol
+ * Kartu cuma muncul di 8 dari 1143 model — padahal kartu tersedia untuk 69
+ * karakter dan 271 model bisa dipetakan.
+ *
+ * Kandidat angka disaring dengan daftar id karakter yang benar-benar punya
+ * kartu (diambil sekali dari /api/czn-cards), supaya "01" pada "1056_01"
+ * tidak salah dianggap id karakter.
  * ------------------------------------------------------------------ */
-const CZN_CHAR_RE = /^czn-(?:rigs|cutins-cg)\/(\d{3,6})/;
+const CZN_CHAR_RE = /^czn-(?:rigs|cutins-cg)\//;
+
+/** Set id karakter yang punya kartu, diisi sekali lewat ensureCznCharIds(). */
+let cznCharIds = null;
+let cznCharIdsPromise = null;
+
+function ensureCznCharIds() {
+	if (cznCharIds) return Promise.resolve(cznCharIds);
+	if (!cznCharIdsPromise) {
+		cznCharIdsPromise = fetch("/api/czn-cards")
+			.then((r) => r.json())
+			.then((d) => {
+				cznCharIds = new Set(Object.keys(d.chars || {}));
+				// Setelah daftar siap, tombol untuk model yang sedang tampil
+				// perlu dihitung ulang: sebelum ini tebakannya mungkin salah.
+				if (current) syncCardsButton(current);
+				return cznCharIds;
+			})
+			.catch(() => {
+				cznCharIds = new Set();
+				return cznCharIds;
+			});
+	}
+	return cznCharIdsPromise;
+}
 
 /** id karakter CZN dari sebuah model, atau null. */
 function cznCharId(model) {
-	const m = CZN_CHAR_RE.exec(String(model?.id || ""));
-	return m ? m[1] : null;
+	const id = String(model?.id || "");
+	if (!CZN_CHAR_RE.test(id)) return null;
+	const leaf = id.split("/").pop() || "";
+	const cands = leaf.match(/\d{3,6}/g) || [];
+	if (!cands.length) return null;
+	if (cznCharIds && cznCharIds.size) {
+		// Cocokkan dengan daftar yang benar-benar punya kartu.
+		return cands.find((c) => cznCharIds.has(c)) || null;
+	}
+	// Daftar belum siap: pakai angka terpanjang sebagai tebakan terbaik.
+	return cands.slice().sort((a, b) => b.length - a.length)[0];
 }
 
 /** Tampilkan/sembunyikan tombol Kartu sesuai model yang sedang dibuka. */
@@ -2586,6 +2625,8 @@ async function loadModelBody(model) {
 	if (el.skinSelect) el.skinSelect.disabled = false;
 	if (el.animSelect) el.animSelect.disabled = false;
 	// Model dibuka berarti sudah dilihat — hapus badge NEW-nya (dan simpan).
+	// Muat daftar id karakter ber-kartu sekali, lalu segarkan tombol.
+	ensureCznCharIds();
 	syncCardsButton(model);
 	markSeen(model.id);
 	el.loading.hidden = false;
