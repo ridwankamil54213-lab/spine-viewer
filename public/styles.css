@@ -2213,3 +2213,4 @@ input:focus-visible {
 /* Media kartu harus punya sudut membulat yang sama dengan bingkainya. */
 .card-tile img,
 .card-tile video { border-radius: 8px; }
+

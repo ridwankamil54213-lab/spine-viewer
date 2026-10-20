@@ -957,7 +957,19 @@ async function openCards() {
 		const data = await fetch(`/api/czn-cards/${id}`).then((r) => r.json());
 		const cards = data.cards || [];
 		if (!el.cardsGrid) return;
-		for (const c of cards) {
+		renderCards(cards);
+	} catch {
+		// Gagal memuat: biarkan panel kosong, tanpa pesan teks.
+	}
+}
+
+/** Gambar petak kartu. Panel ini sengaja tanpa teks: tidak ada judul,
+ *  caption, maupun tombol saringan — hanya ilustrasi dan bingkainya. */
+function renderCards(cards) {
+	if (!el.cardsGrid) return;
+	el.cardsGrid.innerHTML = "";
+	for (const c of cards) {
+		{
 			const fig = document.createElement("figure");
 			fig.className = "card-tile";
 			// Utamakan animasi .webm; ilustrasi .webp hanya cadangan. Sebagian
@@ -1021,8 +1033,6 @@ async function openCards() {
 			wireCardTilt(fig);
 			el.cardsGrid.append(fig);
 		}
-	} catch {
-		// Gagal memuat: biarkan panel kosong, tanpa pesan teks.
 	}
 }
 
