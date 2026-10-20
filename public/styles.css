@@ -2058,3 +2058,46 @@ input:focus-visible {
 }
 .model-grid.is-gallery .model-fav:hover { transform: scale(1.12); }
 
+
+/* ------------------------------------------------------------------ *
+ * Panel kartu skill (Chaos Zero Nightmare)
+ *
+ * Petak ilustrasi kartu. Lebar tile tetap supaya kartu terlihat seperti
+ * kartu fisik dan tidak melar; grid mengisi lebar modal dan menggulir.
+ * ------------------------------------------------------------------ */
+.cards-card { max-width: 980px; width: min(94vw, 980px); }
+.cards-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	gap: 12px;
+	margin-top: 12px;
+	max-height: min(72vh, 720px);
+	overflow-y: auto;
+	padding-right: 4px;
+}
+.card-tile {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	align-items: center;
+}
+.card-tile img {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 8px;
+	background: var(--ink-800);
+	border: 1px solid var(--line);
+	transition: transform 0.12s var(--ease), border-color 0.12s var(--ease);
+}
+.card-tile img:hover {
+	transform: translateY(-2px) scale(1.02);
+	border-color: var(--accent, #ffb02e);
+}
+.card-tile figcaption {
+	font-size: 11px;
+	color: var(--fg-mute);
+	text-align: center;
+	line-height: 1.3;
+}

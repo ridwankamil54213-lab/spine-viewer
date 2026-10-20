@@ -3684,6 +3684,45 @@ app.get("/api/thumbnails", (req, res) => {
 	res.json({ thumbs: thumbManifest() });
 });
 
+/**
+ * Kartu skill Chaos Zero Nightmare, per karakter.
+ *
+ * Kartu tidak punya indeks daring, jadi daftarnya dibangun dengan memindai
+ * nama berkas (tools/download-czn-cards.py) dan disimpan di
+ * assets/czn-cards/index.json: { "<charid>": { name, cards: [{kind,file}] } }.
+ *
+ * `<charid>` adalah id numerik yang sama dengan prefiks id rig
+ * (czn-rigs/1056_01) dan nama berkas thumb di _names.json ("1056.png"),
+ * sehingga klien bisa menautkan model -> kartu tanpa tabel tambahan.
+ */
+let cznCardCache = { at: 0, data: null };
+
+app.get("/api/czn-cards/:charid", (req, res) => {
+	const id = String(req.params.charid || "");
+	// Hanya angka: nilainya dipakai untuk menyusun path berkas.
+	if (!/^\d+$/.test(id)) return res.status(400).json({ error: "id karakter tidak valid." });
+	// Cache 30 detik: berkas index hanya berubah saat script unduh dijalankan.
+	if (!cznCardCache.data || Date.now() - cznCardCache.at > 30000) {
+		try {
+			const raw = fs.readFileSync(path.join(ASSETS, "czn-cards", "index.json"), "utf8");
+			cznCardCache = { at: Date.now(), data: JSON.parse(raw) };
+		} catch {
+			cznCardCache = { at: Date.now(), data: {} };
+		}
+	}
+	const rec = cznCardCache.data[id];
+	if (!rec) return res.json({ charid: id, name: null, cards: [] });
+	// URL disusun di server supaya klien tidak perlu tahu layout folder dan
+	// setiap segmen di-encode (nama berkas memakai garis bawah, aman, tapi
+	// tetap konsisten dengan endpoint lain).
+	const cards = (rec.cards || []).map((c) => ({
+		kind: c.kind,
+		url: `/czn-cards/${id}/${encodeURIComponent(c.file)}`,
+		file: c.file,
+	}));
+	res.json({ charid: id, name: rec.name || null, cards });
+});
+
 // --- upload: .json/.skel/.atlas/.png/.webp/... into assets/<folder>/ ---
 const slug = (s) =>
 	String(s)
@@ -4160,6 +4199,15 @@ app.use(
 app.use(
 	"/epic7-wallpaper",
 	express.static(path.join(ASSETS, "epic7-wallpaper"), {
+		fallthrough: false,
+		maxAge: "7d",
+		immutable: true,
+	})
+);
+// Ilustrasi kartu skill Chaos Zero Nightmare (WebP, ~30 KB per kartu).
+app.use(
+	"/czn-cards",
+	express.static(path.join(ASSETS, "czn-cards"), {
 		fallthrough: false,
 		maxAge: "7d",
 		immutable: true,

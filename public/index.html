@@ -438,6 +438,7 @@
 					<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
 					<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
 					<button id="slot-tip-btn" class="btn btn-toggle" data-on="false" title="Tampilkan nama slot di dekat kursor saat menunjuk model (T)">Nama Slot</button>
+					<button id="cards-btn" class="btn" type="button" title="Lihat kartu skill karakter ini (K)" hidden>Kartu</button>
 					<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>
 					<select id="density-select" class="btn btn-select" aria-label="Kerapatan piksel render"
 						title="Kerapatan piksel render — makin tinggi makin tajam (beban GPU naik)">
@@ -453,6 +454,23 @@
 		</div>
 	</section>
 </main>
+
+<!-- ================= KARTU SKILL (Chaos Zero Nightmare) ================= -->
+<div id="cards-modal" class="modal" hidden>
+	<div class="modal-backdrop" data-close="1"></div>
+	<div class="modal-card cards-card" role="dialog" aria-modal="true" aria-labelledby="cards-title">
+		<div class="modal-head">
+			<h2 id="cards-title">Kartu skill</h2>
+			<button id="cards-close" class="btn btn-icon btn-sm" aria-label="Tutup" title="Tutup (Esc)">
+				<svg viewBox="0 0 24 24" class="icon"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+			</button>
+		</div>
+		<div class="modal-body">
+			<p class="modal-hint" id="cards-note">Memuat…</p>
+			<div class="cards-grid" id="cards-grid"></div>
+		</div>
+	</div>
+</div>
 
 <!-- ================= EXPORT DIALOG ================= -->
 <div id="export-modal" class="modal" hidden>

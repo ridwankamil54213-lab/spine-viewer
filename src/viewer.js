@@ -408,6 +408,12 @@ const el = {
 	boneEditBtn: $("#bone-edit-btn"),
 	bonePanel: $("#bone-panel"),
 	slotTipBtn: $("#slot-tip-btn"),
+	cardsBtn: $("#cards-btn"),
+	cardsModal: $("#cards-modal"),
+	cardsGrid: $("#cards-grid"),
+	cardsNote: $("#cards-note"),
+	cardsTitle: $("#cards-title"),
+	cardsClose: $("#cards-close"),
 	densitySelect: $("#density-select"),
 	pmaSelect: $("#pma-select"),
 
@@ -871,6 +877,82 @@ const spine21 = {
 	lastTime: 0,
 	time: 0,
 };
+
+/* ------------------------------------------------------------------ *
+ * Kartu skill Chaos Zero Nightmare
+ *
+ * Tombol "Kartu" hanya muncul untuk model CZN yang id-nya bisa dipetakan ke
+ * id karakter numerik. Kartu milik karakter itu diambil dari
+ * /api/czn-cards/<charid> lalu ditampilkan sebagai petak ilustrasi.
+ *
+ * Pemetaan diambil dari id model: rig CZN berbentuk "czn-rigs/1056_01",
+ * sedangkan berkas kartu bernama "unique_1056_01.webp" — angka 1056 itulah
+ * id karakternya. Model seperti "god_caligo" tidak punya angka, jadi
+ * tombolnya disembunyikan daripada menampilkan daftar kosong.
+ * ------------------------------------------------------------------ */
+const CZN_CHAR_RE = /^czn-(?:rigs|cutins-cg)\/(\d{3,6})/;
+
+/** id karakter CZN dari sebuah model, atau null. */
+function cznCharId(model) {
+	const m = CZN_CHAR_RE.exec(String(model?.id || ""));
+	return m ? m[1] : null;
+}
+
+/** Tampilkan/sembunyikan tombol Kartu sesuai model yang sedang dibuka. */
+function syncCardsButton(model) {
+	const id = cznCharId(model);
+	if (el.cardsBtn) el.cardsBtn.hidden = !id;
+	// Panel ditutup saat model berganti: daftar kartu lama tidak berlaku lagi.
+	if (el.cardsModal && !el.cardsModal.hidden && !id) closeCards();
+}
+
+function closeCards() {
+	if (el.cardsModal) el.cardsModal.hidden = true;
+}
+
+async function openCards() {
+	const id = cznCharId(current);
+	if (!id || !el.cardsModal) return;
+	el.cardsModal.hidden = false;
+	if (el.cardsGrid) el.cardsGrid.innerHTML = "";
+	if (el.cardsNote) el.cardsNote.textContent = "Memuat kartu…";
+	if (el.cardsTitle) el.cardsTitle.textContent = `Kartu skill — ${modelLabel(current)}`;
+	try {
+		const data = await fetch(`/api/czn-cards/${id}`).then((r) => r.json());
+		const cards = data.cards || [];
+		if (el.cardsNote) {
+			el.cardsNote.textContent = cards.length
+				? `${cards.length} kartu untuk ${data.name || modelLabel(current)}.`
+				: "Belum ada kartu untuk karakter ini.";
+		}
+		if (!el.cardsGrid) return;
+		for (const c of cards) {
+			const fig = document.createElement("figure");
+			fig.className = "card-tile";
+			const img = document.createElement("img");
+			img.src = c.url;
+			img.alt = c.file.replace(/\.webp$/i, "");
+			img.loading = "lazy";
+			img.decoding = "async";
+			img.width = 210;
+			img.height = 316;
+			const cap = document.createElement("figcaption");
+			// "unique_1056_01" -> "Unique 01", "start_1056_02" -> "Start 02"
+			const m = /^(start|unique)_\d+_(\d+)$/.exec(c.file.replace(/\.webp$/i, ""));
+			cap.textContent = m
+				? `${m[1] === "unique" ? "Unique" : "Start"} ${m[2]}`
+				: c.file.replace(/\.webp$/i, "");
+			fig.append(img, cap);
+			el.cardsGrid.append(fig);
+		}
+	} catch {
+		if (el.cardsNote) el.cardsNote.textContent = "Gagal memuat kartu.";
+	}
+}
+
+el.cardsBtn?.addEventListener("click", openCards);
+el.cardsClose?.addEventListener("click", closeCards);
+el.cardsModal?.querySelector('[data-close="1"]')?.addEventListener("click", closeCards);
 
 /* ------------------------------------------------------------------ *
  * Bones overlay
@@ -2504,6 +2586,7 @@ async function loadModelBody(model) {
 	if (el.skinSelect) el.skinSelect.disabled = false;
 	if (el.animSelect) el.animSelect.disabled = false;
 	// Model dibuka berarti sudah dilihat — hapus badge NEW-nya (dan simpan).
+	syncCardsButton(model);
 	markSeen(model.id);
 	el.loading.hidden = false;
 	el.loading.textContent = "Memuat " + model.name + "…";
@@ -7605,6 +7688,10 @@ syncLayoutButtons();
 
 /** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
 function closeTopmostModal() {
+	if (el.cardsModal && !el.cardsModal.hidden) {
+		closeCards();
+		return true;
+	}
 	if (el.exportModal && !el.exportModal.hidden) {
 		closeExport();
 		return true;
