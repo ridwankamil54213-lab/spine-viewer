@@ -5998,6 +5998,13 @@ el.playBtn.addEventListener("click", () => {
 el.loopBtn.addEventListener("click", () => {
 	state.loop = !state.loop;
 	el.loopBtn.dataset.on = String(state.loop);
+	// Video punya flag loop sendiri; tanpa ini tombol Loop tidak berpengaruh
+	// pada model video (atribut `loop` di-set sekali saat elemen dibuat).
+	if (videoStageActive()) {
+		const v = videoElement();
+		if (v) v.loop = state.loop;
+		return;
+	}
 	// `spine` pada model Cubism ada, tetapi .state-nya tidak — tanpa ?.
 	const track = spine?.state?.tracks?.[0];
 	if (track) track.loop = state.loop;
@@ -6106,6 +6113,19 @@ el.rateSelect.addEventListener("change", () => (state.rate = parseFloat(el.rateS
 el.scrub.addEventListener("pointerdown", () => (state.scrubbing = true));
 window.addEventListener("pointerup", () => (state.scrubbing = false));
 el.scrub.addEventListener("input", () => {
+	// Video: seek langsung ke elemen <video>. Dulu handler ini keluar lebih
+	// awal karena `spine` null untuk model video, jadi scrub bar di panel
+	// tidak melakukan apa pun — itu sebabnya kontrol bawaan browser
+	// (controls=true) terasa perlu. Sekarang kontrol bawaan dimatikan, jadi
+	// jalur ini yang harus bekerja.
+	if (videoStageActive()) {
+		const v = videoElement();
+		if (!v || !Number.isFinite(v.duration) || v.duration <= 0) return;
+		const t = (parseFloat(el.scrub.value) / 1000) * v.duration;
+		v.currentTime = t;
+		el.timeCur.textContent = t.toFixed(2) + "s";
+		return;
+	}
 	if (!duration || !spine) return;
 	state.trackTime = (parseFloat(el.scrub.value) / 1000) * duration;
 	// Live2D: the motion manager has no trackTime, so seek by shifting the

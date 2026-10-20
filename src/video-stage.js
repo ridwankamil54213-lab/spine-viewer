@@ -58,11 +58,21 @@ export function loadVideo({ wrap, url }) {
 	vid = document.createElement("video");
 	vid.className = "video-stage";
 	vid.src = url;
-	vid.controls = true;
+	// Kontrol bawaan browser DIMATIKAN: viewer sudah punya tombol play/pause
+	// sendiri dan scrub bar di panel bawah. Kontrol bawaan menutupi bagian
+	// bawah kanvas (terutama untuk klip 4K) dan gayanya tidak bisa disamakan
+	// dengan UI aplikasi. Klik pada video tetap ditangani lewat stage.
+	vid.controls = false;
 	vid.autoplay = true;
 	vid.loop = true;
 	vid.playsInline = true;
 	vid.preload = "auto";
+	// Tanpa `controls`, klik di video tidak melakukan apa pun — beberapa
+	// pengguna menjangkanya untuk pause. Petakan ke play/pause.
+	vid.addEventListener("click", () => {
+		if (vid.paused) vid.play().catch(() => {});
+		else vid.pause();
+	});
 	host.appendChild(vid);
 	return vid;
 }
