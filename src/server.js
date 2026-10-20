@@ -3735,11 +3735,20 @@ app.get("/api/czn-cards/:charid", (req, res) => {
 	// URL disusun di server supaya klien tidak perlu tahu layout folder dan
 	// setiap segmen di-encode (nama berkas memakai garis bawah, aman, tapi
 	// tetap konsisten dengan endpoint lain).
-	const cards = (rec.cards || []).map((c) => ({
-		kind: c.kind,
-		url: `/czn-cards/${id}/${encodeURIComponent(c.file)}`,
-		file: c.file,
-	}));
+	// Setiap kartu bisa punya dua bentuk: animasi .webm (kalau ada) dan
+	// ilustrasi diam .webp. Keduanya disajikan; klien memilih video lebih
+	// dulu dan jatuh ke gambar bila animasinya tidak tersedia.
+	const cards = (rec.cards || []).map((c) => {
+		const stem = String(c.file).replace(/\.webp$/i, "");
+		const base = `/czn-cards/${id}/${encodeURIComponent(stem)}`;
+		return {
+			kind: c.kind,
+			file: c.file,
+			video: !!c.video,
+			url: `${base}.webp`,
+			videoUrl: c.video ? `${base}.webm` : null,
+		};
+	});
 	res.json({ charid: id, name: rec.name || null, cards });
 });
 

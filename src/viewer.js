@@ -968,20 +968,51 @@ async function openCards() {
 		for (const c of cards) {
 			const fig = document.createElement("figure");
 			fig.className = "card-tile";
-			const img = document.createElement("img");
-			img.src = c.url;
-			img.alt = c.file.replace(/\.webp$/i, "");
-			img.loading = "lazy";
-			img.decoding = "async";
-			img.width = 210;
-			img.height = 316;
+			// Utamakan animasi .webm; ilustrasi .webp hanya cadangan. Sebagian
+			// besar kartu "unique" punya animasi, kartu "start" tidak.
+			let media;
+			if (c.video && c.videoUrl) {
+				const v = document.createElement("video");
+				v.src = c.videoUrl;
+				v.width = 210;
+				v.height = 316;
+				v.autoplay = true;
+				v.loop = true;
+				v.muted = true; // wajib: autoplay diblokir kalau bersuara
+				v.playsInline = true;
+				v.preload = "metadata";
+				// Kalau .webm gagal, jatuh ke ilustrasi diam tanpa memaksa
+				// pengguna memuat ulang panel.
+				v.addEventListener(
+					"error",
+					() => {
+						const img = document.createElement("img");
+						img.src = c.url;
+						img.alt = c.file.replace(/\.webp$/i, "");
+						img.width = 210;
+						img.height = 316;
+						v.replaceWith(img);
+					},
+					{ once: true }
+				);
+				media = v;
+			} else {
+				const img = document.createElement("img");
+				img.src = c.url;
+				img.alt = c.file.replace(/\.webp$/i, "");
+				img.loading = "lazy";
+				img.decoding = "async";
+				img.width = 210;
+				img.height = 316;
+				media = img;
+			}
 			const cap = document.createElement("figcaption");
 			// "unique_1056_01" -> "Unique 01", "start_1056_02" -> "Start 02"
 			const m = /^(start|unique)_\d+_(\d+)$/.exec(c.file.replace(/\.webp$/i, ""));
 			cap.textContent = m
 				? `${m[1] === "unique" ? "Unique" : "Start"} ${m[2]}`
 				: c.file.replace(/\.webp$/i, "");
-			fig.append(img, cap);
+			fig.append(media, cap);
 			el.cardsGrid.append(fig);
 		}
 	} catch {
