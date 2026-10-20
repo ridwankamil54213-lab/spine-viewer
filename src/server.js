@@ -675,42 +675,17 @@ const GAME_ROOTS = [
 	// again and STILL scramble as of this check, even though its numbers look
 	// healthy (no exploded vertices, spans within bounds). Do not "optimise"
 	// this back to pixi-spine on numeric evidence alone.
-	// Epic Seven (com.stove.epic7.google).
+	// Epic Seven — sumber: e7codex.com (tools/download-e7codex.py).
 	//
-	// Assets live in a single ~7 GB XOR-encrypted data.pack under
-	//   /sdcard/Android/data/<pkg>/files/data.pack
-	// with its file table in data.indices/*.pigz (gzip). Both are handled by
-	// CeciliaBot/EpicSevenAssetRipper, whose DataPack class we drive headless
-	// from tools/extract-epic7.py — its GUI is PyQt6 and the pack is far too
-	// big to click through.
-	//
-	// Models ship as .scsp (binary skeleton) + .sct (ASTC/ETC2/RGBA texture)
-	// + .atlas, converted by Kutinana/E7SpineAssetConverter to .json/.png.
-	// Two gaps in that tool we patch in our extractor:
-	//   * fix_atlas.py only strips the `pma:` line, but its README promises
-	//     rewriting the .sct reference on line 1 — without that the atlas
-	//     points at a .sct file we never write and no texture is found.
-	//   * only scsp2json.py accepts a directory; sct2png/fix_atlas are
-	//     per-file, so we loop over them ourselves.
-	//
-	// TWO GENERATIONS IN ONE GAME. E7 kept shipping both: 1169 models are
-	// SCSP v2 (Spine 2.1.27) and 104 are SCSP v3 (Spine 3.8.99). They need
-	// different renderers (legacy viewer vs pixi-spine), and spineRuntime is
-	// resolved per game root, so tools/split-epic7.py moves the v3 models
-	// into their own tree. The longer "epic7-v3" match has to come first.
-	{
-		match: "epic7-v3",
-		key: "epic7",
-		label: "Epic Seven",
-		pmaDefault: false,
-	},
-	// Spine 2.1.27 — the same vintage as Project QT, so it needs the legacy
-	// runtime (pixi-spine cannot draw it).
+	// Model campuran: Spine 2.1.27 (217), 3.8.95 (30), dan 3.8.99 (601),
+	// jadi spineRuntime TIDAK dipatok — versi dideteksi per model dari
+	// isi skeleton. Sebelumnya folder epic7-v3 (SCSP v3) memakai entri
+	// terpisah dengan match lebih panjang; sumber baru ini memakai satu
+	// pohon assets/epic7/ sehingga entri epic7-v3 dihapus.
 	{
 		match: "epic7",
 		key: "epic7",
 		label: "Epic Seven",
-		spineRuntime: "2.1.27",
 		pmaDefault: false,
 	},
 	// Cherry Tale (88kongque).
@@ -1667,6 +1642,9 @@ function scanModels() {
 	// Make Drama: name each skin from the library catalog and fold a character's
 	// standing/affection/desire rigs into one card with a variant dropdown.
 	applyMadNames(models);
+	// Epic Seven: nama + rarity/elemen/kelas dari katalog e7codex
+	// (assets/epic7/_names.json, ditulis tools/fetch-e7codex-meta.py).
+	applyEpic7Names(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -1774,6 +1752,56 @@ function applyCznNames(models) {
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
 			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
 		}
+	}
+}
+
+/**
+ * Epic Seven — nama + metadata dari katalog e7codex.
+ *
+ * Sumbernya https://e7codex.com/data/units.json; tools/fetch-e7codex-meta.py
+ * merangkumnya jadi assets/epic7/_names.json (id -> {name, kind, rarity,
+ * element, class, slug, ...}). Tanpa ini kartu hanya menampilkan kode
+ * ("C1001") padahal katalognya tahu itu "Ras", 3★, Fire, Knight.
+ *
+ * Penamaan mengikuti pola applyCznNames/applyMadNames: `name` dipakai untuk
+ * label kartu, `character` untuk tooltip dan baris kedua. `kind` (unit /
+ * npc / monster) ditempel di nama karena tanpa itu NPC dan monster ikut
+ * terbaca seperti hero.
+ */
+function applyEpic7Names(models) {
+	const e7 = models.filter((m) => (m.game || "") === "epic7");
+	if (!e7.length) return;
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(ASSETS, "epic7", "_names.json"), "utf8"));
+	} catch {
+		return; // katalog belum dibuat — kartu tetap memakai id
+	}
+	const kindSuffix = (kind) => {
+		if (!kind || kind === "unit") return "";
+		return kind === "npc" ? " (NPC)" : kind === "monster" ? " (Monster)" : ` (${kind})`;
+	};
+	for (const m of e7) {
+		const key = String(m.id || "").slice("epic7/".length);
+		const rec = map[key];
+		if (!rec || !rec.name) continue;
+		const suffix = kindSuffix(rec.kind);
+		m.name = rec.name + suffix;
+		// `character` adalah bentuk yang sudah dipahami UI: name + rarity +
+		// class + element tampil di baris kedua, sisanya di tooltip.
+		m.character = {
+			name: rec.name,
+			plain: rec.name,
+			source: "e7codex.com",
+			rarity: rec.rarity || null,
+			class: rec.class || null,
+			element: rec.element || null,
+			skin: rec.hero && rec.hero !== rec.name ? rec.hero : null,
+			code: key,
+		};
+		if (rec.slug) m.slug = rec.slug;
+		if (rec.released) m.released = rec.released;
+		m.kind = rec.kind || "unit";
 	}
 }
 

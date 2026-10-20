@@ -147,8 +147,32 @@ export function detectFromBinary(bytes) {
 	return null;
 }
 
-/** Convenience: detect from either kind of payload. */
+/**
+ * Detect from either kind of payload.
+ *
+ * `raw` untuk JSON bisa berupa STRING/BUFFER mentah (begitulah viewer
+ * memanggilnya: isi berkas skeleton apa adanya) atau objek yang sudah
+ * di-parse. Versi lama selalu memperlakukannya sebagai objek, sehingga
+ * `json?.skeleton?.spine` selalu undefined dan hasilnya null — akibatnya
+ * setiap skeleton JSON (bukan biner) kehilangan deteksi versinya dan
+ * dirender dengan runtime default 4.1. Model 3.8 dari e7codex jadi
+ * berantakan karena itu.
+ */
 export function detectSpineVersion({ isBinary, raw }) {
-	if (!isBinary) return detectFromJson(raw);
-	return detectFromBinary(raw);
+	if (isBinary) return detectFromBinary(raw);
+	if (raw && typeof raw === "object" && !(raw instanceof Uint8Array)) {
+		return detectFromJson(raw);
+	}
+	// String / ArrayBuffer / Uint8Array: parse dulu, lalu baca versinya.
+	// Parsing gagal bukan error fatal — kembalikan null supaya pemanggil
+	// memakai runtime default.
+	try {
+		const text =
+			typeof raw === "string"
+				? raw
+				: new TextDecoder().decode(raw instanceof Uint8Array ? raw : new Uint8Array(raw));
+		return detectFromJson(JSON.parse(text));
+	} catch {
+		return null;
+	}
 }
