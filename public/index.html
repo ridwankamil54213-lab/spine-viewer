@@ -24,17 +24,6 @@
 		<h1>Spine&nbsp;Stage</h1>
 		<p class="brand-sub">Penampil skeleton 2D</p>
 	</div>
-	<!-- Breadcrumb: satu tempat yang menjawab "saya di mana", menggantikan
-	     label model yang mengambang. Strukturnya meniru sketsa 1
-	     (Pustaka / Game / Model) dan tiap bagian bisa diklik untuk naik. -->
-	<nav class="crumb" id="crumb" aria-label="Lokasi">
-		<button class="crumb-link" id="crumb-root" type="button" title="Kembali ke pustaka">Pustaka</button>
-		<span class="crumb-sep" id="crumb-sep-game" hidden>/</span>
-		<button class="crumb-link" id="crumb-game" type="button" hidden></button>
-		<span class="crumb-sep" id="crumb-sep-model" hidden>/</span>
-		<span class="crumb-here" id="crumb-model">—</span>
-	</nav>
-
 	<nav class="brand-meta">
 		<span class="mono" id="title-model">—</span>
 		<!-- Tautan permalink: menghasilkan URL yang mengembalikan persis
@@ -75,18 +64,6 @@
 					aria-label="Lihat log proses pembaruan" title="Log proses pembaruan">
 					<svg viewBox="0 0 24 24" class="icon"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
 				</button>
-			</div>
-
-			<!-- Tab pustaka: memisahkan tiga hal yang sebelumnya bertumpuk di
-			     satu daftar. "Game" adalah daftar game, "Model" daftar model di
-			     dalam game terpilih, "Favorit" menyaring keduanya. -->
-			<div class="lib-tabs" role="tablist" aria-label="Tampilan pustaka">
-				<button id="tab-games" class="lib-tab is-on" role="tab" type="button"
-					aria-selected="true" data-tab="games">Game</button>
-				<button id="tab-models" class="lib-tab" role="tab" type="button"
-					aria-selected="false" data-tab="models">Model</button>
-				<button id="tab-fav" class="lib-tab" role="tab" type="button"
-					aria-selected="false" data-tab="fav">Favorit</button>
 			</div>
 
 			<input id="search" class="search" type="search" aria-label="Cari model" placeholder="Cari model…" autocomplete="off" />
@@ -184,21 +161,6 @@
 				<canvas id="fps-graph" class="fps-graph" width="160" height="34"
 					aria-hidden="true"></canvas>
 				<button id="fps-reset" class="fps-reset" type="button" title="Reset min/avg">Reset</button>
-			</div>
-
-			<!-- Zoom dipindah ke sudut kanan-atas panggung (sketsa 1). Id
-			     dipertahankan, jadi viewer.js tidak berubah. -->
-			<div class="zoom-float" role="group" aria-label="Zoom">
-					<div class="zoom-group">
-						<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
-							<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
-						</button>
-						<span id="zoom-label" class="zoom-label mono">100</span>
-						<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
-							<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-						</button>
-						<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
-					</div>
 			</div>
 		</div>
 
@@ -383,135 +345,131 @@
 			</div>
 		</div>
 
-			<!-- Wadah panel editor: dulu mengambang sendiri di atas kanvas,
-			     sekarang ditata oleh inspektor. Id dan markup tiap panel tetap. -->
-			<div id="insp-editor" class="insp-tools-body">
-			<!-- Panel vertex mesh -->
-	<div id="vtx-panel" class="bounds-panel" hidden>
-		<div class="bone-row">
-			<span class="bone-label">Mesh</span>
-			<code id="vtx-name">klik mesh</code>
-			<span class="bone-label">Titik</span>
-			<code id="vtx-count">—</code>
-		</div>
-		<div class="bone-row">
-			<span class="bone-label">Vertex</span>
-			<select class="select select-sm" id="vtx-sel" disabled></select>
-			<button class="btn btn-sm" id="vtx-reset" type="button" title="Kembalikan bentuk mesh ini">Reset mesh</button>
-		</div>
-		<div class="bone-row">
-			<span class="bone-hint">Klik mesh, klik titik, lalu tarik. Ikut tertulis di Ekspor skeleton.</span>
-		</div>
+		<!-- Panel vertex mesh -->
+<div id="vtx-panel" class="bounds-panel" hidden>
+	<div class="bone-row">
+		<span class="bone-label">Mesh</span>
+		<code id="vtx-name">klik mesh</code>
+		<span class="bone-label">Titik</span>
+		<code id="vtx-count">—</code>
 	</div>
-
-	<!-- Panel bounds attachment: nilai kotak bisa diketik langsung. -->
-	<div id="bounds-panel" class="bounds-panel" hidden>
-		<div class="bone-row">
-			<span class="bone-label">Attachment</span>
-			<code id="bounds-name">klik model</code>
-		</div>
-		<div class="bone-row bone-nums">
-			<label class="bone-num"><span class="bone-label">X</span>
-				<input class="field field-xs mono" id="bounds-x" type="number" step="0.1"></label>
-			<label class="bone-num"><span class="bone-label">Y</span>
-				<input class="field field-xs mono" id="bounds-y" type="number" step="0.1"></label>
-			<label class="bone-num"><span class="bone-label">Lebar</span>
-				<input class="field field-xs mono" id="bounds-w" type="number" step="0.1"></label>
-			<label class="bone-num"><span class="bone-label">Tinggi</span>
-				<input class="field field-xs mono" id="bounds-h" type="number" step="0.1"></label>
-			<label class="bone-num"><span class="bone-label">Rotasi</span>
-				<input class="field field-xs mono" id="bounds-rot" type="number" step="0.1"></label>
-		</div>
-		<div class="bone-row">
-			<span class="bone-hint">Tarik sudut = ukuran · tarik tengah = pindah. Ikut tertulis di Ekspor skeleton.</span>
-		</div>
+	<div class="bone-row">
+		<span class="bone-label">Vertex</span>
+		<select class="select select-sm" id="vtx-sel" disabled></select>
+		<button class="btn btn-sm" id="vtx-reset" type="button" title="Kembalikan bentuk mesh ini">Reset mesh</button>
 	</div>
-
-	<!-- Panel IK: rantai yang sedang disunting + tombol reset. -->
-	<div id="ik-panel" class="ik-panel" hidden>
-		<span class="ik-panel-title">IK</span>
-		<span class="ik-panel-chain mono" id="ik-chain">—</span>
-		<button id="ik-reset" class="btn btn-ghost btn-sm" title="Kembalikan rotasi rantai ini">Reset</button>
+	<div class="bone-row">
+		<span class="bone-hint">Klik mesh, klik titik, lalu tarik. Ikut tertulis di Ekspor skeleton.</span>
 	</div>
+</div>
 
-	<div id="bone-panel" class="bone-panel" hidden>
-				<div class="bone-row">
-					<span class="bone-label">Tulang</span>
-					<code data-bone-name>—</code>
-					<span class="bone-label">Diubah</span>
-					<code data-bone-count>0</code>
-				</div>
-				<!-- Mode seret: putar / geser / skala. -->
-				<div class="bone-row">
-					<span class="bone-label">Mode</span>
-					<div class="bone-modes" role="group" aria-label="Mode seret tulang">
-						<button class="btn btn-sm bone-mode" id="bone-mode-rotate" data-mode="rotate" type="button"
-							title="Putar tulang (R)">Putar</button>
-						<button class="btn btn-sm bone-mode" id="bone-mode-move" data-mode="move" type="button"
-							title="Geser tulang (G)">Geser</button>
-						<button class="btn btn-sm bone-mode" id="bone-mode-scale" data-mode="scale" type="button"
-							title="Skala tulang (S)">Skala</button>
-					</div>
-				</div>
-				<!-- Nilai angka: bisa diketik langsung, panah untuk nudge. -->
-				<div class="bone-row bone-nums">
-					<label class="bone-num">
-						<span class="bone-label">Rotasi</span>
-						<input class="field field-xs mono" id="bone-num-rotation" type="number" step="0.1" inputmode="decimal">
-					</label>
-					<label class="bone-num">
-						<span class="bone-label">X</span>
-						<input class="field field-xs mono" id="bone-num-x" type="number" step="0.1" inputmode="decimal">
-					</label>
-					<label class="bone-num">
-						<span class="bone-label">Y</span>
-						<input class="field field-xs mono" id="bone-num-y" type="number" step="0.1" inputmode="decimal">
-					</label>
-					<label class="bone-num">
-						<span class="bone-label">Skala</span>
-						<input class="field field-xs mono" id="bone-num-scale" type="number" step="0.01" inputmode="decimal">
-					</label>
-					<span class="bone-hint">↑↓ ±1 · Shift+↑↓ ±0.1</span>
-				</div>
-				<!-- Pustaka pose: simpan/muat pose bernama, dan cermin kiri-kanan. -->
-				<div class="bone-row bone-lib">
-					<input class="field field-xs" id="pose-lib-name" type="text" placeholder="Nama pose…"
-						autocomplete="off" spellcheck="false" style="width:120px">
-					<button class="btn btn-sm" id="pose-lib-save" type="button" title="Simpan pose sekarang">Simpan</button>
-					<select class="select select-sm" id="pose-lib-select" title="Muat pose tersimpan" disabled>
-						<option value="">Belum ada pose</option>
-					</select>
-					<button class="btn btn-sm" id="pose-lib-delete" type="button" title="Hapus pose terpilih" disabled>Hapus</button>
-				</div>
-				<div class="bone-row">
-					<span class="bone-label">Cermin</span>
-					<button class="btn btn-sm" id="bone-mirror-ltr" type="button"
-						title="Salin pose kiri ke kanan (rotasi & X dibalik)">L → R</button>
-					<button class="btn btn-sm" id="bone-mirror-rtl" type="button"
-						title="Salin pose kanan ke kiri (rotasi & X dibalik)">R → L</button>
-					<span class="bone-hint" id="bone-mirror-info">—</span>
-				</div>
-				<div class="bone-row">
-					<button class="btn btn-sm" id="bone-undo" type="button" title="Batalkan langkah terakhir (Ctrl+Z)" disabled>↶</button>
-					<button class="btn btn-sm" id="bone-redo" type="button" title="Ulangi langkah (Ctrl+Shift+Z)" disabled>↷</button>
-					<button class="btn" id="bone-reset" type="button" title="Kembalikan semua tulang ke setup pose">Reset pose</button>
-					<button class="btn" id="bone-export" type="button" title="Unduh pose sebagai JSON">Ekspor pose</button>
-					<button class="btn" id="bone-export-skel" type="button" title="Unduh skeleton JSON hasil editan (model JSON saja)">Ekspor skeleton</button>
-					<label class="btn bone-import" title="Muat pose dari JSON">
-						Muat pose
-						<input id="bone-import-file" type="file" accept="application/json,.json" hidden>
-					</label>
-				</div>
-				<!-- Pohon tulang: klik kanvas nyaris mustahil untuk tulang kecil yang
-				     bertumpuk (Rei punya 184 tulang). Cari nama lalu klik. -->
-				<div class="bone-tree-head">
-					<input id="bone-search" class="field field-sm" type="search"
-						placeholder="Cari tulang…" autocomplete="off" spellcheck="false">
-					<span class="bone-tree-count mono" id="bone-tree-count">—</span>
-				</div>
-				<ul class="bone-tree" id="bone-tree"></ul>
+<!-- Panel bounds attachment: nilai kotak bisa diketik langsung. -->
+<div id="bounds-panel" class="bounds-panel" hidden>
+	<div class="bone-row">
+		<span class="bone-label">Attachment</span>
+		<code id="bounds-name">klik model</code>
+	</div>
+	<div class="bone-row bone-nums">
+		<label class="bone-num"><span class="bone-label">X</span>
+			<input class="field field-xs mono" id="bounds-x" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Y</span>
+			<input class="field field-xs mono" id="bounds-y" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Lebar</span>
+			<input class="field field-xs mono" id="bounds-w" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Tinggi</span>
+			<input class="field field-xs mono" id="bounds-h" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Rotasi</span>
+			<input class="field field-xs mono" id="bounds-rot" type="number" step="0.1"></label>
+	</div>
+	<div class="bone-row">
+		<span class="bone-hint">Tarik sudut = ukuran · tarik tengah = pindah. Ikut tertulis di Ekspor skeleton.</span>
+	</div>
+</div>
+
+<!-- Panel IK: rantai yang sedang disunting + tombol reset. -->
+<div id="ik-panel" class="ik-panel" hidden>
+	<span class="ik-panel-title">IK</span>
+	<span class="ik-panel-chain mono" id="ik-chain">—</span>
+	<button id="ik-reset" class="btn btn-ghost btn-sm" title="Kembalikan rotasi rantai ini">Reset</button>
+</div>
+
+<div id="bone-panel" class="bone-panel" hidden>
+			<div class="bone-row">
+				<span class="bone-label">Tulang</span>
+				<code data-bone-name>—</code>
+				<span class="bone-label">Diubah</span>
+				<code data-bone-count>0</code>
 			</div>
+			<!-- Mode seret: putar / geser / skala. -->
+			<div class="bone-row">
+				<span class="bone-label">Mode</span>
+				<div class="bone-modes" role="group" aria-label="Mode seret tulang">
+					<button class="btn btn-sm bone-mode" id="bone-mode-rotate" data-mode="rotate" type="button"
+						title="Putar tulang (R)">Putar</button>
+					<button class="btn btn-sm bone-mode" id="bone-mode-move" data-mode="move" type="button"
+						title="Geser tulang (G)">Geser</button>
+					<button class="btn btn-sm bone-mode" id="bone-mode-scale" data-mode="scale" type="button"
+						title="Skala tulang (S)">Skala</button>
+				</div>
 			</div>
+			<!-- Nilai angka: bisa diketik langsung, panah untuk nudge. -->
+			<div class="bone-row bone-nums">
+				<label class="bone-num">
+					<span class="bone-label">Rotasi</span>
+					<input class="field field-xs mono" id="bone-num-rotation" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">X</span>
+					<input class="field field-xs mono" id="bone-num-x" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">Y</span>
+					<input class="field field-xs mono" id="bone-num-y" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">Skala</span>
+					<input class="field field-xs mono" id="bone-num-scale" type="number" step="0.01" inputmode="decimal">
+				</label>
+				<span class="bone-hint">↑↓ ±1 · Shift+↑↓ ±0.1</span>
+			</div>
+			<!-- Pustaka pose: simpan/muat pose bernama, dan cermin kiri-kanan. -->
+			<div class="bone-row bone-lib">
+				<input class="field field-xs" id="pose-lib-name" type="text" placeholder="Nama pose…"
+					autocomplete="off" spellcheck="false" style="width:120px">
+				<button class="btn btn-sm" id="pose-lib-save" type="button" title="Simpan pose sekarang">Simpan</button>
+				<select class="select select-sm" id="pose-lib-select" title="Muat pose tersimpan" disabled>
+					<option value="">Belum ada pose</option>
+				</select>
+				<button class="btn btn-sm" id="pose-lib-delete" type="button" title="Hapus pose terpilih" disabled>Hapus</button>
+			</div>
+			<div class="bone-row">
+				<span class="bone-label">Cermin</span>
+				<button class="btn btn-sm" id="bone-mirror-ltr" type="button"
+					title="Salin pose kiri ke kanan (rotasi & X dibalik)">L → R</button>
+				<button class="btn btn-sm" id="bone-mirror-rtl" type="button"
+					title="Salin pose kanan ke kiri (rotasi & X dibalik)">R → L</button>
+				<span class="bone-hint" id="bone-mirror-info">—</span>
+			</div>
+			<div class="bone-row">
+				<button class="btn btn-sm" id="bone-undo" type="button" title="Batalkan langkah terakhir (Ctrl+Z)" disabled>↶</button>
+				<button class="btn btn-sm" id="bone-redo" type="button" title="Ulangi langkah (Ctrl+Shift+Z)" disabled>↷</button>
+				<button class="btn" id="bone-reset" type="button" title="Kembalikan semua tulang ke setup pose">Reset pose</button>
+				<button class="btn" id="bone-export" type="button" title="Unduh pose sebagai JSON">Ekspor pose</button>
+				<button class="btn" id="bone-export-skel" type="button" title="Unduh skeleton JSON hasil editan (model JSON saja)">Ekspor skeleton</button>
+				<label class="btn bone-import" title="Muat pose dari JSON">
+					Muat pose
+					<input id="bone-import-file" type="file" accept="application/json,.json" hidden>
+				</label>
+			</div>
+			<!-- Pohon tulang: klik kanvas nyaris mustahil untuk tulang kecil yang
+			     bertumpuk (Rei punya 184 tulang). Cari nama lalu klik. -->
+			<div class="bone-tree-head">
+				<input id="bone-search" class="field field-sm" type="search"
+					placeholder="Cari tulang…" autocomplete="off" spellcheck="false">
+				<span class="bone-tree-count mono" id="bone-tree-count">—</span>
+			</div>
+			<ul class="bone-tree" id="bone-tree"></ul>
+		</div>
 
 		<div class="transport-row transport-row-2">
 				<div class="tgroup">
@@ -544,6 +502,16 @@
 				<div class="spacer"></div>
 
 				<div class="tgroup">
+					<div class="zoom-group">
+						<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
+						</button>
+						<span id="zoom-label" class="zoom-label mono">100</span>
+						<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+						</button>
+						<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
+					</div>
 
 					<button id="flip-btn" class="btn btn-toggle" data-on="false" title="Balik horizontal">Balik</button>
 					<div class="bg-group" role="group" aria-label="Warna latar">
