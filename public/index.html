@@ -173,6 +173,21 @@
 					aria-hidden="true"></canvas>
 				<button id="fps-reset" class="fps-reset" type="button" title="Reset min/avg">Reset</button>
 			</div>
+
+			<!-- Zoom dipindah ke sudut kanan-atas panggung (sketsa 1). Id
+			     dipertahankan, jadi viewer.js tidak berubah. -->
+			<div class="zoom-float" role="group" aria-label="Zoom">
+					<div class="zoom-group">
+						<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
+						</button>
+						<span id="zoom-label" class="zoom-label mono">100</span>
+						<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
+							<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
+						</button>
+						<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
+					</div>
+			</div>
 		</div>
 
 		<!-- transport -->
@@ -513,16 +528,6 @@
 				<div class="spacer"></div>
 
 				<div class="tgroup">
-					<div class="zoom-group">
-						<button id="zoom-out" class="btn btn-icon btn-sm" aria-label="Perkecil" title="Perkecil (−)">
-							<svg viewBox="0 0 24 24" class="icon"><path d="M5 11h14v2H5z"/></svg>
-						</button>
-						<span id="zoom-label" class="zoom-label mono">100</span>
-						<button id="zoom-in" class="btn btn-icon btn-sm" aria-label="Perbesar" title="Perbesar (+)">
-							<svg viewBox="0 0 24 24" class="icon"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></svg>
-						</button>
-						<button id="zoom-reset" class="btn btn-ghost btn-sm" title="Sesuaikan ulang (0)">Pas</button>
-					</div>
 
 					<button id="flip-btn" class="btn btn-toggle" data-on="false" title="Balik horizontal">Balik</button>
 					<div class="bg-group" role="group" aria-label="Warna latar">

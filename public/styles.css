@@ -1293,11 +1293,49 @@ input:focus-visible {
 .transport {
 	border-top: 1px solid var(--line);
 	background: linear-gradient(180deg, var(--ink-850), var(--ink-800));
-	padding: 12px 16px;
+	padding: 10px 16px;
 	display: flex;
+	/* Dua baris secara bawaan. Satu baris hanya diterapkan pada layar lebar
+	   (lihat @media di bawah): menggabungkan keduanya butuh ~1400 px, dan di
+	   bawah itu isinya meluber keluar layar atau saling menutupi. Sketsa 1
+	   sendiri memang khusus desktop dan diukur pada 1440x900. */
 	flex-direction: column;
 	gap: 10px;
 	flex: 0 0 auto;
+}
+
+/* Baris kedua kehilangan perannya sebagai baris: isinya ikut mengalir di
+   baris yang sama dan hanya pindah ke baris baru kalau layar sempit. */
+/* Baris 1 harus boleh menyusut: isinya (play, scrub, ulang, layar penuh,
+   unduh) selebar 637 px, dan tanpa min-width:0 ia menolak mengecil sehingga
+   baris 2 terlempar ke bawah dan transport jadi dua baris lagi. */
+.transport > .transport-row { min-width: 0; }
+/* Kluster scrub yang mengambil sisa ruang, jadi ia yang mengalah lebih dulu. */
+.transport > .transport-row .tgroup-scrub { flex: 1 1 120px; min-width: 90px; }
+/* flex-basis kecil supaya baris kedua mau ikut di baris yang sama, bukan
+   didorong ke bawah oleh lebar minimumnya. */
+.transport > .transport-row-2 { min-width: 0; flex-wrap: wrap; }
+/* Di dalam baris gabungan, kluster kedua tidak perlu garis pemisah sendiri. */
+.transport > .transport-row-2 .tgroup + .tgroup { border-left: 0; padding-left: 0; }
+.transport > .transport-row-2 .tgroup { gap: 8px; flex-wrap: nowrap; }
+.transport > .transport-row-2 .field-inline > span { display: none; }
+.transport > .transport-row-2 .select { max-width: 150px; }
+
+/* Satu baris hanya kalau memang muat. Diukur: butuh >=1400 px agar isi
+   kedua baris duduk sejajar tanpa saling menutupi. Di bawah itu dua baris
+   lebih baik daripada tombol yang terpotong. */
+@media (min-width: 1400px) {
+	.transport {
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: nowrap;
+	}
+	.transport > .transport-row { flex: 0 0 auto; flex-wrap: nowrap; }
+	.transport > .transport-row-2 { flex: 1 1 0; flex-wrap: nowrap; }
+	.transport > .transport-row-2 .tgroup + .tgroup { border-left: 0; padding-left: 0; }
+	.transport > .transport-row-2 .tgroup { gap: 8px; flex-wrap: nowrap; }
+	.transport > .transport-row-2 .field-inline > span { display: none; }
+	.transport > .transport-row-2 .select { max-width: 150px; }
 }
 
 .transport-row { display: flex; align-items: center; gap: 14px; }
@@ -2532,3 +2570,29 @@ input:focus-visible {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+/* ------------------------------------------------------------------ *
+ * Zoom mengambang di sudut kanan-atas panggung
+ *
+ * Di sketsa, zoom bukan bagian dari baris transport melainkan kontrol
+ * panggung — dekat dengan model yang sedang dilihat, dan tidak ikut
+ * berdesakan dengan play/scrub.
+ * ------------------------------------------------------------------ */
+.zoom-float {
+	position: absolute;
+	right: 14px;
+	top: 14px;
+	z-index: 3;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 3px;
+	border-radius: 9px;
+	border: 1px solid var(--line);
+	background: rgba(10, 13, 19, 0.82);
+	backdrop-filter: blur(8px);
+}
+.zoom-float .zoom-group { display: flex; align-items: center; gap: 2px; }
+.zoom-float .btn-icon { width: 28px; height: 26px; }
+.zoom-float .zoom-label { min-width: 34px; text-align: center; font-size: 11.5px; }
+.zoom-float .btn-ghost { padding: 4px 8px; font-size: 11.5px; }
