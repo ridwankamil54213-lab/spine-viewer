@@ -66,20 +66,22 @@ const IDS = [
 		if (inPopover) await ensureToolsOpen(false);
 	}
 
-	// Zoom buttons must change the label (and it must render as a number + %).
-	const zoomBefore = await page.textContent("#zoom-label");
-	await page.click("#zoom-in");
-	await page.waitForTimeout(150);
-	const zoomAfter = await page.textContent("#zoom-label");
-	await page.click("#zoom-reset");
-	await page.waitForTimeout(150);
-	const zoomReset = await page.textContent("#zoom-label");
-
-	// A model must still load end-to-end (the real regression risk).
+	// A model must load end-to-end (the real regression risk). Dikerjakan
+	// SEBELUM uji zoom: tanpa model, zoom tidak punya sasaran sehingga
+	// labelnya memang tetap 100 dan uji zoom gagal palsu.
 	await page.click("#game-list .game");
 	await page.waitForTimeout(900);
 	await page.click("#model-list .model");
 	await page.waitForTimeout(2500);
+
+	// Zoom buttons must change the label (and it must render as a number + %).
+	const zoomBefore = await page.textContent("#zoom-label");
+	await page.click("#zoom-in");
+	await page.waitForTimeout(200);
+	const zoomAfter = await page.textContent("#zoom-label");
+	await page.click("#zoom-reset");
+	await page.waitForTimeout(200);
+	const zoomReset = await page.textContent("#zoom-label");
 	const loaded = await page.evaluate(() => ({
 		hudVisible: !document.getElementById("hud").hidden,
 		hudText: document.getElementById("hud-model")?.textContent?.trim() || "",

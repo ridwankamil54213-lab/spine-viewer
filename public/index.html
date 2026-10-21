@@ -77,6 +77,18 @@
 				</button>
 			</div>
 
+			<!-- Tab pustaka: memisahkan tiga hal yang sebelumnya bertumpuk di
+			     satu daftar. "Game" adalah daftar game, "Model" daftar model di
+			     dalam game terpilih, "Favorit" menyaring keduanya. -->
+			<div class="lib-tabs" role="tablist" aria-label="Tampilan pustaka">
+				<button id="tab-games" class="lib-tab is-on" role="tab" type="button"
+					aria-selected="true" data-tab="games">Game</button>
+				<button id="tab-models" class="lib-tab" role="tab" type="button"
+					aria-selected="false" data-tab="models">Model</button>
+				<button id="tab-fav" class="lib-tab" role="tab" type="button"
+					aria-selected="false" data-tab="fav">Favorit</button>
+			</div>
+
 			<input id="search" class="search" type="search" aria-label="Cari model" placeholder="Cari model…" autocomplete="off" />
 
 			<div class="lib-filters">

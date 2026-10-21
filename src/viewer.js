@@ -6966,6 +6966,100 @@ function syncPanes() {
 
 	syncUpdater(inGame ? browse.game : null);
 	syncCrumb();
+	syncLibTabs();
+}
+
+/* --- Tab pustaka ------------------------------------------------------
+ * Tiga tab yang memetakan ke state yang SUDAH ada:
+ *   Game    -> browse.view = "games"
+ *   Model   -> browse.view = "models" (butuh game terpilih)
+ *   Favorit -> favOnly = true, lalu tampilkan game yang punya favorit
+ * Tidak ada state baru, jadi tidak ada jalur render baru yang perlu dirawat.
+ */
+function syncLibTabs() {
+	const tabGames = document.getElementById("tab-games");
+	const tabModels = document.getElementById("tab-models");
+	const tabFav = document.getElementById("tab-fav");
+	if (!tabGames) return;
+
+	const inModels = browse.view === "models" && !!browse.game;
+	if (tabModels) {
+		// Tab Model hanya masuk akal setelah ada game dipilih.
+		tabModels.disabled = !browse.game;
+		tabModels.classList.toggle("is-on", inModels && !browse.favOnly);
+		tabModels.setAttribute("aria-selected", String(inModels && !browse.favOnly));
+	}
+	tabGames.classList.toggle("is-on", !inModels && !browse.favOnly);
+	tabGames.setAttribute("aria-selected", String(!inModels && !browse.favOnly));
+	if (tabFav) {
+		tabFav.classList.toggle("is-on", !!browse.favOnly);
+		tabFav.setAttribute("aria-selected", String(!!browse.favOnly));
+	}
+}
+
+function selectLibTab(which) {
+	if (which === "fav") {
+		browse.favOnly = true;
+		// Favorit selalu mulai dari daftar game; filter yang menyaring isinya.
+		browse.view = "games";
+		browse.game = null;
+		browse.page = 1;
+	} else if (which === "models") {
+		if (!browse.game) return;
+		browse.favOnly = false;
+		browse.view = "models";
+	} else {
+		browse.favOnly = false;
+		browse.view = "games";
+		browse.game = null;
+		browse.page = 1;
+	}
+	syncPanes();
+	renderGames();
+	syncLibTabs();
+}
+
+/* --- Jebakan tombol zoom ----------------------------------------------
+ * #zoom-in / #zoom-out berisi <svg> dengan class "icon". Aturan CSS global
+ * memberi `.icon { pointer-events: none }` supaya ikon tidak menelan klik,
+ * TAPI di dalam tombol zoom hal itu membuat click() pada <svg> tidak
+ * diteruskan ke <button> ketika tes mengklik lewat koordinat tengah.
+ * Hasilnya: label zoom tidak berubah (100 -> 100) walau tombolnya benar.
+ *
+ * Perbaikannya di CSS: kembalikan pointer-events untuk ikon di dalam
+ * kontrol panggung/interaktif. Lihat .zoom-float .icon di styles.css.
+ */
+/**
+ * Apakah event pointer berasal dari kontrol yang MENEMPEL di atas kanvas?
+ *
+ * Zoom, HUD, dan meter FPS hidup di dalam .canvas-wrap supaya posisinya
+ * mengikuti panggung. Handler pointer kanvas (pan, tap, editor tulang/IK/
+ * bounds/vertex) memanggil preventDefault(), dan itu MEMBATALKAN event click
+ * pada tombol yang ada di bawahnya — terukur: menekan #zoom-in tidak pernah
+ * memicu "click", hanya pointerdown/mousedown.
+ *
+ * Solusinya bukan menghapus preventDefault (dibutuhkan untuk drag), tapi
+ * membuat handler kanvas mengabaikan event yang berasal dari overlay
+ * interaktif. Cek dilakukan sekali di sini dan dipakai semua handler.
+ */
+function fromStageOverlay(ev) {
+	const t = ev?.target;
+	if (!t || typeof t.closest !== "function") return false;
+	return !!t.closest(".zoom-float, .hud, .fps-meter, .legacy-note");
+}
+
+function initZoomHitArea() {
+	// Tidak ada yang perlu dipasang di sini; fungsi ini hanya dokumentasi
+	// kenapa CSS-nya ada. Dibiarkan supaya pembaca berikutnya tidak
+	// menghapus aturan itu tanpa tahu alasannya.
+}
+
+function initLibTabs() {
+	for (const id of ["tab-games", "tab-models", "tab-fav"]) {
+		document.getElementById(id)?.addEventListener("click", (e) => {
+			selectLibTab(e.currentTarget.dataset.tab);
+		});
+	}
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -7802,6 +7896,7 @@ function fromStagePoint(x, y) {
 el.canvasWrap.addEventListener(
 	"pointerdown",
 	(e) => {
+		if (fromStageOverlay(e)) return;
 		if (!VTX.on || !spine || e.button !== 0) return;
 		const p = toStagePoint(e.clientX, e.clientY);
 		const sc = 1 / (state.zoom || 1);
@@ -7893,6 +7988,7 @@ window.addEventListener("pointercancel", vtxEndDrag);
 el.canvasWrap.addEventListener(
 	"pointerdown",
 	(e) => {
+		if (fromStageOverlay(e)) return;
 		if (!BOUNDS.on || !spine || e.button !== 0) return;
 		const p = toStagePoint(e.clientX, e.clientY);
 		const sc = 1 / (state.zoom || 1);
@@ -7997,6 +8093,7 @@ window.addEventListener("pointercancel", boundsEndDrag);
 el.canvasWrap.addEventListener(
 	"pointerdown",
 	(e) => {
+		if (fromStageOverlay(e)) return;
 		if (!IK.on || !spine || e.button !== 0) return;
 		const p = toStagePoint(e.clientX, e.clientY);
 		const r = IK.hitRadius / (state.zoom || 1);
@@ -8061,6 +8158,7 @@ el.canvasWrap.addEventListener("pointermove", (e) => {
 el.canvasWrap.addEventListener(
 	"pointerdown",
 	(e) => {
+		if (fromStageOverlay(e)) return;
 		if (!BONES.on || !spine || e.button !== 0) return;
 		const p = toStagePoint(e.clientX, e.clientY);
 		const b = boneAt(p.x, p.y);
@@ -8129,6 +8227,7 @@ el.canvasWrap.addEventListener("pointermove", (e) => {
 });
 
 el.canvasWrap.addEventListener("pointerdown", (e) => {
+	if (fromStageOverlay(e)) return;
 	// Live2D "Sentuh": a TAP (not a drag/pan) on the model triggers a touch
 	// motion for the tapped height. Track press/release so panning never fires it.
 	if (isLive2D(current) && live2dTouchOn && e.button === 0) {
@@ -8376,10 +8475,14 @@ el.canvasWrap.addEventListener("pointerdown", (e) => {
 		}
 		return;
 	}
-	// Overlays inside the stage (the FPS meter, the HUD) own their own clicks.
-	// Capturing the pointer here would swallow their mouseup, so a button
-	// inside them would receive mousedown and never a click.
-	if (e.target instanceof Element && e.target.closest(".fps-meter")) return;
+	// Overlays inside the stage (the FPS meter, the HUD, the floating zoom
+	// bar) own their own clicks. Capturing the pointer here would swallow
+	// their mouseup, so a button inside them receives mousedown and never a
+	// click — measured: #zoom-in fired pointerdown/mousedown but no "click",
+	// because setPointerCapture() retargeted the subsequent events to the
+	// canvas. Zoom lives inside .canvas-wrap since the refactor, so it must
+	// be listed here alongside the FPS meter.
+	if (e.target instanceof Element && e.target.closest(".fps-meter, .zoom-float, .hud, .legacy-note")) return;
 	if (e.pointerType === "mouse" && e.button !== 0 && e.button !== 1) return;
 	pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 	// Capture can throw for synthetic/expired pointers, and an escape here would
@@ -10276,6 +10379,7 @@ function initToolsMenu() {
 }
 
 initCrumb();
+initLibTabs();
 initToolsMenu();
 
 /* --- Editor tulang: undo/redo, pohon, ekspor skeleton ------------------ */
