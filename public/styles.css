@@ -343,13 +343,71 @@ body {
 /* --- view 1: game cards --- */
 /* The list was cramped card-to-card, so 23 games read as one block of text.
  * A little more air between rows makes it scannable. */
-.game-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+/* Daftar game: grid 2 kolom yang TERBATAS tingginya.
+ *
+ * Sebelumnya satu kolom penuh: dengan 63 game daftarnya setinggi 4652 px dan
+ * sidebar harus digulir 4939 px — pengguna kehilangan konteks dan tidak tahu
+ * masih ada game apa di bawah. Grid 2 kolom + tinggi terbatas membuat
+ * seluruh daftar muat di area yang bisa dipindai sekilas.
+ *
+ * Markup TIDAK berubah: renderGames() masih menghasilkan
+ * <li><button class="game">, jadi viewer.js tidak perlu disentuh.
+ */
+.game-list {
+	list-style: none;
+	margin: 10px 0 0;
+	padding: 0 2px 0 0;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+	align-content: start;
+	overflow-y: auto;
+	/* Sisakan ruang untuk pencarian di atas dan tombol di bawah; angka ini
+	   membuat daftar tidak pernah mendorong sidebar ikut menggulir. */
+	max-height: clamp(240px, calc(100dvh - 340px), 640px);
+}
+
+/* Di dalam grid, tiap <li> adalah sel; tombol mengisi sel penuh. */
+.game-list > li { min-width: 0; display: flex; }
+.game-list .game { height: 100%; }
+
+/* Tata letak VERTIKAL di dalam grid: ikon di atas, nama di bawah.
+ *
+ * Dengan tata letak mendatar, nama game hanya dapat ~90 px di kolom 180 px
+ * dan terpotong jadi "Alliance …" / "Angelica…" — tidak informatif. Menumpuk
+ * ikon di atas memberi nama lebar penuh sel, dan dua baris cukup untuk nama
+ * panjang seperti "Azure Lane — Chibi" atau "マブラヴ ガールズガーデンX — CG".
+ */
+.game-list .game {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+	padding: 8px;
+}
+.game-list .game-badge {
+	width: 100%;
+	height: 54px;
+	border-radius: 7px;
+}
+.game-list .game-body { width: 100%; flex: 0 0 auto; }
+.game-list .game-name {
+	font-size: 11.5px;
+	line-height: 1.28;
+	white-space: normal;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.game-list .game-meta { font-size: 10px; }
+/* Panah chevron tidak berguna saat kartu ditumpuk — buang di dalam grid. */
+.game-list .game-chevron { display: none; }
 
 .game {
 	width: 100%;
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	gap: 9px;
 	text-align: left;
 	background: var(--ink-800);
 	border: 1px solid var(--line);

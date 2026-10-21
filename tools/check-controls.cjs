@@ -30,16 +30,40 @@ const IDS = [
 	const missing = await page.evaluate((ids) => ids.filter((id) => !document.getElementById(id)), IDS);
 
 	// Click every toggle-able button and confirm its data-on flips.
+	//
+	// Sebagian tombol (Waktu, Periksa, Kisi, Tulang) pindah ke popover "Alat"
+	// di commit 4ecc3b1, jadi tidak terlihat sampai menu dibuka. Membuka menu
+	// dulu membuat tes ini menguji hal yang sama seperti sebelumnya.
 	const toggles = ["loop-btn", "timeline-btn", "inspector-btn", "flip-btn", "grid-btn", "bones-btn", "bg-btn"];
 	const toggleResults = [];
+	const ensureToolsOpen = async (open) => {
+		const isOpen = await page.evaluate(
+			() => !document.getElementById("tools-pop")?.hidden
+		);
+		if (isOpen !== open) {
+			await page.click("#tools-btn");
+			await page.waitForTimeout(120);
+		}
+	};
 	for (const id of toggles) {
+		// Tombol di dalam popover perlu menunya terbuka; tombol transport tidak.
+		const inPopover = await page.evaluate(
+			(id) => !!document.getElementById("tools-pop")?.contains(document.getElementById(id)),
+			id
+		);
+		if (inPopover) await ensureToolsOpen(true);
 		const before = await page.getAttribute(`#${id}`, "data-on");
 		await page.click(`#${id}`);
-		await page.waitForTimeout(120);
+		await page.waitForTimeout(150);
 		const after = await page.getAttribute(`#${id}`, "data-on");
 		toggleResults.push({ id, before, after, ok: before !== after });
+		// Waktu dan Periksa sengaja menutup popover saat diklik (panelnya
+		// tumbuh di bawah panggung dan akan tertutup menu). Buka lagi sebelum
+		// mengembalikan toggle-nya.
+		if (inPopover) await ensureToolsOpen(true);
 		await page.click(`#${id}`); // restore
-		await page.waitForTimeout(80);
+		await page.waitForTimeout(90);
+		if (inPopover) await ensureToolsOpen(false);
 	}
 
 	// Zoom buttons must change the label (and it must render as a number + %).
