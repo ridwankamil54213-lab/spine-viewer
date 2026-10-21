@@ -1331,7 +1331,10 @@ input:focus-visible {
 		flex-wrap: nowrap;
 	}
 	.transport > .transport-row { flex: 0 0 auto; flex-wrap: nowrap; }
-	.transport > .transport-row-2 { flex: 1 1 0; flex-wrap: nowrap; }
+	/* min-width wajib: dengan flex-basis 0 tanpa min-width, kalau baris 1
+	   sudah memakai seluruh lebar, baris 2 menyusut ke 0 px dan semua
+	   kontrolnya (termasuk tombol Alat) hilang dari pandangan. */
+	.transport > .transport-row-2 { flex: 1 1 260px; min-width: 0; flex-wrap: nowrap; }
 	.transport > .transport-row-2 .tgroup + .tgroup { border-left: 0; padding-left: 0; }
 	.transport > .transport-row-2 .tgroup { gap: 8px; flex-wrap: nowrap; }
 	.transport > .transport-row-2 .field-inline > span { display: none; }
@@ -2647,3 +2650,62 @@ input:focus-visible {
 .zoom-float .btn-icon { pointer-events: auto; }
 .zoom-float .icon { pointer-events: none; }
 .zoom-float .btn-icon { cursor: pointer; }
+
+/* ------------------------------------------------------------------ *
+ * Inspektor sebagai kolom kanan
+ *
+ * Di sketsa, inspektor adalah kolom tetap di kanan panggung — bukan panel
+ * yang muncul di dalam bar transport dan mendorong semua kontrol turun.
+ * Layout-nya tiga kolom: pustaka | panggung | inspektor.
+ *
+ * Panggung dibiarkan mengambil sisa ruang; inspektor lebarnya tetap supaya
+ * lebar kanvas tidak melompat saat inspektor dibuka/tutup.
+ * ------------------------------------------------------------------ */
+/* Hanya MENAMBAH kolom ketiga; aturan .layout asli (baris 223) yang mengatur
+   tinggi, posisi, dan transisi tetap berlaku. Menulis ulang .layout di sini
+   sempat menimpa grid-template-columns asli dan membuat baris kontrol
+   menyusut jadi 0 px. */
+.layout.has-inspector {
+	grid-template-columns: var(--sidebar-w) minmax(0, 1fr) 300px;
+	/* Grid tiga kolom tidak boleh melebihi lebar viewport. Tanpa ini, kolom
+	   kanvas yang punya lebar minimum sendiri mendorong inspektor keluar
+	   layar (terukur: overflow 278 px). */
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+/* Inspektor duduk di kolom ketiga, setinggi panggung, dan menggulir sendiri. */
+.layout.has-inspector > .inspector {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	overflow: hidden;
+	border-left: 1px solid var(--line);
+	background: var(--ink-850);
+}
+.inspector .insp-body { overflow-y: auto; flex: 1; min-height: 0; }
+
+/* Panel di dalam inspektor mengalir, tidak lagi mengambang. */
+.insp-tools-body { padding: 0 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.insp-tools-sec > summary { cursor: pointer; }
+.insp-tools-body .bone-panel,
+.insp-tools-body .ik-panel,
+.insp-tools-body .bounds-panel {
+	margin: 0;
+	position: static;
+	width: auto;
+}
+
+/* Di lebar menengah, inspektor jadi lebih sempit. */
+@media (max-width: 1280px) {
+	.layout.has-inspector { grid-template-columns: var(--sidebar-w, 340px) minmax(0, 1fr) 260px; }
+}
+/* Di layar sempit inspektor tidak lagi jadi kolom: kembali jadi panel
+   di dalam alur (perilaku lama) supaya panggung tidak habis. */
+@media (max-width: 1024px) {
+	.layout,
+	.layout.has-inspector { grid-template-columns: 1fr; }
+	.layout.has-inspector > .inspector { border-left: 0; border-top: 1px solid var(--line); }
+}

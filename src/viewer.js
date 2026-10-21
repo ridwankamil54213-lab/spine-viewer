@@ -5501,6 +5501,10 @@ function setInspectorTab(tab) {
 function setInspectorVisible(on) {
 	insp.open = on;
 	el.inspector.hidden = !on;
+	// Inspektor sekarang kolom ketiga pada grid .layout. Kelas ini yang
+	// menambah kolomnya; tanpa ini inspektor akan menumpuk di bawah panggung
+	// dan mendorong seluruh tata letak.
+	document.querySelector(".layout")?.classList.toggle("has-inspector", !!on);
 	el.inspectorBtn.dataset.on = String(on);
 	el.inspectorBtn.setAttribute("aria-pressed", String(on));
 	try {
