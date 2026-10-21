@@ -345,7 +345,14 @@
 			</div>
 		</div>
 
-		<div id="bone-panel" class="bone-panel" hidden>
+		<!-- Panel IK: rantai yang sedang disunting + tombol reset. -->
+<div id="ik-panel" class="ik-panel" hidden>
+	<span class="ik-panel-title">IK</span>
+	<span class="ik-panel-chain mono" id="ik-chain">—</span>
+	<button id="ik-reset" class="btn btn-ghost btn-sm" title="Kembalikan rotasi rantai ini">Reset</button>
+</div>
+
+<div id="bone-panel" class="bone-panel" hidden>
 			<div class="bone-row">
 				<span class="bone-label">Tulang</span>
 				<code data-bone-name>—</code>
@@ -445,6 +452,7 @@
 								<span class="tools-sec-title">Periksa &amp; sunting</span>
 								<div class="tools-grid">
 									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
+									<button id="ik-btn" class="btn btn-toggle" data-on="false" title="IK — klik tulang, lalu geser titik ujungnya (J)">IK</button>
 									<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
 									<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot &amp; perbandingan (I)">Periksa</button>
 									<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>

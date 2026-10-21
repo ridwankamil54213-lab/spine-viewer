@@ -406,6 +406,8 @@ const el = {
 	bonesBtn: $("#bones-btn"),
 	partsBtn: $("#parts-btn"),
 	boneEditBtn: $("#bone-edit-btn"),
+	ikBtn: $("#ik-btn"),
+	ikPanel: $("#ik-panel"),
 	bonePanel: $("#bone-panel"),
 	slotTipBtn: $("#slot-tip-btn"),
 	cardsBtn: $("#cards-btn"),
@@ -1367,6 +1369,180 @@ function drawBones() {
 }
 
 /* ------------------------------------------------------------------ *
+ * IK: rantai dua tulang yang ujungnya bisa digeser
+ *
+ * Cara pakai: nyalakan IK, klik satu tulang (mis. tangan), lalu geser titik
+ * ujungnya. Tulang itu dan induknya diputar supaya ujungnya mengikuti kursor.
+ *
+ * Kenapa CCD dan bukan rumus dua-tulang tertutup: runtime ini TIDAK
+ * menyegarkan matriks world saat dipanggil di luar render loop — sudah diuji
+ * `skeleton.updateWorldTransform()`, `bone.updateWorldTransform()`,
+ * `spine.update(0)`, `spine.updateTransform()`, dan `autoUpdateTransform()`;
+ * semuanya menghasilkan 0 px pergeseran walau rotasi lokal diubah 45°.
+ * Matriks hanya segar di dalam ticker, SESUDAH `updateWorldTransform()` pada
+ * blok edit tulang. Jadi penyelesaian dilakukan satu langkah per frame
+ * (Cyclic Coordinate Descent): tiap frame memutar satu tulang ke arah target,
+ * frame berikutnya mengukur ulang dari matriks yang sudah segar. Konvergen
+ * dalam beberapa frame (~50-100 ms), tidak terasa.
+ *
+ * Rotasi disimpan di BONES.edits supaya dipasang ulang tiap frame — animasi
+ * menulis ulang `bone.rotation`, jadi nilai di bone sendiri akan hilang.
+ * ------------------------------------------------------------------ */
+const IK = {
+	on: false,
+	/** Tulang yang ujungnya dipegang (titik pegangan menggantung di ujungnya). */
+	tip: null,
+	/** Tulang yang diputar, dari pangkal ke ujung: [induk, tip]. */
+	chain: [],
+	handle: null,
+	dragging: false,
+	target: null,
+	hitRadius: 16,
+};
+
+/** Titik ujung (handle) tulang IK dalam koordinat world. */
+function ikTipPoint() {
+	const b = IK.tip;
+	if (!b) return null;
+	const v = { x: b.data.length || 0, y: 0 };
+	try {
+		b.localToWorld(v);
+	} catch {
+		return null;
+	}
+	return v;
+}
+
+/** Rantai untuk sebuah tulang: tulang itu + induknya (dua tulang). */
+function ikSelect(bone) {
+	if (!bone) return;
+	IK.tip = bone;
+	IK.chain = [bone.parent, bone].filter(Boolean);
+	IK.handle = ikTipPoint();
+	ikSyncUI();
+	drawBones();
+}
+
+/**
+ * Satu langkah CCD: untuk tiap tulang dari ujung ke pangkal, putar supaya
+ * ujung rantai menuju target. Rotasi world bertambah sebesar selisih sudut,
+ * jadi rotasi lokal cukup ditambah selisih yang sama (gain 1) — asumsi ini
+ * berlaku untuk tulang tanpa skala negatif, dan seluruh model diuji tidak
+ * memakai skala negatif pada rantai lengan.
+ */
+function ikStep() {
+	if (!IK.dragging || !IK.target) return;
+	let tipP = ikTipPoint();
+	if (!tipP) return;
+	// Deadzone: kalau ujung sudah hampir di target, berhenti. Tanpa ini CCD
+	// terus mengoreksi dan rantai bergetar 0 <-> 30 px tiap frame.
+	// Deadzone 6 px: animasi tetap berjalan sambil pengguna menyeret, jadi
+	// tulang lain terus bergerak dan ujung bergeser sedikit tiap frame.
+	// Ambang terlalu kecil membuat IK mengoreksi terus -> bergetar.
+	if (Math.hypot(tipP.x - IK.target.x, tipP.y - IK.target.y) < 6) return;
+	for (let i = IK.chain.length - 1; i >= 0; i--) {
+		const b = IK.chain[i];
+		const w = boneWorld(b);
+		if (!w) continue;
+		const a1 = Math.atan2(tipP.y - w.y, tipP.x - w.x);
+		const a2 = Math.atan2(IK.target.y - w.y, IK.target.x - w.x);
+		let d = a2 - a1;
+		while (d > Math.PI) d -= Math.PI * 2;
+		while (d < -Math.PI) d += Math.PI * 2;
+		// Batasi langkah + redam: tanpa redaman, langkah besar membuat rantai
+		// berayun melewati target dan berhenti di sisa galat ~60 px.
+		// Langkah penuh (tanpa redaman). CCD mengoreksi sudut ke arah target
+		// secara eksak untuk tulang terakhir, jadi meredamnya justru membuat
+		// rantai merayap dan berayun di sekitar target. Dibatasi 0,5 rad
+		// hanya untuk mencegah lompatan liar saat target jauh.
+		// Tanpa batas: gain sudah ±1 (terukur -0,83..-0,94), jadi satu
+		// koreksi penuh langsung menaruh ujung di target. Membatasi langkah
+		// membuat rantai merayap puluhan frame sebelum sampai.
+		d = Math.max(-Math.PI, Math.min(Math.PI, d));
+		// Tanda minus: pada runtime ini rotasi lokal bertambah BERLAWANAN
+		// dengan sudut world (terukur: rot -90.2 -> world 84.9, dan rot +40
+		// menurunkan sudut world). Menambah positif membuat ujung menjauh
+		// dari target, jadi delta world dikurangkan.
+		let deg = (b.rotation || 0) - (d * 180) / Math.PI;
+		deg = (((deg + 180) % 360) + 360) % 360 - 180;
+		b.rotation = deg;
+		BONES.edits.set(b.data.name, deg);
+		// Matriks world belum tersegarkan di dalam frame ini, jadi ujung
+		// perkiraan diputar manual mengelilingi pangkal tulang sebesar
+		// perubahan world-nya (gain ±1, tanda negatif seperti di atas).
+		// Tanpa ini, koreksi tulang berikutnya memakai ujung yang sudah
+		// basi dan justru membatalkan koreksi sebelumnya — hasilnya rantai
+		// merayap beberapa persen per frame.
+		const ca = Math.cos(d);
+		const sa = Math.sin(d);
+		const vx = tipP.x - w.x;
+		const vy = tipP.y - w.y;
+		tipP = { x: w.x + vx * ca - vy * sa, y: w.y + vx * sa + vy * ca };
+	}
+}
+
+/** Gambar pegangan + garis ke target. Dipanggil tiap frame. */
+function drawIk() {
+	if (!IK.on) return;
+	const p = ikTipPoint();
+	IK.handle = p;
+	if (!p) return;
+	const s = 1 / (state.zoom || 1);
+	if (IK.dragging && IK.target) {
+		bonesGfx.lineStyle(2 * s, 0x7ad1ff, 0.6);
+		bonesGfx.moveTo(p.x, p.y);
+		bonesGfx.lineTo(IK.target.x, IK.target.y);
+	}
+	bonesGfx.beginFill(IK.dragging ? 0x33ff99 : 0x7ad1ff, 1);
+	bonesGfx.drawCircle(p.x, p.y, 6 * s);
+	bonesGfx.endFill();
+	bonesGfx.lineStyle(2 * s, 0x0b0e14, 0.9);
+	bonesGfx.drawCircle(p.x, p.y, 6 * s);
+}
+
+function setIkMode(on) {
+	IK.on = !!on && !!spine?.skeleton;
+	if (IK.on && !state.showBones) {
+		// Sama seperti editor tulang: overlay harus terlihat supaya tulang
+		// bisa diklik dan pegangan IK tergambar.
+		state.showBones = true;
+		bonesGfx.visible = true;
+		el.bonesBtn?.setAttribute("aria-pressed", "true");
+		if (el.bonesBtn) el.bonesBtn.dataset.on = "true";
+	}
+	if (!IK.on) {
+		if (IK.dragging && IK.wasPlaying) setPlaying(true);
+		IK.wasPlaying = false;
+		IK.dragging = false;
+		IK.target = null;
+		IK.tip = null;
+		IK.chain = [];
+		IK.handle = null;
+	}
+	el.ikBtn?.setAttribute("aria-pressed", String(IK.on));
+	if (el.ikBtn) el.ikBtn.dataset.on = String(IK.on);
+	el.ikPanel?.toggleAttribute("hidden", !IK.on);
+	ikSyncUI();
+	drawBones();
+}
+
+function ikSyncUI() {
+	const out = document.getElementById("ik-chain");
+	if (!out) return;
+	if (!IK.tip) {
+		out.textContent = "klik tulang";
+		return;
+	}
+	out.textContent = IK.chain.map((b) => b.data.name).join(" → ") || IK.tip.data.name;
+}
+
+function ikReset() {
+	for (const b of IK.chain) BONES.edits.delete(b.data.name);
+	BONES.edits.clear();
+	drawBones();
+}
+
+/* ------------------------------------------------------------------ *
  * Render loop
  *
  * pixi-spine's SpineBase only advances the animation inside update(),
@@ -1432,10 +1608,14 @@ app.ticker.add(() => {
 	// Mode edit tulang: animasi baru saja menulis ulang SEMUA rotasi bone, jadi
 	// pose hasil edit harus dipasang SESUDAH update() — kalau tidak, rotasi
 	// yang digeser pengguna langsung kembali ke nilai animasi tiap frame.
-	if (BONES.on && BONES.edits.size) {
+	if ((BONES.on || IK.on) && BONES.edits.size) {
 		applyBoneEdits();
 		spine.skeleton.updateWorldTransform();
 		drawBones();
+	}
+	if (IK.on) {
+		ikStep();
+		drawIk();
 	}
 
 	// Panel B punya renderer sendiri, jadi harus digambar sendiri juga —
@@ -6456,6 +6636,57 @@ function fromStagePoint(x, y) {
 	};
 }
 
+// IK: klik tulang untuk memilih rantai, lalu geser pegangan di ujungnya.
+// Ditangkap di fase capture supaya tidak ikut menggeser kamera (pan).
+el.canvasWrap.addEventListener(
+	"pointerdown",
+	(e) => {
+		if (!IK.on || !spine || e.button !== 0) return;
+		const p = toStagePoint(e.clientX, e.clientY);
+		const r = IK.hitRadius / (state.zoom || 1);
+		// 1) pegangan yang sudah ada -> mulai geser
+		if (IK.handle && Math.hypot(p.x - IK.handle.x, p.y - IK.handle.y) <= r) {
+			IK.dragging = true;
+			IK.target = { x: p.x, y: p.y };
+			// Bekukan animasi selama menyeret. Tanpa ini tulang lain terus
+			// bergerak oleh animasi dan ujung yang ditahan bergetar ~30 px,
+			// karena rantai IK hanya memutar dua tulang, bukan seluruh badan.
+			IK.wasPlaying = state.playing;
+			if (state.playing) setPlaying(false);
+			el.canvasWrap.setPointerCapture?.(e.pointerId);
+			e.stopPropagation();
+			e.preventDefault();
+			drawIk();
+			return;
+		}
+		// 2) tulang lain -> pilih sebagai ujung rantai baru
+		const b = boneAt(p.x, p.y);
+		if (b) {
+			ikSelect(b);
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	},
+	true,
+);
+
+window.addEventListener("pointermove", (e) => {
+	if (!IK.dragging) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	IK.target = { x: p.x, y: p.y };
+});
+
+function ikEndDrag() {
+	if (!IK.dragging) return;
+	IK.dragging = false;
+	IK.target = null;
+	if (IK.wasPlaying) setPlaying(true);
+	IK.wasPlaying = false;
+	drawIk();
+}
+window.addEventListener("pointerup", ikEndDrag);
+window.addEventListener("pointercancel", ikEndDrag);
+
 // Bone editor: hover + klik-pilih + drag untuk memutar bone. Hanya aktif saat
 // mode edit menyala, dan selalu mendahului pan kanvas supaya drag bone tidak
 // ikut menggeser kamera.
@@ -7942,6 +8173,12 @@ window.addEventListener("keydown", (e) => {
 			e.preventDefault();
 			el.exportBtn?.click();
 			break;
+		case "j":
+		case "J":
+			// IK: pilih tulang lalu geser ujungnya.
+			e.preventDefault();
+			setIkMode(!IK.on);
+			break;
 		case "\\":
 			e.preventDefault();
 			el.sidebarToggle?.click();
@@ -8550,6 +8787,11 @@ window.__spineStage = {
 	get fps() { return fps; },
 	get parts() { return parts; },
 	sourcePixelScale: () => (spine ? sourcePixelScale(spine) : 0),
+	get ik() { return IK; },
+	get bones() { return BONES; },
+	ikSelect,
+	ikTipPoint,
+	setIkMode,
 	pngOutputSize: () => (spine ? pngOutputSize(spine) : null),
 };
 
@@ -8607,6 +8849,15 @@ function initToolsMenu() {
 }
 
 initToolsMenu();
+
+/* --- IK ---------------------------------------------------------------- */
+el.ikBtn?.addEventListener("click", () => setIkMode(!IK.on));
+document.getElementById("ik-reset")?.addEventListener("click", () => {
+	ikReset();
+	IK.tip = null;
+	IK.chain = [];
+	ikSyncUI();
+});
 
 initFps();
 initParts();

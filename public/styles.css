@@ -2301,3 +2301,32 @@ input:focus-visible {
 	border-color: var(--accent, #ffb02e);
 	color: var(--accent, #ffb02e);
 }
+
+/* ------------------------------------------------------------------ *
+ * Panel IK
+ *
+ * Sama seperti panel edit tulang: melayang di panggung, hanya muncul saat
+ * mode IK menyala. Isinya sengaja satu baris supaya tidak menutupi model.
+ * ------------------------------------------------------------------ */
+/* Mengalir di bawah panggung seperti panel edit tulang — BUKAN absolute:
+   absolute membuatnya menempel ke sudut halaman dan menimpa sidebar. */
+.ik-panel {
+	margin: 6px 0 2px;
+	padding: 8px 10px;
+	border: 1px solid var(--line, #2b3242);
+	border-radius: 8px;
+	background: var(--panel, #151a23);
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	font-size: 12px;
+}
+.ik-panel[hidden] { display: none; }
+.ik-panel-title {
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent, #ffb02e);
+}
+.ik-panel-chain { color: var(--fg-mute, #8b93a3); }
