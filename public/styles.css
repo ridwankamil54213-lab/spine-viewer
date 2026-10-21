@@ -1324,7 +1324,10 @@ input:focus-visible {
 /* Satu baris hanya kalau memang muat. Diukur: butuh >=1400 px agar isi
    kedua baris duduk sejajar tanpa saling menutupi. Di bawah itu dua baris
    lebih baik daripada tombol yang terpotong. */
-@media (min-width: 1400px) {
+/* Ambang 1560 px, bukan 1400: diukur, pada 1440 px tombol paling kanan
+   berakhir di x=1519 — 79 px di luar viewport, jadi tidak bisa diklik.
+   Di bawah 1560 px dua baris lebih baik daripada tombol yang hilang. */
+@media (min-width: 1560px) {
 	.transport {
 		flex-direction: row;
 		align-items: center;
@@ -1334,7 +1337,10 @@ input:focus-visible {
 	/* min-width wajib: dengan flex-basis 0 tanpa min-width, kalau baris 1
 	   sudah memakai seluruh lebar, baris 2 menyusut ke 0 px dan semua
 	   kontrolnya (termasuk tombol Alat) hilang dari pandangan. */
-	.transport > .transport-row-2 { flex: 1 1 260px; min-width: 0; flex-wrap: nowrap; }
+	/* flex-basis 300px: dengan 260px isi baris kedua masih meluber 8 px di
+	   viewport 1440 sehingga tombol paling kanan (Alat) terdorong keluar
+	   layar dan tidak bisa diklik. */
+	.transport > .transport-row-2 { flex: 1 1 300px; min-width: 0; flex-wrap: nowrap; }
 	.transport > .transport-row-2 .tgroup + .tgroup { border-left: 0; padding-left: 0; }
 	.transport > .transport-row-2 .tgroup { gap: 8px; flex-wrap: nowrap; }
 	.transport > .transport-row-2 .field-inline > span { display: none; }
@@ -2708,4 +2714,44 @@ input:focus-visible {
 	.layout,
 	.layout.has-inspector { grid-template-columns: 1fr; }
 	.layout.has-inspector > .inspector { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* ------------------------------------------------------------------ *
+ * Panel editor ditambatkan ke kolom inspektor
+ *
+ * Panel vertex/bounds/IK/tulang sudah dibungkus #insp-editor di dalam
+ * panggung. Supaya tampil di kolom inspektor, wadah itu diletakkan tetap di
+ * sisi kanan dan hanya terlihat saat inspektor terbuka.
+ *
+ * `bottom` diberi jarak cukup supaya bar transport (63-282 px tergantung
+ * lebar layar) tidak tertutup — kalau wadah ini menimpa tombol Alat, klik
+ * ke tombol itu terhalang dan Playwright melaporkan "intercepts pointer
+ * events".
+ * ------------------------------------------------------------------ */
+.layout.has-inspector #insp-editor {
+	position: fixed;
+	right: 8px;
+	top: calc(var(--topbar-h) + 46px);
+	bottom: 150px;
+	width: 292px;
+	z-index: 20;
+	overflow-y: auto;
+	padding: 8px;
+	border: 1px solid var(--line);
+	border-radius: var(--r, 10px);
+	background: rgba(12, 15, 22, 0.96);
+	backdrop-filter: blur(8px);
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+/* Saat inspektor tertutup panel editor disembunyikan; alat tinggal di
+   inspektor, sesuai sketsa. */
+.layout:not(.has-inspector) #insp-editor { display: none; }
+
+/* Panel di dalamnya mengalir normal, bukan mengambang. */
+#insp-editor .bone-panel,
+#insp-editor .ik-panel,
+#insp-editor .bounds-panel {
+	position: static;
+	margin: 0 0 8px;
+	width: auto;
 }
