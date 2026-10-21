@@ -345,7 +345,25 @@
 			</div>
 		</div>
 
-		<!-- Panel bounds attachment: nilai kotak bisa diketik langsung. -->
+		<!-- Panel vertex mesh -->
+<div id="vtx-panel" class="bounds-panel" hidden>
+	<div class="bone-row">
+		<span class="bone-label">Mesh</span>
+		<code id="vtx-name">klik mesh</code>
+		<span class="bone-label">Titik</span>
+		<code id="vtx-count">—</code>
+	</div>
+	<div class="bone-row">
+		<span class="bone-label">Vertex</span>
+		<select class="select select-sm" id="vtx-sel" disabled></select>
+		<button class="btn btn-sm" id="vtx-reset" type="button" title="Kembalikan bentuk mesh ini">Reset mesh</button>
+	</div>
+	<div class="bone-row">
+		<span class="bone-hint">Klik mesh, klik titik, lalu tarik. Ikut tertulis di Ekspor skeleton.</span>
+	</div>
+</div>
+
+<!-- Panel bounds attachment: nilai kotak bisa diketik langsung. -->
 <div id="bounds-panel" class="bounds-panel" hidden>
 	<div class="bone-row">
 		<span class="bone-label">Attachment</span>
@@ -535,6 +553,7 @@
 									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
 									<button id="ik-btn" class="btn btn-toggle" data-on="false" title="IK — klik tulang, lalu geser titik ujungnya (J)">IK</button>
 									<button id="bounds-btn" class="btn btn-toggle" data-on="false" title="Bounds — klik bagian model, lalu geser/ubah ukuran kotaknya (U)">Bounds</button>
+									<button id="vtx-btn" class="btn btn-toggle" data-on="false" title="Vertex — tarik titik mesh untuk mengubah bentuk (V)">Vertex</button>
 									<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
 									<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot &amp; perbandingan (I)">Periksa</button>
 									<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>

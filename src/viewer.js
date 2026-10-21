@@ -406,6 +406,8 @@ const el = {
 	bonesBtn: $("#bones-btn"),
 	boundsBtn: $("#bounds-btn"),
 	boundsPanel: $("#bounds-panel"),
+	vtxBtn: $("#vtx-btn"),
+	vtxPanel: $("#vtx-panel"),
 	partsBtn: $("#parts-btn"),
 	boneEditBtn: $("#bone-edit-btn"),
 	ikBtn: $("#ik-btn"),
@@ -1092,10 +1094,14 @@ const bonesGfx = new Graphics();
 // Overlay kotak bounds attachment (mode Bounds). Lapisan terpisah supaya
 // drawBones() dan drawBoundsOverlay() tidak saling menghapus.
 const boundsGfx = new Graphics();
+// Overlay titik vertex mesh (mode Vertex).
+const vtxGfx = new Graphics();
 bonesGfx.visible = false;
 stageRoot.addChild(bonesGfx);
 stageRoot.addChild(boundsGfx);
 boundsGfx.visible = false;
+stageRoot.addChild(vtxGfx);
+vtxGfx.visible = false;
 
 /**
  * Bone editor — putar bone dengan mouse, simpan pose, ekspor ke JSON.
@@ -1562,6 +1568,19 @@ async function exportSkeleton() {
 		}
 		if (touched) changed++;
 	}
+	// Vertex mesh: tulis balik daftar titiknya.
+	let vtxChanged = 0;
+	for (const item of vtxExportData()) {
+		for (const skin of data.skins || []) {
+			const atts = skin.attachments?.[item.slot];
+			const rec = atts?.[item.attachment];
+			if (!rec) continue;
+			rec.vertices = item.vertices;
+			vtxChanged++;
+			break;
+		}
+	}
+
 	// Attachment (region/mesh): tulis balik kotaknya. Struktur JSON Spine
 	// menaruh satu objek per slot per skin di bawah "skins".
 	let attChanged = 0;
@@ -1590,7 +1609,7 @@ async function exportSkeleton() {
 		}
 	}
 
-	if (!changed && !attChanged) {
+	if (!changed && !attChanged && !vtxChanged) {
 		toast("Belum ada tulang atau bounds yang diubah.");
 		return;
 	}
@@ -1606,7 +1625,7 @@ async function exportSkeleton() {
 	a.click();
 	a.remove();
 	setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-	toast(`Skeleton diekspor: ${changed} tulang, ${attChanged} attachment.`);
+	toast(`Skeleton diekspor: ${changed} tulang, ${attChanged} attachment, ${vtxChanged} mesh.`);
 }
 
 /* --- Pustaka pose -----------------------------------------------------
@@ -1711,6 +1730,211 @@ function poseLibDelete(name) {
 	toast(`Pose "${name}" dihapus.`);
 }
 
+/* --- Editor vertex mesh -----------------------------------------------
+ * Menarik titik mesh langsung. Ini satu-satunya cara mengubah BENTUK kain:
+ * kotak attachment hanya memindahkan titik acuan, sedangkan bentuknya
+ * ditentukan daftar vertex.
+ *
+ * Dua bentuk data yang harus dibedakan:
+ *   unweighted  vertices = [x0,y0, x1,y1, ...]           -> mudah
+ *   weighted    vertices = [b0,n0, w,x,y, w,x,y, ..., b1,n1, ...]
+ *               tiap vertex punya beberapa bone + bobot, jadi satu titik
+ *               dibuat dari beberapa pasangan (x,y,w) yang harus digeser
+ *               bersama-sama supaya bentuknya berubah, bukan tercabik.
+ * Struktur weighted dideteksi dari adanya array `bones` pada attachment.
+ */
+const VTX = {
+	on: false,
+	slot: null,
+	att: null,
+	/** Indeks vertex terpilih (bukan indeks mentah pada array). */
+	sel: -1,
+	dragging: false,
+	start: null,
+	base: null,
+	hit: 10,
+	/** Vertex hasil edit, per attachment: { [name]: Float32Array }. */
+	edits: new Map(),
+};
+
+/** Jumlah vertex logis dari sebuah mesh. */
+function vtxCount(att) {
+	if (!att) return 0;
+	if (att.bones) return att.worldVerticesLength >> 1;
+	return (att.vertices?.length || 0) >> 1;
+}
+
+/** Posisi lokal semua vertex (mengabaikan bobot: diambil rata-rata). */
+function vtxPoints(att) {
+	const n = vtxCount(att);
+	const v = att.vertices;
+	const out = new Array(n);
+	if (!att.bones) {
+		for (let i = 0; i < n; i++) out[i] = { x: v[i * 2], y: v[i * 2 + 1] };
+		return out;
+	}
+	// Weighted: jumlah pengaruh per vertex ada di array `bones` (pola
+	// [count, idx, idx, ...]), sedangkan `vertices` hanya deretan (x,y,w)
+	// tanpa pemisah. Salah membaca count dari `vertices` menghasilkan
+	// koordinat tak masuk akal (terukur ribuan sampai puluhan ribu).
+	let k = 0; // penunjuk vertices
+	let bi = 0; // penunjuk bones
+	for (let i = 0; i < n; i++) {
+		const cnt = att.bones[bi++];
+		let sx = 0;
+		let sy = 0;
+		for (let j = 0; j < cnt; j++) {
+			sx += v[k] * v[k + 2];
+			sy += v[k + 1] * v[k + 2];
+			k += 3;
+		}
+		bi += cnt;
+		out[i] = { x: sx, y: sy };
+	}
+	return out;
+}
+
+/** Geser vertex ke-i sebesar (dx, dy) dalam satuan lokal attachment. */
+function vtxMove(att, i, dx, dy) {
+	const v = att.vertices;
+	if (!att.bones) {
+		v[i * 2] += dx;
+		v[i * 2 + 1] += dy;
+		return;
+	}
+	// Hitung offset pengaruh vertex ke-i dari array `bones`.
+	let bi = 0;
+	let infl = 0; // jumlah (x,y,w) sebelum vertex ini
+	for (let idx = 0; idx < i; idx++) {
+		const c = att.bones[bi++];
+		infl += c;
+		bi += c;
+	}
+	const cnt = att.bones[bi];
+	let k = infl * 3;
+	for (let j = 0; j < cnt; j++) {
+		v[k] += dx;
+		v[k + 1] += dy;
+		k += 3;
+	}
+}
+
+/** Posisi world semua vertex, untuk menggambar dan hit-test. */
+function vtxWorldPoints(att, slot) {
+	const n = vtxCount(att);
+	if (!n) return null;
+	const buf = new Float32Array(n * 2);
+	try {
+		att.computeWorldVertices(slot, 0, n, buf, 0, 2);
+	} catch {
+		return null;
+	}
+	const out = new Array(n);
+	for (let i = 0; i < n; i++) out[i] = { x: buf[i * 2], y: buf[i * 2 + 1] };
+	return out;
+}
+
+function setVtxMode(on) {
+	VTX.on = !!on && !!spine?.skeleton;
+	if (!VTX.on) {
+		VTX.slot = null;
+		VTX.att = null;
+		VTX.sel = -1;
+		VTX.dragging = false;
+	}
+	el.vtxBtn?.setAttribute("aria-pressed", String(VTX.on));
+	if (el.vtxBtn) el.vtxBtn.dataset.on = String(VTX.on);
+	el.vtxPanel?.toggleAttribute("hidden", !VTX.on);
+	vtxSyncUI();
+	drawVtxOverlay();
+}
+
+function vtxSyncUI() {
+	const nm = document.getElementById("vtx-name");
+	const cnt = document.getElementById("vtx-count");
+	const sel = document.getElementById("vtx-sel");
+	if (nm) nm.textContent = VTX.att ? `${VTX.slot?.data?.name || "?"} / ${VTX.att.name || "?"}` : "klik mesh";
+	if (cnt) cnt.textContent = VTX.att ? `${vtxCount(VTX.att)} vertex` : "—";
+	if (sel) {
+		sel.disabled = VTX.sel < 0;
+		if (document.activeElement === sel) return;
+		sel.value = VTX.sel < 0 ? "" : String(VTX.sel);
+	}
+}
+
+/** Pilih mesh dari titik layar; kalau ada vertex dekat kursor, pilih vertex. */
+function vtxPick(clientX, clientY) {
+	const hit = slotAtClient(clientX, clientY);
+	if (!hit) return null;
+	const att = hit.attachment;
+	if (!/Mesh/i.test(att?.constructor?.name || "")) return null;
+	return { slot: hit.slot, att };
+}
+
+/** Gambar titik-titik mesh; vertex terpilih lebih besar dan berwarna beda. */
+function drawVtxOverlay() {
+	const g = vtxGfx;
+	if (!g) return;
+	g.clear();
+	if (!VTX.on || !VTX.att) return;
+	const pts = vtxWorldPoints(VTX.att, VTX.slot);
+	if (!pts) return;
+	const sc = 1 / (state.zoom || 1);
+	// Isi dropdown vertex sekali per mesh (bukan tiap frame).
+	const selEl = document.getElementById("vtx-sel");
+	if (selEl && selEl.dataset.for !== (VTX.att.name || "")) {
+		selEl.dataset.for = VTX.att.name || "";
+		selEl.innerHTML = "";
+		for (let i = 0; i < pts.length; i++) {
+			const o = document.createElement("option");
+			o.value = String(i);
+			o.textContent = `#${i}`;
+			selEl.append(o);
+		}
+		selEl.disabled = false;
+	}
+	for (let i = 0; i < pts.length; i++) {
+		const on = i === VTX.sel;
+		g.beginFill(on ? 0xffb02e : 0x7ad1ff, on ? 1 : 0.75);
+		g.drawCircle(pts[i].x, pts[i].y, (on ? 6 : 3.4) * sc);
+		g.endFill();
+	}
+}
+
+/** Simpan/ambil salinan vertex asli supaya bisa direset. */
+function vtxOriginal(att) {
+	const key = att.name || "";
+	if (!VTX.orig) VTX.orig = new Map();
+	if (!VTX.orig.has(key)) {
+		VTX.orig.set(key, Float32Array.from(att.vertices || []));
+	}
+	return VTX.orig.get(key);
+}
+
+function vtxReset() {
+	if (!VTX.att) return;
+	const orig = VTX.orig?.get(VTX.att.name || "");
+	if (!orig) return;
+	VTX.att.vertices.set(orig);
+	try {
+		spine.skeleton.updateWorldTransform();
+	} catch {
+		/* frame berikutnya */
+	}
+	drawVtxOverlay();
+	toast("Vertex mesh dikembalikan.");
+}
+
+/** Kumpulkan edit vertex untuk ekspor skeleton. */
+function vtxExportData() {
+	const out = [];
+	for (const [key, arr] of VTX.edits) {
+		const [slotName, attName] = key.split("/");
+		out.push({ slot: slotName, attachment: attName, vertices: Array.from(arr) });
+	}
+	return out;
+}
+
 /* --- Editor bounds attachment -----------------------------------------
  * Region/mesh attachment punya kotak (x, y, width, height, rotation) relatif
  * terhadap slot. Mode ini menampilkan kotak itu, bisa digeser dan diubah
@@ -1813,6 +2037,9 @@ function setBoundsMode(on) {
 		BOUNDS.grip = null;
 	}
 	if (boundsGfx) boundsGfx.visible = BOUNDS.on;
+	if (vtxGfx) vtxGfx.visible = false;
+	// vtxGfx dipakai oleh drawVtxOverlay(); nyalakan saat mode vertex aktif.
+	if (vtxGfx && typeof VTX !== "undefined") vtxGfx.visible = VTX.on;
 	el.boundsBtn?.setAttribute("aria-pressed", String(BOUNDS.on));
 	if (el.boundsBtn) el.boundsBtn.dataset.on = String(BOUNDS.on);
 	el.boundsPanel?.toggleAttribute("hidden", !BOUNDS.on);
@@ -3808,6 +4035,11 @@ async function loadModelBody(model) {
 	boneTreeCache = null;
 	skeletonJsonCache = null;
 	BOUNDS.edits = {};
+	VTX.edits.clear();
+	VTX.orig = new Map();
+	VTX.slot = null;
+	VTX.att = null;
+	VTX.sel = -1;
 	BOUNDS.slot = null;
 	BOUNDS.att = null;
 	if (BONES.on) renderBoneTree();
@@ -7511,6 +7743,97 @@ function fromStagePoint(x, y) {
 	};
 }
 
+// Vertex mesh: klik mesh untuk memilih, klik titik untuk memilih vertex,
+// lalu tarik untuk memindahkannya.
+el.canvasWrap.addEventListener(
+	"pointerdown",
+	(e) => {
+		if (!VTX.on || !spine || e.button !== 0) return;
+		const p = toStagePoint(e.clientX, e.clientY);
+		const sc = 1 / (state.zoom || 1);
+		const r = VTX.hit * sc;
+
+		// 1) titik pada mesh terpilih?
+		if (VTX.att) {
+			const pts = vtxWorldPoints(VTX.att, VTX.slot);
+			if (pts) {
+				let best = -1;
+				let bd = Infinity;
+				for (let i = 0; i < pts.length; i++) {
+					const d = Math.hypot(p.x - pts[i].x, p.y - pts[i].y);
+					if (d < bd) {
+						bd = d;
+						best = i;
+					}
+				}
+				if (best >= 0 && bd <= r) {
+					VTX.sel = best;
+					VTX.dragging = true;
+					VTX.start = p;
+					vtxOriginal(VTX.att);
+					el.canvasWrap.setPointerCapture?.(e.pointerId);
+					vtxSyncUI();
+					drawVtxOverlay();
+					e.stopPropagation();
+					e.preventDefault();
+					return;
+				}
+			}
+		}
+
+		// 2) pilih mesh baru
+		const hit = vtxPick(e.clientX, e.clientY);
+		if (hit) {
+			VTX.slot = hit.slot;
+			VTX.att = hit.att;
+			VTX.sel = -1;
+			vtxOriginal(hit.att);
+			vtxSyncUI();
+			drawVtxOverlay();
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	},
+	true,
+);
+
+window.addEventListener("pointermove", (e) => {
+	if (!VTX.dragging || !VTX.att || VTX.sel < 0) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	// Selisih world -> lokal slot.
+	let lx = p.x - VTX.start.x;
+	let ly = p.y - VTX.start.y;
+	try {
+		const v = { x: lx, y: ly };
+		VTX.slot.bone.worldToLocal(v);
+		const v0 = { x: 0, y: 0 };
+		VTX.slot.bone.worldToLocal(v0);
+		lx = v.x - v0.x;
+		ly = v.y - v0.y;
+	} catch {
+		/* pakai selisih mentah */
+	}
+	vtxMove(VTX.att, VTX.sel, lx, ly);
+	VTX.start = p; // geser bertahap, bukan absolut
+	// Catat hasil untuk ekspor.
+	const key = `${VTX.slot.data.name}/${VTX.att.name || ""}`;
+	VTX.edits.set(key, Float32Array.from(VTX.att.vertices));
+	try {
+		spine.skeleton.updateWorldTransform();
+	} catch {
+		/* frame berikutnya */
+	}
+	drawVtxOverlay();
+});
+
+function vtxEndDrag() {
+	if (!VTX.dragging) return;
+	VTX.dragging = false;
+	drawVtxOverlay();
+}
+window.addEventListener("pointerup", vtxEndDrag);
+window.addEventListener("pointercancel", vtxEndDrag);
+
 // Bounds attachment: klik untuk memilih, tarik sudut untuk mengubah ukuran,
 // tarik tengah untuk memindahkan. Ditangkap lebih dulu daripada pan kanvas.
 el.canvasWrap.addEventListener(
@@ -9184,6 +9507,11 @@ window.addEventListener("keydown", (e) => {
 				else boneUndo();
 			}
 			break;
+		case "v":
+		case "V":
+			e.preventDefault();
+			setVtxMode(!VTX.on);
+			break;
 		case "u":
 		case "U":
 			e.preventDefault();
@@ -9810,6 +10138,14 @@ window.__spineStage = {
 	nudgeBone,
 	setBoneValue,
 	get bounds() { return BOUNDS; },
+	get vtx() { return VTX; },
+	setVtxMode,
+	vtxPick,
+	vtxCount,
+	vtxMove,
+	vtxPoints,
+	vtxWorldPoints,
+	vtxExportData,
 	setBoundsMode,
 	boundsPick,
 	boundsApply,
@@ -9944,6 +10280,22 @@ window.addEventListener("keydown", (e) => {
 	nudgeBone("rotation", step);
 });
 setBoneMode("rotate");
+
+/* --- Editor vertex ---------------------------------------------------- */
+el.vtxBtn?.addEventListener("click", () => setVtxMode(!VTX.on));
+document.getElementById("vtx-reset")?.addEventListener("click", () => vtxReset());
+
+// Isi dropdown pilihan vertex setiap kali mesh berubah.
+const vtxSelEl = document.getElementById("vtx-sel");
+if (vtxSelEl) {
+	vtxSelEl.addEventListener("change", () => {
+		const i = Number(vtxSelEl.value);
+		if (Number.isFinite(i)) {
+			VTX.sel = i;
+			drawVtxOverlay();
+		}
+	});
+}
 
 /* --- Editor bounds ---------------------------------------------------- */
 el.boundsBtn?.addEventListener("click", () => setBoundsMode(!BOUNDS.on));
