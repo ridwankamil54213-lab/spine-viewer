@@ -409,6 +409,8 @@ const el = {
 	ikBtn: $("#ik-btn"),
 	ikPanel: $("#ik-panel"),
 	bonePanel: $("#bone-panel"),
+	boneTree: $("#bone-tree"),
+	boneSearch: $("#bone-search"),
 	slotTipBtn: $("#slot-tip-btn"),
 	cardsBtn: $("#cards-btn"),
 	cardsModal: $("#cards-modal"),
@@ -1115,13 +1117,43 @@ const BONES = {
 	hitRadius: 18,
 };
 
-/** Pasang kembali semua rotasi hasil edit ke bone (dipanggil tiap frame). */
+/**
+ * Pasang kembali semua hasil edit ke bone (dipanggil tiap frame).
+ *
+ * Nilai disimpan sebagai objek {rotation, x, y, scaleX, scaleY}; hanya field
+ * yang benar-benar diubah yang ditulis, supaya tulang yang cuma diputar tidak
+ * ikut "mengunci" posisinya dan tetap mengikuti animasi.
+ */
 function applyBoneEdits() {
 	if (!spine?.skeleton) return;
 	for (const b of spine.skeleton.bones) {
-		const r = BONES.edits.get(b.data.name);
-		if (r != null) b.rotation = r;
+		const e = BONES.edits.get(b.data.name);
+		if (!e) continue;
+		if (typeof e === "number") {
+			// Bentuk lama (pose tersimpan sebelum ada posisi/skala).
+			b.rotation = e;
+			continue;
+		}
+		if (e.rotation != null) b.rotation = e.rotation;
+		if (e.x != null) b.x = e.x;
+		if (e.y != null) b.y = e.y;
+		if (e.scaleX != null) b.scaleX = e.scaleX;
+		if (e.scaleY != null) b.scaleY = e.scaleY;
 	}
+}
+
+/** Ambil record edit sebuah tulang sebagai objek (selalu objek baru). */
+function boneEdit(name) {
+	const e = BONES.edits.get(name);
+	if (e == null) return {};
+	return typeof e === "number" ? { rotation: e } : { ...e };
+}
+
+/** Simpan sebagian perubahan ke sebuah tulang. */
+function writeBoneEdit(name, patch) {
+	const next = { ...boneEdit(name), ...patch };
+	BONES.edits.set(name, next);
+	return next;
 }
 
 /** Semua bone yang bisa dipilih, urut dari yang paling dalam (anak dulu). */
@@ -1216,12 +1248,119 @@ function aimBoneAt(b, x, y) {
 	let deg = (worldAngle - parentAngle) * (180 / Math.PI);
 	deg = ((deg + 180) % 360 + 360) % 360 - 180; // normalisasi -180..180
 	b.rotation = deg;
-	BONES.edits.set(b.data.name, deg);
+	writeBoneEdit(b.data.name, { rotation: deg });
 }
 
 /** Reset semua rotasi bone ke pose setup animasi saat ini. */
+/* --- Riwayat pose (undo/redo) -----------------------------------------
+ * Yang disimpan adalah SNAPSHOT seluruh BONES.edits, bukan satu tulang.
+ * Map-nya kecil (puluhan entri), jadi menyalin utuh jauh lebih sederhana
+ * dan tidak bisa salah dibanding mencatat operasi per tulang. Riwayat
+ * direset tiap kali model berganti.
+ */
+const BONE_UNDO = { stack: [], index: -1, max: 40 };
+
+/** Salin BONES.edits jadi struktur biasa yang aman disimpan. */
+function snapshotEdits() {
+	const out = {};
+	for (const [name, raw] of BONES.edits) {
+		out[name] = typeof raw === "number" ? { rotation: raw } : { ...raw };
+	}
+	return out;
+}
+
+function restoreEdits(snap) {
+	// Bone yang kehilangan edit harus dikembalikan ke nilai SETUP (data),
+	// bukan dibiarkan pada nilai hasil edit terakhir: applyBoneEdits hanya
+	// menulis bone yang punya edit, jadi tanpa ini undo terlihat tidak
+	// berefek sampai animasi kebetulan menimpanya.
+	const skel = spine?.skeleton;
+	if (skel) {
+		for (const b of skel.bones) {
+			if (snap && snap[b.data.name]) continue;
+			if (!BONES.edits.has(b.data.name)) continue;
+			b.rotation = b.data.rotation;
+			b.x = b.data.x;
+			b.y = b.data.y;
+			b.scaleX = b.data.scaleX;
+			b.scaleY = b.data.scaleY;
+		}
+	}
+	BONES.edits.clear();
+	for (const [name, rec] of Object.entries(snap || {})) {
+		BONES.edits.set(name, { ...rec });
+	}
+}
+
+/** Catat keadaan SEBELUM sebuah aksi diubah. Panggil sebelum mengubah edits. */
+function pushBoneUndo() {
+	if (!spine?.skeleton) return;
+	const snap = snapshotEdits();
+	// Jangan menumpuk keadaan yang identik: pola "catat sebelum, ubah, catat
+	// sesudah" akan mencatat dua kali keadaan yang sama di antara aksi.
+	const top = BONE_UNDO.stack[BONE_UNDO.index];
+	if (top && JSON.stringify(top) === JSON.stringify(snap)) return;
+	// Buang cabang redo kalau pengguna beraksi setelah undo.
+	BONE_UNDO.stack.length = BONE_UNDO.index + 1;
+	BONE_UNDO.stack.push(snap);
+	if (BONE_UNDO.stack.length > BONE_UNDO.max) BONE_UNDO.stack.shift();
+	BONE_UNDO.index = BONE_UNDO.stack.length - 1;
+	bonesUndoUI();
+}
+
+/** Aksi "kosong" tidak perlu masuk riwayat: semua toolbar memanggil ini dulu. */
+function boneUndoBegin() {
+	// Snapshot hanya berguna kalau memang akan ada perubahan; pemanggil yang
+	// tahu pasti. Di sini kita hanya memastikan tidak menumpuk snapshot sama.
+	pushBoneUndo();
+}
+
+function boneUndoSync() {
+	applyBoneEdits();
+	spine?.skeleton?.updateWorldTransform?.();
+	drawBones();
+	updateBoneUI();
+	bonesUndoUI();
+}
+
+function boneUndo() {
+	if (BONE_UNDO.index <= 0) {
+		toast("Tidak ada langkah untuk dibatalkan.");
+		return;
+	}
+	BONE_UNDO.index -= 1;
+	restoreEdits(BONE_UNDO.stack[BONE_UNDO.index]);
+	boneUndoSync();
+}
+
+function boneRedo() {
+	if (BONE_UNDO.index >= BONE_UNDO.stack.length - 1) {
+		toast("Tidak ada langkah untuk diulang.");
+		return;
+	}
+	BONE_UNDO.index += 1;
+	restoreEdits(BONE_UNDO.stack[BONE_UNDO.index]);
+	boneUndoSync();
+}
+
+/** Segarkan status tombol undo/redo. */
+function bonesUndoUI() {
+	const u = document.getElementById("bone-undo");
+	const r = document.getElementById("bone-redo");
+	if (u) u.disabled = BONE_UNDO.index <= 0;
+	if (r) r.disabled = BONE_UNDO.index >= BONE_UNDO.stack.length - 1;
+}
+
+/** Model berganti: riwayat lama tidak berlaku lagi. */
+function boneUndoReset() {
+	BONE_UNDO.stack.length = 0;
+	BONE_UNDO.index = -1;
+	pushBoneUndo(); // keadaan awal jadi titik nol
+}
+
 function resetBonePose() {
 	if (!spine?.skeleton) return;
+	pushBoneUndo();
 	BONES.edits.clear();
 	const skel = spine.skeleton;
 	// Setup pose = nilai dari data (bukan dari animasi yang sedang jalan).
@@ -1242,8 +1381,13 @@ function resetBonePose() {
 function exportBonePose() {
 	if (!spine?.skeleton || !current) return;
 	const out = { model: current.id, bones: {} };
-	for (const [name, rotation] of BONES.edits) {
-		out.bones[name] = { rotation: +rotation.toFixed(4) };
+	for (const [name, raw] of BONES.edits) {
+		const e = typeof raw === "number" ? { rotation: raw } : raw;
+		const rec = {};
+		for (const k of ["rotation", "x", "y", "scaleX", "scaleY"]) {
+			if (e[k] != null) rec[k] = +Number(e[k]).toFixed(4);
+		}
+		if (Object.keys(rec).length) out.bones[name] = rec;
 	}
 	const n = Object.keys(out.bones).length;
 	if (!n) {
@@ -1269,14 +1413,20 @@ async function importBonePose(file) {
 		toast("Berkas pose bukan JSON yang valid.");
 		return;
 	}
+	pushBoneUndo();
 	BONES.edits.clear();
 	const known = new Set(spine.skeleton.bones.map((b) => b.data.name));
 	let n = 0;
 	for (const [name, rec] of Object.entries(obj.bones || {})) {
 		if (!known.has(name)) continue;
-		const rot = typeof rec === "number" ? rec : rec?.rotation;
-		if (rot == null) continue;
-		BONES.edits.set(name, rot);
+		// Bentuk lama: nilai angka = rotasi saja. Bentuk baru: objek.
+		const e = typeof rec === "number" ? { rotation: rec } : rec || {};
+		const clean = {};
+		for (const k of ["rotation", "x", "y", "scaleX", "scaleY"]) {
+			if (e[k] != null && Number.isFinite(Number(e[k]))) clean[k] = Number(e[k]);
+		}
+		if (!Object.keys(clean).length) continue;
+		BONES.edits.set(name, clean);
 		n++;
 	}
 	applyBoneEdits();
@@ -1286,9 +1436,185 @@ async function importBonePose(file) {
 	toast(`Pose dimuat: ${n} tulang.`);
 }
 
+/* --- Ekspor skeleton JSON ---------------------------------------------
+ * Menulis ulang berkas skeleton JSON asli dengan rotasi/posisi/skala hasil
+ * editan, lalu mengunduhnya. Hanya berlaku untuk model yang skeleton-nya
+ * JSON; model .skel (binary) tidak bisa ditulis balik tanpa encoder binary,
+ * jadi tombolnya dinonaktifkan dengan penjelasan.
+ *
+ * Yang diubah HANYA blok "bones" pada setup pose. Animasi, slot, ikatan mesh,
+ * dan skin dibiarkan apa adanya — file hasilnya tetap bisa dibuka Spine.
+ */
+let skeletonJsonCache = null; // { id, data }
+
+async function loadSkeletonJson(model) {
+	if (skeletonJsonCache && skeletonJsonCache.id === model.id) return skeletonJsonCache.data;
+	const dirPath = String(model.id || "").split("#")[0];
+	const base = "/assets/" + dirPath.split("/").map(encodeURIComponent).join("/") + "/";
+	const name = model.skeletonFile;
+	if (!name || !/\.json$/i.test(name)) return null;
+	const res = await fetch(base + encodeURIComponent(name));
+	if (!res.ok) throw new Error(`HTTP ${res.status}`);
+	const data = await res.json();
+	skeletonJsonCache = { id: model.id, data };
+	return data;
+}
+
+/** Apakah model ini bisa diekspor sebagai skeleton JSON? */
+function canExportSkeleton() {
+	const n = current?.skeletonFile || "";
+	return /\.json$/i.test(n);
+}
+
+async function exportSkeleton() {
+	if (!spine?.skeleton || !current) return;
+	if (!canExportSkeleton()) {
+		toast("Skeleton model ini .skel (binary) — tidak bisa ditulis balik. Pakai Ekspor pose.");
+		return;
+	}
+	let data;
+	try {
+		data = await loadSkeletonJson(current);
+	} catch (e) {
+		toast(`Gagal membaca skeleton: ${e.message || e}`);
+		return;
+	}
+	if (!data || !Array.isArray(data.bones)) {
+		toast("Struktur skeleton tidak dikenal.");
+		return;
+	}
+	// Nilai setup pose diambil dari DATA bone (bukan state runtime, yang
+	// sedang memutar animasi). Edit diterapkan di atasnya.
+	let changed = 0;
+	for (const bd of data.bones) {
+		const e = BONES.edits.get(bd.name);
+		if (!e) continue;
+		const rec = typeof e === "number" ? { rotation: e } : e;
+		let touched = false;
+		for (const k of ["rotation", "x", "y", "scaleX", "scaleY"]) {
+			if (rec[k] == null) continue;
+			bd[k] = +Number(rec[k]).toFixed(4);
+			touched = true;
+		}
+		if (touched) changed++;
+	}
+	if (!changed) {
+		toast("Belum ada tulang yang diubah.");
+		return;
+	}
+	const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	const stem = String(current.id).split("/").pop().replace(/[^\w.-]+/g, "_");
+	a.download = `${stem}-edited.json`;
+	// Anchor harus menempel di DOM agar kliknya memicu unduhan di semua
+	// browser (dan agar bisa diuji otomatis).
+	a.style.display = "none";
+	document.body.append(a);
+	a.click();
+	a.remove();
+	setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+	toast(`Skeleton diekspor: ${changed} tulang diubah.`);
+}
+
+/* --- Pohon tulang -----------------------------------------------------
+ * Daftar datar dengan indentasi sesuai kedalaman parent. Untuk rig 180+
+ * tulang, pohon berjenjang penuh (dengan lipat) lebih merepotkan daripada
+ * membantu; pencarian yang bekerja + baris yang bisa diklik sudah cukup.
+ */
+
+/** Daftar tulang + kedalaman, dihitung sekali per model. */
+let boneTreeCache = null;
+
+function boneTreeRows() {
+	if (boneTreeCache) return boneTreeCache;
+	if (!spine?.skeleton) return [];
+	const rows = [];
+	const depth = new Map();
+	for (const b of spine.skeleton.bones) {
+		const d = b.parent ? (depth.get(b.parent) ?? 0) + 1 : 0;
+		depth.set(b, d);
+		rows.push({
+			bone: b,
+			name: b.data.name,
+			depth: d,
+			edited: () => BONES.edits.has(b.data.name),
+		});
+	}
+	boneTreeCache = rows;
+	return rows;
+}
+
+function renderBoneTree() {
+	const list = document.getElementById("bone-tree");
+	const count = document.getElementById("bone-tree-count");
+	if (!list) return;
+	const q = (document.getElementById("bone-search")?.value || "").trim().toLowerCase();
+	const rows = boneTreeRows();
+	const shown = q ? rows.filter((r) => r.name.toLowerCase().includes(q)) : rows;
+	if (count) count.textContent = `${shown.length}/${rows.length}`;
+	list.innerHTML = "";
+	// Batasi 400 baris yang dirender; di atas itu pencarian yang dipakai.
+	for (const r of shown.slice(0, 400)) {
+		const li = document.createElement("li");
+		li.className = "bone-tree-item";
+		li.dataset.name = r.name;
+		li.style.paddingLeft = `${6 + Math.min(r.depth, 12) * 9}px`;
+		if (BONES.selected === r.bone) li.classList.add("is-sel");
+		const nm = document.createElement("span");
+		nm.className = "bone-tree-name";
+		nm.textContent = r.name;
+		li.append(nm);
+		if (BONES.edits.has(r.name)) {
+			const dot = document.createElement("span");
+			dot.className = "bone-tree-dot";
+			dot.title = "sudah diubah";
+			li.append(dot);
+		}
+		li.addEventListener("click", () => {
+			BONES.selected = r.bone;
+			updateBoneUI();
+			drawBones();
+			renderBoneTree();
+			// Sorot tulangnya di kanvas tanpa mengubah kamera.
+			focusBoneIfOffscreen(r.bone);
+		});
+		list.append(li);
+	}
+}
+
+/** Kalau tulang terpilih di luar pandangan, geser kamera supaya terlihat. */
+function focusBoneIfOffscreen(b) {
+	const w = boneWorld(b);
+	if (!w) return;
+	const wrap = el.canvasWrap;
+	if (!wrap) return;
+	const sx = w.x * (world.scale.x || 1) + world.position.x;
+	const sy = w.y * (world.scale.y || 1) + world.position.y;
+	const m = 80;
+	if (sx > m && sy > m && sx < wrap.clientWidth - m && sy < wrap.clientHeight - m) return;
+	state.panX = wrap.clientWidth / 2 - w.x * state.zoom;
+	state.panY = wrap.clientHeight / 2 - w.y * state.zoom;
+	applyTransform();
+}
+
+/** Pilih tulang dari panel: sorot baris yang sedang terpilih saja. */
+function syncBoneTreeSelection() {
+	const list = document.getElementById("bone-tree");
+	if (!list) return;
+	for (const li of list.children) {
+		li.classList.toggle("is-sel", BONES.selected && li.dataset.name === BONES.selected.data.name);
+	}
+}
+
 /** Nyalakan/matikan mode edit bone. */
 function setBoneEdit(on) {
 	BONES.on = !!on;
+	if (on) {
+		boneTreeCache = null;
+		renderBoneTree();
+		if (!BONE_UNDO.stack.length) boneUndoReset();
+	}
 	if (on) {
 		// Editor butuh overlay bones terlihat supaya bisa diklik.
 		if (!state.showBones) {
@@ -1322,6 +1648,7 @@ function updateBoneUI() {
 	if (rotEl) rotEl.textContent = sel ? `${sel.rotation.toFixed(1)}°` : "—";
 	const cntEl = el.bonePanel.querySelector("[data-bone-count]");
 	if (cntEl) cntEl.textContent = String(BONES.edits.size);
+	syncBoneTreeSelection();
 }
 
 function drawBones() {
@@ -1466,7 +1793,7 @@ function ikStep() {
 		let deg = (b.rotation || 0) - (d * 180) / Math.PI;
 		deg = (((deg + 180) % 360) + 360) % 360 - 180;
 		b.rotation = deg;
-		BONES.edits.set(b.data.name, deg);
+		writeBoneEdit(b.data.name, { rotation: deg });
 		// Matriks world belum tersegarkan di dalam frame ini, jadi ujung
 		// perkiraan diputar manual mengelilingi pangkal tulang sebesar
 		// perubahan world-nya (gain ±1, tanda negatif seperti di atas).
@@ -2936,6 +3263,14 @@ async function loadModelBody(model) {
 	// Muat daftar id karakter ber-kartu sekali, lalu segarkan tombol.
 	ensureCznCharIds();
 	syncCardsButton(model);
+	// Model baru: riwayat undo, cache pohon tulang, dan cache skeleton JSON
+	// milik model sebelumnya tidak berlaku lagi.
+	BONE_UNDO.stack.length = 0;
+	BONE_UNDO.index = -1;
+	pushBoneUndo();
+	boneTreeCache = null;
+	skeletonJsonCache = null;
+	if (BONES.on) renderBoneTree();
 	markSeen(model.id);
 	el.loading.hidden = false;
 	el.loading.textContent = "Memuat " + model.name + "…";
@@ -6680,6 +7015,7 @@ function ikEndDrag() {
 	if (!IK.dragging) return;
 	IK.dragging = false;
 	IK.target = null;
+	pushBoneUndo();
 	if (IK.wasPlaying) setPlaying(true);
 	IK.wasPlaying = false;
 	drawIk();
@@ -6710,6 +7046,8 @@ el.canvasWrap.addEventListener(
 		if (!b) return;
 		// Tangkap pointer supaya drag tetap jalan walau kursor keluar kanvas.
 		BONES.selected = b;
+		// Snapshot SEBELUM rotasi diubah: satu drag = satu langkah undo.
+		pushBoneUndo();
 		BONES.dragging = true;
 		e.stopPropagation();
 		e.preventDefault();
@@ -6732,6 +7070,8 @@ window.addEventListener("pointermove", (e) => {
 function boneEndDrag() {
 	if (!BONES.dragging) return;
 	BONES.dragging = false;
+	// Simpan keadaan SESUDAH aksi, supaya redo bisa kembali ke sini.
+	pushBoneUndo();
 	updateBoneUI();
 }
 window.addEventListener("pointerup", boneEndDrag);
@@ -8173,6 +8513,16 @@ window.addEventListener("keydown", (e) => {
 			e.preventDefault();
 			el.exportBtn?.click();
 			break;
+		case "z":
+		case "Z":
+			// Undo/redo pose tulang. Hanya saat editor tulang menyala, supaya
+			// tidak merebut Ctrl+Z browser di tempat lain.
+			if ((e.ctrlKey || e.metaKey) && BONES.on) {
+				e.preventDefault();
+				if (e.shiftKey) boneRedo();
+				else boneUndo();
+			}
+			break;
 		case "j":
 		case "J":
 			// IK: pilih tulang lalu geser ujungnya.
@@ -8789,6 +9139,13 @@ window.__spineStage = {
 	sourcePixelScale: () => (spine ? sourcePixelScale(spine) : 0),
 	get ik() { return IK; },
 	get bones() { return BONES; },
+	pushUndo: () => pushBoneUndo(),
+	writeEdit: (n, patch) => writeBoneEdit(n, patch),
+	applyEdits: () => applyBoneEdits(),
+	boneUndo,
+	boneRedo,
+	renderBoneTree,
+	exportSkeleton,
 	ikSelect,
 	ikTipPoint,
 	setIkMode,
@@ -8849,6 +9206,12 @@ function initToolsMenu() {
 }
 
 initToolsMenu();
+
+/* --- Editor tulang: undo/redo, pohon, ekspor skeleton ------------------ */
+document.getElementById("bone-undo")?.addEventListener("click", () => boneUndo());
+document.getElementById("bone-redo")?.addEventListener("click", () => boneRedo());
+document.getElementById("bone-export-skel")?.addEventListener("click", () => exportSkeleton());
+document.getElementById("bone-search")?.addEventListener("input", () => renderBoneTree());
 
 /* --- IK ---------------------------------------------------------------- */
 el.ikBtn?.addEventListener("click", () => setIkMode(!IK.on));

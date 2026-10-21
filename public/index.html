@@ -362,14 +362,24 @@
 				<code data-bone-count>0</code>
 			</div>
 			<div class="bone-row">
+				<button class="btn btn-sm" id="bone-undo" type="button" title="Batalkan langkah terakhir (Ctrl+Z)" disabled>↶</button>
+				<button class="btn btn-sm" id="bone-redo" type="button" title="Ulangi langkah (Ctrl+Shift+Z)" disabled>↷</button>
 				<button class="btn" id="bone-reset" type="button" title="Kembalikan semua tulang ke setup pose">Reset pose</button>
 				<button class="btn" id="bone-export" type="button" title="Unduh pose sebagai JSON">Ekspor pose</button>
+				<button class="btn" id="bone-export-skel" type="button" title="Unduh skeleton JSON hasil editan (model JSON saja)">Ekspor skeleton</button>
 				<label class="btn bone-import" title="Muat pose dari JSON">
 					Muat pose
 					<input id="bone-import-file" type="file" accept="application/json,.json" hidden>
 				</label>
-				<span class="bone-hint">Klik tulang lalu geser untuk memutar.</span>
 			</div>
+			<!-- Pohon tulang: klik kanvas nyaris mustahil untuk tulang kecil yang
+			     bertumpuk (Rei punya 184 tulang). Cari nama lalu klik. -->
+			<div class="bone-tree-head">
+				<input id="bone-search" class="field field-sm" type="search"
+					placeholder="Cari tulang…" autocomplete="off" spellcheck="false">
+				<span class="bone-tree-count mono" id="bone-tree-count">—</span>
+			</div>
+			<ul class="bone-tree" id="bone-tree"></ul>
 		</div>
 
 		<div class="transport-row transport-row-2">
