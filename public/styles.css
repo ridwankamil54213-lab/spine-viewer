@@ -2409,3 +2409,7 @@ input:focus-visible {
 .field-xs::-webkit-outer-spin-button,
 .field-xs::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .field-xs { -moz-appearance: textfield; appearance: textfield; }
+
+/* Baris pustaka pose di panel tulang. */
+.bone-lib { gap: 6px; }
+.bone-lib .select { min-width: 130px; max-width: 190px; }

@@ -1574,6 +1574,182 @@ async function exportSkeleton() {
 	toast(`Skeleton diekspor: ${changed} tulang diubah.`);
 }
 
+/* --- Pustaka pose -----------------------------------------------------
+ * Menyimpan pose bernama di localStorage, dikelompokkan per MODEL supaya
+ * pose "duduk" milik satu karakter tidak muncul di karakter lain (nama
+ * tulangnya beda dan akan diabaikan saat dimuat).
+ */
+const POSE_LIB_KEY = "spineStage.poseLib.v1";
+
+function poseLibAll() {
+	try {
+		return JSON.parse(localStorage.getItem(POSE_LIB_KEY) || "{}");
+	} catch {
+		return {};
+	}
+}
+
+function poseLibSave(obj) {
+	try {
+		localStorage.setItem(POSE_LIB_KEY, JSON.stringify(obj));
+	} catch {
+		toast("Penyimpanan penuh — pose tidak tersimpan.");
+	}
+}
+
+/** Daftar pose untuk model yang sedang dibuka. */
+function poseLibForCurrent() {
+	const lib = poseLibAll();
+	return lib[current?.id] || {};
+}
+
+function poseLibRefresh() {
+	const sel = document.getElementById("pose-lib-select");
+	const del = document.getElementById("pose-lib-delete");
+	if (!sel) return;
+	const list = poseLibForCurrent();
+	const names = Object.keys(list).sort();
+	sel.innerHTML = "";
+	const opt0 = document.createElement("option");
+	opt0.value = "";
+	opt0.textContent = names.length ? `Pose tersimpan (${names.length})` : "Belum ada pose";
+	sel.append(opt0);
+	for (const n of names) {
+		const o = document.createElement("option");
+		o.value = n;
+		o.textContent = n;
+		sel.append(o);
+	}
+	sel.disabled = !names.length;
+	if (del) del.disabled = true;
+}
+
+/** Simpan pose sekarang dengan nama. */
+function poseLibStore() {
+	if (!spine?.skeleton || !current) return;
+	const inp = document.getElementById("pose-lib-name");
+	const name = (inp?.value || "").trim();
+	if (!name) {
+		toast("Beri nama pose dulu.");
+		return;
+	}
+	if (!BONES.edits.size) {
+		toast("Belum ada tulang yang diubah.");
+		return;
+	}
+	const lib = poseLibAll();
+	lib[current.id] = lib[current.id] || {};
+	lib[current.id][name] = snapshotEdits();
+	poseLibSave(lib);
+	if (inp) inp.value = "";
+	poseLibRefresh();
+	toast(`Pose "${name}" disimpan.`);
+}
+
+/** Muat pose tersimpan berdasarkan nama. */
+function poseLibLoad(name) {
+	if (!name) return;
+	const rec = poseLibForCurrent()[name];
+	if (!rec) return;
+	pushBoneUndo();
+	BONES.edits.clear();
+	const known = new Set(spine.skeleton.bones.map((b) => b.data.name));
+	let n = 0;
+	for (const [bone, e] of Object.entries(rec)) {
+		if (!known.has(bone)) continue;
+		BONES.edits.set(bone, { ...e });
+		n++;
+	}
+	boneUndoSync();
+	pushBoneUndo();
+	toast(`Pose "${name}" dimuat: ${n} tulang.`);
+}
+
+function poseLibDelete(name) {
+	if (!name || !current) return;
+	const lib = poseLibAll();
+	if (!lib[current.id] || !lib[current.id][name]) return;
+	delete lib[current.id][name];
+	if (!Object.keys(lib[current.id]).length) delete lib[current.id];
+	poseLibSave(lib);
+	poseLibRefresh();
+	toast(`Pose "${name}" dihapus.`);
+}
+
+/* --- Cermin kiri-kanan -------------------------------------------------
+ * Menyalin pose satu sisi ke sisi lainnya. Konvensi penamaan yang didukung:
+ *   arm_L_01  <-> arm_R_01     (Ark Re:Code, banyak rig Unity)
+ *   arm.L     <-> arm.R
+ *   L_arm     <-> R_arm
+ *   _left     <-> _right
+ *   Left      <-> Right
+ * Rotasi dicerminkan (tanda dibalik), posisi X dibalik, skala X dibalik;
+ * itu yang membuat pose benar-benar simetris, bukan sekadar disalin.
+ */
+const MIRROR_PAIRS = [
+	[/(^|[_.\-])L(?=[_.\-]|$)/, "$1R"],
+	[/(^|[_.\-])R(?=[_.\-]|$)/, "$1L"],
+	[/left/i, "__RIGHT__"],
+	[/right/i, "__LEFT__"],
+];
+
+/** Nama tulang pasangan cermin, atau null kalau tidak ada. */
+function mirrorName(name) {
+	const out = new Set();
+	// 1) penanda L/R berdiri sendiri
+	for (const re of [/(^|[_.\-])L(?=[_.\-]|$)/g, /(^|[_.\-])R(?=[_.\-]|$)/g]) {
+		const m = re.exec(name);
+		if (m) {
+			const beda = m[0].includes("L") || m[0].toLowerCase().endsWith("l") ? "R" : "L";
+			const idx = m.index + m[0].length - 1;
+			out.add(name.slice(0, idx) + beda + name.slice(idx + 1));
+		}
+	}
+	// 2) kata left/right
+	if (/left/i.test(name)) out.add(name.replace(/left/gi, (t) => (t[0] === "L" ? "Right" : "right")));
+	if (/right/i.test(name)) out.add(name.replace(/right/gi, (t) => (t[0] === "R" ? "Left" : "left")));
+	const known = new Set((spine?.skeleton?.bones || []).map((b) => b.data.name));
+	for (const c of out) if (known.has(c)) return c;
+	return null;
+}
+
+/** Berapa tulang yang punya pasangan cermin pada model ini. */
+function mirrorStats() {
+	const rows = boneTreeRows();
+	let n = 0;
+	for (const r of rows) if (mirrorName(r.name)) n++;
+	return { pairs: Math.floor(n / 2), total: rows.length };
+}
+
+/**
+ * Cerminkan pose. Arah "ltr" menyalin L -> R, "rtl" sebaliknya.
+ * Hanya tulang yang sudah diubah (punya edit) yang disalin, supaya pose
+ * setengah jadi tidak menghapus sisi lain yang belum disentuh.
+ */
+function mirrorPose(dir) {
+	if (!spine?.skeleton) return;
+	pushBoneUndo();
+	const from = dir === "rtl" ? /(^|[_.\-])R(?=[_.\-]|$)/ : /(^|[_.\-])L(?=[_.\-]|$)/;
+	let n = 0;
+	for (const [name, raw] of [...BONES.edits]) {
+		if (!from.test(name)) continue;
+		const twin = mirrorName(name);
+		if (!twin) continue;
+		const e = typeof raw === "number" ? { rotation: raw } : { ...raw };
+		const rec = {};
+		if (e.rotation != null) rec.rotation = -e.rotation;
+		if (e.x != null) rec.x = -e.x;
+		if (e.y != null) rec.y = e.y;
+		if (e.scaleX != null) rec.scaleX = -e.scaleX;
+		if (e.scaleY != null) rec.scaleY = e.scaleY;
+		BONES.edits.set(twin, rec);
+		n++;
+	}
+	boneUndoSync();
+	pushBoneUndo();
+	toast(n ? `Pose dicerminkan: ${n} tulang.` : "Tidak ada tulang bercermin yang sudah diubah.");
+}
+
 /* --- Input angka & mode transform ------------------------------------- */
 
 const BONE_NUM_IDS = {
@@ -1733,6 +1909,12 @@ function setBoneEdit(on) {
 		boneTreeCache = null;
 		renderBoneTree();
 		if (!BONE_UNDO.stack.length) boneUndoReset();
+		poseLibRefresh();
+		const info = document.getElementById("bone-mirror-info");
+		if (info) {
+			const st = mirrorStats();
+			info.textContent = st.pairs ? `${st.pairs} pasang` : "tidak ada pasangan L/R";
+		}
 	}
 	if (on) {
 		// Editor butuh overlay bones terlihat supaya bisa diklik.
@@ -9280,6 +9462,12 @@ window.__spineStage = {
 	setBoneMode,
 	nudgeBone,
 	setBoneValue,
+	mirrorName,
+	mirrorPose,
+	mirrorStats,
+	poseLibStore,
+	poseLibLoad,
+	poseLibRefresh,
 	writeEdit: (n, patch) => writeBoneEdit(n, patch),
 	applyEdits: () => applyBoneEdits(),
 	boneUndo,
@@ -9348,6 +9536,25 @@ function initToolsMenu() {
 initToolsMenu();
 
 /* --- Editor tulang: undo/redo, pohon, ekspor skeleton ------------------ */
+// Pustaka pose + cermin
+document.getElementById("pose-lib-save")?.addEventListener("click", () => poseLibStore());
+document.getElementById("pose-lib-select")?.addEventListener("change", (e) => {
+	const del = document.getElementById("pose-lib-delete");
+	if (del) del.disabled = !e.target.value;
+	poseLibLoad(e.target.value);
+});
+document.getElementById("pose-lib-delete")?.addEventListener("click", () => {
+	const sel = document.getElementById("pose-lib-select");
+	poseLibDelete(sel?.value || "");
+	if (sel) {
+		sel.value = "";
+		const del = document.getElementById("pose-lib-delete");
+		if (del) del.disabled = true;
+	}
+});
+document.getElementById("bone-mirror-ltr")?.addEventListener("click", () => mirrorPose("ltr"));
+document.getElementById("bone-mirror-rtl")?.addEventListener("click", () => mirrorPose("rtl"));
+
 document.getElementById("bone-undo")?.addEventListener("click", () => boneUndo());
 document.getElementById("bone-redo")?.addEventListener("click", () => boneRedo());
 document.getElementById("bone-export-skel")?.addEventListener("click", () => exportSkeleton());

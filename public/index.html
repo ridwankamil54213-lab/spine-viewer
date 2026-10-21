@@ -391,6 +391,24 @@
 				</label>
 				<span class="bone-hint">↑↓ ±1 · Shift+↑↓ ±0.1</span>
 			</div>
+			<!-- Pustaka pose: simpan/muat pose bernama, dan cermin kiri-kanan. -->
+			<div class="bone-row bone-lib">
+				<input class="field field-xs" id="pose-lib-name" type="text" placeholder="Nama pose…"
+					autocomplete="off" spellcheck="false" style="width:120px">
+				<button class="btn btn-sm" id="pose-lib-save" type="button" title="Simpan pose sekarang">Simpan</button>
+				<select class="select select-sm" id="pose-lib-select" title="Muat pose tersimpan" disabled>
+					<option value="">Belum ada pose</option>
+				</select>
+				<button class="btn btn-sm" id="pose-lib-delete" type="button" title="Hapus pose terpilih" disabled>Hapus</button>
+			</div>
+			<div class="bone-row">
+				<span class="bone-label">Cermin</span>
+				<button class="btn btn-sm" id="bone-mirror-ltr" type="button"
+					title="Salin pose kiri ke kanan (rotasi & X dibalik)">L → R</button>
+				<button class="btn btn-sm" id="bone-mirror-rtl" type="button"
+					title="Salin pose kanan ke kiri (rotasi & X dibalik)">R → L</button>
+				<span class="bone-hint" id="bone-mirror-info">—</span>
+			</div>
 			<div class="bone-row">
 				<button class="btn btn-sm" id="bone-undo" type="button" title="Batalkan langkah terakhir (Ctrl+Z)" disabled>↶</button>
 				<button class="btn btn-sm" id="bone-redo" type="button" title="Ulangi langkah (Ctrl+Shift+Z)" disabled>↷</button>
