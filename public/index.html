@@ -345,7 +345,30 @@
 			</div>
 		</div>
 
-		<!-- Panel IK: rantai yang sedang disunting + tombol reset. -->
+		<!-- Panel bounds attachment: nilai kotak bisa diketik langsung. -->
+<div id="bounds-panel" class="bounds-panel" hidden>
+	<div class="bone-row">
+		<span class="bone-label">Attachment</span>
+		<code id="bounds-name">klik model</code>
+	</div>
+	<div class="bone-row bone-nums">
+		<label class="bone-num"><span class="bone-label">X</span>
+			<input class="field field-xs mono" id="bounds-x" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Y</span>
+			<input class="field field-xs mono" id="bounds-y" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Lebar</span>
+			<input class="field field-xs mono" id="bounds-w" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Tinggi</span>
+			<input class="field field-xs mono" id="bounds-h" type="number" step="0.1"></label>
+		<label class="bone-num"><span class="bone-label">Rotasi</span>
+			<input class="field field-xs mono" id="bounds-rot" type="number" step="0.1"></label>
+	</div>
+	<div class="bone-row">
+		<span class="bone-hint">Tarik sudut = ukuran · tarik tengah = pindah. Ikut tertulis di Ekspor skeleton.</span>
+	</div>
+</div>
+
+<!-- Panel IK: rantai yang sedang disunting + tombol reset. -->
 <div id="ik-panel" class="ik-panel" hidden>
 	<span class="ik-panel-title">IK</span>
 	<span class="ik-panel-chain mono" id="ik-chain">—</span>
@@ -511,6 +534,7 @@
 								<div class="tools-grid">
 									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
 									<button id="ik-btn" class="btn btn-toggle" data-on="false" title="IK — klik tulang, lalu geser titik ujungnya (J)">IK</button>
+									<button id="bounds-btn" class="btn btn-toggle" data-on="false" title="Bounds — klik bagian model, lalu geser/ubah ukuran kotaknya (U)">Bounds</button>
 									<button id="timeline-btn" class="btn btn-toggle" data-on="false" title="Garis waktu animasi (T)">Waktu</button>
 									<button id="inspector-btn" class="btn btn-toggle" data-on="false" title="Inspektor slot &amp; perbandingan (I)">Periksa</button>
 									<button id="fps-btn" class="btn btn-toggle" data-on="false" title="Meter FPS (P)">FPS</button>

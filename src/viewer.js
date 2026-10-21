@@ -404,6 +404,8 @@ const el = {
 	updateLogClear: $("#update-log-clear"),
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
+	boundsBtn: $("#bounds-btn"),
+	boundsPanel: $("#bounds-panel"),
 	partsBtn: $("#parts-btn"),
 	boneEditBtn: $("#bone-edit-btn"),
 	ikBtn: $("#ik-btn"),
@@ -1087,8 +1089,13 @@ el.cardsModal?.querySelector('[data-close="1"]')?.addEventListener("click", clos
  * Bones overlay
  * ------------------------------------------------------------------ */
 const bonesGfx = new Graphics();
+// Overlay kotak bounds attachment (mode Bounds). Lapisan terpisah supaya
+// drawBones() dan drawBoundsOverlay() tidak saling menghapus.
+const boundsGfx = new Graphics();
 bonesGfx.visible = false;
 stageRoot.addChild(bonesGfx);
+stageRoot.addChild(boundsGfx);
+boundsGfx.visible = false;
 
 /**
  * Bone editor — putar bone dengan mouse, simpan pose, ekspor ke JSON.
@@ -1555,8 +1562,36 @@ async function exportSkeleton() {
 		}
 		if (touched) changed++;
 	}
-	if (!changed) {
-		toast("Belum ada tulang yang diubah.");
+	// Attachment (region/mesh): tulis balik kotaknya. Struktur JSON Spine
+	// menaruh satu objek per slot per skin di bawah "skins".
+	let attChanged = 0;
+	const edits = Object.values(BOUNDS.edits || {});
+	if (edits.length && Array.isArray(data.skins)) {
+		for (const skin of data.skins) {
+			for (const [slotName, atts] of Object.entries(skin.attachments || {})) {
+				for (const [attName, rec] of Object.entries(atts)) {
+					const e = edits.find((x) => x.slot === slotName && x.attachment === attName);
+					if (!e || !rec) continue;
+					// Mesh: hanya width/height yang aman ditulis; x/y/rotation
+					// tidak dipakai mesh dan akan mengotori file.
+					if (e.mesh) {
+						if (rec.width != null) rec.width = e.width;
+						if (rec.height != null) rec.height = e.height;
+					} else {
+						if (e.x != null) rec.x = e.x;
+						if (e.y != null) rec.y = e.y;
+						rec.width = e.width;
+						rec.height = e.height;
+						if (rec.rotation != null || rec.type === "region") rec.rotation = e.rotation;
+					}
+					attChanged++;
+				}
+			}
+		}
+	}
+
+	if (!changed && !attChanged) {
+		toast("Belum ada tulang atau bounds yang diubah.");
 		return;
 	}
 	const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
@@ -1571,7 +1606,7 @@ async function exportSkeleton() {
 	a.click();
 	a.remove();
 	setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-	toast(`Skeleton diekspor: ${changed} tulang diubah.`);
+	toast(`Skeleton diekspor: ${changed} tulang, ${attChanged} attachment.`);
 }
 
 /* --- Pustaka pose -----------------------------------------------------
@@ -1674,6 +1709,206 @@ function poseLibDelete(name) {
 	poseLibSave(lib);
 	poseLibRefresh();
 	toast(`Pose "${name}" dihapus.`);
+}
+
+/* --- Editor bounds attachment -----------------------------------------
+ * Region/mesh attachment punya kotak (x, y, width, height, rotation) relatif
+ * terhadap slot. Mode ini menampilkan kotak itu, bisa digeser dan diubah
+ * ukurannya langsung di kanvas, dan hasilnya ikut tertulis di Ekspor
+ * skeleton.
+ *
+ * Batasan yang perlu diketahui: untuk MESH, nilai x/y/width/height tidak
+ * menentukan bentuk kain — yang menentukan adalah daftar vertex. Mengubah
+ * kotak mesh hanya memindahkan titik acuan; bentuk mesh tetap. Untuk REGION
+ * (mayoritas ikon/partikel/prop) kotak inilah yang menentukan tampilan.
+ */
+const BOUNDS = {
+	on: false,
+	slot: null,
+	att: null,
+	dragging: false,
+	/** "move" | corner index 0..3 */
+	grip: null,
+	start: null,
+	base: null,
+	hit: 12,
+};
+
+/** Attachment terpilih beserta kotak lokalnya (koordinat slot). */
+function boundsBox(att) {
+	if (!att) return null;
+	let w = Number(att.width) || 0;
+	let h = Number(att.height) || 0;
+	// Mesh attachment: width/height hanya metadata kotak asal (sering 32x32).
+	// Yang benar-benar menentukan bentuk adalah daftar vertex, jadi untuk
+	// mesh kita pakai sebaran vertex sebagai kotak acuan.
+	if (!w || !h) {
+		const v = att.vertices;
+		if (v && v.length >= 2) {
+			let minX = Infinity;
+			let maxX = -Infinity;
+			let minY = Infinity;
+			let maxY = -Infinity;
+			for (let i = 0; i + 1 < v.length; i += 2) {
+				minX = Math.min(minX, v[i]);
+				maxX = Math.max(maxX, v[i]);
+				minY = Math.min(minY, v[i + 1]);
+				maxY = Math.max(maxY, v[i + 1]);
+			}
+			if (Number.isFinite(minX)) {
+				w = Math.max(w, maxX - minX);
+				h = Math.max(h, maxY - minY);
+			}
+		}
+	}
+	const x = Number(att.x) || 0;
+	const y = Number(att.y) || 0;
+	const r = ((Number(att.rotation) || 0) * Math.PI) / 180;
+	return { x, y, w, h, rot: r };
+}
+
+/** Empat sudut kotak di koordinat world. */
+function boundsCorners(slot, att) {
+	const box = boundsBox(att);
+	if (!box) return null;
+	const c = Math.cos(box.rot);
+	const sn = Math.sin(box.rot);
+	const out = [];
+	// Sudut kotak relatif terhadap pusat attachment (Spine memakai pusat).
+	for (const [sx, sy] of [
+		[-1, -1],
+		[1, -1],
+		[1, 1],
+		[-1, 1],
+	]) {
+		const lx = box.x + (sx * box.w) / 2;
+		const ly = box.y + (sy * box.h) / 2;
+		const v = { x: c * lx - sn * ly, y: sn * lx + c * ly };
+		try {
+			slot.bone.localToWorld(v);
+		} catch {
+			return null;
+		}
+		out.push(v);
+	}
+	return out;
+}
+
+/** Pilih attachment dari sebuah titik layar. */
+function boundsPick(clientX, clientY) {
+	const hit = slotAtClient(clientX, clientY);
+	if (!hit) return null;
+	const att = hit.attachment;
+	// Hanya attachment yang punya kotak (region/mesh).
+	if (att.width == null && att.height == null) return null;
+	return hit;
+}
+
+function setBoundsMode(on) {
+	BOUNDS.on = !!on && !!spine?.skeleton;
+	if (!BOUNDS.on) {
+		BOUNDS.slot = null;
+		BOUNDS.att = null;
+		BOUNDS.dragging = false;
+		BOUNDS.grip = null;
+	}
+	if (boundsGfx) boundsGfx.visible = BOUNDS.on;
+	el.boundsBtn?.setAttribute("aria-pressed", String(BOUNDS.on));
+	if (el.boundsBtn) el.boundsBtn.dataset.on = String(BOUNDS.on);
+	el.boundsPanel?.toggleAttribute("hidden", !BOUNDS.on);
+	boundsSyncUI();
+	drawBoundsOverlay();
+}
+
+function boundsSyncUI() {
+	const name = document.getElementById("bounds-name");
+	const x = document.getElementById("bounds-x");
+	const y = document.getElementById("bounds-y");
+	const w = document.getElementById("bounds-w");
+	const h = document.getElementById("bounds-h");
+	const rot = document.getElementById("bounds-rot");
+	const a = BOUNDS.att;
+	if (name) name.textContent = a ? `${BOUNDS.slot?.data?.name || "?"} / ${a.name || "?"}` : "klik model";
+	for (const [inp, v] of [
+		[x, a?.x],
+		[y, a?.y],
+		[w, a?.width],
+		[h, a?.height],
+		[rot, a?.rotation],
+	]) {
+		if (!inp) continue;
+		inp.disabled = !a;
+		if (document.activeElement === inp) continue;
+		inp.value = v == null ? "" : String(+Number(v).toFixed(2));
+	}
+}
+
+/** Terapkan nilai kotak ke attachment, catat untuk ekspor. */
+function boundsApply(patch) {
+	const a = BOUNDS.att;
+	if (!a) return;
+	for (const [k, v] of Object.entries(patch)) {
+		if (k === "width") a.width = v;
+		else if (k === "height") a.height = v;
+		else a[k] = v;
+	}
+	const key = `${BOUNDS.slot?.data?.name || ""}/${a.name || ""}`;
+	const isMesh = /Mesh/i.test(a.constructor?.name || "");
+	BOUNDS.edits[key] = {
+		slot: BOUNDS.slot?.data?.name || null,
+		attachment: a.name || null,
+		mesh: isMesh,
+		x: isMesh ? null : +Number(a.x || 0).toFixed(4),
+		y: isMesh ? null : +Number(a.y || 0).toFixed(4),
+		width: +Number(a.width || 0).toFixed(4),
+		height: +Number(a.height || 0).toFixed(4),
+		rotation: isMesh ? null : +Number(a.rotation || 0).toFixed(4),
+	};
+	// Region attachment menyimpan quad hasil hitung; tanpa updateOffset()
+	// gambarnya tidak ikut berubah walau lebarnya sudah diubah.
+	try {
+		if (typeof a.updateOffset === "function") a.updateOffset();
+	} catch {
+		/* mesh: tidak perlu */
+	}
+	try {
+		spine.skeleton.updateWorldTransform();
+	} catch {
+		/* biarkan frame berikutnya */
+	}
+	boundsSyncUI();
+	drawBoundsOverlay();
+}
+
+BOUNDS.edits = {};
+
+/** Gambar kotak bounds + pegangan sudut. */
+function drawBoundsOverlay() {
+	const g = boundsGfx;
+	if (!g) return;
+	g.clear();
+	if (!BOUNDS.on || !BOUNDS.att) return;
+	const pts = boundsCorners(BOUNDS.slot, BOUNDS.att);
+	if (!pts) return;
+	const sc = 1 / (state.zoom || 1);
+	g.lineStyle(2 * sc, 0x33ff99, 0.95);
+	g.moveTo(pts[0].x, pts[0].y);
+	for (let i = 1; i < 4; i++) g.lineTo(pts[i].x, pts[i].y);
+	g.lineTo(pts[0].x, pts[0].y);
+	for (const p of pts) {
+		g.beginFill(0xffb02e, 1);
+		g.drawCircle(p.x, p.y, 5 * sc);
+		g.endFill();
+	}
+	// Titik tengah = pegangan geser.
+	const c = { x: 0, y: 0 };
+	for (const p of pts) {
+		c.x += p.x / 4;
+		c.y += p.y / 4;
+	}
+	g.beginFill(0x7ad1ff, 1);
+	g.drawCircle(c.x, c.y, 4.5 * sc);
+	g.endFill();
 }
 
 /* --- Cermin kiri-kanan -------------------------------------------------
@@ -3572,6 +3807,9 @@ async function loadModelBody(model) {
 	pushBoneUndo();
 	boneTreeCache = null;
 	skeletonJsonCache = null;
+	BOUNDS.edits = {};
+	BOUNDS.slot = null;
+	BOUNDS.att = null;
 	if (BONES.on) renderBoneTree();
 	markSeen(model.id);
 	el.loading.hidden = false;
@@ -7273,6 +7511,110 @@ function fromStagePoint(x, y) {
 	};
 }
 
+// Bounds attachment: klik untuk memilih, tarik sudut untuk mengubah ukuran,
+// tarik tengah untuk memindahkan. Ditangkap lebih dulu daripada pan kanvas.
+el.canvasWrap.addEventListener(
+	"pointerdown",
+	(e) => {
+		if (!BOUNDS.on || !spine || e.button !== 0) return;
+		const p = toStagePoint(e.clientX, e.clientY);
+		const sc = 1 / (state.zoom || 1);
+		const r = BOUNDS.hit * sc;
+
+		// 1) Sudut kotak yang sedang dipilih -> mulai resize
+		if (BOUNDS.att) {
+			const pts = boundsCorners(BOUNDS.slot, BOUNDS.att);
+			if (pts) {
+				for (let i = 0; i < 4; i++) {
+					if (Math.hypot(p.x - pts[i].x, p.y - pts[i].y) <= r) {
+						BOUNDS.dragging = true;
+						BOUNDS.grip = i;
+						BOUNDS.start = p;
+						const a = BOUNDS.att;
+						BOUNDS.base = { x: a.x, y: a.y, width: a.width, height: a.height };
+						el.canvasWrap.setPointerCapture?.(e.pointerId);
+						e.stopPropagation();
+						e.preventDefault();
+						return;
+					}
+				}
+				// 2) Tengah kotak -> pindahkan
+				const c = {
+					x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+					y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4,
+				};
+				if (Math.hypot(p.x - c.x, p.y - c.y) <= r * 1.4) {
+					BOUNDS.dragging = true;
+					BOUNDS.grip = "move";
+					BOUNDS.start = p;
+					const a = BOUNDS.att;
+					BOUNDS.base = { x: a.x, y: a.y, width: a.width, height: a.height };
+					el.canvasWrap.setPointerCapture?.(e.pointerId);
+					e.stopPropagation();
+					e.preventDefault();
+					return;
+				}
+			}
+		}
+
+		// 3) Selain itu: pilih attachment di bawah kursor
+		const hit = boundsPick(e.clientX, e.clientY);
+		if (hit) {
+			BOUNDS.slot = hit.slot;
+			BOUNDS.att = hit.attachment;
+			boundsSyncUI();
+			drawBoundsOverlay();
+			e.stopPropagation();
+			e.preventDefault();
+		}
+	},
+	true,
+);
+
+window.addEventListener("pointermove", (e) => {
+	if (!BOUNDS.dragging || !BOUNDS.att || !BOUNDS.base) return;
+	const p = toStagePoint(e.clientX, e.clientY);
+	// Selisih kursor diubah ke satuan lokal slot (bone).
+	const dx = p.x - BOUNDS.start.x;
+	const dy = p.y - BOUNDS.start.y;
+	let lx = dx;
+	let ly = dy;
+	try {
+		const v = { x: dx, y: dy };
+		// worldToLocal mengubah vektor world -> lokal; offset pangkal ikut
+		// terpakai, jadi kurangi dulu supaya murni arah.
+		BOUNDS.slot.bone.worldToLocal(v);
+		const v0 = { x: 0, y: 0 };
+		BOUNDS.slot.bone.worldToLocal(v0);
+		lx = v.x - v0.x;
+		ly = v.y - v0.y;
+	} catch {
+		/* pakai selisih mentah */
+	}
+	if (BOUNDS.grip === "move") {
+		boundsApply({ x: BOUNDS.base.x + lx, y: BOUNDS.base.y + ly });
+	} else {
+		// Resize: sudut yang ditarik menentukan tanda. Lebar/tinggi minimal 1
+		// supaya tidak pernah nol (region nol tidak bisa dipilih lagi).
+		const sx = BOUNDS.grip === 0 || BOUNDS.grip === 3 ? -1 : 1;
+		const sy = BOUNDS.grip === 0 || BOUNDS.grip === 1 ? -1 : 1;
+		boundsApply({
+			width: Math.max(1, BOUNDS.base.width + sx * lx * 2),
+			height: Math.max(1, BOUNDS.base.height + sy * ly * 2),
+		});
+	}
+});
+
+function boundsEndDrag() {
+	if (!BOUNDS.dragging) return;
+	BOUNDS.dragging = false;
+	BOUNDS.grip = null;
+	BOUNDS.base = null;
+	drawBoundsOverlay();
+}
+window.addEventListener("pointerup", boundsEndDrag);
+window.addEventListener("pointercancel", boundsEndDrag);
+
 // IK: klik tulang untuk memilih rantai, lalu geser pegangan di ujungnya.
 // Ditangkap di fase capture supaya tidak ikut menggeser kamera (pan).
 el.canvasWrap.addEventListener(
@@ -8842,6 +9184,11 @@ window.addEventListener("keydown", (e) => {
 				else boneUndo();
 			}
 			break;
+		case "u":
+		case "U":
+			e.preventDefault();
+			setBoundsMode(!BOUNDS.on);
+			break;
 		case "j":
 		case "J":
 			// IK: pilih tulang lalu geser ujungnya.
@@ -9462,6 +9809,11 @@ window.__spineStage = {
 	setBoneMode,
 	nudgeBone,
 	setBoneValue,
+	get bounds() { return BOUNDS; },
+	setBoundsMode,
+	boundsPick,
+	boundsApply,
+	boundsCorners,
 	mirrorName,
 	mirrorPose,
 	mirrorStats,
@@ -9592,6 +9944,23 @@ window.addEventListener("keydown", (e) => {
 	nudgeBone("rotation", step);
 });
 setBoneMode("rotate");
+
+/* --- Editor bounds ---------------------------------------------------- */
+el.boundsBtn?.addEventListener("click", () => setBoundsMode(!BOUNDS.on));
+for (const [prop, id] of [
+	["x", "bounds-x"],
+	["y", "bounds-y"],
+	["width", "bounds-w"],
+	["height", "bounds-h"],
+	["rotation", "bounds-rot"],
+]) {
+	const inp = document.getElementById(id);
+	if (!inp) continue;
+	inp.addEventListener("change", () => {
+		const v = Number(inp.value);
+		if (Number.isFinite(v)) boundsApply({ [prop]: v });
+	});
+}
 
 /* --- IK ---------------------------------------------------------------- */
 el.ikBtn?.addEventListener("click", () => setIkMode(!IK.on));
