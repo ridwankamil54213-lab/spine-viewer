@@ -2386,3 +2386,26 @@ input:focus-visible {
 	flex: 0 0 auto;
 	margin-left: auto;
 }
+
+/* ------------------------------------------------------------------ *
+ * Mode seret + input angka di panel tulang
+ * ------------------------------------------------------------------ */
+.bone-modes { display: inline-flex; gap: 4px; }
+.bone-mode.is-on {
+	border-color: var(--accent, #ffb02e);
+	color: var(--accent, #ffb02e);
+	background: rgba(255, 176, 46, 0.12);
+}
+.bone-nums { gap: 10px; flex-wrap: wrap; }
+.bone-num { display: inline-flex; align-items: center; gap: 5px; }
+.field-xs {
+	width: 74px;
+	padding: 4px 6px;
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+}
+.field-xs:disabled { opacity: 0.45; }
+/* Sembunyikan spinner bawaan: panah dipakai untuk nudge, bukan spinner. */
+.field-xs::-webkit-outer-spin-button,
+.field-xs::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.field-xs { -moz-appearance: textfield; appearance: textfield; }

@@ -1115,6 +1115,12 @@ const BONES = {
 	 */
 	edits: new Map(),
 	hitRadius: 18,
+	/** Mode seret: "rotate" | "move" | "scale". */
+	mode: "rotate",
+	/** Titik awal seret, untuk menghitung selisih (mode move/scale). */
+	dragStart: null,
+	/** Nilai tulang saat seret dimulai. */
+	dragBase: null,
 };
 
 /**
@@ -1251,6 +1257,54 @@ function aimBoneAt(b, x, y) {
 	writeBoneEdit(b.data.name, { rotation: deg });
 }
 
+/**
+ * Geser tulang: ubah x/y LOKAL sebesar selisih kursor dalam satuan lokal.
+ * Dibagi skala world supaya gerakan 1 px di layar tetap terasa 1 px walau
+ * zoom berbeda.
+ */
+function moveBoneTo(b, dxWorld, dyWorld) {
+	const base = BONES.dragBase;
+	if (!base) return;
+	const sx = world.scale.x || 1;
+	const sy = world.scale.y || 1;
+	let nx = base.x + dxWorld / sx;
+	let ny = base.y + dyWorld / sy;
+	b.x = nx;
+	b.y = ny;
+	writeBoneEdit(b.data.name, { x: nx, y: ny });
+}
+
+/** Skala tulang dari jarak kursor ke pangkalnya, relatif saat seret mulai. */
+function scaleBoneTo(b, px, py) {
+	const base = BONES.dragBase;
+	const start = BONES.dragStart;
+	if (!base || !start) return;
+	const w = boneWorld(b);
+	if (!w) return;
+	// Rasio jarak kursor sekarang vs saat mulai, diukur dari pangkal tulang.
+	const d0 = Math.max(8, Math.hypot(start.x - w.x, start.y - w.y));
+	const d1 = Math.hypot(px - w.x, py - w.y);
+	const k = Math.max(0.05, Math.min(20, d1 / d0));
+	const sx = +(base.scaleX * k).toFixed(4);
+	const sy = +(base.scaleY * k).toFixed(4);
+	b.scaleX = sx;
+	b.scaleY = sy;
+	writeBoneEdit(b.data.name, { scaleX: sx, scaleY: sy });
+}
+
+/** Terapkan nilai absolut ke satu properti (dipakai input angka & nudge). */
+function setBoneValue(b, prop, value) {
+	if (!b || !Number.isFinite(value)) return;
+	if (prop === "rotation") {
+		let v = ((value + 180) % 360 + 360) % 360 - 180;
+		b.rotation = v;
+		writeBoneEdit(b.data.name, { rotation: v });
+	} else {
+		b[prop] = value;
+		writeBoneEdit(b.data.name, { [prop]: value });
+	}
+}
+
 /** Reset semua rotasi bone ke pose setup animasi saat ini. */
 /* --- Riwayat pose (undo/redo) -----------------------------------------
  * Yang disimpan adalah SNAPSHOT seluruh BONES.edits, bukan satu tulang.
@@ -1276,8 +1330,11 @@ function restoreEdits(snap) {
 	// berefek sampai animasi kebetulan menimpanya.
 	const skel = spine?.skeleton;
 	if (skel) {
+		// Kembalikan SELURUH field transform ke setup untuk setiap tulang yang
+		// sedang diedit, lalu snapshot dipasang di atasnya. Hanya mengembalikan
+		// field yang hilang tidak cukup: snapshot lama tidak memuat scaleX,
+		// sehingga nilai skala dari aksi berikutnya tertinggal saat undo.
 		for (const b of skel.bones) {
-			if (snap && snap[b.data.name]) continue;
 			if (!BONES.edits.has(b.data.name)) continue;
 			b.rotation = b.data.rotation;
 			b.x = b.data.x;
@@ -1517,6 +1574,68 @@ async function exportSkeleton() {
 	toast(`Skeleton diekspor: ${changed} tulang diubah.`);
 }
 
+/* --- Input angka & mode transform ------------------------------------- */
+
+const BONE_NUM_IDS = {
+	rotation: "bone-num-rotation",
+	x: "bone-num-x",
+	y: "bone-num-y",
+	scaleX: "bone-num-scale",
+};
+
+/** Tulis nilai tulang terpilih ke kotak angka (tanpa mengganggu fokus). */
+function syncBoneNums() {
+	const b = BONES.selected;
+	for (const [prop, id] of Object.entries(BONE_NUM_IDS)) {
+		const inp = document.getElementById(id);
+		if (!inp) continue;
+		// Jangan timpa kotak yang sedang diketik pengguna.
+		if (document.activeElement === inp) continue;
+		inp.disabled = !b;
+		if (!b) {
+			inp.value = "";
+			continue;
+		}
+		const v = prop === "rotation" ? b.rotation : b[prop];
+		inp.value = Number.isFinite(v) ? String(+Number(v).toFixed(2)) : "";
+	}
+}
+
+/** Terapkan nilai dari kotak angka. */
+function applyBoneNum(prop, raw) {
+	const b = BONES.selected;
+	if (!b) return;
+	const v = Number(raw);
+	if (!Number.isFinite(v)) return;
+	pushBoneUndo();
+	setBoneValue(b, prop, v);
+	boneUndoSync();
+	pushBoneUndo();
+}
+
+/** Nudge nilai tulang terpilih dengan panah atas/bawah. */
+function nudgeBone(prop, delta) {
+	const b = BONES.selected;
+	if (!b) return;
+	const cur = prop === "rotation" ? b.rotation : b[prop];
+	if (!Number.isFinite(cur)) return;
+	pushBoneUndo();
+	setBoneValue(b, prop, cur + delta);
+	boneUndoSync();
+	pushBoneUndo();
+}
+
+/** Ganti mode seret tulang. */
+function setBoneMode(mode) {
+	BONES.mode = mode === "move" || mode === "scale" ? mode : "rotate";
+	for (const el2 of document.querySelectorAll(".bone-mode")) {
+		const on = el2.dataset.mode === BONES.mode;
+		el2.classList.toggle("is-on", on);
+		el2.dataset.on = String(on);
+	}
+	el.canvasWrap.style.cursor = BONES.mode === "move" ? "move" : BONES.mode === "scale" ? "nwse-resize" : "";
+}
+
 /* --- Pohon tulang -----------------------------------------------------
  * Daftar datar dengan indentasi sesuai kedalaman parent. Untuk rig 180+
  * tulang, pohon berjenjang penuh (dengan lipat) lebih merepotkan daripada
@@ -1649,6 +1768,7 @@ function updateBoneUI() {
 	const cntEl = el.bonePanel.querySelector("[data-bone-count]");
 	if (cntEl) cntEl.textContent = String(BONES.edits.size);
 	syncBoneTreeSelection();
+	syncBoneNums();
 }
 
 function drawBones() {
@@ -7046,8 +7166,16 @@ el.canvasWrap.addEventListener(
 		if (!b) return;
 		// Tangkap pointer supaya drag tetap jalan walau kursor keluar kanvas.
 		BONES.selected = b;
-		// Snapshot SEBELUM rotasi diubah: satu drag = satu langkah undo.
+		// Snapshot SEBELUM diubah: satu drag = satu langkah undo.
 		pushBoneUndo();
+		BONES.dragStart = { x: p.x, y: p.y };
+		BONES.dragBase = {
+			rotation: b.rotation,
+			x: b.x,
+			y: b.y,
+			scaleX: b.scaleX,
+			scaleY: b.scaleY,
+		};
 		BONES.dragging = true;
 		e.stopPropagation();
 		e.preventDefault();
@@ -7061,7 +7189,14 @@ el.canvasWrap.addEventListener(
 window.addEventListener("pointermove", (e) => {
 	if (!BONES.dragging || !BONES.selected || !spine) return;
 	const p = toStagePoint(e.clientX, e.clientY);
-	aimBoneAt(BONES.selected, p.x, p.y);
+	const st = BONES.dragStart;
+	if (BONES.mode === "move" && st) {
+		moveBoneTo(BONES.selected, p.x - st.x, p.y - st.y);
+	} else if (BONES.mode === "scale") {
+		scaleBoneTo(BONES.selected, p.x, p.y);
+	} else {
+		aimBoneAt(BONES.selected, p.x, p.y);
+	}
 	spine.skeleton.updateWorldTransform();
 	drawBones();
 	updateBoneUI();
@@ -7070,6 +7205,8 @@ window.addEventListener("pointermove", (e) => {
 function boneEndDrag() {
 	if (!BONES.dragging) return;
 	BONES.dragging = false;
+	BONES.dragStart = null;
+	BONES.dragBase = null;
 	// Simpan keadaan SESUDAH aksi, supaya redo bisa kembali ke sini.
 	pushBoneUndo();
 	updateBoneUI();
@@ -9140,6 +9277,9 @@ window.__spineStage = {
 	get ik() { return IK; },
 	get bones() { return BONES; },
 	pushUndo: () => pushBoneUndo(),
+	setBoneMode,
+	nudgeBone,
+	setBoneValue,
 	writeEdit: (n, patch) => writeBoneEdit(n, patch),
 	applyEdits: () => applyBoneEdits(),
 	boneUndo,
@@ -9212,6 +9352,39 @@ document.getElementById("bone-undo")?.addEventListener("click", () => boneUndo()
 document.getElementById("bone-redo")?.addEventListener("click", () => boneRedo());
 document.getElementById("bone-export-skel")?.addEventListener("click", () => exportSkeleton());
 document.getElementById("bone-search")?.addEventListener("input", () => renderBoneTree());
+for (const btn of document.querySelectorAll(".bone-mode")) {
+	btn.addEventListener("click", () => setBoneMode(btn.dataset.mode));
+}
+for (const [prop, id] of Object.entries(BONE_NUM_IDS)) {
+	const inp = document.getElementById(id);
+	if (!inp) continue;
+	inp.addEventListener("change", () => applyBoneNum(prop, inp.value));
+	// Nudge panah saat kotak difokuskan. preventDefault supaya angka di kotak
+	// tidak ikut berubah dua kali (browser punya panah bawaan untuk number).
+	inp.dataset.boneProp = prop;
+	inp.addEventListener("keydown", (e) => {
+		if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+		// Hentikan di sini: tanpa stopPropagation, handler global di bawah
+		// ikut jalan dan menudge "rotation" juga.
+		e.preventDefault();
+		e.stopPropagation();
+		const step = (e.shiftKey ? 0.1 : 1) * (e.key === "ArrowUp" ? 1 : -1);
+		nudgeBone(prop, step);
+	});
+}
+// Panah bekerja juga saat fokus di kanvas (atau di mana pun selain kotak
+// angka tulang). Default properti = rotasi.
+window.addEventListener("keydown", (e) => {
+	if (!BONES.on || !BONES.selected) return;
+	if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+	if (e.ctrlKey || e.metaKey || e.altKey) return;
+	const ae = document.activeElement;
+	if (ae && ae.dataset && ae.dataset.boneProp) return; // sudah ditangani input
+	e.preventDefault();
+	const step = (e.shiftKey ? 0.1 : 1) * (e.key === "ArrowUp" ? 1 : -1);
+	nudgeBone("rotation", step);
+});
+setBoneMode("rotate");
 
 /* --- IK ---------------------------------------------------------------- */
 el.ikBtn?.addEventListener("click", () => setIkMode(!IK.on));

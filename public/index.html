@@ -356,10 +356,40 @@
 			<div class="bone-row">
 				<span class="bone-label">Tulang</span>
 				<code data-bone-name>—</code>
-				<span class="bone-label">Rotasi</span>
-				<code data-bone-rot>—</code>
 				<span class="bone-label">Diubah</span>
 				<code data-bone-count>0</code>
+			</div>
+			<!-- Mode seret: putar / geser / skala. -->
+			<div class="bone-row">
+				<span class="bone-label">Mode</span>
+				<div class="bone-modes" role="group" aria-label="Mode seret tulang">
+					<button class="btn btn-sm bone-mode" id="bone-mode-rotate" data-mode="rotate" type="button"
+						title="Putar tulang (R)">Putar</button>
+					<button class="btn btn-sm bone-mode" id="bone-mode-move" data-mode="move" type="button"
+						title="Geser tulang (G)">Geser</button>
+					<button class="btn btn-sm bone-mode" id="bone-mode-scale" data-mode="scale" type="button"
+						title="Skala tulang (S)">Skala</button>
+				</div>
+			</div>
+			<!-- Nilai angka: bisa diketik langsung, panah untuk nudge. -->
+			<div class="bone-row bone-nums">
+				<label class="bone-num">
+					<span class="bone-label">Rotasi</span>
+					<input class="field field-xs mono" id="bone-num-rotation" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">X</span>
+					<input class="field field-xs mono" id="bone-num-x" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">Y</span>
+					<input class="field field-xs mono" id="bone-num-y" type="number" step="0.1" inputmode="decimal">
+				</label>
+				<label class="bone-num">
+					<span class="bone-label">Skala</span>
+					<input class="field field-xs mono" id="bone-num-scale" type="number" step="0.01" inputmode="decimal">
+				</label>
+				<span class="bone-hint">↑↓ ±1 · Shift+↑↓ ±0.1</span>
 			</div>
 			<div class="bone-row">
 				<button class="btn btn-sm" id="bone-undo" type="button" title="Batalkan langkah terakhir (Ctrl+Z)" disabled>↶</button>
