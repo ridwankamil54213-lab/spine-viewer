@@ -24,6 +24,17 @@
 		<h1>Spine&nbsp;Stage</h1>
 		<p class="brand-sub">Penampil skeleton 2D</p>
 	</div>
+	<!-- Breadcrumb: satu tempat yang menjawab "saya di mana", menggantikan
+	     label model yang mengambang. Strukturnya meniru sketsa 1
+	     (Pustaka / Game / Model) dan tiap bagian bisa diklik untuk naik. -->
+	<nav class="crumb" id="crumb" aria-label="Lokasi">
+		<button class="crumb-link" id="crumb-root" type="button" title="Kembali ke pustaka">Pustaka</button>
+		<span class="crumb-sep" id="crumb-sep-game" hidden>/</span>
+		<button class="crumb-link" id="crumb-game" type="button" hidden></button>
+		<span class="crumb-sep" id="crumb-sep-model" hidden>/</span>
+		<span class="crumb-here" id="crumb-model">—</span>
+	</nav>
+
 	<nav class="brand-meta">
 		<span class="mono" id="title-model">—</span>
 		<!-- Tautan permalink: menghasilkan URL yang mengembalikan persis

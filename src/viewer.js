@@ -43,7 +43,7 @@ import { loadTextures } from "@pixi/assets";
 import {
 	detectSpineVersion,
 	pickRuntime,
-} from "./spine-version.js";
+} from "./spine-version.cjs";
 import {
 	isLive2D,
 	loadLive2D,
@@ -5735,6 +5735,10 @@ function renderHud() {
 	document.title = current.name + " — Spine Stage";
 	el.gridLink.hidden = false;
 	el.delBtn.hidden = false;
+	// renderHud() dipanggil setiap model selesai dimuat, dan ia satu-satunya
+	// tempat yang pasti melihat `current` sudah terisi. syncPanes() tidak
+	// dipanggil di jalur itu, jadi breadcrumb harus disegarkan dari sini.
+	syncCrumb();
 }
 
 /* ------------------------------------------------------------------ *
@@ -6497,6 +6501,55 @@ const badgeLetter = (label) => (label || "?").trim().charAt(0).toUpperCase();
  * Label for one grid card. Prefers the real character name, and appends the
  * variant so c010 / c010+aim / c010+cover don't read as three identical "Rapi".
  */
+/**
+ * Segarkan breadcrumb (Pustaka / Game / Model).
+ *
+ * Dipanggil dari renderChrome(), satu-satunya tempat yang sudah tahu
+ * keadaan "sedang di mana". Isinya hanya membaca state — tidak mengubah
+ * apa pun — jadi aman dipanggil sesering apa pun.
+ */
+function syncCrumb() {
+	const root = document.getElementById("crumb-root");
+	const gameBtn = document.getElementById("crumb-game");
+	const sepGame = document.getElementById("crumb-sep-game");
+	const sepModel = document.getElementById("crumb-sep-model");
+	const here = document.getElementById("crumb-model");
+	if (!root || !gameBtn || !here) return;
+
+	const inGame = browse.view === "models" && !!browse.game;
+	const bucket = inGame ? gameBuckets().find((g) => g.key === browse.game) : null;
+	const gameLabel = bucket?.label || browse.game || "";
+
+	// Model hanya dianggap "terbuka" kalau memang pane model yang aktif.
+	// `current` tetap menyimpan model terakhir walau pengguna sudah kembali
+	// ke pustaka, jadi memakainya langsung membuat breadcrumb menampilkan
+	// nama model di halaman pustaka.
+	const hasModel = inGame && !!current;
+
+	// Bagian game hanya tampil kalau memang sedang di dalam sebuah game.
+	gameBtn.hidden = !inGame;
+	if (sepGame) sepGame.hidden = !inGame;
+	if (inGame) gameBtn.textContent = gameLabel;
+
+	if (sepModel) sepModel.hidden = !hasModel;
+	here.textContent = hasModel ? modelLabel(current) : "";
+	here.hidden = !hasModel;
+}
+
+function initCrumb() {
+	// Klik "Pustaka" -> kembali ke daftar game.
+	document.getElementById("crumb-root")?.addEventListener("click", () => {
+		browse.game = null;
+		browse.view = "games";
+		syncPanes();
+		renderGames();
+	});
+	// Klik nama game -> kembali ke daftar model game itu.
+	document.getElementById("crumb-game")?.addEventListener("click", () => {
+		document.getElementById("back-btn")?.click();
+	});
+}
+
 function modelLabel(m) {
 	if (m.character) {
 		const v = m.family && m.family.root !== m.id ? " " + m.family.label : "";
@@ -6912,6 +6965,7 @@ function syncPanes() {
 	}
 
 	syncUpdater(inGame ? browse.game : null);
+	syncCrumb();
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -10221,6 +10275,7 @@ function initToolsMenu() {
 	});
 }
 
+initCrumb();
 initToolsMenu();
 
 /* --- Editor tulang: undo/redo, pohon, ekspor skeleton ------------------ */

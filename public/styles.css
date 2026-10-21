@@ -2485,3 +2485,50 @@ input:focus-visible {
 	font-size: 12px;
 }
 .bounds-panel[hidden] { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * Breadcrumb di top bar
+ *
+ * Menggantikan label model yang mengambang di kanvas (sekarang HUD, tetap
+ * ada) dengan satu tempat yang menjawab "saya di mana" dan bisa dipakai
+ * untuk naik: Pustaka / Game / Model.
+ * ------------------------------------------------------------------ */
+.crumb {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	flex: 1 1 auto;
+	font-size: 13px;
+	color: var(--fg-mute);
+}
+.crumb[hidden] { display: none; }
+.crumb-link {
+	font: inherit;
+	font-size: 13px;
+	background: none;
+	border: 0;
+	padding: 2px 4px;
+	border-radius: 5px;
+	color: var(--fg-mute);
+	cursor: pointer;
+	max-width: 26ch;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.crumb-link:hover { color: var(--fg); background: rgba(255, 255, 255, 0.05); }
+.crumb-sep { color: var(--fg-mute); opacity: 0.5; }
+/* `#title-model` sudah digantikan breadcrumb. Elemennya TETAP ada karena
+   viewer.js menulis ke sana di banyak tempat, tapi tidak ditampilkan —
+   menyembunyikan lewat CSS jauh lebih aman daripada menghapusnya. */
+.brand-meta > #title-model { display: none; }
+
+.crumb-here {
+	color: var(--fg);
+	font-weight: 600;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
