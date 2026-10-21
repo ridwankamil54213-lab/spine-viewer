@@ -343,18 +343,28 @@ body {
 /* --- view 1: game cards --- */
 /* The list was cramped card-to-card, so 23 games read as one block of text.
  * A little more air between rows makes it scannable. */
-.game-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+/* Baris game dirapatkan: 64 px -> 46 px, jarak 10 -> 6 px.
+ *
+ * Ini satu-satunya daftar panjang di aplikasi: 63 game mengisi 4939 px di
+ * dalam wadah 836 px (skala 5,9x), jadi pengguna menghabiskan banyak waktu
+ * menggulir. Dengan tinggi 46 px skalanya turun ke ~3,9x dan yang terlihat
+ * sekaligus naik dari ~11 menjadi ~16 game.
+ *
+ * Yang dikecilkan hanya bingkai baris (padding + ikon); ukuran teks tetap,
+ * karena nama game panjang dan mengecilkannya akan memotong lebih banyak
+ * nama. */
+.game-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 
 .game {
 	width: 100%;
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	gap: 10px;
 	text-align: left;
 	background: var(--ink-800);
 	border: 1px solid var(--line);
 	border-radius: var(--r);
-	padding: 12px 13px;
+	padding: 7px 11px;
 	cursor: pointer;
 	color: var(--fg);
 	font-family: var(--font-body);
@@ -365,13 +375,13 @@ body {
 
 .game-badge {
 	flex: 0 0 auto;
-	width: 38px;
-	height: 38px;
-	border-radius: 9px;
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
 	display: grid;
 	place-items: center;
 	font-family: var(--font-display);
-	font-size: 15px;
+	font-size: 13px;
 	font-weight: 700;
 	color: #221703;
 	background: linear-gradient(145deg, var(--spark), #e08c14);
