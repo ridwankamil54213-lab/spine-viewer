@@ -31,6 +31,19 @@ const RUNTIMES = {
 	// bundles its own core and dispatches attachments with `instanceof`, so
 	// using a separate copy makes every model render as nothing at all.
 	"4.2": () => require("spine-pixi-v7-42"),
+	// Spine 4.3 — same reason as 4.2, and the same failure mode if omitted:
+	// pickRuntime() happily returns "4.3" for a 4.3.39 file, but this table
+	// had no entry for it, so probeSkelBinary skipped the key and fell through
+	// to older runtimes. 4.2 dies on the header ("Transform constraint data
+	// name must not be null"); 4.1 parses just far enough to return an empty
+	// skeleton with 0 bones, which the caller mistakes for success. Every 4.3
+	// model therefore landed in the cache with spine:null and no animations
+	// (~95 of them: all of azuretaboo and shenlan).
+	//
+	// Only the CORE is needed here — this path never renders, it just reads
+	// metadata — so the server-side spine-core is the right source. The
+	// browser uses @esotericsoftware/spine-pixi-v7 in the same way.
+	"4.3": () => require("@esotericsoftware/spine-core"),
 };
 
 const ROOT = path.resolve(__dirname, "..");
@@ -73,7 +86,11 @@ function probeSkelBinary(file, atlasFile) {
 	// Detection from the bytes picks the matching runtime; the fallback order
 	// then walks progressively OLDER runtimes. 4.2 is included because
 	// Stellar Affinity ships 4.2.35, which no @pixi-spine runtime can read.
-	const order = [key, "4.2", "4.1", "4.0", "3.8"];
+	// Newest first so a file whose version string is unreadable still lands on
+	// the runtime most likely to parse it. 4.3 leads the list for the same
+	// reason 4.2 does: it is a superset-era format, and anything it cannot
+	// read is older, not newer.
+	const order = [key, "4.3", "4.2", "4.1", "4.0", "3.8"];
 
 	let data = null;
 	let lastErr = null;
@@ -415,6 +432,24 @@ const GAME_ROOTS = [
 	// varian CG (`<id>_CG1`, `_CG2`). CDN + alias game (梦娘\幻姬\梦姬\少女总裁\
 	// Dream of Freya) ditemukan dari bongkaran '二游资源工具.exe' (tools/game-cdn-list.md).
 	{ match: "peachhan", key: "peachhan", label: "FREYA 夢姬 (Dream of Freya)" },
+	// PokerFate / 扑克命运. Unity 2022.3.62f3 (IL2CPP), Addressables di
+	// assets/aa/Android. Bundle dibungkus header XENC dan XOR-stream yang
+	// diderivasi ulang tiap 64 byte; konstanta S/C diturunkan dari
+	// GameAssembly.dll versi 2026-10 (lihat tools/pokerfate/decrypt.py).
+	// Skeleton Spine binary 4.1.24, atlas memakai kunci kustom
+	// bounds/offsets yang harus dikonversi dulu (convert_atlas.py).
+	//
+	// Hanya 75 dari 529 bundle berisi Spine; sisanya tekstur, CG, dan audio.
+	// Satu bundle bisa memuat beberapa model sekaligus (1001_3 memuat 4),
+	// jadi exporter menulis satu direktori per batang nama .skel.
+	// Diperbarui lewat: tools/pokerfate/update-pokerfate.py
+	{
+		match: "pokerfate",
+		key: "pokerfate",
+		label: "Poker Fate",
+		spineRuntime: "4.1",
+		pmaDefault: true,
+	},
 	{ match: "girlwars-l2d", key: "girlwars-l2d", label: "Girl Wars — Live2D" },
 	{ match: "girlwars", key: "girlwars", label: "Girl Wars" },
 	{ match: "ivntight", key: "ivntight", label: "イヴンタイト (IV-N-Tight)" },
