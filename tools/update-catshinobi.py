@@ -2,16 +2,24 @@
 """Perbarui model Spine Cat Shinobi (ねこ親方 / com.cookapps.catshinobi).
 
 Cat Shinobi adalah Unity Addressables: skeleton-nya berada di dalam bundle
-`assets/aa/Android/*.bundle` di dalam APK split `split_UnityDataAssetPack.apk`
-yang terpasang di perangkat (redroid). Tidak ada CDN terpisah — game ini
-mengemas 546 skeleton di satu bundle `defaultlocalgroup_assets_all_*.bundle`.
+`assets/aa/Android/*.bundle`. Game ini mengemas ~546 skeleton di satu bundle
+`defaultlocalgroup_assets_all_*.bundle`.
+
+Sumber APK: APKPure, selalu versi TERBARU
+    https://d.apkpure.com/b/XAPK/com.cookapps.catshinobi?version=latest
+XAPK itu zip berisi beberapa APK; yang dibutuhkan hanya UnityDataAssetPack.apk
+(548 MB dari total 710 MB), jadi updater membaca central directory lewat HTTP
+Range lalu mengunduh HANYA entri tersebut. Kalau versi di server berubah,
+updater otomatis mengambilnya; kalau sama, unduhan dilewati.
 
 Alur:
-    1. (opsional) `adb pull` split_UnityDataAssetPack.apk dari perangkat.
-    2. unzip `assets/aa/Android/*.bundle` ke direktori kerja.
-    3. Scan bundle: kumpulkan TextAsset .skel/.atlas + metadata Texture2D.
-    4. Bandingkan dengan folder yang sudah ada di assets/catshinobi -> baru.
-    5. Ekstrak HANYA yang baru ke assets/catshinobi/<nama>/.
+    1. Baca daftar entri XAPK (Range 3 MB terakhir), cari UnityDataAssetPack.apk.
+    2. Unduh entri itu saja ke WORK/UnityDataAssetPack.apk (md5 tidak tersedia
+       di APKPure, jadi ukuran dipakai sebagai penanda versi).
+    3. unzip `assets/aa/Android/*.bundle` ke direktori kerja.
+    4. Scan bundle: kumpulkan TextAsset .skel/.atlas + metadata Texture2D.
+    5. Bandingkan dengan folder yang sudah ada di assets/catshinobi -> baru.
+    6. Ekstrak HANYA yang baru ke assets/catshinobi/<nama>/.
 
 Catatan penting (warisan dari extract-catshinobi.py):
   * TextAsset di-decode lewat get_raw_data() + parser manual; obj.read().m_Script
@@ -23,7 +31,8 @@ Catatan penting (warisan dari extract-catshinobi.py):
 Pemakaian:
     /srv/venv-spine/bin/python tools/update-catshinobi.py --check
     /srv/venv-spine/bin/python tools/update-catshinobi.py --apply
-    /srv/venv-spine/bin/python tools/update-catshinobi.py --check --apk /opt/catshinobi/split_UnityDataAssetPack.apk
+    /srv/venv-spine/bin/python tools/update-catshinobi.py --apply --force    # paksa unduh ulang
+    /srv/venv-spine/bin/python tools/update-catshinobi.py --check --apk /opt/catshinobi/UnityDataAssetPack.apk
 """
 import argparse
 import json
@@ -34,6 +43,8 @@ import struct
 import subprocess
 import sys
 import time
+import urllib.parse
+import urllib.request
 import zipfile
 
 import UnityPy
@@ -41,9 +52,20 @@ import UnityPy
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ASSET_DIR = os.environ.get("CS_OUT", os.path.join(ROOT, "assets", "catshinobi"))
 WORK = os.environ.get("CS_WORK", "/srv/spine-assets/catshinobi-update")
-APK_CACHE = os.path.join(WORK, "split_UnityDataAssetPack.apk")
+APK_CACHE = os.path.join(WORK, "UnityDataAssetPack.apk")
 BUNDLE_ROOT = os.path.join(WORK, "bundles")
 BUNDLE_DIR = os.path.join(BUNDLE_ROOT, "assets", "aa", "Android")
+
+# Sumber resmi APK: APKPure melayani XAPK (zip berisi beberapa APK). Yang kita
+# butuhkan hanya UnityDataAssetPack.apk di dalamnya — 548 MB dari total 710 MB.
+# URL ini selalu menunjuk versi terbaru ("version=latest"), jadi setiap kali
+# updater dijalankan ia memeriksa versi terbaru lebih dulu.
+XAPK_URL = os.environ.get(
+    "CS_XAPK_URL",
+    "https://d.apkpure.com/b/XAPK/com.cookapps.catshinobi?version=latest",
+)
+TARGET_ENTRY = "UnityDataAssetPack.apk"
+UA = "Mozilla/5.0 (Linux; Android 13)"
 PKG = "com.cookapps.catshinobi"
 ADB = os.environ.get("ADB", "adb")
 SERIAL = os.environ.get("ADB_SERIAL", "127.0.0.1:15555")
@@ -119,37 +141,124 @@ def device_split_size(path):
     return -1
 
 
-def pull_bundles(force=False):
+def _http_open(url, headers=None, method="GET"):
+    h = {"User-Agent": UA}
+    if headers:
+        h.update(headers)
+    req = urllib.request.Request(url, headers=h, method=method)
+    return urllib.request.urlopen(req, timeout=60)
+
+
+def xapk_entries(url):
+    """Baca daftar entri XAPK tanpa mengunduh seluruh berkas.
+
+    XAPK adalah zip; central directory-nya ada di akhir berkas. Jadi cukup
+    ambil ~3 MB terakhir lewat HTTP Range, lalu parse sendiri. Ini menghindari
+    unduhan 710 MB hanya untuk mengetahui nama dan offset entri.
+    """
+    with _http_open(url) as r:
+        final = r.geturl()
+        total = int(r.headers.get("content-length") or 0)
+    if total <= 0:
+        raise RuntimeError("server tidak memberi content-length")
+
+    tail_len = min(3 * 1024 * 1024, total)
+    start = total - tail_len
+    with _http_open(final, {"Range": f"bytes={start}-{total - 1}"}) as r:
+        tail = r.read()
+
+    idx = tail.rfind(b"PK\x05\x06")
+    if idx < 0:
+        raise RuntimeError("central directory XAPK tidak ditemukan")
+    cd_size, cd_off = struct.unpack("<II", tail[idx + 12:idx + 20])
+    if cd_off < start:
+        raise RuntimeError("central directory di luar jendela Range")
+    cd = tail[cd_off - start: cd_off - start + cd_size]
+
+    out = []
+    p = 0
+    while p < len(cd) - 46 and cd[p:p + 4] == b"PK\x01\x02":
+        comp = struct.unpack("<I", cd[p + 20:p + 24])[0]
+        nlen = struct.unpack("<H", cd[p + 28:p + 30])[0]
+        elen = struct.unpack("<H", cd[p + 30:p + 32])[0]
+        clen = struct.unpack("<H", cd[p + 32:p + 34])[0]
+        off = struct.unpack("<I", cd[p + 42:p + 46])[0]
+        name = cd[p + 46:p + 46 + nlen].decode("utf-8", "replace")
+        out.append({"name": name, "comp": comp, "off": off, "dataoff": off + 30 + nlen + elen})
+        p += 46 + nlen + elen + clen
+    return final, total, out
+
+
+def download_latest_apk(force=False):
+    """Unduh UnityDataAssetPack.apk versi TERBARU dari APKPure.
+
+    Hanya entri itu yang diambil (548 MB dari 710 MB XAPK), memakai HTTP Range
+    di offset yang sudah dihitung. Kalau ukuran entri sama dengan berkas yang
+    sudah ada dan tidak `force`, unduhan dilewati — jadi menjalankan updater
+    berkali-kali tidak membuang bandwidth.
+
+    Kembalikan (path, versi_string).
+    """
+    _log("memeriksa versi terbaru di APKPure…")
+    final, total, entries = xapk_entries(XAPK_URL)
+    target = next((e for e in entries if e["name"] == TARGET_ENTRY), None)
+    if not target:
+        raise RuntimeError(f"{TARGET_ENTRY} tidak ada di XAPK (entri: {[e['name'] for e in entries]})")
+
+    # Versi ikut di nama berkas unduhan APKPure: "…_2.1.59_APKPure.xapk"
+    m = re.search(r"_([0-9]+(?:\.[0-9]+)+)_APKPure", urllib.parse.unquote(final))
+    version = m.group(1) if m else "unknown"
+
+    os.makedirs(WORK, exist_ok=True)
+    if (not force and os.path.exists(APK_CACHE)
+            and os.path.getsize(APK_CACHE) == target["comp"]):
+        _log(f"APK cache sudah versi terbaru ({version}, {target['comp']/2**20:.0f} MB) — lewati unduhan")
+        return APK_CACHE, version
+
+    _log(f"mengunduh {TARGET_ENTRY} v{version} ({target['comp']/2**20:.0f} MB)…")
+    tmp = APK_CACHE + ".part"
+    got = 0
+    end = target["dataoff"] + target["comp"] - 1
+    last = 0.0
+    with _http_open(final, {"Range": f"bytes={target['dataoff']}-{end}"}) as r, open(tmp, "wb") as fh:
+        while True:
+            chunk = r.read(1024 * 1024)
+            if not chunk:
+                break
+            fh.write(chunk)
+            got += len(chunk)
+            if time.time() - last > 10:
+                last = time.time()
+                _log(f"  {got/2**20:.0f} / {target['comp']/2**20:.0f} MB")
+    if got != target["comp"]:
+        os.unlink(tmp)
+        raise RuntimeError(f"unduhan tidak lengkap: {got} != {target['comp']}")
+    os.replace(tmp, APK_CACHE)
+    _log("unduhan selesai")
+    return APK_CACHE, version
+
+
+def pull_bundles(force=False, apk_path=None, apk_version=None):
     """Pastikan bundle ada di BUNDLE_DIR.
 
-    Murah saat diulang: kalau ukuran split di perangkat SAMA dengan APK yang
-    sudah di-cache, lewati pull+unzip (unduhan 528 MB tidak diulang tiap check);
-    kalau beda (game diperbarui) baru ambil ulang.
+    Sumber utama: APK terbaru dari APKPure. `apk_path` (argumen --apk) masih
+    didukung untuk memakai berkas lokal, mis. saat offline.
+
+    Ekstraksi selalu diulang dari APK yang dipakai, supaya tidak ada bundle
+    basi tertinggal saat game diperbarui.
     """
-    have_bundles = (os.path.isdir(BUNDLE_DIR)
-                    and any(f.endswith(".bundle") for f in os.listdir(BUNDLE_DIR)))
-    if have_bundles and not force:
-        dev = device_split_path()
-        if not dev:
-            return
-        size = device_split_size(dev)
-        if size > 0 and os.path.exists(APK_CACHE) and os.path.getsize(APK_CACHE) == size:
-            _log("cache cocok dengan perangkat — lewati pull 528 MB")
-            return  # cache masih cocok dengan perangkat
-    os.makedirs(WORK, exist_ok=True)
-    dev = device_split_path()
-    if not dev:
-        raise RuntimeError("split_UnityDataAssetPack.apk tidak ditemukan di perangkat")
-    size = device_split_size(dev)
-    need_pull = (not os.path.exists(APK_CACHE)
-                 or (size > 0 and os.path.getsize(APK_CACHE) != size))
-    if need_pull:
-        _log(f"adb pull split_UnityDataAssetPack.apk (~{size/1024**2:.0f} MB)…" if size > 0
-             else "adb pull split_UnityDataAssetPack.apk…")
-        subprocess.run([ADB, "-s", SERIAL, "pull", dev, APK_CACHE],
-                       check=True, capture_output=True, text=True)
-    # bersihkan lalu ekstrak ulang supaya tak ada bundle basi
-    _log("ekstrak bundle dari split APK…")
+    global APK_CACHE
+    if apk_path:
+        APK_CACHE = apk_path
+        _log(f"memakai APK lokal: {apk_path}")
+    elif not (os.path.isdir(BUNDLE_DIR) and any(f.endswith(".bundle") for f in os.listdir(BUNDLE_DIR))) or force:
+        APK_CACHE, _ver = download_latest_apk(force=force)
+    else:
+        # Bundle sudah ada; tetap periksa versi terbaru supaya pembaruan tidak
+        # terlewat. Kalau ukurannya sama, unduhan dilewati oleh download_latest_apk.
+        APK_CACHE, _ver = download_latest_apk(force=False)
+
+    _log("ekstrak bundle dari APK…")
     if os.path.isdir(BUNDLE_ROOT):
         shutil.rmtree(BUNDLE_ROOT, ignore_errors=True)
     os.makedirs(BUNDLE_ROOT, exist_ok=True)
@@ -210,9 +319,9 @@ def discover():
     return texts, tex_objs, skels
 
 
-def check():
+def check(apk_path=None, force=False):
     try:
-        pull_bundles()
+        pull_bundles(apk_path=apk_path, force=force)
         texts, tex_objs, skels = discover()
     except Exception as exc:  # noqa: BLE001
         return {"ok": False, "error": str(exc)[:200], "new": 0, "installed": len(installed())}
@@ -236,9 +345,9 @@ def check():
     }
 
 
-def apply_update(limit=0):
+def apply_update(limit=0, apk_path=None, force=False):
     try:
-        pull_bundles()
+        pull_bundles(apk_path=apk_path, force=force)
         texts, tex_objs, skels = discover()
     except Exception as exc:  # noqa: BLE001
         return {"ok": False, "error": str(exc)[:200], "extracted": 0}
@@ -315,20 +424,22 @@ def main():
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--limit", type=int, default=0)
-    ap.add_argument("--apk", default=None, help="pakai APK split lokal (lewati adb pull)")
+    ap.add_argument("--apk", default=None,
+                    help="pakai APK lokal; default: unduh versi terbaru dari APKPure")
+    ap.add_argument("--force", action="store_true",
+                    help="paksa unduh ulang walau ukuran cache sama")
     ap.add_argument("--bundles", default=None, help="pakai direktori bundle lokal")
     a = ap.parse_args()
 
-    global APK_CACHE, BUNDLE_DIR
-    if a.apk:
-        APK_CACHE = a.apk
+    global BUNDLE_DIR
     if a.bundles:
         BUNDLE_DIR = a.bundles
 
     if a.apply:
-        print(json.dumps(apply_update(limit=a.limit), indent=1, ensure_ascii=False))
+        print(json.dumps(apply_update(limit=a.limit, apk_path=a.apk, force=a.force),
+                         indent=1, ensure_ascii=False))
     elif a.check:
-        print(json.dumps(check(), indent=1, ensure_ascii=False))
+        print(json.dumps(check(apk_path=a.apk, force=a.force), indent=1, ensure_ascii=False))
     else:
         ap.print_help()
         return 2
