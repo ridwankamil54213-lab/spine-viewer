@@ -41,13 +41,33 @@ def log(msg: str) -> None:
 
 
 def skeleton_version(data: bytes) -> str:
-    """Ambil string versi dari .skel biner (hash nul-terminated lalu versi)."""
-    try:
-        j = data.index(b"\x00", 0, 64) + 1
-        k = data.index(b"\x00", j, j + 32)
-        return data[j:k].decode("ascii", "replace")
-    except ValueError:
-        return "?"
+    """Ambil string versi Spine dari .skel biner.
+
+    Jangan mengandalkan offset tetap: tata letak header berbeda antar versi.
+    Pada 3.6/3.8 ada hash 8 byte lalu string versi; pada 3.4/3.5 langsung
+    string versi. Jadi cari pola "x.y.z" di 64 byte pertama dan ambil yang
+    bentuknya paling masuk akal.
+
+    Versi salah baca sebelumnya membuat laporan statistik penuh sampah biner
+    (mis. "=1725", "root=3") sehingga tidak informatif.
+    """
+    head = data[:64]
+    best = ""
+    i = 0
+    while i < len(head) - 3:
+        if head[i : i + 1].isdigit():
+            j = i
+            while j < len(head) and (head[j : j + 1].isdigit() or head[j : j + 1] == b"."):
+                j += 1
+            cand = head[i:j].decode("ascii", "ignore")
+            # bentuk yang diharapkan: digit.digit[.digit]
+            if cand.count(".") >= 1 and len(cand) >= 3:
+                best = cand
+                break
+            i = j
+        else:
+            i += 1
+    return best or "?"
 
 
 def main() -> int:
