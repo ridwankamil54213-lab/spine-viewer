@@ -94,7 +94,10 @@ def remote_path(game: str, rel: str) -> str:
 def atlas_pages(text: str) -> list[str]:
     out = []
     for line in text.splitlines():
-        s = line.strip()
+        # Sebagian atlas diawali BOM (U+FEFF) sebelum nama halaman pertama;
+        # kalau tidak dibuang, nama berkasnya ikut membawa karakter tak
+        # terlihat dan unduhan PNG selalu 404.
+        s = line.strip().lstrip("\ufeff").strip()
         if s.lower().endswith((".png", ".jpg", ".jpeg")) and ":" not in s:
             out.append(s)
     return out
@@ -139,12 +142,27 @@ def load_models(game: str) -> list[dict]:
                 if name.endswith(suf):
                     name = name[: -len(suf)]
             stem = name.rsplit(".", 1)[0] if "." in name else name
-            key = stem
+
+            # Kunci folder harus unik. Satu karakter bisa punya beberapa varian
+            # dan nama .skel-nya bisa SAMA di folder berbeda — contoh nyata BD2
+            # `004201`: varian 0 dan varian 1 dua-duanya bernama
+            # `cutscene_char004201.skel.bytes`, hanya foldernya yang beda
+            # (…/cutscene_char004201/ vs …/cutscene_char004201_1/). Memakai
+            # nama skel saja membuat varian 1 menimpa varian 0.
+            dname = (s.get("dir") or "").rstrip("/").rsplit("/", 1)[-1]
+            if dname and dname != stem:
+                key = f"{stem}__{dname}"
+            else:
+                key = stem
             if key in seen:
-                continue
+                # masih bentrok: tambahkan nomor urut agar tidak ada yang hilang
+                n = 2
+                while f"{key}_{n}" in seen:
+                    n += 1
+                key = f"{key}_{n}"
             seen.add(key)
             models.append({
-                "name": "".join(c if c.isalnum() or c in "_-." else "_" for c in stem),
+                "name": "".join(c if c.isalnum() or c in "_-." else "_" for c in key),
                 "dir": s.get("dir") or "",
                 "skel": skel,
                 "atlas": s.get("atlas") or "",
@@ -162,10 +180,23 @@ def download_one(game: str, m: dict, out_dir: str) -> tuple[str, int, str | None
         return m["name"], 0, str(e)[:70]
 
     os.makedirs(dest, exist_ok=True)
-    with open(os.path.join(dest, f"{m['name']}.skel"), "wb") as fh:
+
+    # Nama berkas di disk harus mengikuti nama ASLI dari index, bukan nama
+    # folder. Dua varian bisa punya folder berbeda tapi nama skel sama
+    # (BD2 `004201`, NIKKE `catalog-*`), sehingga menamai berkas dengan nama
+    # folder membuat .skel tidak ditemukan dan folder berisi atlas saja.
+    skel_name = os.path.basename(m["skel"])
+    for suf in (".bytes", ".txt"):
+        if skel_name.endswith(suf):
+            skel_name = skel_name[: -len(suf)]
+    if not skel_name.endswith(".skel"):
+        skel_name = skel_name.rsplit(".", 1)[0] + ".skel"
+    atlas_name = skel_name[: -len(".skel")] + ".atlas"
+
+    with open(os.path.join(dest, skel_name), "wb") as fh:
         fh.write(skel)
     atlas_text = convert_atlas(atlas_raw.decode("utf-8", "replace"))
-    with open(os.path.join(dest, f"{m['name']}.atlas"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(dest, atlas_name), "w", encoding="utf-8") as fh:
         fh.write(atlas_text)
 
     n = 2
