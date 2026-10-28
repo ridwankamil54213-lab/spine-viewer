@@ -230,12 +230,35 @@ function inspectSkeleton(file, atlasFile) {
 	return meta;
 }
 
+/**
+ * True when `buf` is a Spine JSON skeleton rather than a binary one that
+ * merely happens to start with '{'.
+ *
+ * Spine JSON always begins `{"skeleton":{` (whitespace allowed), and a binary
+ * .skel carries arbitrary bytes — including NULs and 0xFF — so a quick head
+ * check on both the prefix and the byte distribution separates them reliably
+ * without paying for a full JSON.parse of a multi-hundred-KB file.
+ */
+function looksLikeJsonSkeleton(buf) {
+	const head = buf.subarray(0, 64).toString("utf8");
+	if (/^\s*\{\s*"(skeleton|bones|slots)"/.test(head)) return true;
+	// No recognised key up front: fall back to "is this text at all?".
+	const probe = buf.subarray(0, 512);
+	for (const b of probe) if (b === 0 || b === 0xff) return false;
+	return false;
+}
+
 function inspectSkeletonUncached(file, atlasFile) {
 	try {
 		const buf = fs.readFileSync(file);
 		if (buf.length < 8) return null;
-		if (buf[0] === 0x7b) {
-			// starts with '{' -> JSON skeleton
+		// A binary .skel is a hash prefix followed by an ASCII version string,
+		// so nothing stops the first byte from being '{' (0x7b). Cherry Tale
+		// ships four such files; testing only buf[0] sent them down the JSON
+		// path, JSON.parse threw, the catch returned null and the model showed
+		// up with runtime:null / animations:[] even though it renders fine.
+		// Require the payload to really look like JSON before parsing it.
+		if (buf[0] === 0x7b && looksLikeJsonSkeleton(buf)) {
 			const data = JSON.parse(buf.toString("utf8"));
 			const skel = data.skeleton || {};
 			const ver = String(skel.spine || "");
@@ -761,17 +784,28 @@ const GAME_ROOTS = [
 	},
 	// Cherry Tale (88kongque).
 	//
-	// Daftar bundle-nya (bundleMap.txt) berbentuk "assetID|bundleName",
-	// bukan katalog Addressables. Diunduh oleh tools/extract-cherrytale.py.
+	// Sumbernya sekarang index JSON, bukan bundleMap.txt lagi:
+	//   https://pfdd.88kongque.com/patch/files/index.txt.<md5>
+	//   {"<nama aset>": [ukuran, "<md5>"], ...}  ->  <BASE>/<nama aset>.<md5>
+	// Diunduh dan diekstrak oleh tools/extract-cherrytale.py.
 	//
-	// 212 model, hampir semuanya skeleton BINER .skel versi 4.0.55 (143) dan
-	// 4.0.64 (68). Runtime 4.0/4.1 membaca keduanya, jadi tidak perlu
-	// konversi apa pun.
+	// Bundle-nya HARUS didekripsi dulu. Resepnya (CherryTaleDecrypt.py):
+	//   1. tukar bytes[i] <-> bytes[len-i] untuk i in {0x3FB, 0xD99, 0x197C}
+	//      (memperbaiki dua field ukuran di header + satu byte blok info)
+	//   2. ganti b"2018.3.5f1\0" -> b"2020.3.41f1\0" lalu LEWATI satu byte
+	//      sesudahnya, karena string pengganti satu byte lebih panjang
+	// Tanpa langkah 2, field ukuran bergeser dan UnityPy melapor
+	// "signed integer is greater than maximum".
 	//
-	// Tidak perlu dekripsi untuk bundle dari CDN ini — magic UnityFS ada di
-	// offset 0 dan versinya sudah benar. (Script CherryTaleDecrypt.py yang
-	// beredar menukar tiga byte dan mengganti string versi 2018.3.5f1; itu
-	// diperlukan untuk berkas yang diambil dari perangkat, bukan dari sini.)
+	// PENTING soal penamaan folder: nama aset di index memuat path lengkap
+	// (assets_resources_honly_baseassets_uiprefabs_simpleprefab_..._cg_spine).
+	// Kalau dipakai apa adanya, satu model jadi 15 tingkat direktori --
+	// melewati batas kedalaman pemindai (8 di scanModels/walkAssets) sehingga
+	// modelnya tidak pernah muncul. Extractor memangkasnya jadi satu tingkat:
+	// assets/cherrytale/img_cg_dynamic_e004_02_teaching_cg_spine/.
+	//
+	// Model campuran Spine 4.0.55 dan 4.0.64, skeleton biner .skel. Runtime
+	// 4.0/4.1 membaca keduanya, jadi tidak perlu konversi.
 	//
 	// Deteksi versi per berkas sudah cukup — jangan paksa spineRuntime.
 	{
@@ -2785,6 +2819,31 @@ function buildModelsPayload(models) {
 	};
 	return modelsPayload;
 }
+
+/**
+ * Data interaksi CrossCore.
+ *
+ * Sumber: katalog ArtHub (crosscore-interaction/catalog/catalog.json, 4,3 MB),
+ * diringkas oleh tools/update-crosscore-interaction.py menjadi
+ * data/cc-interaction.json (~0,36 MB) yang hanya memuat field yang dipakai
+ * mesin interaksi: id, nama, prefab, grup, dan daftar aksi (areas, audioId,
+ * sType, content).
+ *
+ * Dipisah dari /api/models karena payload-nya besar dan hanya dibutuhkan
+ * saat pengguna membuka panel interaksi.
+ */
+app.get("/api/interaction/:game", (req, res) => {
+	const game = String(req.params.game || "").toLowerCase();
+	const allowed = { crosscore: "cc-interaction.json" };
+	const file = allowed[game];
+	if (!file) return res.status(404).json({ error: "game tidak punya data interaksi" });
+	try {
+		const raw = fs.readFileSync(path.join(ROOT, "data", file), "utf8");
+		res.type("application/json").send(raw);
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
+});
 
 app.get("/api/models", (req, res) => {
 	try {

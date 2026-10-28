@@ -39,6 +39,7 @@ import {
 	AtlasAttachmentLoader as AtlasAttachmentLoader43,
 } from "@esotericsoftware/spine-pixi-v7";
 import * as runtime43 from "@esotericsoftware/spine-pixi-v7";
+import { InteractionController } from "./interaction-core.js";
 import { loadTextures } from "@pixi/assets";
 import {
 	detectSpineVersion,
@@ -4181,6 +4182,11 @@ async function loadModelBody(model) {
 		// would answer hit tests with names this model doesn't have.
 		parts.bounds = null;
 		parts.hover = null;
+
+		// Nyalakan mesin interaksi kalau model ini punya data aksi.
+		// Sengaja tidak di-await: katalog 0,36 MB dan kegagalannya tidak
+		// boleh menggagalkan pemuatan model.
+		cciAttach(model).catch(() => {});
 	} catch (err) {
 		console.error(err);
 		showError(`Gagal memuat “${model.name}”: ${err.message}`);
@@ -7743,11 +7749,127 @@ function fromStagePoint(x, y) {
 	};
 }
 
+// ── Interaksi CrossCore ────────────────────────────────────────────────
+// Model CrossCore interaktif punya daftar aksi dengan kotak sentuh
+// (areas) dalam koordinat model. Klik pada area menjalankan animasi
+// yang sesuai. Mesin state-nya ada di src/interaction-core.js (port
+// dari ArtHub), di sini hanya bagian renderer + input.
+//
+// Nonaktif secara default supaya tidak mengganggu alur klik yang sudah
+// ada (pan, vertex, bounds, IK). Menyala hanya kalau model yang dimuat
+// punya data interaksi.
+const CCI = {
+	on: false,
+	catalog: null,        // {models: [...]} dari /api/interaction/crosscore
+	byPrefab: new Map(),  // prefab -> {idle, actions}
+	controller: null,
+	lastEvent: null,
+	// Bounding box model dalam koordinat stage, dipakai untuk memetakan
+	// titik sentuh (koordinat area memakai ruang model, bukan piksel).
+	bounds: null,
+};
+
+/** Muat katalog interaksi sekali saja (0,36 MB, di-cache browser). */
+async function cciLoadCatalog() {
+	if (CCI.catalog) return CCI.catalog;
+	const res = await fetch("/api/interaction/crosscore");
+	if (!res.ok) throw new Error(`katalog interaksi ${res.status}`);
+	const data = await res.json();
+	CCI.catalog = data;
+	CCI.byPrefab = new Map();
+	for (const m of data.models || []) {
+		// idle default: aksi bernama "in", kalau tidak ada pakai aksi pertama
+		const idleAction = (m.actions || []).find((a) => a.sName === "in");
+		CCI.byPrefab.set(String(m.prefab || "").toLowerCase(), {
+			id: m.id,
+			name: m.name,
+			title: m.title,
+			idle: idleAction?.sName || null,
+			actions: m.actions || [],
+		});
+	}
+	return data;
+}
+
+/** Nama model saat ini -> data interaksi, atau null. */
+function cciEntryFor(model) {
+	if (!model || !CCI.byPrefab.size) return null;
+	// id model di viewer: <game>/<folder>. Folder interaktif dibuat dari
+	// nama prefab, jadi cocokkan lewat basis nama folder.
+	const folder = String(model.id || "").split("/").pop().toLowerCase();
+	if (CCI.byPrefab.has(folder)) return CCI.byPrefab.get(folder);
+	// prefab bisa punya akhiran lain; coba pencocokan longgar sekali
+	for (const [k, v] of CCI.byPrefab) {
+		if (folder.startsWith(k) || k.startsWith(folder)) return v;
+	}
+	return null;
+}
+
+/** Hit-test titik stage terhadap area aksi. */
+function cciHitAt(clientX, clientY) {
+	if (!CCI.on || !CCI.controller) return null;
+	const p = toStagePoint(clientX, clientY);
+	// Area dinyatakan dalam ruang model dengan y menghadap ke atas,
+	// sedangkan toStagePoint memberi koordinat y ke bawah -> balik.
+	return CCI.controller.hit(p.x, -p.y);
+}
+
+/** Jalankan aksi pada indeks tertentu. */
+function cciTrigger(index) {
+	if (!CCI.on || !CCI.controller) return null;
+	return CCI.controller.trigger(index, performance.now() / 1000);
+}
+
+/** Pasang/lepas interaksi ketika model berganti. */
+async function cciAttach(model) {
+	CCI.on = false;
+	CCI.controller = null;
+	CCI.lastEvent = null;
+	try {
+		await cciLoadCatalog();
+	} catch {
+		return;
+	}
+	const entry = cciEntryFor(model);
+	if (!entry || !entry.actions.length) return;
+	CCI.controller = new InteractionController({ actions: entry.actions, idle: entry.idle }, (ev) => {
+		CCI.lastEvent = ev;
+		cciApplyEvent(ev);
+	});
+	CCI.on = true;
+}
+
+/** Terapkan hasil aksi ke viewer (mainkan animasi). */
+function cciApplyEvent(ev) {
+	if (!ev || !spine) return;
+	if (ev.kind === "action" || ev.kind === "guide" || ev.kind === "idle") {
+		const name = ev.name || ev.kind === "idle" ? ev.name : null;
+		if (!name) return;
+		const names = current?.animations || [];
+		if (!names.includes(name)) return;
+		animName = name;
+		if (el.animSelect) el.animSelect.value = name;
+		try {
+			spine.state.setAnimation(0, name, true);
+			spine.state.timeScale = 1;
+		} catch {
+			/* animasi tidak cocok dengan runtime ini; abaikan */
+		}
+	}
+}
+
 // Vertex mesh: klik mesh untuk memilih, klik titik untuk memilih vertex,
 // lalu tarik untuk memindahkannya.
 el.canvasWrap.addEventListener(
 	"pointerdown",
 	(e) => {
+		if (CCI.on && e.button === 0) {
+			const hit = cciHitAt(e.clientX, e.clientY);
+			if (hit) {
+				cciTrigger(hit.index);
+				return; // jangan lanjut ke pan/vertex
+			}
+		}
 		if (!VTX.on || !spine || e.button !== 0) return;
 		const p = toStagePoint(e.clientX, e.clientY);
 		const sc = 1 / (state.zoom || 1);
