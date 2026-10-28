@@ -115,6 +115,10 @@ langsung dimuat dan diputar.
 | `I` | Toggle inspektor |
 | `P` | Toggle FPS meter |
 | `R` | Toggle part picker |
+| `X` | Ganti tampilan pustaka: daftar ↔ galeri |
+| `Y` | Toggle nama slot (tooltip) |
+| `Shift+E` | Toggle edit tulang |
+| `V` `U` `J` | Toggle mode vertex / bounds / IK |
 | `\` | Toggle sidebar |
 | `,` `.` | Step keyframe (kalau timeline kebuka) |
 | `Esc` | Tutup dialog / keluar fullscreen |
@@ -139,6 +143,28 @@ Entry yang lebih spesifik harus ditaruh **sebelum** yang lebih umum:
 Script ekstraksi ada di `tools/` (dan `tools/REFERENCES.md` buat catatan
 sumber eksternal). Tiap game beda format bundle, jadi script-nya juga beda —
 lihat `tools/extract-*.py` yang udah ada buat contoh.
+
+### Cherry Tale
+
+Bundle-nya diacak, bukan dienkripsi betulan, dan **wajib** didekripsi dulu
+(`tools/extract-cherrytale.py` melakukannya otomatis):
+
+1. tukar `bytes[i] <-> bytes[len-i]` untuk `i` di `{0x3FB, 0xD99, 0x197C}`
+2. ganti `2018.3.5f1\0` → `2020.3.41f1\0`, lalu **lewati satu byte** sesudahnya
+
+Langkah 2 penting: string pengganti satu byte lebih panjang, jadi tanpa
+lompatan itu semua field setelahnya bergeser dan UnityPy melapor
+`signed integer is greater than maximum`.
+
+Nama aset di index memuat path penuh
+(`assets_resources_honly_baseassets_uiprefabs_simpleprefab_..._cg_spine`).
+Dipakai apa adanya, satu model jadi 15 tingkat direktori — melewati batas
+kedalaman pemindai (8), sehingga modelnya tidak pernah muncul. Extractor
+memangkasnya jadi satu tingkat:
+`assets/cherrytale/img_cg_dynamic_e004_02_teaching_cg_spine/`.
+
+> Bundle `_gacha_` dan `rtcamera_` tidak memuat TextAsset (spine-nya
+> dirujuk dari bundle lain), jadi memang dilewati — bukan gagal.
 
 ### Upload manual
 
@@ -209,6 +235,7 @@ node tools/check-toolbar.cjs     # layout toolbar
 node tools/check-fps.cjs         # FPS meter
 node tools/check-mad-ports.cjs   # export PNG, clock, part picker
 node tools/check-permalink.cjs   # tautan: tulis, dialog, pulihkan, payload rusak
+node tools/check-cherrytale.cjs  # model Cherry Tale benar-benar tergambar
 ```
 
 Butuh `playwright-core` dan server jalan di port 3000.
