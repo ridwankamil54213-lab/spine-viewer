@@ -100,3 +100,11 @@ data/scan-memo.json
 
 # azlassets config dir created if azl runs in repo root
 /config/
+
+# Katalog interaksi mentah dari ArtHub (4,3 MB). Versi ringkasnya
+# (data/cc-interaction.json) yang dipakai viewer dan ikut di-commit.
+data/crosscore-interaction-catalog.json
+
+# Kunci dekripsi aset hasil capture (data/mlbb-crypto.json). Kunci tidak
+# pernah ikut repo; extractor membacanya dari disk kalau ada.
+data/mlbb-crypto.json
