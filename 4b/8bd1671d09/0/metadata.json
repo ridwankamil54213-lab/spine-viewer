@@ -1,0 +1,41 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "4b8bd1671d09",
+  "session_id": "local-55a9aa0f369cf388210e494daf37f126d68fe462b15af3974626f47c98601ac9",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-05T15:19:12.133386001Z",
+  "branch": "master",
+  "checkpoints_count": 5,
+  "save_step_count": 5,
+  "files_touched": [
+    "data/lustyodyssey-names.json",
+    "public/index.html",
+    "public/styles.css",
+    "public/thumbs/_game/lustyodyssey.png",
+    "src/server.js",
+    "src/viewer.js",
+    "tools/lustyodyssey/README.md",
+    "tools/lustyodyssey/prepare-pack.py"
+  ],
+  "agent": "Hermes Agent",
+  "model": "tokenharbor/deepseek-v4.1-flash:free",
+  "turn_id": "0dc0b0ff783a",
+  "compact_transcript_start": 0,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 5
+  }
+}
