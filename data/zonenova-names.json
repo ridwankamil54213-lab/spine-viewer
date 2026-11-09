@@ -1,0 +1,1506 @@
+{
+ "cg1_4001": {
+  "character": "Naya",
+  "id": "4001",
+  "kind": "CG",
+  "name": "Naya — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4002": {
+  "character": "Lyla",
+  "id": "4002",
+  "kind": "CG",
+  "name": "Lyla — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4003": {
+  "character": "Pennie",
+  "id": "4003",
+  "kind": "CG",
+  "name": "Pennie — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4004": {
+  "character": "Cynia",
+  "id": "4004",
+  "kind": "CG",
+  "name": "Cynia — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4005": {
+  "character": "Cleopatra",
+  "id": "4005",
+  "kind": "CG",
+  "name": "Cleopatra — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4006": {
+  "character": "Horus",
+  "id": "4006",
+  "kind": "CG",
+  "name": "Horus — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4007": {
+  "character": "Anubis",
+  "id": "4007",
+  "kind": "CG",
+  "name": "Anubis — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4008": {
+  "character": "Guinevere",
+  "id": "4008",
+  "kind": "CG",
+  "name": "Guinevere — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4009": {
+  "character": "Arthur",
+  "id": "4009",
+  "kind": "CG",
+  "name": "Arthur — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4010": {
+  "character": "Merlin",
+  "id": "4010",
+  "kind": "CG",
+  "name": "Merlin — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4011": {
+  "character": "Joan of Arc",
+  "id": "4011",
+  "kind": "CG",
+  "name": "Joan of Arc — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4012": {
+  "character": "Gaia",
+  "id": "4012",
+  "kind": "CG",
+  "name": "Gaia — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4013": {
+  "character": "Zeus",
+  "id": "4013",
+  "kind": "CG",
+  "name": "Zeus — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4014": {
+  "character": "Hera",
+  "id": "4014",
+  "kind": "CG",
+  "name": "Hera — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4015": {
+  "character": "Apollo",
+  "id": "4015",
+  "kind": "CG",
+  "name": "Apollo — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4016": {
+  "character": "Artemis",
+  "id": "4016",
+  "kind": "CG",
+  "name": "Artemis — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4017": {
+  "character": "Athena",
+  "id": "4017",
+  "kind": "CG",
+  "name": "Athena — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4018": {
+  "character": "Aphrodite",
+  "id": "4018",
+  "kind": "CG",
+  "name": "Aphrodite — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4019": {
+  "character": "Hela",
+  "id": "4019",
+  "kind": "CG",
+  "name": "Hela — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4020": {
+  "character": "Odin",
+  "id": "4020",
+  "kind": "CG",
+  "name": "Odin — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4021": {
+  "character": "Thor",
+  "id": "4021",
+  "kind": "CG",
+  "name": "Thor — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4022": {
+  "character": "Loki",
+  "id": "4022",
+  "kind": "CG",
+  "name": "Loki — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4023": {
+  "character": "Frigga",
+  "id": "4023",
+  "kind": "CG",
+  "name": "Frigga — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4024": {
+  "character": "Freya",
+  "id": "4024",
+  "kind": "CG",
+  "name": "Freya — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4025": {
+  "character": "Tamamo-no-Mae",
+  "id": "4025",
+  "kind": "CG",
+  "name": "Tamamo-no-Mae — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4026": {
+  "character": "Shuten-dōji",
+  "id": "4026",
+  "kind": "CG",
+  "name": "Shuten-dōji — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4027": {
+  "character": "Ibaraki-doji",
+  "id": "4027",
+  "kind": "CG",
+  "name": "Ibaraki-doji — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4028": {
+  "character": "Jorogumo",
+  "id": "4028",
+  "kind": "CG",
+  "name": "Jorogumo — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4029": {
+  "character": "Keller",
+  "id": "4029",
+  "kind": "CG",
+  "name": "Keller — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4030": {
+  "character": "Hiyori",
+  "id": "4030",
+  "kind": "CG",
+  "name": "Hiyori — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4031": {
+  "character": "Sharin",
+  "id": "4031",
+  "kind": "CG",
+  "name": "Sharin — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4032": {
+  "character": "Jill",
+  "id": "4032",
+  "kind": "CG",
+  "name": "Jill — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4033": {
+  "character": "Lust - Asmodeus",
+  "id": "4033",
+  "kind": "CG",
+  "name": "Lust - Asmodeus — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4034": {
+  "character": "Pride - Lucifer",
+  "id": "4034",
+  "kind": "CG",
+  "name": "Pride - Lucifer — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4035": {
+  "character": "Wrath - Samael",
+  "id": "4035",
+  "kind": "CG",
+  "name": "Wrath - Samael — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4036": {
+  "character": "Gluttony - Beelzebub",
+  "id": "4036",
+  "kind": "CG",
+  "name": "Gluttony - Beelzebub — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4037": {
+  "character": "Lavinia",
+  "id": "4037",
+  "kind": "CG",
+  "name": "Lavinia — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4038": {
+  "character": "Lily",
+  "id": "4038",
+  "kind": "CG",
+  "name": "Lily — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4039": {
+  "character": "Nini",
+  "id": "4039",
+  "kind": "CG",
+  "name": "Nini — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4040": {
+  "character": "Morgan Le Fey",
+  "id": "4040",
+  "kind": "CG",
+  "name": "Morgan Le Fey — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4041": {
+  "character": "Apep",
+  "id": "4041",
+  "kind": "CG",
+  "name": "Apep — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4050": {
+  "character": "Erika",
+  "id": "4050",
+  "kind": "CG",
+  "name": "Erika — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4051": {
+  "character": "Veronica",
+  "id": "4051",
+  "kind": "CG",
+  "name": "Veronica — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4052": {
+  "character": "Set",
+  "id": "4052",
+  "kind": "CG",
+  "name": "Set — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4053": {
+  "character": "Nephthys",
+  "id": "4053",
+  "kind": "CG",
+  "name": "Nephthys — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4054": {
+  "character": "Bedivere",
+  "id": "4054",
+  "kind": "CG",
+  "name": "Bedivere — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4055": {
+  "character": "Bors",
+  "id": "4055",
+  "kind": "CG",
+  "name": "Bors — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4056": {
+  "character": "Poseidon",
+  "id": "4056",
+  "kind": "CG",
+  "name": "Poseidon — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4057": {
+  "character": "Medusa",
+  "id": "4057",
+  "kind": "CG",
+  "name": "Medusa — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4058": {
+  "character": "Brynhild",
+  "id": "4058",
+  "kind": "CG",
+  "name": "Brynhild — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4059": {
+  "character": "Fenrir",
+  "id": "4059",
+  "kind": "CG",
+  "name": "Fenrir — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4060": {
+  "character": "Ootakemaru",
+  "id": "4060",
+  "kind": "CG",
+  "name": "Ootakemaru — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4061": {
+  "character": "Suzuka Gozen",
+  "id": "4061",
+  "kind": "CG",
+  "name": "Suzuka Gozen — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_4062": {
+  "character": "Secret Archduke - Nahema",
+  "id": "4062",
+  "kind": "CG",
+  "name": "Secret Archduke - Nahema — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_8001": {
+  "character": "Sigurd",
+  "id": "8001",
+  "kind": "CG",
+  "name": "Sigurd — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg1_8002": {
+  "character": "Mila",
+  "id": "8002",
+  "kind": "CG",
+  "name": "Mila — CG 1",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 1"
+ },
+ "cg2_4001": {
+  "character": "Naya",
+  "id": "4001",
+  "kind": "CG",
+  "name": "Naya — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4002": {
+  "character": "Lyla",
+  "id": "4002",
+  "kind": "CG",
+  "name": "Lyla — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4003": {
+  "character": "Pennie",
+  "id": "4003",
+  "kind": "CG",
+  "name": "Pennie — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4004": {
+  "character": "Cynia",
+  "id": "4004",
+  "kind": "CG",
+  "name": "Cynia — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4005": {
+  "character": "Cleopatra",
+  "id": "4005",
+  "kind": "CG",
+  "name": "Cleopatra — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4006": {
+  "character": "Horus",
+  "id": "4006",
+  "kind": "CG",
+  "name": "Horus — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4007": {
+  "character": "Anubis",
+  "id": "4007",
+  "kind": "CG",
+  "name": "Anubis — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4008": {
+  "character": "Guinevere",
+  "id": "4008",
+  "kind": "CG",
+  "name": "Guinevere — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4009": {
+  "character": "Arthur",
+  "id": "4009",
+  "kind": "CG",
+  "name": "Arthur — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4010": {
+  "character": "Merlin",
+  "id": "4010",
+  "kind": "CG",
+  "name": "Merlin — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4011": {
+  "character": "Joan of Arc",
+  "id": "4011",
+  "kind": "CG",
+  "name": "Joan of Arc — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4012": {
+  "character": "Gaia",
+  "id": "4012",
+  "kind": "CG",
+  "name": "Gaia — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4013": {
+  "character": "Zeus",
+  "id": "4013",
+  "kind": "CG",
+  "name": "Zeus — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4014": {
+  "character": "Hera",
+  "id": "4014",
+  "kind": "CG",
+  "name": "Hera — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4015": {
+  "character": "Apollo",
+  "id": "4015",
+  "kind": "CG",
+  "name": "Apollo — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4016": {
+  "character": "Artemis",
+  "id": "4016",
+  "kind": "CG",
+  "name": "Artemis — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4017": {
+  "character": "Athena",
+  "id": "4017",
+  "kind": "CG",
+  "name": "Athena — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4018": {
+  "character": "Aphrodite",
+  "id": "4018",
+  "kind": "CG",
+  "name": "Aphrodite — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4019": {
+  "character": "Hela",
+  "id": "4019",
+  "kind": "CG",
+  "name": "Hela — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4020": {
+  "character": "Odin",
+  "id": "4020",
+  "kind": "CG",
+  "name": "Odin — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4021": {
+  "character": "Thor",
+  "id": "4021",
+  "kind": "CG",
+  "name": "Thor — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4022": {
+  "character": "Loki",
+  "id": "4022",
+  "kind": "CG",
+  "name": "Loki — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4023": {
+  "character": "Frigga",
+  "id": "4023",
+  "kind": "CG",
+  "name": "Frigga — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4024": {
+  "character": "Freya",
+  "id": "4024",
+  "kind": "CG",
+  "name": "Freya — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4025": {
+  "character": "Tamamo-no-Mae",
+  "id": "4025",
+  "kind": "CG",
+  "name": "Tamamo-no-Mae — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4026": {
+  "character": "Shuten-dōji",
+  "id": "4026",
+  "kind": "CG",
+  "name": "Shuten-dōji — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4027": {
+  "character": "Ibaraki-doji",
+  "id": "4027",
+  "kind": "CG",
+  "name": "Ibaraki-doji — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4029": {
+  "character": "Keller",
+  "id": "4029",
+  "kind": "CG",
+  "name": "Keller — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4030": {
+  "character": "Hiyori",
+  "id": "4030",
+  "kind": "CG",
+  "name": "Hiyori — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4031": {
+  "character": "Sharin",
+  "id": "4031",
+  "kind": "CG",
+  "name": "Sharin — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4032": {
+  "character": "Jill",
+  "id": "4032",
+  "kind": "CG",
+  "name": "Jill — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4033": {
+  "character": "Lust - Asmodeus",
+  "id": "4033",
+  "kind": "CG",
+  "name": "Lust - Asmodeus — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4034": {
+  "character": "Pride - Lucifer",
+  "id": "4034",
+  "kind": "CG",
+  "name": "Pride - Lucifer — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4035": {
+  "character": "Wrath - Samael",
+  "id": "4035",
+  "kind": "CG",
+  "name": "Wrath - Samael — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4036": {
+  "character": "Gluttony - Beelzebub",
+  "id": "4036",
+  "kind": "CG",
+  "name": "Gluttony - Beelzebub — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4037": {
+  "character": "Lavinia",
+  "id": "4037",
+  "kind": "CG",
+  "name": "Lavinia — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4038": {
+  "character": "Lily",
+  "id": "4038",
+  "kind": "CG",
+  "name": "Lily — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4039": {
+  "character": "Nini",
+  "id": "4039",
+  "kind": "CG",
+  "name": "Nini — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4040": {
+  "character": "Morgan Le Fey",
+  "id": "4040",
+  "kind": "CG",
+  "name": "Morgan Le Fey — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4041": {
+  "character": "Apep",
+  "id": "4041",
+  "kind": "CG",
+  "name": "Apep — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4050": {
+  "character": "Erika",
+  "id": "4050",
+  "kind": "CG",
+  "name": "Erika — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4051": {
+  "character": "Veronica",
+  "id": "4051",
+  "kind": "CG",
+  "name": "Veronica — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4052": {
+  "character": "Set",
+  "id": "4052",
+  "kind": "CG",
+  "name": "Set — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4053": {
+  "character": "Nephthys",
+  "id": "4053",
+  "kind": "CG",
+  "name": "Nephthys — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4054": {
+  "character": "Bedivere",
+  "id": "4054",
+  "kind": "CG",
+  "name": "Bedivere — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4055": {
+  "character": "Bors",
+  "id": "4055",
+  "kind": "CG",
+  "name": "Bors — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4056": {
+  "character": "Poseidon",
+  "id": "4056",
+  "kind": "CG",
+  "name": "Poseidon — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4057": {
+  "character": "Medusa",
+  "id": "4057",
+  "kind": "CG",
+  "name": "Medusa — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4058": {
+  "character": "Brynhild",
+  "id": "4058",
+  "kind": "CG",
+  "name": "Brynhild — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4059": {
+  "character": "Fenrir",
+  "id": "4059",
+  "kind": "CG",
+  "name": "Fenrir — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4060": {
+  "character": "Ootakemaru",
+  "id": "4060",
+  "kind": "CG",
+  "name": "Ootakemaru — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4061": {
+  "character": "Suzuka Gozen",
+  "id": "4061",
+  "kind": "CG",
+  "name": "Suzuka Gozen — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_4062": {
+  "character": "Secret Archduke - Nahema",
+  "id": "4062",
+  "kind": "CG",
+  "name": "Secret Archduke - Nahema — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_8001": {
+  "character": "Sigurd",
+  "id": "8001",
+  "kind": "CG",
+  "name": "Sigurd — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg2_8002": {
+  "character": "Mila",
+  "id": "8002",
+  "kind": "CG",
+  "name": "Mila — CG 2",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 2"
+ },
+ "cg3_4001": {
+  "character": "Naya",
+  "id": "4001",
+  "kind": "CG",
+  "name": "Naya — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4003": {
+  "character": "Pennie",
+  "id": "4003",
+  "kind": "CG",
+  "name": "Pennie — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4005": {
+  "character": "Cleopatra",
+  "id": "4005",
+  "kind": "CG",
+  "name": "Cleopatra — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4008": {
+  "character": "Guinevere",
+  "id": "4008",
+  "kind": "CG",
+  "name": "Guinevere — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4012": {
+  "character": "Gaia",
+  "id": "4012",
+  "kind": "CG",
+  "name": "Gaia — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4019": {
+  "character": "Hela",
+  "id": "4019",
+  "kind": "CG",
+  "name": "Hela — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "cg3_4040": {
+  "character": "Morgan Le Fey",
+  "id": "4040",
+  "kind": "CG",
+  "name": "Morgan Le Fey — CG 3",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "CG 3"
+ },
+ "portrait_3001": {
+  "character": "Saya",
+  "id": "3001",
+  "kind": "Portrait",
+  "name": "Saya — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3002": {
+  "character": "Clara",
+  "id": "3002",
+  "kind": "Portrait",
+  "name": "Clara — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3003": {
+  "character": "Bastet",
+  "id": "3003",
+  "kind": "Portrait",
+  "name": "Bastet — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3004": {
+  "character": "Shu",
+  "id": "3004",
+  "kind": "Portrait",
+  "name": "Shu — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3005": {
+  "character": "Tefnut",
+  "id": "3005",
+  "kind": "Portrait",
+  "name": "Tefnut — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3006": {
+  "character": "Lancelot",
+  "id": "3006",
+  "kind": "Portrait",
+  "name": "Lancelot — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3007": {
+  "character": "Mordred",
+  "id": "3007",
+  "kind": "Portrait",
+  "name": "Mordred — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3008": {
+  "character": "Yuki-onna",
+  "id": "3008",
+  "kind": "Portrait",
+  "name": "Yuki-onna — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3009": {
+  "character": "Zashiki-warashi",
+  "id": "3009",
+  "kind": "Portrait",
+  "name": "Zashiki-warashi — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3010": {
+  "character": "Nini",
+  "id": "3010",
+  "kind": "Portrait",
+  "name": "Nini — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3011": {
+  "character": "Rose",
+  "id": "3011",
+  "kind": "Portrait",
+  "name": "Rose — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3012": {
+  "character": "Behemoth",
+  "id": "3012",
+  "kind": "Portrait",
+  "name": "Behemoth — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3013": {
+  "character": "Mammon",
+  "id": "3013",
+  "kind": "Portrait",
+  "name": "Mammon — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_3014": {
+  "character": "Belphegor",
+  "id": "3014",
+  "kind": "Portrait",
+  "name": "Belphegor — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4001": {
+  "character": "Naya",
+  "id": "4001",
+  "kind": "Portrait",
+  "name": "Naya — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4002": {
+  "character": "Lyla",
+  "id": "4002",
+  "kind": "Portrait",
+  "name": "Lyla — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4003": {
+  "character": "Pennie",
+  "id": "4003",
+  "kind": "Portrait",
+  "name": "Pennie — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4004": {
+  "character": "Cynia",
+  "id": "4004",
+  "kind": "Portrait",
+  "name": "Cynia — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4005": {
+  "character": "Cleopatra",
+  "id": "4005",
+  "kind": "Portrait",
+  "name": "Cleopatra — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4006": {
+  "character": "Horus",
+  "id": "4006",
+  "kind": "Portrait",
+  "name": "Horus — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4007": {
+  "character": "Anubis",
+  "id": "4007",
+  "kind": "Portrait",
+  "name": "Anubis — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4008": {
+  "character": "Guinevere",
+  "id": "4008",
+  "kind": "Portrait",
+  "name": "Guinevere — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4009": {
+  "character": "Arthur",
+  "id": "4009",
+  "kind": "Portrait",
+  "name": "Arthur — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4010": {
+  "character": "Merlin",
+  "id": "4010",
+  "kind": "Portrait",
+  "name": "Merlin — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4011": {
+  "character": "Joan of Arc",
+  "id": "4011",
+  "kind": "Portrait",
+  "name": "Joan of Arc — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4012": {
+  "character": "Gaia",
+  "id": "4012",
+  "kind": "Portrait",
+  "name": "Gaia — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4013": {
+  "character": "Zeus",
+  "id": "4013",
+  "kind": "Portrait",
+  "name": "Zeus — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4014": {
+  "character": "Hera",
+  "id": "4014",
+  "kind": "Portrait",
+  "name": "Hera — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4015": {
+  "character": "Apollo",
+  "id": "4015",
+  "kind": "Portrait",
+  "name": "Apollo — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4016": {
+  "character": "Artemis",
+  "id": "4016",
+  "kind": "Portrait",
+  "name": "Artemis — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4017": {
+  "character": "Athena",
+  "id": "4017",
+  "kind": "Portrait",
+  "name": "Athena — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4018": {
+  "character": "Aphrodite",
+  "id": "4018",
+  "kind": "Portrait",
+  "name": "Aphrodite — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4019": {
+  "character": "Hela",
+  "id": "4019",
+  "kind": "Portrait",
+  "name": "Hela — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4020": {
+  "character": "Odin",
+  "id": "4020",
+  "kind": "Portrait",
+  "name": "Odin — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4021": {
+  "character": "Thor",
+  "id": "4021",
+  "kind": "Portrait",
+  "name": "Thor — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4022": {
+  "character": "Loki",
+  "id": "4022",
+  "kind": "Portrait",
+  "name": "Loki — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4023": {
+  "character": "Frigga",
+  "id": "4023",
+  "kind": "Portrait",
+  "name": "Frigga — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4024": {
+  "character": "Freya",
+  "id": "4024",
+  "kind": "Portrait",
+  "name": "Freya — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4025": {
+  "character": "Tamamo-no-Mae",
+  "id": "4025",
+  "kind": "Portrait",
+  "name": "Tamamo-no-Mae — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4026": {
+  "character": "Shuten-dōji",
+  "id": "4026",
+  "kind": "Portrait",
+  "name": "Shuten-dōji — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4027": {
+  "character": "Ibaraki-doji",
+  "id": "4027",
+  "kind": "Portrait",
+  "name": "Ibaraki-doji — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4028": {
+  "character": "Jorogumo",
+  "id": "4028",
+  "kind": "Portrait",
+  "name": "Jorogumo — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4029": {
+  "character": "Keller",
+  "id": "4029",
+  "kind": "Portrait",
+  "name": "Keller — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4030": {
+  "character": "Hiyori",
+  "id": "4030",
+  "kind": "Portrait",
+  "name": "Hiyori — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4031": {
+  "character": "Sharin",
+  "id": "4031",
+  "kind": "Portrait",
+  "name": "Sharin — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4032": {
+  "character": "Jill",
+  "id": "4032",
+  "kind": "Portrait",
+  "name": "Jill — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4033": {
+  "character": "Lust - Asmodeus",
+  "id": "4033",
+  "kind": "Portrait",
+  "name": "Lust - Asmodeus — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4034": {
+  "character": "Pride - Lucifer",
+  "id": "4034",
+  "kind": "Portrait",
+  "name": "Pride - Lucifer — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4035": {
+  "character": "Wrath - Samael",
+  "id": "4035",
+  "kind": "Portrait",
+  "name": "Wrath - Samael — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4036": {
+  "character": "Gluttony - Beelzebub",
+  "id": "4036",
+  "kind": "Portrait",
+  "name": "Gluttony - Beelzebub — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4037": {
+  "character": "Lavinia",
+  "id": "4037",
+  "kind": "Portrait",
+  "name": "Lavinia — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4038": {
+  "character": "Lily",
+  "id": "4038",
+  "kind": "Portrait",
+  "name": "Lily — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4039": {
+  "character": "Nini",
+  "id": "4039",
+  "kind": "Portrait",
+  "name": "Nini — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4040": {
+  "character": "Morgan Le Fey",
+  "id": "4040",
+  "kind": "Portrait",
+  "name": "Morgan Le Fey — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4041": {
+  "character": "Apep",
+  "id": "4041",
+  "kind": "Portrait",
+  "name": "Apep — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4050": {
+  "character": "Erika",
+  "id": "4050",
+  "kind": "Portrait",
+  "name": "Erika — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4051": {
+  "character": "Veronica",
+  "id": "4051",
+  "kind": "Portrait",
+  "name": "Veronica — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4052": {
+  "character": "Set",
+  "id": "4052",
+  "kind": "Portrait",
+  "name": "Set — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4053": {
+  "character": "Nephthys",
+  "id": "4053",
+  "kind": "Portrait",
+  "name": "Nephthys — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4054": {
+  "character": "Bedivere",
+  "id": "4054",
+  "kind": "Portrait",
+  "name": "Bedivere — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4055": {
+  "character": "Bors",
+  "id": "4055",
+  "kind": "Portrait",
+  "name": "Bors — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4056": {
+  "character": "Poseidon",
+  "id": "4056",
+  "kind": "Portrait",
+  "name": "Poseidon — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4057": {
+  "character": "Medusa",
+  "id": "4057",
+  "kind": "Portrait",
+  "name": "Medusa — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4058": {
+  "character": "Brynhild",
+  "id": "4058",
+  "kind": "Portrait",
+  "name": "Brynhild — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4059": {
+  "character": "Fenrir",
+  "id": "4059",
+  "kind": "Portrait",
+  "name": "Fenrir — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4060": {
+  "character": "Ootakemaru",
+  "id": "4060",
+  "kind": "Portrait",
+  "name": "Ootakemaru — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4061": {
+  "character": "Suzuka Gozen",
+  "id": "4061",
+  "kind": "Portrait",
+  "name": "Suzuka Gozen — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_4062": {
+  "character": "Secret Archduke - Nahema",
+  "id": "4062",
+  "kind": "Portrait",
+  "name": "Secret Archduke - Nahema — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_8001": {
+  "character": "Sigurd",
+  "id": "8001",
+  "kind": "Portrait",
+  "name": "Sigurd — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ },
+ "portrait_8002": {
+  "character": "Mila",
+  "id": "8002",
+  "kind": "Portrait",
+  "name": "Mila — Portrait",
+  "source": "Zone Nova master-data translation_ds",
+  "variant": "Portrait"
+ }
+}

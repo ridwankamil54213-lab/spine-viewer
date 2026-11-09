@@ -1,0 +1,1036 @@
+{
+ "families": [
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4001",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4001",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4001",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4001",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Naya",
+   "root": "zonenova/portrait_4001"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4002",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4002",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4002",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Lyla",
+   "root": "zonenova/portrait_4002"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4003",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4003",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4003",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4003",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Pennie",
+   "root": "zonenova/portrait_4003"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4004",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4004",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4004",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Cynia",
+   "root": "zonenova/portrait_4004"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4005",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4005",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4005",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4005",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Cleopatra",
+   "root": "zonenova/portrait_4005"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4006",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4006",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4006",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Horus",
+   "root": "zonenova/portrait_4006"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4007",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4007",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4007",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Anubis",
+   "root": "zonenova/portrait_4007"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4008",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4008",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4008",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4008",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Guinevere",
+   "root": "zonenova/portrait_4008"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4009",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4009",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4009",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Arthur",
+   "root": "zonenova/portrait_4009"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4010",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4010",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4010",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Merlin",
+   "root": "zonenova/portrait_4010"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4011",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4011",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4011",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Joan of Arc",
+   "root": "zonenova/portrait_4011"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4012",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4012",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4012",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4012",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Gaia",
+   "root": "zonenova/portrait_4012"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4013",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4013",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4013",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Zeus",
+   "root": "zonenova/portrait_4013"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4014",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4014",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4014",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Hera",
+   "root": "zonenova/portrait_4014"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4015",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4015",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4015",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Apollo",
+   "root": "zonenova/portrait_4015"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4016",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4016",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4016",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Artemis",
+   "root": "zonenova/portrait_4016"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4017",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4017",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4017",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Athena",
+   "root": "zonenova/portrait_4017"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4018",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4018",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4018",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Aphrodite",
+   "root": "zonenova/portrait_4018"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4019",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4019",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4019",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4019",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Hela",
+   "root": "zonenova/portrait_4019"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4020",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4020",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4020",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Odin",
+   "root": "zonenova/portrait_4020"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4021",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4021",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4021",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Thor",
+   "root": "zonenova/portrait_4021"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4022",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4022",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4022",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Loki",
+   "root": "zonenova/portrait_4022"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4023",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4023",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4023",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Frigga",
+   "root": "zonenova/portrait_4023"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4024",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4024",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4024",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Freya",
+   "root": "zonenova/portrait_4024"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4025",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4025",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4025",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Tamamo-no-Mae",
+   "root": "zonenova/portrait_4025"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4026",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4026",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4026",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Shuten-dōji",
+   "root": "zonenova/portrait_4026"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4027",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4027",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4027",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Ibaraki-doji",
+   "root": "zonenova/portrait_4027"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4028",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4028",
+     "label": "CG 1"
+    }
+   ],
+   "name": "Jorogumo",
+   "root": "zonenova/portrait_4028"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4029",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4029",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4029",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Keller",
+   "root": "zonenova/portrait_4029"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4030",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4030",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4030",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Hiyori",
+   "root": "zonenova/portrait_4030"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4031",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4031",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4031",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Sharin",
+   "root": "zonenova/portrait_4031"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4032",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4032",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4032",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Jill",
+   "root": "zonenova/portrait_4032"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4033",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4033",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4033",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Lust - Asmodeus",
+   "root": "zonenova/portrait_4033"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4034",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4034",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4034",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Pride - Lucifer",
+   "root": "zonenova/portrait_4034"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4035",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4035",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4035",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Wrath - Samael",
+   "root": "zonenova/portrait_4035"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4036",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4036",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4036",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Gluttony - Beelzebub",
+   "root": "zonenova/portrait_4036"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4037",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4037",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4037",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Lavinia",
+   "root": "zonenova/portrait_4037"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4038",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4038",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4038",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Lily",
+   "root": "zonenova/portrait_4038"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4039",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4039",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4039",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Nini",
+   "root": "zonenova/portrait_4039"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4040",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4040",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4040",
+     "label": "CG 2"
+    },
+    {
+     "id": "zonenova/cg3_4040",
+     "label": "CG 3"
+    }
+   ],
+   "name": "Morgan Le Fey",
+   "root": "zonenova/portrait_4040"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4041",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4041",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4041",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Apep",
+   "root": "zonenova/portrait_4041"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4050",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4050",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4050",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Erika",
+   "root": "zonenova/portrait_4050"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4051",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4051",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4051",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Veronica",
+   "root": "zonenova/portrait_4051"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4052",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4052",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4052",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Set",
+   "root": "zonenova/portrait_4052"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4053",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4053",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4053",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Nephthys",
+   "root": "zonenova/portrait_4053"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4054",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4054",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4054",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Bedivere",
+   "root": "zonenova/portrait_4054"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4055",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4055",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4055",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Bors",
+   "root": "zonenova/portrait_4055"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4056",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4056",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4056",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Poseidon",
+   "root": "zonenova/portrait_4056"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4057",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4057",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4057",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Medusa",
+   "root": "zonenova/portrait_4057"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4058",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4058",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4058",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Brynhild",
+   "root": "zonenova/portrait_4058"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4059",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4059",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4059",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Fenrir",
+   "root": "zonenova/portrait_4059"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4060",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4060",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4060",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Ootakemaru",
+   "root": "zonenova/portrait_4060"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4061",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4061",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4061",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Suzuka Gozen",
+   "root": "zonenova/portrait_4061"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_4062",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_4062",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_4062",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Secret Archduke - Nahema",
+   "root": "zonenova/portrait_4062"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_8001",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_8001",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_8001",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Sigurd",
+   "root": "zonenova/portrait_8001"
+  },
+  {
+   "members": [
+    {
+     "id": "zonenova/portrait_8002",
+     "label": "Portrait"
+    },
+    {
+     "id": "zonenova/cg1_8002",
+     "label": "CG 1"
+    },
+    {
+     "id": "zonenova/cg2_8002",
+     "label": "CG 2"
+    }
+   ],
+   "name": "Mila",
+   "root": "zonenova/portrait_8002"
+  }
+ ]
+}

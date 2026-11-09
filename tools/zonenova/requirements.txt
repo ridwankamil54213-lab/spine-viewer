@@ -1,0 +1,12 @@
+# Dependensi tools/zonenova/update.py (sudah terpasang di /srv/venv-spine).
+# UnityPy + Pillow + lz4.block juga dipakai; ketiganya sudah ada di venv itu.
+#
+#   /srv/venv-spine/bin/python -m pip install -r tools/zonenova/requirements.txt
+#
+# AES-256-CBC master-data didekrip lewat binary `openssl` (stdlib subprocess),
+# JADI pycryptodome TIDAK wajib untuk runtime; baris di bawah hanya untuk
+# menjalankan skrip referensi decrypt.py dari boring877/zone-nova-extractor.
+msgpack>=1.0
+lz4>=4.0
+UnityPy>=1.20
+Pillow>=10.0

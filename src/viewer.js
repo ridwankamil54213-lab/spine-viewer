@@ -7405,6 +7405,7 @@ const UPDATABLE = {
 	nikke: "/api/update/nikke",
 	ivntight: "/api/update/ivntight",
 	arknights: "/api/update/arknights",
+	zonenova: "/api/update/zonenova",
 	girlwars: "/api/update/girlwars",
 	lostsword: "/api/update/lostsword",
 	"lostsword-video": "/api/update/lostsword-video",
@@ -7819,7 +7820,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", arknights: "arknights", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera", mercenary: "mercenary" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", arknights: "arknights", zonenova: "zonenova", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera", mercenary: "mercenary" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.

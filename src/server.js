@@ -573,6 +573,17 @@ const GAME_ROOTS = [
 		spineRuntime: "3.8",
 		pmaDefault: true,
 	},
+	// Zone Nova (禁域战姬, EROLABS): 188 model Spine 4.1.24 dari CDN resmi.
+	// tools/zonenova/update.py men-dekrip katalog XOR + master-data AES lalu
+	// membuang fake-header "UtS\0 5.0." pada tiap .ab. Teksturnya
+	// straight-alpha (viewer komunitas memakai premultipliedAlpha:false).
+	{
+		match: "zonenova",
+		key: "zonenova",
+		label: "Zone Nova (禁域战姬)",
+		spineRuntime: "4.1",
+		pmaDefault: false,
+	},
 	// Make Drama (MAD) — standing / affection / desire / pleasure rigs from the
 	// anyabot/MAD-Viewer community library. Each skin is a folder of loose files
 	// (binary .skel + .atlas + PNG pages) fetched from the MAD-assets-1/2 GitHub
@@ -3833,35 +3844,37 @@ function attachCharacters(models) {
 		if (ivnHits) console.log(`  ivntight  : ${ivnHits} model diberi nama Jepang`);
 	}
 
-	// --- 明日方舟 (Arknights): nama Inggris + family skin -----------------
-	// data/arknights-names.json (leaf folder -> {name, character, skin, ...})
-	// dan data/arknights-family.json ditulis tools/arknights/update.py dari
-	// models_data.json + skin_table/enemy_handbook EN. Folder sengaja ASCII
-	// supaya id model tidak di-slug ulang server (nama asli banyak mengandung #).
-	{
+	// --- Arknights + Zone Nova: nama EN + family varian --------------------
+	// Dua game ini memakai pola data yang sama: <game>-names.json
+	// (leaf folder -> {name, character, ...}) dan <game>-family.json.
+	// Folder sengaja ASCII supaya id model tidak di-slug ulang server.
+	for (const cfg of [
+		{ game: "arknights", names: "arknights-names.json", family: "arknights-family.json" },
+		{ game: "zonenova", names: "zonenova-names.json", family: "zonenova-family.json" },
+	]) {
 		const read = (f) => {
 			try { return JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8")); }
 			catch { return {}; }
 		};
-		const ark = read("arknights-names.json");
-		const fam = read("arknights-family.json");
+		const nameMap = read(cfg.names);
+		const fam = read(cfg.family);
 		const byId = new Map(models.map((m) => [m.id, m]));
-		let arkHits = 0;
+		let hits = 0;
 		for (const m of models) {
-			if ((m.game || "") !== "arknights") continue;
+			if ((m.game || "") !== cfg.game) continue;
 			const leaf = String(m.id).split("/").pop().split("#")[0];
-			const rec = ark[leaf];
+			const rec = nameMap[leaf];
 			if (!rec) continue;
 			const stem = String(m.id).includes("#") ? String(m.id).split("#")[1] : "";
 			m.name = stem ? `${rec.name} · ${stem}` : rec.name;
 			m.character = {
 				name: rec.character || rec.name,
-				skin: rec.skin || null,
-				source: rec.source || "Ark-Models",
+				skin: rec.skin ?? rec.variant ?? null,
+				source: rec.source || cfg.game,
 				rarity: rec.rarity ?? null,
-				type: rec.type || null,
+				type: rec.type ?? rec.kind ?? null,
 			};
-			arkHits++;
+			hits++;
 		}
 		let famHits = 0;
 		for (const f of Array.isArray(fam.families) ? fam.families : []) {
@@ -3877,7 +3890,7 @@ function attachCharacters(models) {
 			if (root && f.name) root.name = f.name;
 			famHits++;
 		}
-		if (arkHits) console.log(`  arknights : ${arkHits} model diberi nama EN, ${famHits} family skin`);
+		if (hits) console.log(`  ${cfg.game} : ${hits} model diberi nama EN, ${famHits} family`);
 	}
 
 	// --- Girl Wars (少女ウォーズ): nama karakter + kostum -------------------
@@ -4239,6 +4252,12 @@ const UPDATERS = {
 	// Menulis 3.112 folder model + 2 data JSON + manifest thumbnail.
 	arknights: {
 		script: path.join(ROOT, "tools", "arknights", "update.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
+	// Zone Nova: config server -> katalog XOR -> master-data AES -> 188 .ab.
+	zonenova: {
+		script: path.join(ROOT, "tools", "zonenova", "update.py"),
 		py: "/srv/venv-spine/bin/python",
 		rescan: true,
 	},
