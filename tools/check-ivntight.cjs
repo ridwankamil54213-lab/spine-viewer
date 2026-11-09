@@ -80,6 +80,9 @@ const atlasPages = (p) => [...new Set(fs.readFileSync(p, "utf8")
 		!/if a\.check:[\s\S]{0,400}saved\["version"\]/.test(src));
 	ok("updater menormalisasi folder warisan non-ASCII",
 		/def normalize_folders/.test(src) && /renamed = normalize_folders\(\)/.test(src));
+	ok("flag --rescan tersedia & dipakai untuk kandidat",
+		/add_argument\(\s*"--rescan"/.test(src) &&
+		/list\(jobs\) if a\.rescan/.test(src) && /"rescanned": len\(cand\)/.test(src));
 	ok("apply menyimpan katalog segar (bukan load_state ulang)",
 		/saved\.update\(\{"version": ver/.test(src));
 	ok("server menandai updater ivntight rescan:true",
@@ -193,6 +196,14 @@ const atlasPages = (p) => [...new Set(fs.readFileSync(p, "utf8")
 			hashes: chk.catalogHashes }));
 	ok("changed konsisten dengan previous",
 		chk.changed === (chk.version !== chk.previous));
+	// --check --rescan tidak mengubah aset, cuma melaporkan bahwa SEMUA job
+	// akan dipindai ulang kalau di-apply.
+	const rs = await runPy(["--check", "--rescan"]);
+	ok("--check --rescan menandai semua bundle untuk dipindai ulang",
+		rs.ok === true && rs.rescan === true && rs.new === rs.total && rs.total > 2000 &&
+		rs.installed === chk.installed,
+		JSON.stringify({ rescan: rs.rescan, new: rs.new, total: rs.total,
+			installed: rs.installed }));
 	try {
 		const st = JSON.parse(fs.readFileSync(STATE_FILE, "utf8"));
 		ok("state menyimpan remoteHash live kedua tag",

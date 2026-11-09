@@ -47,10 +47,22 @@ keys → a `CharacterBattleSpine_<id>.prefab` whose DependencyKey points at an
 # updater: downloads ALL bundles (Test2+Test3) and finds Spine by CONTENT
 /srv/venv-spine/bin/python tools/update-ivntight.py --check   # ~1 s, JSON
 /srv/venv-spine/bin/python tools/update-ivntight.py --apply    # download + scan + extract
+/srv/venv-spine/bin/python tools/update-ivntight.py --apply --rescan  # pindai ULANG semua bundle
 
 # regresi (server jalan di :3000)
 node tools/check-ivntight.cjs
 ```
+
+### `--rescan` (verifikasi ulang)
+
+`--apply` normal cuma memindai bundle yang belum ada di `state.scanned`.
+`--apply --rescan` mengabaikan daftar itu dan memindai **semua 2210 bundle
+unik dari cache** (tidak mengunduh ulang, `download_all` tinggal skip),
+lalu mengekstrak ulang hasilnya. Dipakai untuk memastikan strategi "cari
+Spine dari ISI bundle" tidak ada yang terlewat. 297 nama yang dobel lintas
+`Test2`/`Test3` dipindai sekali saja (ukuran + sha1 sampel identik, dan semua
+nama bundle ber-content-hash 32 hex). Hasil ditambahkan ke field `rescanned`
+dan `spineBundles` pada keluaran JSON.
 
 ### Deteksi pembaruan: `catalog_0.0.1.hash`
 

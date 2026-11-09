@@ -30,6 +30,10 @@ Alur --apply:
 Pemakaian:
     /srv/venv-spine/bin/python tools/update-ivntight.py --check
     /srv/venv-spine/bin/python tools/update-ivntight.py --apply
+    /srv/venv-spine/bin/python tools/update-ivntight.py --apply --rescan
+
+`--rescan` mengabaikan daftar `scanned` dan memindai ULANG semua bundle dari
+cache (tanpa unduh ulang) untuk verifikasi bahwa tidak ada model yang kelewat.
 """
 import argparse
 import concurrent.futures as cf
@@ -435,6 +439,11 @@ def main():
 	ap.add_argument("--check", action="store_true")
 	ap.add_argument("--apply", action="store_true")
 	ap.add_argument("--limit", type=int, default=0)
+	ap.add_argument(
+		"--rescan", action="store_true",
+		help="pindai ULANG semua bundle dari cache (abaikan daftar scanned); "
+		     "tak mengunduh ulang, berguna buat verifikasi tidak ada model yang kelewat",
+	)
 	a = ap.parse_args()
 	if not (a.check or a.apply):
 		a.check = True
@@ -448,14 +457,19 @@ def main():
 		{"catalogs": sigs, "hashes": hashes}, sort_keys=True,
 	).encode()).hexdigest()[:12]
 	done = set(saved.get("scanned") or [])
-	pending = [j for j in jobs if j[1] not in done]
+	# --rescan: anggap semua job belum dipindai, tapi berkasnya tetap diambil
+	# dari cache (download_all akan skip semua). Tujuan: verifikasi bahwa
+	# strategi "cari Spine dari ISI bundle" tidak ada yang terlewat.
+	pending = list(jobs) if a.rescan else [j for j in jobs if j[1] not in done]
 
-	_log(f"total bundle: {len(jobs)} | sudah dipindai: {len(done)} | baru: {len(pending)}")
+	_log(f"total bundle: {len(jobs)} | sudah dipindai: {len(done)} | "
+	     f"{'rescan semua' if a.rescan else 'baru'}: {len(pending)}")
 	result = {
 		"ok": True,
 		"version": ver,
 		"previous": saved.get("version") or None,
 		"changed": ver != saved.get("version"),
+		"rescan": bool(a.rescan),
 		"total": len(jobs),
 		"installed": len(done),
 		"new": len(pending),
@@ -487,10 +501,19 @@ def main():
 	for f in fails[:10]:
 		_log("   GAGAL " + f)
 
-	cand = [j for j in jobs if j[1] not in done]
+	cand = []
+	seen = set()
+	for j in pending:
+		# 297 nama bundle muncul di Test2 DAN Test3; isinya identik (nama
+		# ber-content-hash), jadi pindai sekali saja.
+		if j[1] in seen:
+			continue
+		seen.add(j[1])
+		cand.append(j)
 	if a.limit:
 		cand = cand[: a.limit]
-	_log(f"scan {len(cand)} bundle kandidat ...")
+	_log(f"scan {len(cand)} bundle kandidat "
+	     f"({'(RESCAN PENUH)' if a.rescan else 'baru'}) ...")
 	found = scan_spine(cand)
 	_log(f"ber-Spine: {len(found)}")
 
@@ -529,6 +552,7 @@ def main():
 		"added": extracted,
 		"extracted": extracted,
 		"normalized": len(renamed),
+		"rescanned": len(cand),
 		"spineBundles": len(found),
 		"failedFiles": fail,
 		"new": 0,
