@@ -18,11 +18,16 @@ Isi yang dipakai:
   CDN remote_prefab_spineillust_*.bundle      -> 89 skeleton + atlas + tekstur
 
 Keluaran:
-  assets/mercenary/<slug>/<slug>.json|atlas|<page>.png   (98 model Spine 4.0.64)
+  assets/mercenary/<slug>/<slug>.json|atlas|<page>.png   (98 model Spine 4.0.x)
   assets/mercenary-illust/<slug>.png                     (85 ilustrasi karakter)
   assets/mercenary/_names.json                           (nama + family)
-  public/thumbs/mercenary/*.webp + _manifest.json
+  public/thumbs/mercenary/*.webp + _manifest.json + _sources.json
   data/mercenary-update-state.json
+
+Thumbnail diambil dari GAMBAR ILUSTRASI karakter (UI_Slot_Illust_*), bukan
+halaman atlas yang berisi potongan badan. Kalau karakter tidak punya slot,
+dicari potret emoticon / splash art lobby / art NPC; atlas cuma fallback
+terakhir. Asal tiap thumbnail tercatat di _sources.json.
 
 Jalankan dengan interpreter service: /srv/venv-spine/bin/python
 """
@@ -42,6 +47,7 @@ import zlib
 from pathlib import Path
 
 import UnityPy
+from PIL import Image
 
 UnityPy.config.FALLBACK_UNITY_VERSION = "2021.3.2f1"
 
@@ -58,10 +64,17 @@ STATE = DATA / "mercenary-update-state.json"
 # konten, jadi cache bersama aman dipakai lintas versi.
 CDN_TMPL = "https://d2yyge1twff5nv.cloudfront.net/Product/Live/{version}/Android/"
 REMOTE_DIR = CACHE / "remote" / "bundles"
+# Bundle UI/CDN tambahan yang cuma dipakai buat gambar ilustrasi thumbnail
+# (profil, gacha, splash art lobby). Ukurannya kecil, di-cache terpisah.
+ILLUST_EXTRA_DIR = CACHE / "remote" / "illust-extras"
 # Bundle prefab < 100 KB cuma berisi MonoBehaviour (skeleton-nya ada di APK
 # lokal), jadi tidak perlu diunduh.
 REMOTE_MIN_SIZE = 100_000
 CATALOG_REMOTE = "catalog_Product.json"
+
+# Karakter yang tidak punya UI_Slot_Illust tapi punya splash art lobby di CDN.
+# Batasi unduhan ke mereka saja (36 bundle lobby ada, tapi cuma ini yang perlu).
+ILLUST_LOBBY_KEYS = ("holyemperor",)
 
 LATEST = "https://d.apkpure.net/b/XAPK/com.Cryptect.Mercenary?version=latest"
 SOURCE = "play.google.com/store/apps/details?id=com.Cryptect.Mercenary"
@@ -77,6 +90,23 @@ CATALOG = "assets/aa/catalog.json"
 
 # Ilustrasi slot yang bukan karakter (bingkai rarity / placeholder).
 SLOT_BLACKLIST = {"Beginning", "Divine", "Empty", "Epic", "Heroic", "Mythic", "World"}
+
+# Model yang namanya beda dari berkas UI_Slot_Illust_* (salah eja di game,
+# akhiran angka, atau varian kostum yang memakai ilustrasi karakter dasar).
+ILLUST_ALIASES = {
+    "ema_alt": "ema",
+    "kei_alt": "kei",
+    "albedo2": "albedo",
+    "adult-kronos": "kronos",
+    "bikini-eventdaphne": "bikini-daphne",
+    "ninetails-roselin": "ninetales-roselin",
+    "serina-serina": "serina",
+    "newshoggoth": "shoggoth",
+    "demonking2": "demonking",
+    "citizen-slime-male": "citizen-male",
+    "fallen-holyemperor": "holyemperor",
+    "ts-holyemperor": "holyemperor",
+}
 
 # skeleton TextAsset -> (slug, karakter, label varian)
 MODEL_MAP = {
@@ -349,7 +379,171 @@ def write_webp(png: Path, webp: Path):
     png.unlink(missing_ok=True)
 
 
-def build_remote_models(specs, paths, spine_dir: Path, thumb_dir: Path):
+# ------------------------------------------------------- peta ilustrasi
+def slugify(s):
+    return re.sub(r"[^a-z0-9]+", "-", str(s).lower()).strip("-")
+
+
+def collect_illustrations(textures):
+    """Kumpulkan SEMUA gambar ilustrasi karakter, bukan halaman atlas.
+
+    Sumber (urutan prioritas):
+      1. UI_Slot_Illust_<Karakter>_001     -> potret karakter resmi
+      2. UI_Emoticon_<Karakter>_<Ekspresi> -> potret 640x640
+      3. Citizen_Female_002 / Citizen_Male_001 -> art NPC utuh
+      4. UI_Bg_Lobby_<Karakter>_Title_*    -> splash art karakter dari CDN
+    Return (slot_map, extra_map) berisi PIL.Image dengan kunci slug karakter.
+    """
+    slot, extra = {}, {}
+    for name, im in textures.items():
+        if not isinstance(name, str):
+            continue
+        if name.startswith("UI_Slot_Illust_"):
+            key = re.sub(r"_\d{3}$", "", name[len("UI_Slot_Illust_"):])
+            if key and key not in SLOT_BLACKLIST:
+                slot[slugify(key)] = im
+            continue
+        m = re.match(r"UI_Emoticon_(.+?)_[A-Za-z0-9]+$", name)
+        if m:
+            extra.setdefault(slugify(m.group(1)), im)
+            continue
+        if name.startswith("Citizen_") and min(im.size) >= 600:
+            extra.setdefault(slugify(re.sub(r"_\d{3}$", "", name)), im)
+            continue
+        m = re.match(r"UI_Bg_Lobby_(.+?)_Title_", name)
+        if m:
+            extra.setdefault(slugify(m.group(1)), im)
+    return slot, extra
+
+
+def illust_candidates(slug, family_root=None):
+    """Kunci kandidat ilustrasi untuk satu model, paling spesifik dulu."""
+    out = [ILLUST_ALIASES.get(slug), slug]
+    parts = [p for p in re.split(r"[-_]", slug) if p]
+    if len(parts) > 1:
+        out.append(parts[-1])
+    if family_root and family_root != slug:
+        out += [family_root, ILLUST_ALIASES.get(family_root)]
+        rp = [p for p in re.split(r"[-_]", family_root) if p]
+        if len(rp) > 1:
+            out.append(rp[-1])
+    seen, uniq = set(), []
+    for k in out:
+        if k and k not in seen:
+            seen.add(k)
+            uniq.append(k)
+    return uniq
+
+
+def resolve_illustration(slug, slot, extra, family_root=None):
+    """Cari ilustrasi karakter; kembalikan (PIL.Image, sumber) / (None, None)."""
+    keys = illust_candidates(slug, family_root)
+    for key in keys:
+        if key in slot:
+            return slot[key], "slot:" + key
+    for key in keys:
+        if key in extra:
+            return extra[key], "extra:" + key
+    return None, None
+
+
+def download_illust_extras(version: str, catalog: dict):
+    """Ambil bundle UI tambahan (kecil) untuk ilustrasi karakter yang tidak
+    punya UI_Slot_Illust. -> textures dict, cached lintas versi."""
+    names = sorted({x.rsplit("/", 1)[-1] for x in catalog.get("m_InternalIds", [])
+                    if x.endswith(".bundle") and (
+                        "remote_profile_assets_all_" in x
+                        or "remote_gacha_assets_all_" in x
+                        or ("ui_bg_lobby_" in x.lower() and "_title_" in x.lower()
+                            and any(k in x.lower() for k in ILLUST_LOBBY_KEYS)))})
+    # Bundle yang sudah ada di cache tetap dipakai walau allowlist berubah.
+    names = sorted(set(names) | {p.name for p in ILLUST_EXTRA_DIR.glob("*.bundle")})
+    ILLUST_EXTRA_DIR.mkdir(parents=True, exist_ok=True)
+    base = CDN_TMPL.format(version=version)
+    paths, fresh = [], 0
+    for n in names:
+        dest = ILLUST_EXTRA_DIR / n
+        if not dest.exists() or dest.stat().st_size < 1000:
+            try:
+                data = http_get(base + n, 180)
+            except Exception as exc:  # noqa: BLE001 - opsional, jangan gagalkan apply
+                log(f"LEWATI ilustrasi ekstra {n[:70]}: {exc}")
+                continue
+            if len(data) < 1000:
+                continue
+            tmp = dest.with_suffix(dest.suffix + ".part")
+            tmp.write_bytes(data)
+            os.replace(tmp, dest)
+            fresh += 1
+        paths.append(dest)
+    log(f"ilustrasi ekstra: {fresh}/{len(names)} bundle diunduh, {len(paths)} dipakai")
+    return collect_from_bundles(paths)[1] if paths else {}
+
+
+def build_thumbnails(spine_dir: Path, thumb_dir: Path, slot, extra,
+                     model_ids, fam_payload):
+    """Satu pass thumbnail: SEMUA model pakai gambar ilustrasi karakter.
+
+    Halaman atlas (kumpulan potongan badan) cuma dipakai kalau game memang
+    tidak menyediakan ilustrasi untuk karakter itu. Hasil: _manifest.json
+    (tetap 98 kunci) + _sources.json (asal gambar tiap thumbnail).
+    """
+    # model -> root family, supaya varian kostum mewarisi ilustrasi utama
+    fam_root = {}
+    for fam in fam_payload:
+        root = fam["root"].split("/", 1)[-1]
+        for m in fam["members"]:
+            fam_root.setdefault(m["id"].split("/", 1)[-1], root)
+    manifest, sources = {}, {}
+    counts = {"slot": 0, "extra": 0, "atlas": 0}
+    for mid in sorted(model_ids):
+        slug = mid.split("/", 1)[-1]
+        d = spine_dir / slug
+        im, src = resolve_illustration(slug, slot, extra, fam_root.get(slug))
+        if im is not None:
+            counts["slot" if str(src).startswith("slot:") else "extra"] += 1
+        else:
+            # fallback terakhir: halaman atlas pertama yang sudah ditulis ke
+            # folder model, diperkecil supaya tidak jadi kumpulan potongan badan
+            page = None
+            atlas = d / f"{slug}.atlas"
+            if atlas.exists():
+                pages = atlas_pages(atlas.read_text(encoding="utf-8", errors="replace"))
+                if pages and (d / pages[0]).exists():
+                    page = Image.open(d / pages[0]).convert("RGBA")
+            if page is None:
+                for p in sorted(d.glob("*.png")):
+                    page = Image.open(p).convert("RGBA")
+                    break
+            if page is None:
+                log(f"LEWATI thumbnail {slug}: tak ada sumber gambar")
+                continue
+            im, src = page, "atlas"
+            im.thumbnail((300, 300))
+            counts["atlas"] += 1
+        # ilustrasi portrait tinggi: potong tengah-atas jadi hampir kotak
+        # biar wajah karakter tetap kelihatan di kartu thumbnail
+        im = im.convert("RGBA")
+        w, h = im.size
+        if h > w * 1.25:
+            crop_h = int(w * 1.25)
+            top = max(0, int((h - crop_h) * 0.18))
+            im = im.crop((0, top, w, min(h, top + crop_h)))
+        im.thumbnail((360, 450))
+        png = thumb_dir / f"{slug}.png"
+        im.save(png, format="PNG")
+        write_webp(png, thumb_dir / f"{slug}.webp")
+        manifest[mid] = f"{slug}.webp"
+        sources[mid] = src
+    (thumb_dir / "_sources.json").write_text(
+        json.dumps({"counts": counts, "sources": sources}, ensure_ascii=False, indent=1),
+        encoding="utf-8")
+    log(f"thumbnail: {counts['slot']} slot + {counts['extra']} ekstra ilustrasi, "
+        f"{counts['atlas']} atlas fallback")
+    return manifest, counts
+
+
+def build_remote_models(specs, paths, spine_dir: Path):
     """89 model Spine dari CDN. Tiap bundle self-contained (json+atlas+PNG)."""
     models, manifest, groups = {}, {}, {}
     for spec, path in zip(specs, paths):
@@ -385,17 +579,9 @@ def build_remote_models(specs, paths, spine_dir: Path, thumb_dir: Path):
             "name": char, "label": "Utama",
             "character": {"name": char, "source": SOURCE, "origin": "cdn"},
         }
-        # Thumbnail: ilustrasi slot kalau ada, kalau tidak halaman atlas
-        # pertama diperkecil (sama seperti fallback model lokal).
-        slot = textures.get(f"UI_Slot_Illust_{char.replace(' ', '_')}_001")
-        src = slot or textures.get(Path(pages[0]).stem) or textures.get(pages[0])
-        if src is not None:
-            small = src.copy()
-            small.thumbnail((300, 300))
-            png = thumb_dir / f"{slug}.png"
-            small.save(png, format="PNG")
-            write_webp(png, thumb_dir / f"{slug}.webp")
-            manifest[f"mercenary/{slug}"] = f"{slug}.webp"
+        # Thumbnail tidak dibuat di sini: build_thumbnails() mengerjakannya
+        # satu pass setelah family terbentuk, supaya semua model memakai
+        # ilustrasi karakter (bukan halaman atlas potongan badan).
         # Kelompokkan varian kostum dengan karakter dasarnya, mis.
         # Bikini_Kronos / Adult_Kronos -> famili "Kronos".
         key = spec["key"]
@@ -407,7 +593,7 @@ def build_remote_models(specs, paths, spine_dir: Path, thumb_dir: Path):
 
 
 def build_outputs(texts, textures, catalog_ids, version, stage: Path,
-                  remote_specs=None, remote_paths=None):
+                  remote_specs=None, remote_paths=None, extra_textures=None):
     """Tulis staging lengkap; kembalikan ringkasan + names payload."""
     spine_dir = stage / "mercenary"
     illust_dir = stage / "mercenary-illust"
@@ -453,25 +639,6 @@ def build_outputs(texts, textures, catalog_ids, version, stage: Path,
             "character": {"name": char, "variant": label, "source": SOURCE},
         }
         families.setdefault(char, []).append(f"mercenary/{slug}")
-        # thumbnail dari ilustrasi slot resmi; kalau karakter belum punya slot
-        # (Ada), pakai halaman atlas pertamanya yang diperkecil.
-        slot = textures.get(f"UI_Slot_Illust_{char}_001")
-        thumb_src = None
-        if slot is not None:
-            png = thumb_dir / f"{slug}.png"
-            slot.save(png, format="PNG")
-            thumb_src = png
-        else:
-            first = textures.get(Path(pages[0]).stem) or textures.get(pages[0])
-            if first is not None:
-                small = first.copy()
-                small.thumbnail((300, 300))
-                png = thumb_dir / f"{slug}.png"
-                small.save(png, format="PNG")
-                thumb_src = png
-        if thumb_src is not None:
-            write_webp(thumb_src, thumb_dir / f"{slug}.webp")
-            manifest[f"mercenary/{slug}"] = f"{slug}.webp"
         log(f"model {slug}: {len(skel)} byte skeleton, {len(pages)} halaman")
 
     # --- model Spine dari CDN Addressables ----------------------------------
@@ -481,7 +648,7 @@ def build_outputs(texts, textures, catalog_ids, version, stage: Path,
     remote_groups: dict[str, list[str]] = {}
     if remote_specs and remote_paths:
         remote_models, remote_manifest, remote_groups = build_remote_models(
-            remote_specs, remote_paths, spine_dir, thumb_dir)
+            remote_specs, remote_paths, spine_dir)
         models.update(remote_models)
         manifest.update(remote_manifest)
 
@@ -531,6 +698,17 @@ def build_outputs(texts, textures, catalog_ids, version, stage: Path,
                    for x in ids]
         fam_payload.append({"root": root, "name": fam_name, "members": members})
 
+    # --- thumbnail: gambar ilustrasi karakter, bukan halaman atlas ----------
+    # Ambil UI_Slot_Illust_* dari bundle lokal + bundle UI tambahan CDN;
+    # varian kostum mewarisi ilustrasi karakter utama lewat family picker.
+    all_textures = dict(textures)
+    all_textures.update(extra_textures or {})
+    slot, extra = collect_illustrations(all_textures)
+    log(f"peta ilustrasi: {len(slot)} slot + {len(extra)} ekstra")
+    spine_ids = [k for k in models if k.startswith("mercenary/")]
+    manifest, thumb_counts = build_thumbnails(
+        spine_dir, thumb_dir, slot, extra, spine_ids, fam_payload)
+
     names = {
         "source": SOURCE,
         "gameVersion": version,
@@ -564,6 +742,8 @@ def build_outputs(texts, textures, catalog_ids, version, stage: Path,
         raise RuntimeError(f"staging {valid}/{expected} model valid")
     return dict(models=valid, illusts=len(illust_ids),
                 families=len(fam_payload), names=names, manifest=manifest,
+                thumbCounts=thumb_counts,
+                thumbIllust=thumb_counts["slot"] + thumb_counts["extra"],
                 characters=len(characters))
 
 
@@ -676,6 +856,9 @@ def apply() -> dict:
     rcatalog = remote_catalog(version)
     specs, canon = remote_bundle_specs(version, rcatalog, set(MODEL_MAP_SLUGS))
     remote_paths, remote_fresh = download_remote_bundles(version, specs)
+    # 3 bundle UI kecil: potret profil, gacha, dan splash art lobby. Dipakai
+    # supaya thumbnail tidak ada yang jadi halaman atlas potongan badan.
+    extra_textures = download_illust_extras(version, rcatalog)
     cdn_hash = ""
     try:
         cdn_hash = http_get(
@@ -689,7 +872,8 @@ def apply() -> dict:
         shutil.rmtree(stage)
     stage.mkdir(parents=True)
     info = build_outputs(texts, textures, ids, version, stage,
-                         remote_specs=specs, remote_paths=remote_paths)
+                         remote_specs=specs, remote_paths=remote_paths,
+                         extra_textures=extra_textures)
     swap_into_repo(stage, info)
     shutil.rmtree(stage, ignore_errors=True)
 
@@ -697,11 +881,12 @@ def apply() -> dict:
     sig = info["names"]["sig"]
     write_state({"version": version, "size": size, "sig": sig,
                  "models": spine, "illusts": ill, "cdnHash": cdn_hash,
-                 "cdnModels": len(specs)})
+                 "cdnModels": len(specs), "thumbIllust": info["thumbIllust"]})
     return {"ok": True, "mode": "apply", "version": version,
             "previous": version, "changed": False, "new": 0,
             "models": spine, "illusts": ill, "families": info["families"],
             "characters": info["characters"],
+            "thumbCounts": info["thumbCounts"],
             "downloaded": len(bundle_paths) + 1 + remote_fresh,
             "extracted": info["models"] + info["illusts"],
             "new_ids": [], "sig": sig, "cdnModels": len(specs),

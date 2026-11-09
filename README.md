@@ -808,14 +808,20 @@ cukup 2–3 request HTTP Range untuk membaca central directory lalu mengunduh
   (`Bikini_Kronos`, `Masquerade_Ema`, …) dan rig alternatif (`ema_alt`,
   `kei_alt`) disatukan lewat picker Varian. Nama + family ditulis ke
   `assets/mercenary/_names.json` lalu diterapkan `attachMercenaryNames()`.
-- **98 thumbnail WebP** di `public/thumbs/mercenary/`; model tanpa ilustrasi
-  slot memakai halaman atlas pertamanya yang diperkecil.
+- **98 thumbnail WebP** di `public/thumbs/mercenary/` — **semua dari gambar
+  ilustrasi karakter, bukan halaman atlas** (kumpulan potongan badan).
+  Prioritas: `UI_Slot_Illust_*` → potret `UI_Emoticon_*` → art NPC
+  `Citizen_*` → splash art lobby CDN `UI_Bg_Lobby_*_Title_*` → halaman atlas
+  sebagai fallback terakhir. Varian kostum mewarisi ilustrasi karakter utama
+  lewat family picker; nama beda eja/akhiran (`ninetails-roselin`,
+  `bikini-eventdaphne`, `albedo2`, …) dipetakan lewat `ILLUST_ALIASES`.
+  Asal tiap thumbnail tercatat di `public/thumbs/mercenary/_sources.json`.
 - `UPDATERS["mercenary"]` (`rescan: true`) menjalankan
   `tools/mercenary/update.py` (`--check` / `--apply`). `--check` cuma 1 HEAD
   XAPK + 1 GET 32 byte `catalog_Product.hash`; perubahan katalog CDN tanpa
   naik versi APK tetap terdeteksi. State: `data/mercenary-update-state.json`.
-- Regresi: `tools/check-mercenary.cjs` (31 assertion, termasuk render
-  Playwright untuk model lokal & CDN). Detail: `tools/mercenary/README.md`.
+- Regresi: `tools/check-mercenary.cjs` (36 assertion, termasuk asal thumbnail
+  ilustrasi dan render Playwright untuk model lokal & CDN). Detail: `tools/mercenary/README.md`.
 
 ## 欲洛降临 (EroEra) — `youdianse.com/game/detail/456`
 

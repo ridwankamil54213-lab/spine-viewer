@@ -7,9 +7,11 @@
  *   2. /api/models?game=mercenary-illust -> 85 ilustrasi slot resmi (image).
  *   3. Tiap model punya .json + .atlas + halaman PNG yang disebut atlas;
  *      skeleton JSON ter-parse dan versinya 4.0.64.
- *   4. /api/thumbnails -> 98/98 thumbnail WebP, semua berkas ada.
+ *   4. /api/thumbnails -> 98/98 thumbnail WebP, semua berkas ada, dan
+ *      _sources.json membuktikan ≥90 di antaranya gambar ilustrasi karakter
+ *      (bukan halaman atlas potongan badan).
  *   5. /api/update/mercenary?mode=check -> ok:true, idempoten, have:98,
- *      illusts:85, state berisi cdnHash + cdnModels:89.
+ *      illusts:85, state berisi cdnHash + cdnModels:89 + thumbIllust.
  *   6. Playwright: render 3 model (ada / moa / basilla dari CDN) di kanvas
  *      dengan 0 aset 404, popup Varian Ema, image stage ilustrasi, 0 JS error.
  */
@@ -110,6 +112,24 @@ function getJson(urlPath) {
 	ok(Object.values(man).every((f) => fs.existsSync(
 		path.join(ROOT, "public", "thumbs", "mercenary", f))), "semua berkas WebP ada");
 	ok(Object.keys(man).every((k) => thumbs[k]), "/api/thumbnails memuat 98 kunci mercenary");
+	// Thumbnail HARUS gambar ilustrasi karakter, bukan halaman atlas potongan badan.
+	const srcPath = path.join(ROOT, "public", "thumbs", "mercenary", "_sources.json");
+	ok(fs.existsSync(srcPath), "_sources.json mencatat asal tiap thumbnail");
+	const tsrc = fs.existsSync(srcPath)
+		? JSON.parse(fs.readFileSync(srcPath, "utf8")) : { counts: {}, sources: {} };
+	const tc = tsrc.counts || {};
+	ok((tc.slot || 0) + (tc.extra || 0) >= 90,
+		">= 90 thumbnail dari gambar ilustrasi (slot + ekstra)",
+		`slot=${tc.slot} extra=${tc.extra} atlas=${tc.atlas}`);
+	ok((tc.atlas || 0) <= 8, "atlas fallback maksimal 8 (karakter tanpa ilustrasi resmi)",
+		String(tc.atlas));
+	ok(Object.keys(tsrc.sources || {}).length === 98
+		&& Object.values(tsrc.sources).every((s) =>
+			s === "atlas" || s.startsWith("slot:") || s.startsWith("extra:")),
+		"98 thumbnail bersumber jelas (slot:/extra:/atlas)");
+	ok(String(tsrc.sources["mercenary/moa"] || "").startsWith("slot:"),
+		"moa memakai ilustrasi slot, bukan atlas",
+		String(tsrc.sources["mercenary/moa"]));
 	ok(fs.existsSync(path.join(ROOT, "public", "thumbs", "_game", "mercenary.png")),
 		"ikon game 128px ada");
 
@@ -125,8 +145,10 @@ function getJson(urlPath) {
 	const statePath = path.join(ROOT, "data", "mercenary-update-state.json");
 	const state = JSON.parse(fs.readFileSync(statePath, "utf8"));
 	ok(state.version === u.version && state.models === 98 && state.illusts === 85
-		&& state.cdnModels === 89 && !!state.cdnHash,
-		"state updater tersimpan (98 model, 89 CDN)", JSON.stringify(state));
+		&& state.cdnModels === 89 && !!state.cdnHash
+		&& state.thumbIllust === (tc.slot || 0) + (tc.extra || 0),
+		"state updater tersimpan (98 model, 89 CDN, thumbIllust konsisten)",
+		JSON.stringify(state));
 
 	// --- Playwright: render beneran ----------------------------------------
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });

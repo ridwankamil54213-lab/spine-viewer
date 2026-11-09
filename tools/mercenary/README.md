@@ -92,7 +92,31 @@ Interpreter: `/srv/venv-spine/bin/python` (butuh `UnityPy` + `Pillow`).
 node tools/check-mercenary.cjs
 ```
 
-31 assertion: API (`98` Spine, `85` image), kelengkapan 98 folder
-(json/atlas/PNG), `_names.json`, 98 thumbnail, updater idempoten + state,
-dan Playwright headless (render `ada` / `moa` / `basilla` dari CDN, popup
-Varian Ema, image stage, 0 aset 404, 0 JS error).
+36 assertion: API (`98` Spine, `85` image), kelengkapan 98 folder
+(json/atlas/PNG), `_names.json`, 98 thumbnail **+ `_sources.json` yang
+memastikan ≥90 thumbnail berasal dari gambar ilustrasi karakter** (bukan
+halaman atlas), updater idempoten + state, dan Playwright headless (render
+`ada` / `moa` / `basilla` dari CDN, popup Varian Ema, image stage, 0 aset
+404, 0 JS error).
+
+## Thumbnail = gambar ilustrasi karakter
+
+`build_thumbnails()` jalan satu pass setelah family terbentuk, bukan per-bundle.
+Alasannya: tiap bundle CDN cuma membawa halaman atlas (potongan badan), jadi
+ilustrasi harus diambil dari kumpulan tekstur UI global.
+
+| Prioritas | Sumber | Catatan |
+|---|---|---|
+| 1 | `UI_Slot_Illust_<Karakter>_001` | 85 potret resmi dari `local_ui_assets_all_*` |
+| 2 | `UI_Emoticon_<Karakter>_*` | potret 640² untuk karakter tanpa slot (Ada, …) |
+| 3 | `Citizen_Female_002` / `Citizen_Male_001` | art NPC utuh |
+| 4 | `UI_Bg_Lobby_<Karakter>_Title_*` | splash art CDN, diunduh 1 bundle kecil |
+| 5 | halaman atlas pertama | fallback terakhir, cuma untuk NPC/monster tanpa ilustrasi |
+
+`ILLUST_ALIASES` menjembatani nama model yang beda dari berkas ilustrasi
+(`ninetails-roselin` → `ninetales-roselin`, `bikini-eventdaphne` →
+`bikini-daphne`, `albedo2` → `albedo`, `newshoggoth` → `shoggoth`, …), dan
+varian kostum mewarisi ilustrasi root family-nya. Portrait tinggi dipotong
+tengah-atas supaya wajah tetap kelihatan di kartu. Hasil akhir: `_manifest.json`
+(98 kunci) + `_sources.json` (`counts` + asal tiap thumbnail) + state
+`thumbIllust`.
