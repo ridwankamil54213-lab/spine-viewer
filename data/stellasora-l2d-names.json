@@ -1,0 +1,1514 @@
+{
+ "10301_l": {
+  "character": "Amber",
+  "name": "Amber — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "10301_lf": {
+  "character": "Amber",
+  "name": "Amber — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "10301_lt": {
+  "character": "Amber",
+  "name": "Amber — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "10302_l": {
+  "character": "Amber",
+  "name": "Amber — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "10303_l": {
+  "character": "Amber",
+  "name": "Amber — Playful Innocence",
+  "source": "StellaSora Live2D R2",
+  "variant": "Playful Innocence"
+ },
+ "10304_l": {
+  "character": "Amber",
+  "name": "Amber — Ease Into an Unhurried Summer",
+  "source": "StellaSora Live2D R2",
+  "variant": "Ease Into an Unhurried Summer"
+ },
+ "106_l": {
+  "character": "Aeloria",
+  "name": "Aeloria — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "10701_l": {
+  "character": "Tilia",
+  "name": "Tilia — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "10701_lf": {
+  "character": "Tilia",
+  "name": "Tilia — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "10701_lt": {
+  "character": "Tilia",
+  "name": "Tilia — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "10702_l": {
+  "character": "Tilia",
+  "name": "Tilia — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "10703_l": {
+  "character": "Tilia",
+  "name": "Tilia — This Is My Justice!",
+  "source": "StellaSora Live2D R2",
+  "variant": "This Is My Justice!"
+ },
+ "10704_l": {
+  "character": "Tilia",
+  "name": "Tilia — Shining Bright, Spirits High",
+  "source": "StellaSora Live2D R2",
+  "variant": "Shining Bright, Spirits High"
+ },
+ "10801_l": {
+  "character": "Kasimira",
+  "name": "Kasimira — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "10801_lf": {
+  "character": "Kasimira",
+  "name": "Kasimira — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "10801_lt": {
+  "character": "Kasimira",
+  "name": "Kasimira — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "10802_l": {
+  "character": "Kasimira",
+  "name": "Kasimira — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "109_l": {
+  "character": "Aobelle",
+  "name": "Aobelle — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "11001_l": {
+  "character": "Firenze",
+  "name": "Firenze — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11001_lf": {
+  "character": "Firenze",
+  "name": "Firenze — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11001_lt": {
+  "character": "Firenze",
+  "name": "Firenze — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11002_l": {
+  "character": "Firenze",
+  "name": "Firenze — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11003_l": {
+  "character": "Firenze",
+  "name": "Firenze — Deadly Beauty, Unparalleled Allure",
+  "source": "StellaSora Live2D R2",
+  "variant": "Deadly Beauty, Unparalleled Allure"
+ },
+ "11101_l": {
+  "character": "Iris",
+  "name": "Iris — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11101_lf": {
+  "character": "Iris",
+  "name": "Iris — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11101_lt": {
+  "character": "Iris",
+  "name": "Iris — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11102_l": {
+  "character": "Iris",
+  "name": "Iris — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11103_l": {
+  "character": "Iris",
+  "name": "Iris — The 1/365th of You",
+  "source": "StellaSora Live2D R2",
+  "variant": "The 1/365th of You"
+ },
+ "11104_l": {
+  "character": "Iris",
+  "name": "Iris — Drifting Together on Gentle Waves",
+  "source": "StellaSora Live2D R2",
+  "variant": "Drifting Together on Gentle Waves"
+ },
+ "11201_l": {
+  "character": "Noya",
+  "name": "Noya — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11201_lf": {
+  "character": "Noya",
+  "name": "Noya — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11201_lt": {
+  "character": "Noya",
+  "name": "Noya — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11202_l": {
+  "character": "Noya",
+  "name": "Noya — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11203_l": {
+  "character": "Noya",
+  "name": "Noya — Lingering Sunlight",
+  "source": "StellaSora Live2D R2",
+  "variant": "Lingering Sunlight"
+ },
+ "11205_l": {
+  "character": "Noya",
+  "name": "Noya — A Moment's Rest by Your Side",
+  "source": "StellaSora Live2D R2",
+  "variant": "A Moment's Rest by Your Side"
+ },
+ "11301_l": {
+  "character": "Shimiao",
+  "name": "Shimiao — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11301_lf": {
+  "character": "Shimiao",
+  "name": "Shimiao — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11301_lt": {
+  "character": "Shimiao",
+  "name": "Shimiao — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11302_l": {
+  "character": "Shimiao",
+  "name": "Shimiao — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11303_l": {
+  "character": "Shimiao",
+  "name": "Shimiao — Feeling Spicy? Take the Heat!",
+  "source": "StellaSora Live2D R2",
+  "variant": "Feeling Spicy? Take the Heat!"
+ },
+ "11401_l": {
+  "character": "Chaton",
+  "name": "Chaton — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11401_lf": {
+  "character": "Chaton",
+  "name": "Chaton — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11401_lt": {
+  "character": "Chaton",
+  "name": "Chaton — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11402_l": {
+  "character": "Chaton",
+  "name": "Chaton — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11501_l": {
+  "character": "Firefly",
+  "name": "Firefly — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11501_lf": {
+  "character": "Firefly",
+  "name": "Firefly — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11501_lt": {
+  "character": "Firefly",
+  "name": "Firefly — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11502_l": {
+  "character": "Firefly",
+  "name": "Firefly — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11601_l": {
+  "character": "Ridge",
+  "name": "Ridge — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11601_lf": {
+  "character": "Ridge",
+  "name": "Ridge — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11601_lt": {
+  "character": "Ridge",
+  "name": "Ridge — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11602_l": {
+  "character": "Ridge",
+  "name": "Ridge — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11603_l": {
+  "character": "Ridge",
+  "name": "Ridge — Resting in the Lush Greenhouse",
+  "source": "StellaSora Live2D R2",
+  "variant": "Resting in the Lush Greenhouse"
+ },
+ "11701_l": {
+  "character": "Jinglin",
+  "name": "Jinglin — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11701_lf": {
+  "character": "Jinglin",
+  "name": "Jinglin — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11701_lt": {
+  "character": "Jinglin",
+  "name": "Jinglin — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11702_l": {
+  "character": "Jinglin",
+  "name": "Jinglin — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11703_l": {
+  "character": "Jinglin",
+  "name": "Jinglin — Feast of Fortune March",
+  "source": "StellaSora Live2D R2",
+  "variant": "Feast of Fortune March"
+ },
+ "11801_l": {
+  "character": "Coronis",
+  "name": "Coronis — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11801_lf": {
+  "character": "Coronis",
+  "name": "Coronis — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11801_lt": {
+  "character": "Coronis",
+  "name": "Coronis — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11802_l": {
+  "character": "Coronis",
+  "name": "Coronis — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11901_l": {
+  "character": "Nanoha",
+  "name": "Nanoha — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "11901_lf": {
+  "character": "Nanoha",
+  "name": "Nanoha — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "11901_lt": {
+  "character": "Nanoha",
+  "name": "Nanoha — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "11902_l": {
+  "character": "Nanoha",
+  "name": "Nanoha — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "11903_l": {
+  "character": "Nanoha",
+  "name": "Nanoha — When Distant Winds Rise",
+  "source": "StellaSora Live2D R2",
+  "variant": "When Distant Winds Rise"
+ },
+ "12001_l": {
+  "character": "Canace",
+  "name": "Canace — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "12001_lf": {
+  "character": "Canace",
+  "name": "Canace — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "12001_lt": {
+  "character": "Canace",
+  "name": "Canace — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "12002_l": {
+  "character": "Canace",
+  "name": "Canace — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "12003_l": {
+  "character": "Canace",
+  "name": "Canace — The Formula for Victory",
+  "source": "StellaSora Live2D R2",
+  "variant": "The Formula for Victory"
+ },
+ "12301_l": {
+  "character": "Ann",
+  "name": "Ann — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "12301_lf": {
+  "character": "Ann",
+  "name": "Ann — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "12301_lt": {
+  "character": "Ann",
+  "name": "Ann — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "12302_l": {
+  "character": "Ann",
+  "name": "Ann — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "12303_l": {
+  "character": "Ann",
+  "name": "Ann — Princess of the Wondrous Wilds",
+  "source": "StellaSora Live2D R2",
+  "variant": "Princess of the Wondrous Wilds"
+ },
+ "12501_l": {
+  "character": "Freesia",
+  "name": "Freesia — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "12501_lf": {
+  "character": "Freesia",
+  "name": "Freesia — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "12501_lt": {
+  "character": "Freesia",
+  "name": "Freesia — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "12502_l": {
+  "character": "Freesia",
+  "name": "Freesia — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "12503_l": {
+  "character": "Freesia",
+  "name": "Freesia — The Gift of Falling Snow",
+  "source": "StellaSora Live2D R2",
+  "variant": "The Gift of Falling Snow"
+ },
+ "12601_l": {
+  "character": "Flora",
+  "name": "Flora — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "12601_lf": {
+  "character": "Flora",
+  "name": "Flora — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "12601_lt": {
+  "character": "Flora",
+  "name": "Flora — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "12602_l": {
+  "character": "Flora",
+  "name": "Flora — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "12603_l": {
+  "character": "Flora",
+  "name": "Flora — My Stage, My Creation",
+  "source": "StellaSora Live2D R2",
+  "variant": "My Stage, My Creation"
+ },
+ "12701_l": {
+  "character": "Teresa",
+  "name": "Teresa — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "12701_lf": {
+  "character": "Teresa",
+  "name": "Teresa — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "12701_lt": {
+  "character": "Teresa",
+  "name": "Teresa — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "12702_l": {
+  "character": "Teresa",
+  "name": "Teresa — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "12703_l": {
+  "character": "Teresa",
+  "name": "Teresa — Rookie Hero Reporting In",
+  "source": "StellaSora Live2D R2",
+  "variant": "Rookie Hero Reporting In"
+ },
+ "13001_l": {
+  "character": "Donna",
+  "name": "Donna — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13001_lf": {
+  "character": "Donna",
+  "name": "Donna — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13001_lt": {
+  "character": "Donna",
+  "name": "Donna — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13002_l": {
+  "character": "Donna",
+  "name": "Donna — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13201_l": {
+  "character": "Minova",
+  "name": "Minova — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13201_lf": {
+  "character": "Minova",
+  "name": "Minova — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13201_lt": {
+  "character": "Minova",
+  "name": "Minova — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13202_l": {
+  "character": "Minova",
+  "name": "Minova — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13203_l": {
+  "character": "Minova",
+  "name": "Minova — Tipsy Daydream",
+  "source": "StellaSora Live2D R2",
+  "variant": "Tipsy Daydream"
+ },
+ "13204_l": {
+  "character": "Minova",
+  "name": "Minova — Rippling Void of the Darkest Heartbreak",
+  "source": "StellaSora Live2D R2",
+  "variant": "Rippling Void of the Darkest Heartbreak"
+ },
+ "13301_l": {
+  "character": "Nazuka",
+  "name": "Nazuka — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13301_lf": {
+  "character": "Nazuka",
+  "name": "Nazuka — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13301_lt": {
+  "character": "Nazuka",
+  "name": "Nazuka — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13302_l": {
+  "character": "Nazuka",
+  "name": "Nazuka — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13303_l": {
+  "character": "Nazuka",
+  "name": "Nazuka — A Dip of Fresh Summer",
+  "source": "StellaSora Live2D R2",
+  "variant": "A Dip of Fresh Summer"
+ },
+ "13401_l": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13401_lf": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13401_lt": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13402_l": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13403_l": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Probation Period Cleared!",
+  "source": "StellaSora Live2D R2",
+  "variant": "Probation Period Cleared!"
+ },
+ "13501_l": {
+  "character": "Mistique",
+  "name": "Mistique — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13501_lf": {
+  "character": "Mistique",
+  "name": "Mistique — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13501_lt": {
+  "character": "Mistique",
+  "name": "Mistique — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13502_l": {
+  "character": "Mistique",
+  "name": "Mistique — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13503_l": {
+  "character": "Mistique",
+  "name": "Mistique — Cocoa Night Sweetheart",
+  "source": "StellaSora Live2D R2",
+  "variant": "Cocoa Night Sweetheart"
+ },
+ "13504_l": {
+  "character": "Mistique",
+  "name": "Mistique — Carefree in the Golden Glow",
+  "source": "StellaSora Live2D R2",
+  "variant": "Carefree in the Golden Glow"
+ },
+ "13701_l": {
+  "character": "Eleanor",
+  "name": "Eleanor — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13701_lf": {
+  "character": "Eleanor",
+  "name": "Eleanor — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13701_lt": {
+  "character": "Eleanor",
+  "name": "Eleanor — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13702_l": {
+  "character": "Eleanor",
+  "name": "Eleanor — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "13901_l": {
+  "character": "Allie",
+  "name": "Allie — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "13901_lf": {
+  "character": "Allie",
+  "name": "Allie — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "13901_lt": {
+  "character": "Allie",
+  "name": "Allie — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "13902_l": {
+  "character": "Allie",
+  "name": "Allie — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14001_l": {
+  "character": "Sparkla",
+  "name": "Sparkla — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14001_lf": {
+  "character": "Sparkla",
+  "name": "Sparkla — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14001_lt": {
+  "character": "Sparkla",
+  "name": "Sparkla — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14002_l": {
+  "character": "Sparkla",
+  "name": "Sparkla — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14101_l": {
+  "character": "Chixia",
+  "name": "Chixia — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14101_lf": {
+  "character": "Chixia",
+  "name": "Chixia — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14101_lt": {
+  "character": "Chixia",
+  "name": "Chixia — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14102_l": {
+  "character": "Chixia",
+  "name": "Chixia — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14103_l": {
+  "character": "Chixia",
+  "name": "Chixia — Crimson Reflection of Queen of Hearts",
+  "source": "StellaSora Live2D R2",
+  "variant": "Crimson Reflection of Queen of Hearts"
+ },
+ "14201_l": {
+  "character": "Cosette",
+  "name": "Cosette — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14201_lf": {
+  "character": "Cosette",
+  "name": "Cosette — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14201_lt": {
+  "character": "Cosette",
+  "name": "Cosette — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14202_l": {
+  "character": "Cosette",
+  "name": "Cosette — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14203_l": {
+  "character": "Cosette",
+  "name": "Cosette — A Taste of Summer All to Herself",
+  "source": "StellaSora Live2D R2",
+  "variant": "A Taste of Summer All to Herself"
+ },
+ "14301_l": {
+  "character": "Wraith",
+  "name": "Wraith — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14301_lf": {
+  "character": "Wraith",
+  "name": "Wraith — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14301_lt": {
+  "character": "Wraith",
+  "name": "Wraith — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14302_l": {
+  "character": "Wraith",
+  "name": "Wraith — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14401_l": {
+  "character": "Chitose",
+  "name": "Chitose — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14401_lf": {
+  "character": "Chitose",
+  "name": "Chitose — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14401_lt": {
+  "character": "Chitose",
+  "name": "Chitose — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14402_l": {
+  "character": "Chitose",
+  "name": "Chitose — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14403_l": {
+  "character": "Chitose",
+  "name": "Chitose — When Morning Glories Bloom, Her Eyes Open",
+  "source": "StellaSora Live2D R2",
+  "variant": "When Morning Glories Bloom, Her Eyes Open"
+ },
+ "14404_l": {
+  "character": "Chitose",
+  "name": "Chitose — I Will Always... Stay by Your Side…",
+  "source": "StellaSora Live2D R2",
+  "variant": "I Will Always... Stay by Your Side…"
+ },
+ "14501_l": {
+  "character": "Otoha",
+  "name": "Otoha — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14501_lf": {
+  "character": "Otoha",
+  "name": "Otoha — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14501_lt": {
+  "character": "Otoha",
+  "name": "Otoha — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14502_l": {
+  "character": "Otoha",
+  "name": "Otoha — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14701_l": {
+  "character": "Caramel",
+  "name": "Caramel — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14701_lf": {
+  "character": "Caramel",
+  "name": "Caramel — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14701_lt": {
+  "character": "Caramel",
+  "name": "Caramel — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14702_l": {
+  "character": "Caramel",
+  "name": "Caramel — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14703_l": {
+  "character": "Caramel",
+  "name": "Caramel — Mellow Bass Echo",
+  "source": "StellaSora Live2D R2",
+  "variant": "Mellow Bass Echo"
+ },
+ "14901_l": {
+  "character": "Gerie",
+  "name": "Gerie — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "14901_lf": {
+  "character": "Gerie",
+  "name": "Gerie — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "14901_lt": {
+  "character": "Gerie",
+  "name": "Gerie — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "14902_l": {
+  "character": "Gerie",
+  "name": "Gerie — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "14903_l": {
+  "character": "Gerie",
+  "name": "Gerie — Promise Beyond the Thaw",
+  "source": "StellaSora Live2D R2",
+  "variant": "Promise Beyond the Thaw"
+ },
+ "15001_l": {
+  "character": "Laru",
+  "name": "Laru — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15001_lf": {
+  "character": "Laru",
+  "name": "Laru — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15001_lt": {
+  "character": "Laru",
+  "name": "Laru — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15002_l": {
+  "character": "Laru",
+  "name": "Laru — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "15501_l": {
+  "character": "Shia",
+  "name": "Shia — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15501_lf": {
+  "character": "Shia",
+  "name": "Shia — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15501_lt": {
+  "character": "Shia",
+  "name": "Shia — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15502_l": {
+  "character": "Shia",
+  "name": "Shia — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "15503_l": {
+  "character": "Shia",
+  "name": "Shia — Call of the Coral Sea",
+  "source": "StellaSora Live2D R2",
+  "variant": "Call of the Coral Sea"
+ },
+ "15601_l": {
+  "character": "Nazuna",
+  "name": "Nazuna — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15601_lf": {
+  "character": "Nazuna",
+  "name": "Nazuna — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15601_lt": {
+  "character": "Nazuna",
+  "name": "Nazuna — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15602_l": {
+  "character": "Nazuna",
+  "name": "Nazuna — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "15603_l": {
+  "character": "Nazuna",
+  "name": "Nazuna — Quirky Tea Party",
+  "source": "StellaSora Live2D R2",
+  "variant": "Quirky Tea Party"
+ },
+ "15701_l": {
+  "character": "Karin",
+  "name": "Karin — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15701_lf": {
+  "character": "Karin",
+  "name": "Karin — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15701_lt": {
+  "character": "Karin",
+  "name": "Karin — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15702_l": {
+  "character": "Karin",
+  "name": "Karin — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "15801_l": {
+  "character": "Snowish Laru",
+  "name": "Snowish Laru — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15801_lf": {
+  "character": "Snowish Laru",
+  "name": "Snowish Laru — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15801_lt": {
+  "character": "Snowish Laru",
+  "name": "Snowish Laru — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15802_l": {
+  "character": "Snowish Laru",
+  "name": "Snowish Laru — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "15901_l": {
+  "character": "Springseek Coronis",
+  "name": "Springseek Coronis — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "15901_lf": {
+  "character": "Springseek Coronis",
+  "name": "Springseek Coronis — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "15901_lt": {
+  "character": "Springseek Coronis",
+  "name": "Springseek Coronis — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "15902_l": {
+  "character": "Springseek Coronis",
+  "name": "Springseek Coronis — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "16001_l": {
+  "character": "Suntide Willow",
+  "name": "Suntide Willow — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "16001_lf": {
+  "character": "Suntide Willow",
+  "name": "Suntide Willow — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "16001_lt": {
+  "character": "Suntide Willow",
+  "name": "Suntide Willow — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "16002_l": {
+  "character": "Suntide Willow",
+  "name": "Suntide Willow — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "16201_l": {
+  "character": "Firstlight Noya",
+  "name": "Firstlight Noya — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "16201_lf": {
+  "character": "Firstlight Noya",
+  "name": "Firstlight Noya — Memory Snapshot",
+  "source": "StellaSora Live2D R2",
+  "variant": "Memory Snapshot"
+ },
+ "16201_lt": {
+  "character": "Firstlight Noya",
+  "name": "Firstlight Noya — Talent",
+  "source": "StellaSora Live2D R2",
+  "variant": "Talent"
+ },
+ "16202_l": {
+  "character": "Firstlight Noya",
+  "name": "Firstlight Noya — Awakened",
+  "source": "StellaSora Live2D R2",
+  "variant": "Awakened"
+ },
+ "4004_l": {
+  "character": "Wisteria Dream l2d",
+  "name": "Wisteria Dream l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4005_l": {
+  "character": "Sunlit Blossom l2d",
+  "name": "Sunlit Blossom l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4006_l": {
+  "character": "Witch's Swing l2d",
+  "name": "Witch's Swing l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4007_l": {
+  "character": "Midnight Mayhem l2d",
+  "name": "Midnight Mayhem l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4008_l": {
+  "character": "Soaring Blue l2d",
+  "name": "Soaring Blue l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4015_l": {
+  "character": "Deer's Song l2d",
+  "name": "Deer's Song l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4016_l": {
+  "character": "Chronicles of Spring l2d",
+  "name": "Chronicles of Spring l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4017_l": {
+  "character": "Fireworks l2d",
+  "name": "Fireworks l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4026_l": {
+  "character": "Sword Against Stream l2d",
+  "name": "Sword Against Stream l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4027_l": {
+  "character": "Mystic Brushstrokes l2d",
+  "name": "Mystic Brushstrokes l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4028_l": {
+  "character": "Daylight Garden l2d",
+  "name": "Daylight Garden l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4029_l": {
+  "character": "The Cat's Treasure l2d",
+  "name": "The Cat's Treasure l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4036_l": {
+  "character": "The Lost Pilgrim l2d",
+  "name": "The Lost Pilgrim l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4037_l": {
+  "character": "Claw the Claw l2d",
+  "name": "Claw the Claw l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4038_l": {
+  "character": "Ripples of Nostalgia l2d",
+  "name": "Ripples of Nostalgia l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4044_l": {
+  "character": "Veiled Dawn of Spring l2d",
+  "name": "Veiled Dawn of Spring l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4045_l": {
+  "character": "Petals of Blooming Mirage l2d",
+  "name": "Petals of Blooming Mirage l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4048_l": {
+  "character": "Snowy Night Surprise l2d",
+  "name": "Snowy Night Surprise l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4051_l": {
+  "character": "Stellar Destination l2d",
+  "name": "Stellar Destination l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4054_l": {
+  "character": "Little Paradise l2d",
+  "name": "Little Paradise l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4055_l": {
+  "character": "Fleeting Glimmers l2d",
+  "name": "Fleeting Glimmers l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4057_l": {
+  "character": "Ride the Waves With Me l2d",
+  "name": "Ride the Waves With Me l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4059_l": {
+  "character": "Fly, O Caged Bird l2d",
+  "name": "Fly, O Caged Bird l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4061_l": {
+  "character": "Bedtime Story l2d",
+  "name": "Bedtime Story l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "4066_l": {
+  "character": "My Guiding Star l2d",
+  "name": "My Guiding Star l2d — Disc",
+  "source": "StellaSora Live2D R2",
+  "variant": "Disc"
+ },
+ "813301_l": {
+  "character": "Nazuka",
+  "name": "Nazuka — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "813401_l": {
+  "character": "Fuyuka",
+  "name": "Fuyuka — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "910201_l": {
+  "character": "Willow",
+  "name": "Willow — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "910202_l": {
+  "character": "Willow",
+  "name": "Willow — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "913101_l": {
+  "character": "Bloc",
+  "name": "Bloc — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "913301_l": {
+  "character": "Portia",
+  "name": "Portia — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "915201_l": {
+  "character": "Bastelina",
+  "name": "Bastelina — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "915901_l": {
+  "character": "Horizon",
+  "name": "Horizon — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "916402_l": {
+  "character": "Iori",
+  "name": "Iori — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917201_l": {
+  "character": "Beatrixa",
+  "name": "Beatrixa — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917202_l": {
+  "character": "Beatrixa",
+  "name": "Beatrixa — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917301_l": {
+  "character": "Bernina",
+  "name": "Bernina — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917302_l": {
+  "character": "Bernina",
+  "name": "Bernina — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917401_l": {
+  "character": "Virigia",
+  "name": "Virigia — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "917402_l": {
+  "character": "Virigia",
+  "name": "Virigia — Unknown",
+  "source": "StellaSora Live2D R2",
+  "variant": "Unknown"
+ },
+ "99901_l": {
+  "character": "Spellbound Golem",
+  "name": "Spellbound Golem — Default",
+  "source": "StellaSora Live2D R2",
+  "variant": "Default"
+ },
+ "avg3_100_a": {
+  "character": "avg3_100_a",
+  "name": "avg3_100_a — avg3_100_a",
+  "source": "StellaSora Live2D R2",
+  "variant": "avg3_100_a"
+ },
+ "avg3_101_a": {
+  "character": "avg3_101_a",
+  "name": "avg3_101_a — avg3_101_a",
+  "source": "StellaSora Live2D R2",
+  "variant": "avg3_101_a"
+ },
+ "createplayer2_F": {
+  "character": "createplayer2_F",
+  "name": "createplayer2_F — createplayer2_F",
+  "source": "StellaSora Live2D R2",
+  "variant": "createplayer2_F"
+ },
+ "createplayer2_M": {
+  "character": "createplayer2_M",
+  "name": "createplayer2_M — createplayer2_M",
+  "source": "StellaSora Live2D R2",
+  "variant": "createplayer2_M"
+ },
+ "createplayer_F": {
+  "character": "createplayer_F",
+  "name": "createplayer_F — createplayer_F",
+  "source": "StellaSora Live2D R2",
+  "variant": "createplayer_F"
+ },
+ "createplayer_M": {
+  "character": "createplayer_M",
+  "name": "createplayer_M — createplayer_M",
+  "source": "StellaSora Live2D R2",
+  "variant": "createplayer_M"
+ },
+ "dailyquest_f_l": {
+  "character": "dailyquest_f_l",
+  "name": "dailyquest_f_l — dailyquest_f_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "dailyquest_f_l"
+ },
+ "dailyquest_m_l": {
+  "character": "dailyquest_m_l",
+  "name": "dailyquest_m_l — dailyquest_m_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "dailyquest_m_l"
+ },
+ "qingye_CG": {
+  "character": "qingye_CG",
+  "name": "qingye_CG — qingye_CG",
+  "source": "StellaSora Live2D R2",
+  "variant": "qingye_CG"
+ },
+ "tourguide_f_l": {
+  "character": "tourguide_f_l",
+  "name": "tourguide_f_l — tourguide_f_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "tourguide_f_l"
+ },
+ "tourguide_m_l": {
+  "character": "tourguide_m_l",
+  "name": "tourguide_m_l — tourguide_m_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "tourguide_m_l"
+ },
+ "weeklyquest_f_l": {
+  "character": "weeklyquest_f_l",
+  "name": "weeklyquest_f_l — weeklyquest_f_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "weeklyquest_f_l"
+ },
+ "weeklyquest_m_l": {
+  "character": "weeklyquest_m_l",
+  "name": "weeklyquest_m_l — weeklyquest_m_l",
+  "source": "StellaSora Live2D R2",
+  "variant": "weeklyquest_m_l"
+ }
+}

@@ -1,0 +1,74 @@
+{
+ "families": [
+  {
+   "members": [
+    {
+     "id": "stellasora/400013_CoconutTree",
+     "label": "CoconutTree"
+    },
+    {
+     "id": "stellasora/400013_bg_Icecream_main",
+     "label": "bg_Icecream_main"
+    },
+    {
+     "id": "stellasora/400013_btn_Icecream_level_island_1",
+     "label": "btn_Icecream_level_island_1"
+    },
+    {
+     "id": "stellasora/400013_btn_Icecream_level_island_2",
+     "label": "btn_Icecream_level_island_2"
+    },
+    {
+     "id": "stellasora/400013_btn_Icecream_level_island_3",
+     "label": "btn_Icecream_level_island_3"
+    },
+    {
+     "id": "stellasora/400013_btn_Icecream_level_island_4",
+     "label": "btn_Icecream_level_island_4"
+    }
+   ],
+   "name": "Cool Supply Stand S1",
+   "root": "stellasora/400013_CoconutTree"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora/510007_BOSS1",
+     "label": "BOSS1"
+    },
+    {
+     "id": "stellasora/510007_BOSS2",
+     "label": "BOSS2"
+    }
+   ],
+   "name": "Joint Drill S7 — Coppelius & Olympia",
+   "root": "stellasora/510007_BOSS1"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora/20104_20104_Downdust",
+     "label": "20104_Downdust"
+    },
+    {
+     "id": "stellasora/20104_20104_Iris",
+     "label": "20104_Iris"
+    },
+    {
+     "id": "stellasora/20104_20104_mw_Female",
+     "label": "20104_mw_Female"
+    },
+    {
+     "id": "stellasora/20104_20104_mw_Male",
+     "label": "20104_mw_Male"
+    },
+    {
+     "id": "stellasora/400018_BookScene",
+     "label": "BookScene"
+    }
+   ],
+   "name": "Wholeness at Reunion's Dawn",
+   "root": "stellasora/20104_20104_Downdust"
+  }
+ ]
+}

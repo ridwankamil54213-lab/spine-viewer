@@ -1,0 +1,218 @@
+{
+ "10109_10109GunStorm": {
+  "character": "A Sandstorm of Gunfire",
+  "name": "A Sandstorm of Gunfire — 10109GunStorm",
+  "source": "StellaSora event spine",
+  "variant": "10109GunStorm"
+ },
+ "20103_20103_Summer": {
+  "character": "Sunlit Breeze, Azure Seas Checking In for A Cozy Summer~",
+  "name": "Sunlit Breeze, Azure Seas Checking In for A Cozy Summer~ — 20103_Summer",
+  "source": "StellaSora event spine",
+  "variant": "20103_Summer"
+ },
+ "20104_20104_Downdust": {
+  "character": "Wholeness at Reunion's Dawn",
+  "name": "Wholeness at Reunion's Dawn — 20104_Downdust",
+  "source": "StellaSora event spine",
+  "variant": "20104_Downdust"
+ },
+ "20104_20104_Iris": {
+  "character": "Wholeness at Reunion's Dawn",
+  "name": "Wholeness at Reunion's Dawn — 20104_Iris",
+  "source": "StellaSora event spine",
+  "variant": "20104_Iris"
+ },
+ "20104_20104_mw_Female": {
+  "character": "Wholeness at Reunion's Dawn",
+  "name": "Wholeness at Reunion's Dawn — 20104_mw_Female",
+  "source": "StellaSora event spine",
+  "variant": "20104_mw_Female"
+ },
+ "20104_20104_mw_Male": {
+  "character": "Wholeness at Reunion's Dawn",
+  "name": "Wholeness at Reunion's Dawn — 20104_mw_Male",
+  "source": "StellaSora event spine",
+  "variant": "20104_mw_Male"
+ },
+ "302001_MallCheckInAct_Actor": {
+  "character": "Event 302001",
+  "name": "Event 302001 — MallCheckInAct_Actor",
+  "source": "StellaSora event spine",
+  "variant": "MallCheckInAct_Actor"
+ },
+ "400013_CoconutTree": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — CoconutTree",
+  "source": "StellaSora event spine",
+  "variant": "CoconutTree"
+ },
+ "400013_bg_Icecream_main": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — bg_Icecream_main",
+  "source": "StellaSora event spine",
+  "variant": "bg_Icecream_main"
+ },
+ "400013_btn_Icecream_level_island_1": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — btn_Icecream_level_island_1",
+  "source": "StellaSora event spine",
+  "variant": "btn_Icecream_level_island_1"
+ },
+ "400013_btn_Icecream_level_island_2": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — btn_Icecream_level_island_2",
+  "source": "StellaSora event spine",
+  "variant": "btn_Icecream_level_island_2"
+ },
+ "400013_btn_Icecream_level_island_3": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — btn_Icecream_level_island_3",
+  "source": "StellaSora event spine",
+  "variant": "btn_Icecream_level_island_3"
+ },
+ "400013_btn_Icecream_level_island_4": {
+  "character": "Cool Supply Stand S1",
+  "name": "Cool Supply Stand S1 — btn_Icecream_level_island_4",
+  "source": "StellaSora event spine",
+  "variant": "btn_Icecream_level_island_4"
+ },
+ "400017_castnet": {
+  "character": "A Monolith Too Far",
+  "name": "A Monolith Too Far — castnet",
+  "source": "StellaSora event spine",
+  "variant": "castnet"
+ },
+ "400018_BookScene": {
+  "character": "Wholeness at Reunion's Dawn",
+  "name": "Wholeness at Reunion's Dawn — BookScene",
+  "source": "StellaSora event spine",
+  "variant": "BookScene"
+ },
+ "510007_BOSS1": {
+  "character": "Joint Drill S7 — Coppelius & Olympia",
+  "name": "Joint Drill S7 — Coppelius & Olympia — BOSS1",
+  "source": "StellaSora event spine",
+  "variant": "BOSS1"
+ },
+ "510007_BOSS2": {
+  "character": "Joint Drill S7 — Coppelius & Olympia",
+  "name": "Joint Drill S7 — Coppelius & Olympia — BOSS2",
+  "source": "StellaSora event spine",
+  "variant": "BOSS2"
+ },
+ "sp10301_10301": {
+  "character": "Amber: Default (Spine)",
+  "name": "Amber: Default (Spine) — 10301",
+  "source": "StellaSora event spine",
+  "variant": "10301"
+ },
+ "sp10304_10304": {
+  "character": "Ease Into an Unhurried Summer (Spine)",
+  "name": "Ease Into an Unhurried Summer (Spine) — 10304",
+  "source": "StellaSora event spine",
+  "variant": "10304"
+ },
+ "sp11101_11101": {
+  "character": "Iris: Default (Spine)",
+  "name": "Iris: Default (Spine) — 11101",
+  "source": "StellaSora event spine",
+  "variant": "11101"
+ },
+ "sp11104_11104": {
+  "character": "Drifting Together on Gentle Waves (Spine)",
+  "name": "Drifting Together on Gentle Waves (Spine) — 11104",
+  "source": "StellaSora event spine",
+  "variant": "11104"
+ },
+ "sp11201_11201": {
+  "character": "Noya: Default (Spine)",
+  "name": "Noya: Default (Spine) — 11201",
+  "source": "StellaSora event spine",
+  "variant": "11201"
+ },
+ "sp11203_11203": {
+  "character": "Lingering Sunlight (Spine)",
+  "name": "Lingering Sunlight (Spine) — 11203",
+  "source": "StellaSora event spine",
+  "variant": "11203"
+ },
+ "sp15501_15501": {
+  "character": "Shia: Default (Spine)",
+  "name": "Shia: Default (Spine) — 15501",
+  "source": "StellaSora event spine",
+  "variant": "15501"
+ },
+ "sp15701_15701": {
+  "character": "Karin: Default (Spine)",
+  "name": "Karin: Default (Spine) — 15701",
+  "source": "StellaSora event spine",
+  "variant": "15701"
+ },
+ "sp16001_16001": {
+  "character": "Suntide Willow: Default (Spine)",
+  "name": "Suntide Willow: Default (Spine) — 16001",
+  "source": "StellaSora event spine",
+  "variant": "16001"
+ },
+ "sp966001_966001": {
+  "character": "Skin 966001 (Spine)",
+  "name": "Skin 966001 (Spine) — 966001",
+  "source": "StellaSora event spine",
+  "variant": "966001"
+ },
+ "sp966002_966002": {
+  "character": "Skin 966002 (Spine)",
+  "name": "Skin 966002 (Spine) — 966002",
+  "source": "StellaSora event spine",
+  "variant": "966002"
+ },
+ "sp983001_983001": {
+  "character": "Skin 983001 (Spine)",
+  "name": "Skin 983001 (Spine) — 983001",
+  "source": "StellaSora event spine",
+  "variant": "983001"
+ },
+ "sp983002_983002": {
+  "character": "Skin 983002 (Spine)",
+  "name": "Skin 983002 (Spine) — 983002",
+  "source": "StellaSora event spine",
+  "variant": "983002"
+ },
+ "sp983003_983003": {
+  "character": "Skin 983003 (Spine)",
+  "name": "Skin 983003 (Spine) — 983003",
+  "source": "StellaSora event spine",
+  "variant": "983003"
+ },
+ "sp983004_983004": {
+  "character": "Skin 983004 (Spine)",
+  "name": "Skin 983004 (Spine) — 983004",
+  "source": "StellaSora event spine",
+  "variant": "983004"
+ },
+ "sp984001_984001": {
+  "character": "Skin 984001 (Spine)",
+  "name": "Skin 984001 (Spine) — 984001",
+  "source": "StellaSora event spine",
+  "variant": "984001"
+ },
+ "sp984002_984002": {
+  "character": "Skin 984002 (Spine)",
+  "name": "Skin 984002 (Spine) — 984002",
+  "source": "StellaSora event spine",
+  "variant": "984002"
+ },
+ "sp984003_984003": {
+  "character": "Skin 984003 (Spine)",
+  "name": "Skin 984003 (Spine) — 984003",
+  "source": "StellaSora event spine",
+  "variant": "984003"
+ },
+ "sp984004_984004": {
+  "character": "Skin 984004 (Spine)",
+  "name": "Skin 984004 (Spine) — 984004",
+  "source": "StellaSora event spine",
+  "variant": "984004"
+ }
+}

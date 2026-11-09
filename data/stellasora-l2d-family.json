@@ -1,0 +1,1090 @@
+{
+ "families": [
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/10301_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/10301_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/10301_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/10302_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/10303_l",
+     "label": "Playful Innocence"
+    },
+    {
+     "id": "stellasora-l2d/10304_l",
+     "label": "Ease Into an Unhurried Summer"
+    }
+   ],
+   "name": "Amber",
+   "root": "stellasora-l2d/10301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/10701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/10701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/10701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/10702_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/10703_l",
+     "label": "This Is My Justice!"
+    },
+    {
+     "id": "stellasora-l2d/10704_l",
+     "label": "Shining Bright, Spirits High"
+    }
+   ],
+   "name": "Tilia",
+   "root": "stellasora-l2d/10701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/10801_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/10801_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/10801_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/10802_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Kasimira",
+   "root": "stellasora-l2d/10801_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11002_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11003_l",
+     "label": "Deadly Beauty, Unparalleled Allure"
+    }
+   ],
+   "name": "Firenze",
+   "root": "stellasora-l2d/11001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11101_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11101_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11101_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11102_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11103_l",
+     "label": "The 1/365th of You"
+    },
+    {
+     "id": "stellasora-l2d/11104_l",
+     "label": "Drifting Together on Gentle Waves"
+    }
+   ],
+   "name": "Iris",
+   "root": "stellasora-l2d/11101_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11201_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11201_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11201_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11202_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11203_l",
+     "label": "Lingering Sunlight"
+    },
+    {
+     "id": "stellasora-l2d/11205_l",
+     "label": "A Moment's Rest by Your Side"
+    }
+   ],
+   "name": "Noya",
+   "root": "stellasora-l2d/11201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11301_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11301_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11301_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11302_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11303_l",
+     "label": "Feeling Spicy? Take the Heat!"
+    }
+   ],
+   "name": "Shimiao",
+   "root": "stellasora-l2d/11301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11401_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11401_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11401_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11402_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Chaton",
+   "root": "stellasora-l2d/11401_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11501_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11501_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11501_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11502_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Firefly",
+   "root": "stellasora-l2d/11501_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11601_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11601_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11601_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11602_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11603_l",
+     "label": "Resting in the Lush Greenhouse"
+    }
+   ],
+   "name": "Ridge",
+   "root": "stellasora-l2d/11601_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11702_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11703_l",
+     "label": "Feast of Fortune March"
+    }
+   ],
+   "name": "Jinglin",
+   "root": "stellasora-l2d/11701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11801_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11801_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11801_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11802_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Coronis",
+   "root": "stellasora-l2d/11801_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/11901_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/11901_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/11901_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/11902_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/11903_l",
+     "label": "When Distant Winds Rise"
+    }
+   ],
+   "name": "Nanoha",
+   "root": "stellasora-l2d/11901_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/12001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/12001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/12001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/12002_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/12003_l",
+     "label": "The Formula for Victory"
+    }
+   ],
+   "name": "Canace",
+   "root": "stellasora-l2d/12001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/12301_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/12301_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/12301_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/12302_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/12303_l",
+     "label": "Princess of the Wondrous Wilds"
+    }
+   ],
+   "name": "Ann",
+   "root": "stellasora-l2d/12301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/12501_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/12501_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/12501_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/12502_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/12503_l",
+     "label": "The Gift of Falling Snow"
+    }
+   ],
+   "name": "Freesia",
+   "root": "stellasora-l2d/12501_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/12601_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/12601_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/12601_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/12602_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/12603_l",
+     "label": "My Stage, My Creation"
+    }
+   ],
+   "name": "Flora",
+   "root": "stellasora-l2d/12601_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/12701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/12701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/12701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/12702_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/12703_l",
+     "label": "Rookie Hero Reporting In"
+    }
+   ],
+   "name": "Teresa",
+   "root": "stellasora-l2d/12701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13002_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Donna",
+   "root": "stellasora-l2d/13001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13201_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13201_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13201_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13202_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/13203_l",
+     "label": "Tipsy Daydream"
+    },
+    {
+     "id": "stellasora-l2d/13204_l",
+     "label": "Rippling Void of the Darkest Heartbreak"
+    }
+   ],
+   "name": "Minova",
+   "root": "stellasora-l2d/13201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13301_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13301_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13301_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13302_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/13303_l",
+     "label": "A Dip of Fresh Summer"
+    }
+   ],
+   "name": "Nazuka",
+   "root": "stellasora-l2d/13301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13401_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13401_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13401_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13402_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/13403_l",
+     "label": "Probation Period Cleared!"
+    }
+   ],
+   "name": "Fuyuka",
+   "root": "stellasora-l2d/13401_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13501_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13501_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13501_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13502_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/13503_l",
+     "label": "Cocoa Night Sweetheart"
+    },
+    {
+     "id": "stellasora-l2d/13504_l",
+     "label": "Carefree in the Golden Glow"
+    }
+   ],
+   "name": "Mistique",
+   "root": "stellasora-l2d/13501_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13702_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Eleanor",
+   "root": "stellasora-l2d/13701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/13901_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/13901_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/13901_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/13902_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Allie",
+   "root": "stellasora-l2d/13901_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14002_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Sparkla",
+   "root": "stellasora-l2d/14001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14101_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14101_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14101_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14102_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/14103_l",
+     "label": "Crimson Reflection of Queen of Hearts"
+    }
+   ],
+   "name": "Chixia",
+   "root": "stellasora-l2d/14101_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14201_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14201_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14201_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14202_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/14203_l",
+     "label": "A Taste of Summer All to Herself"
+    }
+   ],
+   "name": "Cosette",
+   "root": "stellasora-l2d/14201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14301_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14301_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14301_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14302_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Wraith",
+   "root": "stellasora-l2d/14301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14401_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14401_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14401_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14402_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/14403_l",
+     "label": "When Morning Glories Bloom, Her Eyes Open"
+    },
+    {
+     "id": "stellasora-l2d/14404_l",
+     "label": "I Will Always... Stay by Your Side…"
+    }
+   ],
+   "name": "Chitose",
+   "root": "stellasora-l2d/14401_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14501_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14501_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14501_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14502_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Otoha",
+   "root": "stellasora-l2d/14501_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14702_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/14703_l",
+     "label": "Mellow Bass Echo"
+    }
+   ],
+   "name": "Caramel",
+   "root": "stellasora-l2d/14701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/14901_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/14901_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/14901_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/14902_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/14903_l",
+     "label": "Promise Beyond the Thaw"
+    }
+   ],
+   "name": "Gerie",
+   "root": "stellasora-l2d/14901_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15002_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Laru",
+   "root": "stellasora-l2d/15001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15501_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15501_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15501_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15502_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/15503_l",
+     "label": "Call of the Coral Sea"
+    }
+   ],
+   "name": "Shia",
+   "root": "stellasora-l2d/15501_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15601_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15601_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15601_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15602_l",
+     "label": "Awakened"
+    },
+    {
+     "id": "stellasora-l2d/15603_l",
+     "label": "Quirky Tea Party"
+    }
+   ],
+   "name": "Nazuna",
+   "root": "stellasora-l2d/15601_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15701_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15701_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15701_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15702_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Karin",
+   "root": "stellasora-l2d/15701_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15801_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15801_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15801_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15802_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Snowish Laru",
+   "root": "stellasora-l2d/15801_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/15901_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/15901_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/15901_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/15902_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Springseek Coronis",
+   "root": "stellasora-l2d/15901_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/16001_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/16001_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/16001_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/16002_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Suntide Willow",
+   "root": "stellasora-l2d/16001_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/16201_l",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-l2d/16201_lf",
+     "label": "Memory Snapshot"
+    },
+    {
+     "id": "stellasora-l2d/16201_lt",
+     "label": "Talent"
+    },
+    {
+     "id": "stellasora-l2d/16202_l",
+     "label": "Awakened"
+    }
+   ],
+   "name": "Firstlight Noya",
+   "root": "stellasora-l2d/16201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/910201_l",
+     "label": "Unknown"
+    },
+    {
+     "id": "stellasora-l2d/910202_l",
+     "label": "Unknown"
+    }
+   ],
+   "name": "Willow",
+   "root": "stellasora-l2d/910201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/917201_l",
+     "label": "Unknown"
+    },
+    {
+     "id": "stellasora-l2d/917202_l",
+     "label": "Unknown"
+    }
+   ],
+   "name": "Beatrixa",
+   "root": "stellasora-l2d/917201_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/917301_l",
+     "label": "Unknown"
+    },
+    {
+     "id": "stellasora-l2d/917302_l",
+     "label": "Unknown"
+    }
+   ],
+   "name": "Bernina",
+   "root": "stellasora-l2d/917301_l"
+  },
+  {
+   "members": [
+    {
+     "id": "stellasora-l2d/917401_l",
+     "label": "Unknown"
+    },
+    {
+     "id": "stellasora-l2d/917402_l",
+     "label": "Unknown"
+    }
+   ],
+   "name": "Virigia",
+   "root": "stellasora-l2d/917401_l"
+  }
+ ]
+}

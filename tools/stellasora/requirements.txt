@@ -1,0 +1,6 @@
+# tools/stellasora/update.py hanya butuh stdlib + Pillow (sudah ada di
+# /srv/venv-spine). Tidak ada UnityPy / msgpack / dekripsi khusus karena
+# asetnya sudah berupa berkas mentah di R2 publik.
+#
+#   /srv/venv-spine/bin/python -m pip install -r tools/stellasora/requirements.txt
+Pillow>=10.0

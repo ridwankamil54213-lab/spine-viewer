@@ -573,6 +573,18 @@ const GAME_ROOTS = [
 		spineRuntime: "3.8",
 		pmaDefault: true,
 	},
+	// Stella Sora (Yostar) — dua root dari satu updater. Urutan PENTING:
+	// resolveGame cocokkan startsWith, jadi "-l2d" harus lebih dulu.
+	// Live2D Cubism 4 dideteksi server dari .moc3; Spine event 4.2.43
+	// memakai runtime spine-pixi-v7-42. Lihat tools/stellasora/.
+	{ match: "stellasora-l2d", key: "stellasora-l2d", label: "Stella Sora — Live2D" },
+	{
+		match: "stellasora",
+		key: "stellasora",
+		label: "Stella Sora — Spine",
+		spineRuntime: "4.2",
+		pmaDefault: false,
+	},
 	// Zone Nova (禁域战姬, EROLABS): 188 model Spine 4.1.24 dari CDN resmi.
 	// tools/zonenova/update.py men-dekrip katalog XOR + master-data AES lalu
 	// membuang fake-header "UtS\0 5.0." pada tiap .ab. Teksturnya
@@ -3851,6 +3863,8 @@ function attachCharacters(models) {
 	for (const cfg of [
 		{ game: "arknights", names: "arknights-names.json", family: "arknights-family.json" },
 		{ game: "zonenova", names: "zonenova-names.json", family: "zonenova-family.json" },
+		{ game: "stellasora", names: "stellasora-names.json", family: "stellasora-family.json" },
+		{ game: "stellasora-l2d", names: "stellasora-l2d-names.json", family: "stellasora-l2d-family.json" },
 	]) {
 		const read = (f) => {
 			try { return JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8")); }
@@ -4252,6 +4266,12 @@ const UPDATERS = {
 	// Menulis 3.112 folder model + 2 data JSON + manifest thumbnail.
 	arknights: {
 		script: path.join(ROOT, "tools", "arknights", "update.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
+	// Stella Sora: satu updater menulis 2 root (Spine event + Live2D).
+	stellasora: {
+		script: path.join(ROOT, "tools", "stellasora", "update.py"),
 		py: "/srv/venv-spine/bin/python",
 		rescan: true,
 	},
