@@ -1,0 +1,37 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "9e2c20563714",
+  "session_id": "local-4f9a98b18d1316e64dbe0800eee7d5829d86472a6d80ff07ffccaf4f9e718882",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-09T12:46:10.270482455Z",
+  "branch": "master",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "tools/check-ivntight.cjs",
+    "tools/ivntight/README.md",
+    "tools/update-ivntight.py"
+  ],
+  "agent": "Hermes Agent",
+  "model": "sas",
+  "turn_id": "f9d106642e41",
+  "checkpoint_transcript_start": 1085,
+  "transcript_lines_at_start": 1085,
+  "compact_transcript_start": 144,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 68
+  }
+}
