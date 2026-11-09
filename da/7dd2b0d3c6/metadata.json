@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "da7dd2b0d3c6",
+  "strategy": "manual-commit",
+  "branch": "master",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "README.md",
+    "tools/check-mercenary.cjs",
+    "tools/mercenary/README.md",
+    "tools/mercenary/refresh.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/da/7dd2b0d3c6/0/metadata.json",
+      "transcript": "/da/7dd2b0d3c6/0/full.jsonl",
+      "compact_transcript": "/da/7dd2b0d3c6/0/transcript.jsonl",
+      "content_hash": "/da/7dd2b0d3c6/0/content_hash.txt",
+      "prompt": "/da/7dd2b0d3c6/0/prompt.txt"
+    }
+  ],
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
