@@ -413,6 +413,23 @@ const GAME_ROOTS = [
 		label: "欲洛降临 (EroEra)",
 		pmaDefault: false,
 	},
+	// Otherworld Mercenary Corps / 异世界佣兵团养成记 (Cryptect).
+	// XAPK Google Play (APKPure), Unity Addressables. 9 model Spine 4.0.64
+	// (TextAsset *.json + *.atlas + Texture2D) + 85 ilustrasi slot karakter.
+	// Entri XAPK STORED -> cukup HTTP Range, tak perlu unduh 697 MB penuh.
+	// Lihat tools/mercenary/. Root -illust harus di atas (prefix match).
+	{
+		match: "mercenary-illust",
+		key: "mercenary-illust",
+		label: "Otherworld Mercenary Corps — Ilustrasi",
+	},
+	{
+		match: "mercenary",
+		key: "mercenary",
+		label: "Otherworld Mercenary Corps",
+		spineRuntime: "4.0",
+		pmaDefault: true,
+	},
 	// Azure Taboo (EroLabs / pinkcore, NuTaku). Unity IL2CPP; the shipped APK
 	// carries 15 hero Spine bundles (assets/prefab/hero/herospines/hero_<id>/
 	// hero_<id>1.unity3d) plus 3 chouka_* UI Spine sets, all Spine 4.3.39-beta
@@ -1842,6 +1859,8 @@ function scanModels() {
 	applyMitaoNames(out);
 	// 欲洛降临 (EroEra): nama karakter Luban + 43 family kartu root dari assets/eroera/_names.json.
 	attachEroEraFamilies(out);
+	// Otherworld Mercenary Corps: nama + family dari assets/mercenary/_names.json.
+	attachMercenaryNames(out);
 	return out;
 }
 
@@ -1885,6 +1904,50 @@ function attachEroEraFamilies(models) {
 		}
 	} catch (err) {
 		console.warn("[eroera] gagal membaca _names.json:", err.message);
+	}
+}
+
+/**
+ * Otherworld Mercenary Corps: nama karakter + family dari
+ * assets/mercenary/_names.json yang ditulis tools/mercenary/refresh.py.
+ * Satu payload dipakai dua root: `mercenary` (9 model Spine 4.0.64) dan
+ * `mercenary-illust` (85 ilustrasi slot). Family menggabungkan dua rig
+ * alternatif Ema / Kei ke kartu utamanya lewat picker Varian.
+ */
+function attachMercenaryNames(models) {
+	const namesFile = path.join(ASSETS, "mercenary", "_names.json");
+	try {
+		if (!fs.existsSync(namesFile)) return;
+		const payload = JSON.parse(fs.readFileSync(namesFile, "utf8"));
+		if (!payload || !payload.models || !Array.isArray(payload.families)) return;
+		const byId = new Map();
+		for (const m of models) {
+			if (m.game === "mercenary" || m.game === "mercenary-illust") byId.set(m.id, m);
+		}
+		if (!byId.size) return;
+		for (const [id, info] of Object.entries(payload.models)) {
+			const m = byId.get(id);
+			if (!m || !info) continue;
+			if (info.name) m.name = info.name;
+			if (info.character) m.character = { ...info.character };
+		}
+		for (const fam of payload.families) {
+			const present = (fam.members || []).filter((x) => x && byId.has(x.id));
+			if (present.length < 2) continue;
+			const rootId = present.some((x) => x.id === fam.root) ? fam.root : present[0].id;
+			const rootModel = byId.get(rootId);
+			if (rootModel && fam.name) rootModel.name = fam.name;
+			const members = present.map((x) => ({
+				id: x.id,
+				label: x.id === rootId ? "Utama" : (x.label || "Varian"),
+			}));
+			for (const x of members) {
+				const m = byId.get(x.id);
+				if (m) m.family = { root: rootId, label: x.label, members };
+			}
+		}
+	} catch (err) {
+		console.warn("[mercenary] gagal membaca _names.json:", err.message);
 	}
 }
 
@@ -2653,10 +2716,12 @@ function scanImageGalleries(models) {
 	for (const t of tops) {
 		const top = t.name;
 		// "-cg" = galeri CG/ilustrasi; "-skill" = animasi skill (animated
-		// WebP) seperti Epic Seven. Keduanya sama-sama kumpulan berkas gambar
-		// tanpa skeleton, jadi jalur pemuatannya identik.
+		// WebP) seperti Epic Seven; "-illust" = galeri ilustrasi karakter
+		// (Otherworld Mercenary Corps). Ketiganya kumpulan berkas gambar tanpa
+		// skeleton, jadi jalur pemuatannya identik.
 		const isSkill = /-skill$/i.test(top);
-		if (!/-cg$/i.test(top) && !isSkill) continue;
+		const isIllust = /-illust$/i.test(top);
+		if (!/-cg$/i.test(top) && !isSkill && !isIllust) continue;
 		const dir = path.join(ASSETS, top);
 		let stat;
 		try {
@@ -4128,6 +4193,13 @@ const UPDATERS = {
 	// terbuka di res-01.eepgames.com (174 model Spine, 43 kartu root, 165 thumbnail).
 	eroera: {
 		script: path.join(ROOT, "tools", "eroera", "update.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
+	// Otherworld Mercenary Corps: probe XAPK APKPure lewat HTTP Range,
+	// ekstrak 9 model Spine + 85 ilustrasi. Lihat tools/mercenary/.
+	mercenary: {
+		script: path.join(ROOT, "tools", "mercenary", "update.py"),
 		py: "/srv/venv-spine/bin/python",
 		rescan: true,
 	},

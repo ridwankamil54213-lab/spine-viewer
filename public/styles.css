@@ -1101,6 +1101,74 @@ input:focus-visible {
 .stage-backdrop[data-scene="studio"] { background-image: url("/backgrounds/studio.svg"); }
 .stage-backdrop[data-scene="night"]  { background-image: url("/backgrounds/night.svg"); }
 
+/* --- Aurora: bintang berkedip + bintang jatuh ----------------------------
+ * aurora.svg sengaja tanpa bintang: CSS animation tidak bisa menyentuh isi
+ * background-image, makanya bintangnya dirender sebagai elemen DOM di sini.
+ * .star cuma kedip; 18 .meteor melintang turun ke kiri dengan ekor gradient,
+ * jeda, panjang lintasan, dan sudut yang beda-beda supaya beberapa kelihatan
+ * bersamaan tanpa jadi hujan meteor yang seragam. Cuma aktif di scene Aurora. */
+.stage-backdrop .starfield {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+.stage-backdrop:not([data-scene="aurora"]) .starfield { display: none; }
+
+.starfield .star {
+	position: absolute;
+	left: var(--x);
+	top: var(--y);
+	width: var(--s, 2px);
+	height: var(--s, 2px);
+	border-radius: 50%;
+	background: #eaf8ff;
+	box-shadow: 0 0 6px 1px rgba(180, 230, 255, 0.65);
+	opacity: 0.2;
+	animation: star-twinkle 3.4s ease-in-out var(--d, 0s) infinite;
+}
+@keyframes star-twinkle {
+	0%, 100% { opacity: 0.18; transform: scale(0.8); }
+	50%      { opacity: 0.95; transform: scale(1.15); }
+}
+
+.starfield .meteor {
+	position: absolute;
+	left: var(--x);
+	top: var(--y);
+	width: var(--w, 150px);
+	height: 2px;
+	border-radius: 2px;
+	/* Kepala terang di ujung kanan = arah gerak setelah rotate(148deg). */
+	background: linear-gradient(90deg,
+		rgba(223, 246, 255, 0) 0%,
+		rgba(223, 246, 255, 0.28) 55%,
+		rgba(255, 255, 255, 0.95) 92%,
+		#ffffff 100%);
+	box-shadow: 0 0 8px 1px rgba(190, 230, 255, 0.5);
+	opacity: 0;
+	animation: meteor-fall var(--dur, 7s) linear var(--d, 0s) infinite;
+}
+@keyframes meteor-fall {
+	/* 0–20% = lintasan, sisanya jeda tak terlihat sebelum mengulang. */
+	0% {
+		transform: translate3d(0, 0, 0) rotate(var(--angle, 148deg));
+		opacity: 0;
+	}
+	2%   { opacity: 1; }
+	17%  { opacity: 0.9; }
+	20%, 100% {
+		transform: translate3d(calc(0px - var(--travel, 560px)), var(--fall, 350px), 0)
+			rotate(var(--angle, 148deg));
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.starfield .star { animation: none; opacity: 0.6; }
+	.starfield .meteor { display: none; }
+}
+
 /* grid veil — sits above the backdrop, below the canvas content */
 .grid {
 	position: absolute;

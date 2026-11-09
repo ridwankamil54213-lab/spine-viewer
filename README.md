@@ -645,6 +645,24 @@ belakang skeleton tanpa mengubah rendering sedikit pun.
 shortcut, persist setelah reload, kunci permalink, dan regresi fullscreen di
 bawah.
 
+### Bintang jatuh di Aurora
+
+Scene **Aurora** punya lapisan bintang animasi: 18 bintang berkedip ditambah
+**18 bintang jatuh** (meteor) yang melintang turun ke kiri. Delay negatif,
+durasi, panjang lintasan, dan sudutnya dibedakan satu sama lain sehingga
+beberapa meteor terlihat bersamaan di langit tanpa jadi hujan yang seragam;
+tiap meteor tetap punya jeda panjang sebelum muncul lagi. Bintangnya **tidak**
+digambar di `aurora.svg` — CSS animation tidak bisa menyentuh isi
+`background-image`, jadi semuanya berupa elemen DOM `.starfield` di dalam
+`#stage-backdrop` (`public/index.html` + `public/styles.css`). Scene Studio dan
+Malam sengaja tetap statis. Animasi otomatis mati saat
+`prefers-reduced-motion: reduce`; meteornya hilang, bintangnya jadi redup.
+
+`tools/check-aurora-stars.cjs` menguji 28 hal: animasi benar-benar berjalan
+(`currentTime` maju), lintasan meteor ke kiri-bawah lalu memudar saat jeda,
+beberapa meteor aktif bersamaan, isolasi antar scene, `prefers-reduced-motion`,
+dan tidak ada 404 aset.
+
 ### Bug fullscreen blank hitam (diperbaiki)
 
 Gejala: begitu masuk fullscreen, seluruh layar jadi hitam walau model masih
@@ -763,6 +781,41 @@ video High/Low dobel, dan nol thumbnail. Pohon lama dibackup ke
   menjalankan `tools/lostsword/update.py` (`--check` / `--apply`). Regresi:
   `tools/check-lostsword.cjs` (33 assertion API + disk + Playwright). Detail:
   `tools/lostsword/README.md`.
+
+## Otherworld Mercenary Corps — `com.Cryptect.Mercenary`
+
+Sumber ganda: **XAPK Google Play** (lewat APKPure) untuk aset bawaan + **CDN
+Addressables resmi** untuk konten unduhan:
+`https://d2yyge1twff5nv.cloudfront.net/Product/Live/<versi>/Android/`.
+XAPK-nya 697 MB tapi seluruh entri `STORED`, jadi `tools/mercenary/refresh.py`
+cukup 2–3 request HTTP Range untuk membaca central directory lalu mengunduh
+**hanya 3 bundle** (~233 MB), bukan paket penuh.
+
+- **98 model Spine 4.0.x** di `assets/mercenary/`: 9 dari 3 bundle lokal
+  (`duplicateassetisolation_*`, `local_assets_all_*`) + 89 dari bundle
+  `remote_prefab_spineillust_*.bundle` di CDN. Tiap bundle remote
+  self-contained (TextAsset skeleton + `.atlas` + Texture2D 4096²).
+  Nama berkas memuat hash konten ⇒ cache `/srv/spine-assets/mercenary/remote/`
+  aman dipakai lintas versi dan `--apply` ulang tidak mengunduh ulang.
+- `catalog_Product.json` di CDN (hash `m_BuildResultHash` berbeda dengan
+  `assets/aa/catalog.json` di APK) dipakai untuk daftar 95 karakter kanonik
+  dan 94 bundle `SpineIllust`. Bundle < 100 KB cuma berisi prefab MonoBehaviour
+  (skeleton-nya sudah ada di APK) ⇒ dilewati.
+- **85 ilustrasi slot** `UI_Slot_Illust_*` → `assets/mercenary-illust/` yang
+  diindeks sebagai galeri `format: "image"` (pemindai galeri menerima akhiran
+  `-illust` selain `-cg` / `-skill`).
+- **49 kartu root + 49 varian** dalam **32 family**: varian kostum
+  (`Bikini_Kronos`, `Masquerade_Ema`, …) dan rig alternatif (`ema_alt`,
+  `kei_alt`) disatukan lewat picker Varian. Nama + family ditulis ke
+  `assets/mercenary/_names.json` lalu diterapkan `attachMercenaryNames()`.
+- **98 thumbnail WebP** di `public/thumbs/mercenary/`; model tanpa ilustrasi
+  slot memakai halaman atlas pertamanya yang diperkecil.
+- `UPDATERS["mercenary"]` (`rescan: true`) menjalankan
+  `tools/mercenary/update.py` (`--check` / `--apply`). `--check` cuma 1 HEAD
+  XAPK + 1 GET 32 byte `catalog_Product.hash`; perubahan katalog CDN tanpa
+  naik versi APK tetap terdeteksi. State: `data/mercenary-update-state.json`.
+- Regresi: `tools/check-mercenary.cjs` (31 assertion, termasuk render
+  Playwright untuk model lokal & CDN). Detail: `tools/mercenary/README.md`.
 
 ## 欲洛降临 (EroEra) — `youdianse.com/game/detail/456`
 
@@ -1009,6 +1062,7 @@ node tools/check-crosscore.cjs   # CrossCore: ArtHub, 827 model, nama, render
 node tools/check-bd2.cjs         # BD2: Zormolo, 517 model .skel, family, render
 node tools/check-mad-drama.cjs   # Make Drama: 143 model, metadata, 134 thumb, render
 node tools/check-backdrop-fullscreen.cjs # backdrop on/off + regresi fullscreen blank hitam
+node tools/check-aurora-stars.cjs  # Aurora: bintang kedip + bintang jatuh (meteor)
 node tools/check-muvluv-thumbs.cjs # MuvLuv: 1107 thumbnail dari game CG
 node tools/check-nikke.cjs        # Nikke: 2104 model ArtHub, 0 duplikat, render
 node tools/check-mitao.cjs        # Mitao: solver iOS v2, manifest, updater
@@ -1016,6 +1070,7 @@ node tools/check-mitao-variants.cjs # Mitao: varian front_*, nama JP, thumbnail
 node tools/check-pokerfate.cjs    # Poker Fate: updater XENC, probe HTTP Range
 node tools/check-lostsword.cjs    # Lost Sword: 287 model, 87 video, 84 family, thumb
 node tools/check-eroera.cjs       # 欲洛降临 (EroEra): 174 model, 43 family, Luban, thumb
+node tools/check-mercenary.cjs    # Mercenary: 98 model (89 CDN), 85 ilustrasi, 32 family
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

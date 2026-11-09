@@ -124,9 +124,19 @@ const pageLines = (atlasPath) => {
 		String(Object.keys(thumbs).filter((k) => k.startsWith("nikke/")).length));
 
 	const chk = await fetch(`${BASE}/api/update/nikke?mode=check`).then((r) => r.json());
+	const chk2 = await fetch(`${BASE}/api/update/nikke?mode=check`).then((r) => r.json());
+	// Katalog ArtHub bisa bertambah kapan saja (pernah 2104 -> 2110). Yang diuji
+	// di sini KONTRAK endpointnya, bukan angka beku: dua --check berturut harus
+	// identik, delta `new` harus sama dengan selisih katalog remote vs folder
+	// lokal, dan ada model baru => wajib changed:true.
 	ok("updater baru --check stabil via HTTP",
-		chk.ok === true && chk.changed === false && chk.new === 0 && chk.expected === 2104,
-		JSON.stringify({ ok: chk.ok, changed: chk.changed, new: chk.new, expected: chk.expected }));
+		chk.ok === true && chk2.ok === true &&
+		chk.changed === chk2.changed && chk.new === chk2.new &&
+		chk.expected === chk2.expected &&
+		chk.new === Math.max(0, chk.expected - ids.length) &&
+		(chk.new === 0 || chk.changed === true),
+		JSON.stringify({ ok: chk.ok, changed: chk.changed, new: chk.new,
+			expected: chk.expected, lokal: ids.length }));
 	// Updater kini berpusat ke NKAS: daftar karakter kanonik ikut dipantau.
 	ok("updater memantau sumber NKAS /nikkes/",
 		chk.nkas?.sumber === "nkas.pages.dev/nikkes" &&

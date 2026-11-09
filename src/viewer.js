@@ -7424,6 +7424,8 @@ const UPDATABLE = {
 	pokerfate: "/api/update/pokerfate",
 	muvluv: "/api/update/muvluv",
 	eroera: "/api/update/eroera",
+	// Otherworld Mercenary Corps (Cryptect): XAPK APKPure via HTTP Range.
+	mercenary: "/api/update/mercenary",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -7816,7 +7818,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera", mercenary: "mercenary" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.

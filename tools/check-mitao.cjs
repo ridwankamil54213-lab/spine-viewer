@@ -3,8 +3,9 @@
 
    Sejak 2026-11 updater memakai pipeline iOS (v2), karena kunci master
    manifest Android v3 disembunyikan di Obfuz VM. Yang dikunci di sini:
-     - --check via endpoint HTTP asli: ok, path aset, have, versi iOS 1.6.2.
-     - --apply --manifest-only: manifest CDN benar-benar terdekrip & terparse.
+     - --check via endpoint HTTP asli: ok, path aset, have, versi iOS live.
+     - --apply --manifest-only: manifest CDN benar-benar terdekrip & terparse,
+       dan katalog yang dibaca sama dengan yang dilaporkan --check.
      - solver dekripsi v2 (iOS) dan v3 (bundle Android) lolos self-test.
 
    Sengaja TIDAK menjalankan --apply penuh (akan mengunduh ~1000 bundle).
@@ -63,10 +64,13 @@ const runPy = (args, timeout = 180000) => {
 	ok("mode --replace + guard staging tersedia",
 		/add_argument\("--replace"/.test(src) && /len\(good\) < 50/.test(src));
 
-	// Kalau API game sedang mati, jangan bikin suite merah karena faktor eksternal.
+	// Versi iOS live bisa naik (pernah 1.6.2 -> 1.7.3). Yang dikunci bukan
+	// angkanya, tapi format semver, konsistensi release_id, dan kesamaan
+	// katalog antara --check dengan --apply --manifest-only.
 	if (chk.version) {
-		ok("versi live iOS 1.6.2", chk.version === "1.6.2" &&
-			/1\.6\.2/.test(String(chk.release_id || "")),
+		ok("versi live iOS valid & konsisten dengan release_id",
+			/^\d+\.\d+\.\d+$/.test(String(chk.version)) &&
+			String(chk.release_id || "").includes(String(chk.version)),
 			JSON.stringify({ v: chk.version, rid: chk.release_id }));
 		ok("changed berupa boolean", typeof chk.changed === "boolean",
 			String(chk.changed));
@@ -77,7 +81,7 @@ const runPy = (args, timeout = 180000) => {
 	let manifestOk = false, manifestInfo = "";
 	try {
 		const d = JSON.parse(mo);
-		manifestOk = d.ok === true && d.catalog === "1.6.2" &&
+		manifestOk = d.ok === true && d.catalog === chk.version &&
 			d.bundles > 3000 && d.skeleton > 1000 &&
 			d.resource_type === "ios_cn_release";
 		manifestInfo = JSON.stringify({ catalog: d.catalog, bundles: d.bundles,

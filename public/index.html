@@ -147,7 +147,50 @@
 			     grid veil dan kanvas (z-index 0 vs kanvas 1). Di-toggle lewat
 			     #backdrop-btn / Shift+L; scene dipilih lewat #backdrop-select. -->
 			<div id="stage-backdrop" class="stage-backdrop" data-scene="aurora"
-				aria-hidden="true" hidden></div>
+				aria-hidden="true" hidden>
+				<!-- Bintang Aurora: kedip + "bintang jatuh" (meteor streak). Murni CSS,
+				     cuma aktif saat data-scene="aurora"; scene lain tetap statis.
+				     Posisi/ukuran/jeda lewat custom property --x/--y/--s/--d. -->
+				<div class="starfield" aria-hidden="true">
+					<i class="star" style="--x:9%;--y:13%;--s:2.4px;--d:-0.4s"></i>
+					<i class="star" style="--x:21%;--y:9%;--s:1.9px;--d:-1.7s"></i>
+					<i class="star" style="--x:38%;--y:16%;--s:2.6px;--d:-2.9s"></i>
+					<i class="star" style="--x:55%;--y:7%;--s:1.8px;--d:-0.9s"></i>
+					<i class="star" style="--x:70%;--y:13%;--s:2.4px;--d:-2.2s"></i>
+					<i class="star" style="--x:87%;--y:10%;--s:2.1px;--d:-3.1s"></i>
+					<i class="star" style="--x:95%;--y:21%;--s:1.8px;--d:-1.2s"></i>
+					<i class="star" style="--x:15%;--y:26%;--s:1.8px;--d:-2.6s"></i>
+					<i class="star" style="--x:48%;--y:22%;--s:1.6px;--d:-0.2s"></i>
+					<i class="star" style="--x:80%;--y:26%;--s:2.0px;--d:-1.5s"></i>
+					<i class="star" style="--x:5%;--y:34%;--s:1.5px;--d:-3.3s"></i>
+					<i class="star" style="--x:28%;--y:6%;--s:1.7px;--d:-2.0s"></i>
+					<i class="star" style="--x:33%;--y:29%;--s:1.4px;--d:-0.7s"></i>
+					<i class="star" style="--x:62%;--y:4%;--s:2.0px;--d:-2.4s"></i>
+					<i class="star" style="--x:72%;--y:27%;--s:1.5px;--d:-1.0s"></i>
+					<i class="star" style="--x:91%;--y:30%;--s:1.7px;--d:-3.0s"></i>
+					<i class="star" style="--x:44%;--y:10%;--s:1.4px;--d:-1.9s"></i>
+					<i class="star" style="--x:18%;--y:19%;--s:1.6px;--d:-2.7s"></i>
+
+					<i class="meteor" style="--x:92%;--y:4%;--w:170px;--d:-0.10s;--dur:7.2s;--travel:560px;--fall:350px;--angle:148deg"></i>
+					<i class="meteor" style="--x:76%;--y:18%;--w:130px;--d:-0.62s;--dur:8.1s;--travel:500px;--fall:320px;--angle:142deg"></i>
+					<i class="meteor" style="--x:105%;--y:2%;--w:190px;--d:-1.10s;--dur:7.6s;--travel:620px;--fall:380px;--angle:152deg"></i>
+					<i class="meteor" style="--x:64%;--y:30%;--w:120px;--d:-1.55s;--dur:8.6s;--travel:460px;--fall:300px;--angle:145deg"></i>
+					<i class="meteor" style="--x:88%;--y:12%;--w:150px;--d:-2.05s;--dur:6.9s;--travel:580px;--fall:360px;--angle:150deg"></i>
+					<i class="meteor" style="--x:48%;--y:8%;--w:110px;--d:-2.50s;--dur:7.9s;--travel:440px;--fall:280px;--angle:140deg"></i>
+					<i class="meteor" style="--x:98%;--y:26%;--w:165px;--d:-2.95s;--dur:8.3s;--travel:600px;--fall:370px;--angle:154deg"></i>
+					<i class="meteor" style="--x:70%;--y:-4%;--w:140px;--d:-3.40s;--dur:7.1s;--travel:520px;--fall:330px;--angle:146deg"></i>
+					<i class="meteor" style="--x:112%;--y:14%;--w:200px;--d:-3.88s;--dur:8.8s;--travel:660px;--fall:410px;--angle:150deg"></i>
+					<i class="meteor" style="--x:56%;--y:22%;--w:100px;--d:-4.30s;--dur:6.7s;--travel:420px;--fall:270px;--angle:138deg"></i>
+					<i class="meteor" style="--x:84%;--y:34%;--w:155px;--d:-4.75s;--dur:7.7s;--travel:560px;--fall:350px;--angle:148deg"></i>
+					<i class="meteor" style="--x:40%;--y:2%;--w:125px;--d:-5.20s;--dur:8.4s;--travel:480px;--fall:310px;--angle:144deg"></i>
+					<i class="meteor" style="--x:100%;--y:-6%;--w:180px;--d:-5.65s;--dur:7.4s;--travel:620px;--fall:390px;--angle:156deg"></i>
+					<i class="meteor" style="--x:62%;--y:12%;--w:115px;--d:-6.10s;--dur:8.0s;--travel:460px;--fall:290px;--angle:142deg"></i>
+					<i class="meteor" style="--x:94%;--y:24%;--w:145px;--d:-6.55s;--dur:6.8s;--travel:540px;--fall:340px;--angle:149deg"></i>
+					<i class="meteor" style="--x:52%;--y:36%;--w:135px;--d:-7.00s;--dur:8.6s;--travel:500px;--fall:320px;--angle:147deg"></i>
+					<i class="meteor" style="--x:108%;--y:6%;--w:175px;--d:-7.45s;--dur:7.3s;--travel:640px;--fall:400px;--angle:153deg"></i>
+					<i class="meteor" style="--x:74%;--y:-2%;--w:105px;--d:-7.90s;--dur:8.2s;--travel:440px;--fall:280px;--angle:140deg"></i>
+				</div>
+			</div>
 			<div id="grid" class="grid" aria-hidden="true"></div>
 
 			<div id="empty" class="empty">
