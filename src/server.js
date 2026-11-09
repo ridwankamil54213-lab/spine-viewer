@@ -4379,9 +4379,10 @@ const UPDATE_LOG_MAX = 400; // baris yang disimpan per job
 const UPDATE_STDOUT_MAX = 4 * 1024 * 1024;
 const UPDATE_TIMEOUT_MS = Number(process.env.UPDATE_TIMEOUT_MS) || 30 * 60 * 1000;
 
-function runUpdater(game, args, onLog) {
+function runUpdater(game, args, onLog, opts = {}) {
 	const cfg = UPDATERS[game];
 	if (!cfg) return null;
+	const limit = opts.timeoutMs || UPDATE_TIMEOUT_MS;
 	return new Promise((resolve) => {
 		// A missing interpreter or script emits an 'error' event on the child.
 		// Without a listener Node treats it as unhandled and kills the whole
@@ -4429,8 +4430,11 @@ function runUpdater(game, args, onLog) {
 			} catch {
 				/* sudah mati */
 			}
-			finish({ error: `Pembaru melebihi batas waktu ${Math.round(UPDATE_TIMEOUT_MS / 60000)} menit.` });
-		}, UPDATE_TIMEOUT_MS);
+			const pretty = limit >= 60000
+				? `${Math.round(limit / 60000)} menit`
+				: `${Math.round(limit / 1000)} detik`;
+			finish({ error: `Pembaru melebihi batas waktu ${pretty}.` });
+		}, limit);
 		if (timer.unref) timer.unref();
 		child.on("close", () => clearTimeout(timer));
 		child.stdout.on("data", (d) => {
@@ -4503,6 +4507,153 @@ app.get("/api/update/:game/status", (_req, res) => {
 		startedAt: updateJob.startedAt,
 		finishedAt: updateJob.finishedAt || null,
 	});
+});
+
+/* --- Updater Health Dashboard --------------------------------------------
+ * Satu layar untuk SEMUA pembaru. --check dijalankan paralel (dibatasi) dengan
+ * timeout per-game supaya satu updater yang lambat tidak menggantung panel.
+ * Hasilnya di-cache ke data/updaters-health.json (di luar git) dan dipakai
+ * ulang sampai TTL habis, jadi membuka panel tidak memicu 28 proses sekaligus.
+ *
+ * mirrorLag: sinyal CDN resmi (cdnSha / dataCommit) berubah tapi `version`
+ * yang dihitung dari mirror komunitas masih sama -> game sudah patch, sumber
+ * komunitas belum sync. Ini yang tidak bisa terlihat dari tombol per-game.
+ */
+const HEALTH_FILE = process.env.HEALTH_FILE ||
+	path.join(ROOT, "data", "updaters-health.json");
+const HEALTH_TTL_MS = 5 * 60 * 1000;
+const HEALTH_TIMEOUT_MS = Number(process.env.HEALTH_TIMEOUT_MS) || 30000;
+const HEALTH_CONCURRENCY = 10;
+let healthCache = null;
+let healthRunning = null;
+
+function loadHealthCache() {
+	if (healthCache) return healthCache;
+	try {
+		const d = JSON.parse(fs.readFileSync(HEALTH_FILE, "utf8"));
+		if (d && Array.isArray(d.games)) healthCache = d;
+	} catch { /* belum pernah dicek */ }
+	return healthCache;
+}
+
+function saveHealthCache(d) {
+	healthCache = d;
+	try {
+		fs.writeFileSync(HEALTH_FILE + ".part", JSON.stringify(d, null, 1));
+		fs.renameSync(HEALTH_FILE + ".part", HEALTH_FILE);
+	} catch (err) {
+		console.warn("[health] gagal menyimpan cache:", err.message);
+	}
+}
+
+function healthLabel(game) {
+	const g = GAME_ROOTS.find((x) => x.key === game || x.match === game);
+	return g?.label || game;
+}
+
+function healthSummary(games) {
+	return {
+		total: games.length,
+		ok: games.filter((g) => g.ok).length,
+		changed: games.filter((g) => g.changed).length,
+		pending: games.filter((g) => (g.new || 0) > 0).length,
+		failed: games.filter((g) => !g.ok).length,
+		mirrorLag: games.filter((g) => g.mirrorLag).length,
+	};
+}
+
+function healthRow(game, result, prev) {
+	const r = result || {};
+	const sig = [r.cdnSha, r.dataCommit].filter(Boolean).join("|");
+	const prevSig = [prev?.cdnSha, prev?.dataCommit].filter(Boolean).join("|");
+	// Kontrak --check tidak seragam: updater lama (shoujoukaisen, dll) tidak
+	// mengirim `ok` sama sekali, dan jumlah model bisa bernama have /
+	// models_have / installed. Yang menandakan kegagalan itu field `error`
+	// dari runUpdater (timeout / JSON rusak) ATAU ok:false eksplisit.
+	const error = r.error || r.message ||
+		(r.ok === false ? (r.reason || "Pembaru melaporkan ok:false.") : null);
+	return {
+		game,
+		label: healthLabel(game),
+		ok: r.ok !== false && !error,
+		error: error || null,
+		version: r.version ?? null,
+		previous: r.previous ?? null,
+		changed: !!r.changed,
+		expected: r.expected ?? r.models_total ?? r.total ?? null,
+		have: r.have ?? r.models_have ?? r.installed ?? null,
+		new: Number.isFinite(r.new) ? r.new : null,
+		extractor: !!r.extractor,
+		rescan: !!UPDATERS[game].rescan,
+		source: r.source || null,
+		cdnSha: r.cdnSha ?? null,
+		dataCommit: r.dataCommit ?? null,
+		// Butuh prev supaya panel pertama kali tidak false-positive.
+		mirrorLag: !!(prev?.checkedAt && sig && sig !== prevSig &&
+			r.version && r.version === prev.version),
+		checkedAt: Date.now(),
+	};
+}
+
+async function runHealthChecks(games) {
+	const cache = loadHealthCache();
+	const byGame = new Map((cache?.games || []).map((g) => [g.game, g]));
+	const rows = [];
+	let cursor = 0;
+
+	async function worker() {
+		while (cursor < games.length) {
+			const game = games[cursor++];
+			let result;
+			if (UPDATERS[game].noCheck) {
+				result = { ok: true, extractor: true, new: 0 };
+			} else {
+				result = await runUpdater(game, ["--check"], null,
+					{ timeoutMs: HEALTH_TIMEOUT_MS });
+			}
+			rows.push(healthRow(game, result, byGame.get(game)));
+		}
+	}
+	await Promise.all(Array.from(
+		{ length: Math.min(HEALTH_CONCURRENCY, games.length) }, worker));
+	// Game yang tidak ikut ronde ini tetap tampil dengan hasil terakhirnya.
+	for (const [game, row] of byGame) {
+		if (!rows.some((r) => r.game === game)) rows.push(row);
+	}
+	rows.sort((a, b) => a.game.localeCompare(b.game));
+	const payload = {
+		at: Date.now(), ttlMs: HEALTH_TTL_MS, games: rows,
+		summary: healthSummary(rows),
+	};
+	saveHealthCache(payload);
+	return payload;
+}
+
+function ensureHealth() {
+	const cache = loadHealthCache();
+	if (cache && Date.now() - cache.at < HEALTH_TTL_MS) {
+		return Promise.resolve({ ...cache, summary: healthSummary(cache.games) });
+	}
+	if (!healthRunning) {
+		healthRunning = runHealthChecks(Object.keys(UPDATERS))
+			.finally(() => { healthRunning = null; });
+	}
+	return healthRunning;
+}
+
+app.get("/api/updaters/health", async (req, res) => {
+	try {
+		if (healthRunning) await healthRunning.catch(() => {});
+		const one = typeof req.query.game === "string" && UPDATERS[req.query.game]
+			? req.query.game : null;
+		if (req.query.refresh === "1" || one) {
+			res.json(await runHealthChecks(one ? [one] : Object.keys(UPDATERS)));
+			return;
+		}
+		res.json(await ensureHealth());
+	} catch (err) {
+		res.status(500).json({ error: err.message });
+	}
 });
 
 app.get("/api/thumbnails", (req, res) => {

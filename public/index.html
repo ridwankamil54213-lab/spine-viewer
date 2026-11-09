@@ -64,6 +64,13 @@
 					aria-label="Lihat log proses pembaruan" title="Log proses pembaruan">
 					<svg viewBox="0 0 24 24" class="icon"><path d="M4 5h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/></svg>
 				</button>
+				<!-- Dashboard lintas-game: selalu tampil, tidak ikut disembunyikan
+				     oleh syncUpdater() seperti tombol updater per-game. -->
+				<button id="health-btn" class="btn btn-icon btn-sm"
+					aria-label="Kesehatan updater (semua game)" title="Kesehatan updater (semua game)">
+					<svg viewBox="0 0 24 24" class="icon"><path d="M2 13h4l2.5-7 4 14 2.5-7H22v-2h-5.7l-1 3-3.3-11-3 9H2z"/></svg>
+					<span class="health-dot" id="health-dot" hidden></span>
+				</button>
 			</div>
 
 			<input id="search" class="search" type="search" aria-label="Cari model" placeholder="Cari model…" autocomplete="off" />
@@ -819,6 +826,41 @@
 		<div class="modal-foot">
 			<button id="update-log-clear" class="btn btn-ghost">Bersihkan</button>
 			<button id="update-log-close2" class="btn btn-primary">Tutup</button>
+		</div>
+	</div>
+</div>
+
+<!-- Updater Health Dashboard: status --check seluruh pembaru dalam satu meja. -->
+<div id="updater-health-modal" class="modal" hidden>
+	<div class="modal-backdrop" data-close="1"></div>
+	<div class="modal-card modal-card-lg" role="dialog" aria-modal="true" aria-labelledby="health-title">
+		<div class="modal-head">
+			<h2 id="health-title">Kesehatan updater</h2>
+			<button id="health-close" class="btn btn-icon btn-sm" aria-label="Tutup" title="Tutup (Esc)">
+				<svg viewBox="0 0 24 24" class="icon"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+			</button>
+		</div>
+		<div class="modal-body">
+			<p class="modal-hint">Hasil <code>--check</code> untuk semua pembaru, dijalankan paralel dan
+				di-cache 5 menit. <strong>Sumber tertinggal</strong> berarti CDN resmi game sudah
+				berubah tetapi mirror komunitas belum sinkron.</p>
+			<div id="health-summary" class="health-summary"></div>
+			<div id="health-status" class="update-log-status"></div>
+			<div class="health-table-wrap">
+				<table class="health-table">
+					<thead><tr>
+						<th>Game</th><th>Status</th><th>Versi</th><th>Baru</th>
+						<th>Model</th><th>Dicek</th><th>Catatan</th>
+					</tr></thead>
+					<tbody id="health-rows"></tbody>
+				</table>
+			</div>
+			<pre id="health-log" class="update-log" hidden></pre>
+		</div>
+		<div class="modal-foot">
+			<button id="health-refresh" class="btn btn-ghost">Cek semua</button>
+			<button id="health-apply" class="btn btn-primary">Terapkan yang berubah</button>
+			<button id="health-close2" class="btn btn-ghost">Tutup</button>
 		</div>
 	</div>
 </div>

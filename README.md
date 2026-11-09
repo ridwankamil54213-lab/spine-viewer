@@ -188,6 +188,37 @@ pakai tombol **"Perbarui aset"** di UI buat game yang punya updater
 `data/favorites.json` juga diabaikan — isinya daftar favorit lokal satu
 orang, bukan punya repo.
 
+## Updater Health Dashboard
+
+Tombol **denyut** di header pustaka (sebelah tombol log) membuka satu meja
+untuk **semua 27 updater** sekaligus — nggak perlu masuk tile game satu-satu.
+Sumbernya `GET /api/updaters/health`:
+
+- `--check` dijalankan **paralel (10 worker)** dengan **timeout 30 detik
+  per game**, jadi satu updater yang lambat nggak menggantung panel.
+- Hasilnya di-cache 5 menit di `data/updaters-health.json` (diabaikan git).
+  Buka panel → pakai cache (11 ms). **Cek semua** → `?refresh=1`.
+  `?game=ivntight&refresh=1` menyegarkan satu baris saja.
+- Kontrak `--check` **tidak seragam**: updater lama seperti
+  `update-shoujoukaisen.py` tidak mengirim field `ok`, dan jumlah model bisa
+  bernama `have` / `models_have` / `installed`. `healthRow()` menormalkannya —
+  yang menandakan gagal itu field `error` dari `runUpdater` atau `ok:false`
+  eksplisit, bukan "tidak ada `ok`".
+- **Sumber tertinggal** (`mirrorLag`): sinyal CDN resmi (`cdnSha` /
+  `dataCommit`) berubah tapi `version` dari mirror komunitas masih sama →
+  game sudah patch, mirror belum sinkron. Muncul sebagai badge kuning.
+- Titik kuning di tombol header menyala kalau ada `changed`, model baru,
+  kegagalan, atau mirror tertinggal.
+
+**Terapkan yang berubah** minta konfirmasi dulu, lalu memanggil endpoint
+`/api/update/:game?mode=apply` yang **sudah ada** secara berurutan sambil
+mengikuti `/api/update/:game/status` untuk log. Tidak ada jalur apply baru,
+jadi aturan `rescan` / `forceModelRescan` tetap identik dengan tombol
+per-game. Apply sengaja tidak pernah dijalankan otomatis.
+
+Regresi: `node tools/check-updater-dashboard.cjs` (39 assertion), termasuk
+bukti bahwa updater tanpa field `ok` tidak lagi dilaporkan gagal.
+
 ## Deteksi runtime
 
 Bukan cuma `.skel` vs `.json`. `src/spine-version.cjs` membaca bytes header
@@ -217,6 +248,7 @@ runtime asli (`spine-pixi-v7-42`), karena 4.1 lahir sebelum formatnya ada dan
 | `POST /api/export/cancel` | Batalkan export |
 | `GET /api/update/:game` | Jalankan updater game |
 | `GET /api/update/:game/status` | Status updater |
+| `GET /api/updaters/health` | `--check` seluruh updater (paralel, cache 5 menit; `?refresh=1`, `?game=…`) |
 | `GET /api/bd2-audio`, `/api/orisries-audio` | Audio game tertentu |
 
 Catatan endpoint:
@@ -1081,6 +1113,7 @@ node tools/check-ivntight.cjs     # IV-N-Tight: hash katalog live, 84 model, 0 4
 node tools/check-arknights.cjs    # Arknights: 3112 Spine 3.8, nama EN, 2777 ilustrasi, render
 node tools/check-zonenova.cjs     # Zone Nova: 188 Spine 4.1 CDN, katalog XOR, ilustrasi, render
 node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilustrasi, render
+node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

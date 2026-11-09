@@ -420,6 +420,16 @@ const el = {
 	updateLogClose: $("#update-log-close"),
 	updateLogClose2: $("#update-log-close2"),
 	updateLogClear: $("#update-log-clear"),
+	healthBtn: $("#health-btn"),
+	healthModal: $("#updater-health-modal"),
+	healthRows: $("#health-rows"),
+	healthSummary: $("#health-summary"),
+	healthStatus: $("#health-status"),
+	healthLog: $("#health-log"),
+	healthRefresh: $("#health-refresh"),
+	healthApply: $("#health-apply"),
+	healthClose: $("#health-close"),
+	healthClose2: $("#health-close2"),
 	gridBtn: $("#grid-btn"),
 	bonesBtn: $("#bones-btn"),
 	boundsBtn: $("#bounds-btn"),
@@ -7538,6 +7548,169 @@ function initUpdateLog() {
 	el.updateLogClear?.addEventListener("click", () => updateLogSet([]));
 }
 
+/* --- Updater Health Dashboard ---------------------------------------------
+ * Satu meja untuk semua pembaru. Data dari /api/updaters/health (di-cache
+ * 5 menit di server). "Terapkan yang berubah" memanggil endpoint apply yang
+ * SUDAH ADA per game secara berurutan, sambil mengikuti /status untuk log —
+ * tidak ada jalur apply baru, jadi aturan rescan/forceModelRescan tetap sama.
+ */
+let healthData = null;
+let healthBusy = false;
+let healthLogLines = [];
+
+const escHtml = (s) => String(s ?? "").replace(/[&<>"']/g,
+	(c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+function healthTime(ts) {
+	if (!ts) return "—";
+	return new Date(ts).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+}
+
+function healthStateOf(r) {
+	if (!r.ok) return { cls: "is-fail", text: "Gagal" };
+	if (r.extractor) return { cls: "is-idle", text: "Ekstraktor" };
+	if (r.changed || (r.new || 0) > 0) {
+		return { cls: "is-warn", text: (r.new || 0) > 0 ? `${r.new} model baru` : "Versi berubah" };
+	}
+	return { cls: "", text: "Aktif" };
+}
+
+function healthTargets() {
+	return (healthData?.games || []).filter((r) =>
+		r.ok && !r.extractor && (r.changed || (r.new || 0) > 0));
+}
+
+function healthStatus(text, kind) {
+	if (!el.healthStatus) return;
+	el.healthStatus.textContent = text || "";
+	el.healthStatus.className = "update-log-status" + (kind ? " is-" + kind : "");
+}
+
+function healthLogPush(line) {
+	healthLogLines.push(line);
+	if (healthLogLines.length > 200) healthLogLines.shift();
+	if (!el.healthLog) return;
+	el.healthLog.hidden = false;
+	el.healthLog.textContent = healthLogLines.join("\n");
+	el.healthLog.scrollTop = el.healthLog.scrollHeight;
+}
+
+function renderHealth(data) {
+	healthData = data;
+	if (!el.healthRows) return;
+	const s = data.summary || {};
+	const pills = [
+		`${s.total ?? 0} updater`, `${s.ok ?? 0} ok`,
+		`${s.changed ?? 0} berubah`, `${s.pending ?? 0} model baru`,
+	];
+	el.healthSummary.innerHTML =
+		pills.map((t, i) => `<span class="health-pill${i === 2 && s.changed ? " is-warn" : ""}">${escHtml(t)}</span>`).join("") +
+		(s.failed ? `<span class="health-pill is-fail">${s.failed} gagal</span>` : "") +
+		(s.mirrorLag ? `<span class="health-pill is-warn">${s.mirrorLag} sumber tertinggal</span>` : "");
+	el.healthRows.innerHTML = (data.games || []).map((r) => {
+		const st = healthStateOf(r);
+		const note = r.error ? escHtml(r.error)
+			: r.mirrorLag ? '<span class="health-badge">sumber tertinggal</span>'
+				: r.extractor ? "tanpa --check" : escHtml(r.source || "");
+		return `<tr data-game="${escHtml(r.game)}">
+			<td>${escHtml(r.label)}<br><span class="mono" style="opacity:.6">${escHtml(r.game)}</span></td>
+			<td><span class="health-state ${st.cls}"><i></i>${st.text}</span></td>
+			<td class="mono" title="${escHtml(r.version || "")}">${escHtml(String(r.version || "—").slice(0, 18))}</td>
+			<td>${r.new ?? "—"}</td>
+			<td>${r.have ?? "—"}${r.expected != null ? " / " + r.expected : ""}</td>
+			<td>${healthTime(r.checkedAt)}</td>
+			<td>${note}</td>
+		</tr>`;
+	}).join("");
+	const dot = document.getElementById("health-dot");
+	if (dot) dot.hidden = !(s.failed || s.changed || s.pending || s.mirrorLag);
+	if (el.healthApply) el.healthApply.disabled = healthTargets().length === 0 || healthBusy;
+}
+
+function healthSetBusy(on) {
+	healthBusy = on;
+	if (el.healthRefresh) el.healthRefresh.disabled = on;
+	if (el.healthApply) el.healthApply.disabled = on || healthTargets().length === 0;
+}
+
+async function loadHealth(url) {
+	if (healthBusy) return;
+	healthSetBusy(true);
+	healthStatus("Memeriksa…", "running");
+	try {
+		const data = await fetch(url).then((r) => r.json());
+		if (data.error) throw new Error(data.error);
+		renderHealth(data);
+		healthStatus(`Selesai · ${healthTime(data.at)}`, "done");
+	} catch (err) {
+		healthStatus(`Gagal: ${err.message}`, "fail");
+	} finally {
+		healthSetBusy(false);
+	}
+}
+
+function openHealth() {
+	if (!el.healthModal) return;
+	el.healthModal.hidden = false;
+	// Panel pertama kali pakai cache; "Cek semua" yang memaksa refresh.
+	if (!healthData) loadHealth("/api/updaters/health");
+}
+
+function closeHealth() {
+	if (el.healthModal) el.healthModal.hidden = true;
+}
+
+/** Terapkan semua game dengan changed/new lewat endpoint apply existing. */
+async function applyPendingUpdaters() {
+	const targets = healthTargets();
+	if (!targets.length || healthBusy) return;
+	// Apply itu operasi berat (bisa ratusan model). Minta konfirmasi eksplisit
+	// supaya klik tidak sengaja tidak langsung menjalankan belasan updater.
+	const names = targets.map((t) => `${t.label} (${t.new || 0} baru)`).join("\n");
+	if (!confirm(`Terapkan pembaruan untuk ${targets.length} game secara berurutan?\n\n${names}\n\nProses ini bisa makan waktu lama.`)) return;
+	healthSetBusy(true);
+	healthLogLines = [];
+	for (const r of targets) {
+		const base = `/api/update/${encodeURIComponent(r.game)}`;
+		healthLogPush(`▶ ${r.label} (${r.game})`);
+		try {
+			const start = await fetch(`${base}?mode=apply`).then((x) => x.json());
+			if (!start.started) {
+				healthLogPush(`  dilewati: ${start.reason || "pembaruan lain masih berjalan"}`);
+				continue;
+			}
+			for (;;) {
+				await new Promise((res) => setTimeout(res, 1200));
+				const st = await fetch(`${base}/status`).then((x) => x.json());
+				const lines = st.log || [];
+				if (lines.length) healthLogPush(`  ${lines[lines.length - 1]}`);
+				if (!st.running) {
+					healthLogPush(st.result?.error
+						? `  ✗ ${st.result.error}` : "  ✓ selesai");
+					break;
+				}
+			}
+		} catch (err) {
+			healthLogPush(`  ✗ ${err.message}`);
+		}
+	}
+	healthLogPush("Menyegarkan ringkasan…");
+	healthSetBusy(false);
+	await loadHealth("/api/updaters/health?refresh=1");
+}
+
+function initUpdaterHealth() {
+	el.healthBtn?.addEventListener("click", openHealth);
+	el.healthClose?.addEventListener("click", closeHealth);
+	el.healthClose2?.addEventListener("click", closeHealth);
+	el.healthModal?.addEventListener("click", (e) => {
+		if (e.target?.dataset?.close) closeHealth();
+	});
+	el.healthRefresh?.addEventListener("click",
+		() => loadHealth("/api/updaters/health?refresh=1"));
+	el.healthApply?.addEventListener("click", applyPendingUpdaters);
+}
+
 /* --- "NEW" badge -------------------------------------------------------
  * Models added by the updater. Kept in localStorage (same store as
  * favorites) so it survives a reload, and cleared for a model AS SOON AS it
@@ -10163,6 +10336,11 @@ function closeTopmostModal() {
 		document.getElementById("link-close")?.click();
 		return true;
 	}
+	const health = document.getElementById("updater-health-modal");
+	if (health && !health.hidden) {
+		closeHealth();
+		return true;
+	}
 	const log = document.getElementById("update-log-modal");
 	if (log && !log.hidden) {
 		document.getElementById("update-log-close")?.click();
@@ -10939,6 +11117,7 @@ initFullscreen();
 initExport();
 initFavorites();
 initUpdateLog();
+initUpdaterHealth();
 /* --- Menu "Alat" ------------------------------------------------------
  * Alat lanjutan (kisi, tulang, bagian, edit tulang, nama slot, FPS, waktu,
  * periksa, PMA, tajam) dikumpulkan di satu popover supaya baris kontrol tidak
