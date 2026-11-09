@@ -1,0 +1,39 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "fa7b2b765f27",
+  "strategy": "manual-commit",
+  "branch": "master",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "README.md",
+    "data/ivntight-names.json",
+    "package.json",
+    "src/server.js",
+    "tools/check-ivntight.cjs",
+    "tools/ivntight/README.md",
+    "tools/update-ivntight.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/fa/7b2b765f27/0/metadata.json",
+      "transcript": "/fa/7b2b765f27/0/full.jsonl",
+      "compact_transcript": "/fa/7b2b765f27/0/transcript.jsonl",
+      "content_hash": "/fa/7b2b765f27/0/content_hash.txt",
+      "prompt": "/fa/7b2b765f27/0/prompt.txt"
+    }
+  ],
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
