@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "c079e2d64408",
+  "session_id": "local-4f9a98b18d1316e64dbe0800eee7d5829d86472a6d80ff07ffccaf4f9e718882",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-09T18:51:32.871841124Z",
+  "branch": "master",
+  "checkpoints_count": 3,
+  "save_step_count": 3,
+  "files_touched": [
+    "src/server.js",
+    "tools/zonenova/refresh.py",
+    "tools/zonenova/update.py"
+  ],
+  "agent": "Hermes Agent",
+  "model": "sas",
+  "turn_id": "c1df59b228bc",
+  "checkpoint_transcript_start": 1140,
+  "transcript_lines_at_start": 1140,
+  "compact_transcript_start": 153,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 74
+  }
+}

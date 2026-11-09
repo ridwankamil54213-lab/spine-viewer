@@ -1,0 +1,35 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "c079e2d64408",
+  "strategy": "manual-commit",
+  "branch": "master",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "src/server.js",
+    "tools/zonenova/refresh.py",
+    "tools/zonenova/update.py"
+  ],
+  "sessions": [
+    {
+      "metadata": "/c0/79e2d64408/0/metadata.json",
+      "transcript": "/c0/79e2d64408/0/full.jsonl",
+      "compact_transcript": "/c0/79e2d64408/0/transcript.jsonl",
+      "content_hash": "/c0/79e2d64408/0/content_hash.txt",
+      "prompt": "/c0/79e2d64408/0/prompt.txt"
+    }
+  ],
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
