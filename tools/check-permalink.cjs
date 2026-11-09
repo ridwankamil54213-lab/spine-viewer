@@ -15,6 +15,7 @@
  */
 const fs = require("fs");
 const { chromium } = require("playwright-core");
+const { openTools } = require("./smoke-helpers.cjs");
 
 function b64urlDecode(s) {
 	const p = String(s).replace(/-/g, "+").replace(/_/g, "/");
@@ -69,16 +70,23 @@ async function launch() {
 	await page.waitForTimeout(800);
 	await page.click("#game-list .game");
 	await page.waitForTimeout(900);
-	await page.click("#model-list .model");
-	await page.waitForTimeout(2500);
-
-	const raw = await page.evaluate(() => new URLSearchParams(location.search).get("v"));
-	const modelId = await page.evaluate(() => window.spineStage.model?.id || null);
+	await page.click("#model-list li > button:not(.model-fav)");
+	// `?v=` ditulis lewat jalur debounce, jadi waitForTimeout tetap bisa keburu
+	// membaca payload perantara yang belum punya `m` (flaky 1/3 run). Tunggu
+	// sampai payload BENAR-BENAR menyebut model yang sedang terbuka.
+	let raw = null;
+	let modelId = null;
 	let payload = null;
-	try {
-		payload = b64urlDecode(raw || "");
-	} catch {
-		/* left null */
+	for (let i = 0; i < 40; i++) {
+		raw = await page.evaluate(() => new URLSearchParams(location.search).get("v"));
+		modelId = await page.evaluate(() => window.spineStage?.model?.id || null);
+		try {
+			payload = b64urlDecode(raw || "");
+		} catch {
+			payload = null;
+		}
+		if (payload?.m && modelId && payload.m === modelId) break;
+		await page.waitForTimeout(250);
 	}
 	check("auto-writes ?v= after opening a model", !!raw, raw ? "" : "no v param");
 	check("payload names the open model", !!payload && payload.m === modelId, `${payload?.m} vs ${modelId}`);
@@ -96,6 +104,8 @@ async function launch() {
 	// 3. Mutate the view, then reload the dialog URL: it must come back the same.
 	await page.click("#link-close"); // close before touching the stage
 	await page.waitForTimeout(200);
+	// #bones-btn / #grid-btn live in the "Alat" popover (hidden by default).
+	await openTools(page);
 	await page.click("#bones-btn"); // bones ON
 	await page.click("#grid-btn"); // grid OFF
 	await page.waitForTimeout(900); // let the debounced write land

@@ -1,5 +1,13 @@
 # Brown Dust 2 (bd2) updater
 
+> **Sumber aktif: https://github.com/Zormolo/Brown-Dust-2-Assets.**
+> Yang dipanggil server sekarang adalah `tools/browndust/update.py`
+> (lihat README utama, section Brown Dust 2) — wrapper yang menjalankan
+> `tools/update-browndust.py` lalu `tools/browndust/refresh-thumbs.py`.
+> Dokumen di bawah menjelaskan skrip unduh modelnya saja.
+
+## Pipeline model (tools/update-browndust.py)
+
 Pulls new Spine models from the community archive repo
 **`github.com/Zormolo/Brown-Dust-2-Assets`** — the only source that maps an
 opaque asset id (`char000203`) onto a character AND a costume.

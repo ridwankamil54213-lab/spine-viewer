@@ -8,9 +8,13 @@
  * Run: node tools/check-fps.cjs
  */
 const { chromium } = require("playwright-core");
+const { openTools } = require("./smoke-helpers.cjs");
 
-const ok = (label, cond, extra = "") =>
+const failed = [];
+const ok = (label, cond, extra = "") => {
+	if (!cond) failed.push(label);
 	console.log(`${cond ? "ok  " : "FAIL"} ${label}${extra ? "  -> " + extra : ""}`);
+};
 
 (async () => {
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });
@@ -25,6 +29,8 @@ const ok = (label, cond, extra = "") =>
 	// networkidle never settles here: the Pixi ticker keeps a rAF loop running
 	// and models stream in, so wait for the app's own boot instead.
 	await page.goto("http://127.0.0.1:3000/", { waitUntil: "domcontentloaded" });
+	// #fps-btn lives in the "Alat" popover, which is hidden on load.
+	await openTools(page);
 	await page.waitForSelector("#fps-btn", { timeout: 20000 });
 	await page.waitForTimeout(800);
 
@@ -32,6 +38,7 @@ const ok = (label, cond, extra = "") =>
 	ok("hidden by default", await page.isHidden("#fps-meter"));
 
 	// 2. toggle via the toolbar button
+	await openTools(page);
 	await page.click("#fps-btn");
 	await page.waitForTimeout(1600);
 	ok("visible after toggle", await page.isVisible("#fps-meter"));
@@ -70,6 +77,8 @@ const ok = (label, cond, extra = "") =>
 
 	// 7. persists across reload
 	await page.reload({ waitUntil: "domcontentloaded" });
+	// The menu state is not persisted, so reopen it after every navigation.
+	await openTools(page);
 	await page.waitForSelector("#fps-btn", { timeout: 20000 });
 	await page.waitForTimeout(700);
 	ok("persists after reload", await page.isVisible("#fps-meter"));
@@ -85,8 +94,15 @@ const ok = (label, cond, extra = "") =>
 	// 9. loading a model must not break it, and stats reset per model
 	await page.click("#game-list .game");
 	await page.waitForTimeout(900);
-	await page.click("#model-list .model");
-	await page.waitForTimeout(3000);
+	await page.click("#model-list li > button:not(.model-fav)");
+	// Muat model bisa makan >3 dtk saat cache server baru saja dingin; jangan
+	// baca FPS dengan timeout buta. Tunggu HUD model DAN meter nyampling.
+	for (let i = 0; i < 80; i++) {
+		const loaded = await page.isVisible("#hud");
+		const v = await page.textContent("#fps-value");
+		if (loaded && Number.parseInt(v, 10) > 0) break;
+		await page.waitForTimeout(250);
+	}
 	const v2 = await page.textContent("#fps-value");
 	ok("still sampling after load", Number.parseInt(v2, 10) > 0, `"${v2}"`);
 	ok("model loaded", await page.isVisible("#hud"));
@@ -96,6 +112,7 @@ const ok = (label, cond, extra = "") =>
 	ok("plausible value", n2 >= 5 && n2 <= 240, `${n2} fps`);
 
 	console.log("js errors:", errors.length ? errors.slice(0, 4) : "none");
+	if (failed.length) console.error(`FAILED: ${failed.join(", ")}`);
 	await browser.close();
-	process.exit(errors.length ? 1 : 0);
+	process.exit(errors.length || failed.length ? 1 : 0);
 })();

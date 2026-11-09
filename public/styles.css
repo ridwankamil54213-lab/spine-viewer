@@ -79,8 +79,20 @@ html, body { height: 100%; }
 :root:fullscreen .sidebar,
 :root:-webkit-full-screen .sidebar { display: none; }
 
+/* PENTING: sebutkan juga varian `.is-gallery` / `.sidebar-hidden`. Aturan
+   `.layout.is-gallery.sidebar-hidden` (3 kelas) imbang spesifisitasnya dengan
+   `:root:fullscreen .layout` (3) dan ditulis belakangan, jadi ia menang dan
+   grid tetap `0 1fr`. Karena sidebar di-display:none saat fullscreen, satu-
+   satunya item grid (.stage) jatuh ke kolom PERTAMA yang lebarnya 0 → layar
+   blank hitam. Selektor 4-5 kelas di bawah mengalahkannya. */
 :root:fullscreen .layout,
-:root:-webkit-full-screen .layout {
+:root:fullscreen .layout.sidebar-hidden,
+:root:fullscreen .layout.is-gallery,
+:root:fullscreen .layout.is-gallery.sidebar-hidden,
+:root:-webkit-full-screen .layout,
+:root:-webkit-full-screen .layout.sidebar-hidden,
+:root:-webkit-full-screen .layout.is-gallery,
+:root:-webkit-full-screen .layout.is-gallery.sidebar-hidden {
 	height: 100vh;
 	grid-template-columns: 1fr;
 }
@@ -908,6 +920,11 @@ body {
 .bg-group .btn { border-radius: 0; margin-left: -1px; }
 .bg-group .btn:first-child { border-radius: var(--r) 0 0 var(--r); margin-left: 0; }
 .bg-group .btn:last-child { border-radius: 0 var(--r) var(--r) 0; }
+/* Grup gambar latar: bentuknya sama dengan grup warna latar di sebelahnya. */
+.bg-image-group { display: inline-flex; align-items: center; gap: 0; }
+.bg-image-group .btn { border-radius: 0; margin-left: -1px; }
+.bg-image-group .btn:first-child { border-radius: var(--r) 0 0 var(--r); margin-left: 0; }
+.bg-image-group .btn:last-child { border-radius: 0 var(--r) var(--r) 0; }
 .btn-select {
 	padding: 8px 9px;
 	font-size: 11.5px;
@@ -1064,6 +1081,25 @@ input:focus-visible {
 /* Magenta/green let you spot semi-transparent edges that grey hides. */
 .stage-bg[data-bg="magenta"] { --stage-bg-color: #ff00ff; }
 .stage-bg[data-bg="green"] { --stage-bg-color: #00ff00; }
+
+/* Gambar latar opsional. Letaknya TEPAT di atas .stage-bg (sama-sama z-index 0,
+   urutan DOM yang menentukan), masih di bawah .grid dan kanvas (z-index 1).
+   Kanvas Pixi punya backgroundAlpha 0, jadi suasana ini terlihat di belakang
+   model tanpa mengubah rendering skeleton sedikit pun. */
+.stage-backdrop {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+	transition: opacity 0.25s var(--ease);
+}
+.stage-backdrop[hidden] { display: none; }
+.stage-backdrop[data-scene="aurora"] { background-image: url("/backgrounds/aurora.svg"); }
+.stage-backdrop[data-scene="studio"] { background-image: url("/backgrounds/studio.svg"); }
+.stage-backdrop[data-scene="night"]  { background-image: url("/backgrounds/night.svg"); }
 
 /* grid veil — sits above the backdrop, below the canvas content */
 .grid {
@@ -1866,6 +1902,101 @@ input:focus-visible {
 	margin: 8px 0 2px;
 }
 
+/* Filter khusus Chaos Zero Nightmare: tab jenis karakter + filter atribut.
+   Muncul hanya saat game czn-rigs dibuka (lihat syncCznFilters). */
+.czn-filters {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 8px 0 2px;
+	padding: 7px;
+	border: 1px solid var(--line);
+	border-radius: var(--r);
+	background: var(--ink-800);
+}
+.czn-filters[hidden] { display: none; }
+.czn-tabs { display: flex; gap: 4px; }
+.czn-tab {
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	padding: 5px 6px;
+	font: inherit;
+	font-size: 11.5px;
+	color: var(--fg-mute);
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 7px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.czn-tab:hover { color: var(--fg); background: var(--ink-700); }
+.czn-tab.is-on {
+	color: var(--fg);
+	background: var(--ink-700);
+	border-color: var(--line);
+	box-shadow: inset 0 -2px 0 var(--spark-hi);
+}
+.czn-tab-count {
+	font-size: 10px;
+	padding: 0 5px;
+	border-radius: 9px;
+	background: rgba(255, 255, 255, .07);
+	color: var(--fg-mute);
+}
+.czn-tab.is-on .czn-tab-count { background: rgba(255, 176, 46, .18); color: var(--fg); }
+.czn-icon-filters { display: flex; flex-direction: column; gap: 5px; }
+.czn-icon-row { display: flex; gap: 4px; }
+.czn-icon {
+	position: relative;
+	flex: 1 1 0;
+	min-width: 0;
+	height: 28px;
+	display: grid;
+	place-items: center;
+	padding: 2px;
+	border: 1px solid var(--line);
+	border-radius: 7px;
+	background: var(--ink-750);
+	cursor: pointer;
+	opacity: .45;
+	transition: opacity .15s, transform .15s, border-color .15s, box-shadow .15s;
+}
+.czn-icon:hover { opacity: .82; transform: scale(1.05); }
+.czn-icon.is-on {
+	opacity: 1;
+	border-color: var(--spark-hi);
+	box-shadow: 0 0 0 1px rgba(255, 176, 46, .25);
+}
+.czn-icon img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+/* Badge ego: latar gradien wiki + ikon di atasnya (lihat .ego-icon di wiki). */
+.czn-ego {
+	position: relative;
+	width: 22px; height: 22px;
+	display: grid; place-items: center;
+	overflow: hidden;
+	border-radius: 4px;
+}
+.czn-ego::before {
+	content: "";
+	position: absolute; inset: 0;
+	background: var(--ego-bg) center / 100% 100% no-repeat;
+}
+.czn-ego img { position: relative; z-index: 1; width: 95%; height: 95%; }
+.czn-job {
+	width: 22px; height: 22px;
+	display: grid; place-items: center;
+	background: #333; border-radius: 4px;
+}
+.czn-job img { width: 95%; height: 95%; }
+/* Bintang berderet rapat seperti GradeFilter wiki. */
+.czn-stars { display: flex; align-items: center; height: 22px; }
+.czn-stars img { width: 19px; height: 19px; margin-left: -8px; }
+.czn-stars img:first-child { margin-left: 0; }
+.czn-reset { align-self: flex-end; }
+
 .btn-fav {
 	display: inline-flex;
 	align-items: center;
@@ -2252,6 +2383,79 @@ input:focus-visible {
 .card-tile img,
 .card-tile video { border-radius: 8px; }
 
+/* ------------------------------------------------------------------ *
+ * Deskripsi kartu skill (dari desc_display wiki)
+ *
+ * .ct-art membungkus ilustrasi + lapisan absolute (.ct-frame/.ct-rarity/
+ * .ct-shine) supaya semuanya berhenti di tepi gambar dan tidak menimpa
+ * caption di bawahnya. .ct-variants muncul di atas .ct-art saat tombol
+ * "+N varian" ditekan.
+ * ------------------------------------------------------------------ */
+.ct-art { position: relative; display: block; }
+.ct-caption {
+	display: block;
+	padding: 4px 6px 6px;
+	border-radius: 0 0 8px 8px;
+	background: linear-gradient(180deg, rgba(0, 0, 0, .28), rgba(0, 0, 0, .55));
+}
+.ct-name {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.25;
+	color: var(--fg);
+}
+.ct-cost {
+	flex: 0 0 auto;
+	min-width: 16px;
+	padding: 0 4px;
+	border-radius: 4px;
+	font-size: 10px;
+	text-align: center;
+	background: var(--ink-700);
+	color: var(--spark-hi);
+}
+.ct-desc {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	margin-top: 2px;
+	font-size: 10px;
+	line-height: 1.35;
+	color: var(--fg-mute);
+}
+.ct-desc u, .ct-desc b { color: var(--fg); }
+.ct-more {
+	margin-top: 3px;
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	font-size: 9.5px;
+	color: var(--cool);
+	cursor: pointer;
+}
+.ct-more:hover { text-decoration: underline; }
+.ct-variants {
+	position: absolute;
+	inset: 0;
+	z-index: 6;
+	display: none;
+	overflow-y: auto;
+	padding: 8px;
+	border-radius: 8px;
+	background: rgba(9, 11, 16, .95);
+	font-size: 10.5px;
+	line-height: 1.45;
+	color: var(--fg);
+}
+.card-tile.is-expanded .ct-variants { display: block; }
+.ct-variants p { margin: 0 0 7px; }
+.ct-variants b { color: var(--spark-hi); }
+
 
 /* ------------------------------------------------------------------ *
  * Menu "Alat": wadah alat lanjutan
@@ -2437,3 +2641,312 @@ input:focus-visible {
 	font-size: 12px;
 }
 .bounds-panel[hidden] { display: none; }
+
+/* ------------------------------------------------------------------ *
+ * Shared variant picker (right edge of the stage)
+ *
+ * One picker for every game with a family — CZN has up to 7 siblings, E7
+ * Lobby/Combat/Skill 1..5, BD2 Utama/Skill-Cutscene/Interaction. The inline
+ * "Varian" dropdown stays in the DOM as the state holder (permalink +
+ * keyboard read it) but is hidden; this popup is the visible UI. Each row
+ * carries a thumbnail from /api/thumbnails, so scanning siblings is fast.
+ * Kept above the HUD (z 2-4) but under the dialogs (z 50+), and
+ * pointer-events are re-enabled explicitly because the canvas-wrap handles
+ * drag-to-pan on the rest of the stage.
+ * ------------------------------------------------------------------ */
+.variant-btn {
+	position: absolute;
+	top: 50%;
+	right: 10px;
+	transform: translateY(-50%);
+	z-index: 12;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 9px 12px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: rgba(18, 18, 31, 0.92);
+	color: var(--fg-dim);
+	font: inherit;
+	font-size: 12px;
+	letter-spacing: 0.02em;
+	cursor: pointer;
+	backdrop-filter: blur(6px);
+	transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+}
+.variant-btn:hover,
+.variant-btn[aria-expanded="true"] {
+	border-color: rgba(255, 176, 46, 0.5);
+	color: var(--spark-hi);
+	background: rgba(255, 176, 46, 0.12);
+}
+.variant-btn[hidden] { display: none; }
+.variant-btn .icon { width: 15px; height: 15px; fill: currentColor; }
+.variant-count {
+	min-width: 18px;
+	padding: 1px 5px;
+	border-radius: 999px;
+	background: rgba(255, 176, 46, 0.18);
+	color: var(--spark-hi);
+	font-family: var(--font-mono);
+	font-size: 11px;
+	line-height: 15px;
+	text-align: center;
+}
+
+.variant-popup {
+	position: absolute;
+	top: 50%;
+	right: 76px;
+	transform: translateY(-50%);
+	z-index: 14;
+	display: flex;
+	flex-direction: column;
+	width: min(320px, calc(100% - 96px));
+	max-height: min(64%, 460px);
+	border: 1px solid var(--line);
+	border-radius: var(--r);
+	background: rgba(14, 14, 25, 0.97);
+	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+	overflow: hidden;
+}
+.variant-popup[hidden] { display: none; }
+.variant-popup-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 12px 12px 10px;
+	border-bottom: 1px solid var(--line-soft);
+}
+.variant-popup-titlewrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.variant-popup-kicker {
+	font-size: 10px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--fg-mute);
+}
+.variant-popup-head strong {
+	font-family: var(--font-display);
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--fg);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.variant-popup-close {
+	flex: none;
+	width: 24px;
+	height: 24px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--fg-mute);
+	font-size: 16px;
+	line-height: 1;
+	cursor: pointer;
+}
+.variant-popup-close:hover { color: var(--fg); border-color: var(--line); }
+
+.variant-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 8px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+.variant-item {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	width: 100%;
+	padding: 6px 8px;
+	border: 1px solid transparent;
+	border-radius: var(--r-sm);
+	background: transparent;
+	color: var(--fg-dim);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+.variant-item:hover { background: var(--ink-750); color: var(--fg); }
+.variant-item.is-active {
+	border-color: rgba(255, 176, 46, 0.42);
+	background: rgba(255, 176, 46, 0.12);
+	color: var(--spark-hi);
+}
+.variant-item-thumb {
+	flex: 0 0 44px;
+	width: 44px;
+	height: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	border-radius: 6px;
+	background: var(--ink-800);
+	color: var(--fg-mute);
+	font-size: 15px;
+	font-weight: 600;
+}
+.variant-item-thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.variant-item-thumb.is-empty { background: var(--ink-750); }
+.variant-item-text {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+.variant-item-label { font-size: 13px; }
+.variant-item-meta {
+	font-size: 11px;
+	color: var(--fg-mute);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 100%;
+}
+.variant-item.is-active .variant-item-meta { color: var(--spark-dim); }
+.variant-item-badge {
+	flex: 0 0 auto;
+	padding: 2px 6px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	font-size: 10px;
+	white-space: nowrap;
+	color: var(--fg-mute);
+}
+.variant-popup-foot {
+	padding: 8px 12px 10px;
+	border-top: 1px solid var(--line-soft);
+	font-size: 10.5px;
+	color: var(--fg-mute);
+}
+
+/* ------------------------------------------------------------------ *
+ * Pelengkap picker: chip di kartu, tab cepat, preview hover, header grup
+ * ------------------------------------------------------------------ */
+/* family.members sudah ikut di payload lean, jadi chip ini gratis. */
+.variant-chip {
+	flex: 0 0 auto;
+	padding: 2px 6px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: rgba(255, 176, 46, 0.10);
+	color: var(--spark-hi);
+	font-size: 10px;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+.variant-chip:hover {
+	border-color: rgba(255, 176, 46, 0.5);
+	background: rgba(255, 176, 46, 0.20);
+}
+.gcard .variant-chip { align-self: flex-start; margin-top: 2px; }
+
+/* <=3 varian: tab segmented selalu terlihat, satu klik tanpa popup. */
+.variant-tabs {
+	position: absolute;
+	top: 12px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 12;
+	display: flex;
+	gap: 2px;
+	max-width: calc(100% - 24px);
+	padding: 3px;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+	background: rgba(14, 14, 25, 0.92);
+	backdrop-filter: blur(6px);
+	overflow-x: auto;
+}
+.variant-tabs[hidden] { display: none; }
+.variant-tab {
+	flex: 0 0 auto;
+	padding: 5px 11px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--fg-mute);
+	font: inherit;
+	font-size: 11px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+.variant-tab:hover { color: var(--fg); background: var(--ink-750); }
+.variant-tab.is-active { background: rgba(255, 176, 46, 0.16); color: var(--spark-hi); }
+
+/* Preview gambar besar, mengambang di kiri popup saat hover baris. */
+.variant-preview {
+	position: absolute;
+	top: 50%;
+	right: 408px;
+	transform: translateY(-50%);
+	z-index: 13;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	width: 190px;
+	padding: 8px;
+	border: 1px solid var(--line);
+	border-radius: var(--r);
+	background: rgba(14, 14, 25, 0.97);
+	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+	pointer-events: none;
+}
+.variant-preview[hidden] { display: none; }
+.variant-preview img {
+	display: block;
+	width: 100%;
+	height: 172px;
+	object-fit: contain;
+	border-radius: 6px;
+	background: var(--ink-800);
+}
+.variant-preview span {
+	font-size: 11px;
+	color: var(--fg-dim);
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Header grup hanya muncul di popup dengan >3 varian. */
+.variant-group-head {
+	padding: 7px 8px 3px;
+	font-size: 10px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--fg-mute);
+}
+.variant-group-head:not(:first-child) {
+	margin-top: 3px;
+	border-top: 1px solid var(--line-soft);
+}
+
+/* Narrow stages: popup pindah ke bawah, preview tidak muat di sampingnya. */
+@media (max-width: 1100px) {
+	#variant-preview { display: none; }
+}
+@media (max-width: 900px) {
+	.variant-popup {
+		right: 8px;
+		top: auto;
+		bottom: 64px;
+		transform: none;
+		max-height: 56%;
+	}
+	.variant-btn { top: auto; bottom: 68px; transform: none; }
+	.variant-tabs { top: auto; bottom: 68px; }
+}

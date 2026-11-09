@@ -1,5 +1,16 @@
 # Make Drama (MAD) — community rig library
 
+> **ARSIP.** Dokumen ini menjelaskan pipeline LAMA berbasis clone git
+> `/opt/re-targets/mad-viewer` + `git fetch` (`tools/update-mad.py`,
+> `tools/extract-mad-viewer.py`). Sejak pindah ke sumber live
+> **`https://mad.altterisk.cc/viewer/`**, yang dipakai adalah
+> `tools/mad-drama/refresh.py` + `tools/mad-drama/update.py` — lihat section
+> **Make Drama** di `README.md`. Skrip lama sengaja dibiarkan sebagai referensi
+> format aset; `UPDATERS["mad-drama"]` sudah tidak menunjuk ke sana.
+>
+> Angka di bawah (131 model / 74 thumbnail / 93 kartu) adalah kondisi lama.
+> Kondisi baru: **143 model / 134 thumbnail / 101 kartu root / 63 family**.
+
 Game key `mad-drama`, label **Make Drama**. Source is the community content
 library behind [anyabot/MAD-Viewer](https://github.com/anyabot/MAD-Viewer) — the
 same shape as the CZN integration (a model library, not a game CDN).

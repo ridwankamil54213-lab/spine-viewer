@@ -6,9 +6,6 @@ const fsp = require("fs/promises");
 const express = require("express");
 const multer = require("multer");
 const compression = require("compression");
-const zlib = require("zlib");
-const crypto = require("crypto");
-const { promisify } = require("util");
 const { spawn, spawnSync } = require("child_process");
 const { SkeletonBinary, AtlasAttachmentLoader } = require("@pixi-spine/runtime-4.1");
 const { TextureAtlas } = require("@pixi-spine/base");
@@ -383,7 +380,7 @@ const dirBytesCache = new Map();
  */
 const GAME_ROOTS = [
 	{ match: "nikke", key: "nikke", label: "Nikke: Goddess of Victory" },
-	{ match: "lostsword-video", key: "lostsword-video", label: "Lost Sword — Video" },
+	{ match: "lostsword-video", key: "lostsword-video", label: "Lost Sword — Video", hiddenGame: true },
 	{ match: "lostsword", key: "lostsword", label: "Lost Sword" },
 	{ match: "talesofangels", key: "talesofangels", label: "Tales of Angels" },
 	{ match: "crosscore", key: "crosscore", label: "CrossCore" },
@@ -403,6 +400,17 @@ const GAME_ROOTS = [
 		match: "mcs18",
 		key: "mcs18",
 		label: "禁果便利店",
+		pmaDefault: false,
+	},
+	// 欲洛降临 (EroEra — youdianse.com/game/detail/456).
+	// Unity GameFramework hotupdate terbuka di res-01.eepgames.com/hotupdate/0_1_64/Android/.
+	// 174 model Spine 4.1.23/4.1.24 (30 hero + 10 pet + 3 extra = 43 kartu root),
+	// nama dari tabel Luban hero_tbheroshowgirl & pet_tbpetcharacter, thumbnail dari
+	// SpriteAtlas/Packs/Hero. Lihat tools/eroera/.
+	{
+		match: "eroera",
+		key: "eroera",
+		label: "欲洛降临 (EroEra)",
 		pmaDefault: false,
 	},
 	// Azure Taboo (EroLabs / pinkcore, NuTaku). Unity IL2CPP; the shipped APK
@@ -1097,6 +1105,19 @@ const GAME_ROOTS = [
 		key: "dotabyss-l2d",
 		label: "DotAbyss Live2D",
 	},
+	// Craving Quest / Lusty Odyssey (ERO LABS). Pak share dari Live2DHub
+	// (topik 4791, "【绅士冒险】spine文件分享"): per karakter satu folder
+	// berisi CG H beranimasi. Isinya campur — 44 folder memakai skeleton
+	// Spine JSON yang tersimpan ber-ekstensi `.prefab` (server mengenalinya
+	// sebagai .json), sisanya `.skel` binary. Semua Spine 3.8 (55 dan 99).
+	// Atlas tanpa baris `pma:` dan alpha-nya bersih (texel transparan hitam),
+	// jadi setelan PMA Auto sudah benar.
+	{
+		match: "lustyodyssey",
+		key: "lustyodyssey",
+		label: "Craving Quest (Lusty Odyssey)",
+		spineRuntime: "3.8",
+	},
 	// Bundled sample models. They live directly under assets/ and are not from
 	// any game — grouping them keeps "Lainnya" from meaning "demo".
 	{ match: "spineboy", key: "demo", label: "Demo" },
@@ -1385,6 +1406,47 @@ function pairSkeletonAtlas(skels, atlases) {
 function attachLostSwordFamilies(models, videos) {
 	const ls = models.filter((m) => (m.game || "") === "lostsword");
 	if (!ls.length) return models;
+
+	// Jalur utama: katalog resmi https://lost-sword-l2d-viewer.pages.dev/
+	// yang ditulis oleh tools/lostsword/refresh.py ke assets/lostsword/_names.json.
+	// Berisi `models` (nama + metadata karakter untuk 287 model Spine & 87 video)
+	// serta `families` (84 family karakter tanpa tabrakan aset maupun label).
+	const namesFile = path.join(ASSETS, "lostsword", "_names.json");
+	try {
+		if (fs.existsSync(namesFile)) {
+			const payload = JSON.parse(fs.readFileSync(namesFile, "utf8"));
+			if (payload && payload.models && Array.isArray(payload.families)) {
+				const byId = new Map();
+				for (const m of models) byId.set(m.id, m);
+				for (const v of videos || []) byId.set(v.id, v);
+				for (const [id, info] of Object.entries(payload.models)) {
+					const m = byId.get(id);
+					if (!m || !info) continue;
+					if (info.name) m.name = info.name;
+					if (info.character) m.character = { ...info.character };
+				}
+				for (const fam of payload.families) {
+					const present = (fam.members || []).filter((x) => x && byId.has(x.id));
+					if (!present.length) continue;
+					const rootId = present.some((x) => x.id === fam.root) ? fam.root : present[0].id;
+					const rootModel = byId.get(rootId);
+					if (rootModel && fam.name) rootModel.name = fam.name;
+					if (present.length < 2) continue;
+					const members = present.map((x, idx) => ({
+						id: x.id,
+						label: idx === 0 && x.id === rootId ? "Utama" : (x.label || "Varian"),
+					}));
+					for (const x of members) {
+						const m = byId.get(x.id);
+						if (m) m.family = { root: rootId, label: x.label, members };
+					}
+				}
+				return models;
+			}
+		}
+	} catch (err) {
+		console.warn("[lostsword] gagal membaca _names.json:", err.message);
+	}
 
 	const TAG = /^(lobby_|pc_|npc_|bg_|ps_|pet_)/i;
 	const stripTag = (name) => name.replace(TAG, "");
@@ -1752,12 +1814,147 @@ function scanModels() {
 	// Epic Seven: nama + rarity/elemen/kelas dari katalog e7codex
 	// (assets/epic7/_names.json, ditulis tools/fetch-e7codex-meta.py).
 	applyEpic7Names(models);
+	// CrossCore: nama tampilan dari katalog ArtHub
+	// (assets/crosscore/_names.json, ditulis tools/crosscore/refresh-meta.py).
+	applyCrosscoreNames(models);
+	// CrossCore: satukan rig Spine dan rig interaksi yang berbagi folder jadi
+	// SATU kartu dengan dropdown varian (324 dari 325 folder interaksi punya
+	// pasangan). Tanpa ini 827 model tampil sebagai kartu terpisah, padahal
+	// sebagian besar adalah karakter yang sama.
+	attachCrosscoreFamilies(models);
+	// Craving Quest / Lusty Odyssey: nama karakter asli (Tionghoa) dari
+	// data/lustyodyssey-names.json — folder asetnya sengaja ASCII karena
+	// klien memakai id yang sudah disanitasi sebagai path aset.
+	applyLustyNames(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
 	// root is listed, so they never appear as separate cards.
 	const lsVideos = models.filter((m) => (m.game || "") === "lostsword-video");
-	return attachLostSwordFamilies(attachCharacters(attachFamilies(sorted)), lsVideos);
+	const out = attachLostSwordFamilies(
+		applyNikkiNames(attachCharacters(attachNikkiFamilies(attachFamilies(sorted)))),
+		lsVideos);
+	// Mitao Utopia: front_<id> jadi kartu root; back/hfront/common/skill/
+	// hspecial_<id> jadi baris varian di picker yang sama. Prefix lain
+	// (monster, loading, ...) sengaja dibiarkan sebagai kartu berdiri sendiri.
+	attachMitaoFamilies(out);
+	// Nama karakter dari tabel HEROINFO_Name_<id> di bundle (JP sebagai utama).
+	applyMitaoNames(out);
+	// 欲洛降临 (EroEra): nama karakter Luban + 43 family kartu root dari assets/eroera/_names.json.
+	attachEroEraFamilies(out);
+	return out;
+}
+
+/**
+ * 欲洛降临 (EroEra): baca nama karakter & struktur family dari assets/eroera/_names.json
+ * yang dihasilkan tools/eroera/refresh.py (30 hero `hero_10001..10030` beserta varian
+ * H Scene Base/Adv, Interaction, Activity, Aim, Cover, Skill Cut + 10 Pet + 3 Extra).
+ */
+function attachEroEraFamilies(models) {
+	const namesFile = path.join(ASSETS, "eroera", "_names.json");
+	try {
+		if (!fs.existsSync(namesFile)) return;
+		const payload = JSON.parse(fs.readFileSync(namesFile, "utf8"));
+		if (!payload || !payload.models || !Array.isArray(payload.families)) return;
+		const byId = new Map();
+		for (const m of models) {
+			if (m.game === "eroera") byId.set(m.id, m);
+		}
+		if (!byId.size) return;
+		for (const [id, info] of Object.entries(payload.models)) {
+			const m = byId.get(id);
+			if (!m || !info) continue;
+			if (info.name) m.name = info.name;
+			if (info.character) m.character = { ...info.character };
+		}
+		for (const fam of payload.families) {
+			const present = (fam.members || []).filter((x) => x && byId.has(x.id));
+			if (!present.length) continue;
+			const rootId = present.some((x) => x.id === fam.root) ? fam.root : present[0].id;
+			const rootModel = byId.get(rootId);
+			if (rootModel && fam.name) rootModel.name = fam.name;
+			if (present.length < 2) continue;
+			const members = present.map((x, idx) => ({
+				id: x.id,
+				label: idx === 0 && x.id === rootId ? "Utama" : (x.label || "Varian"),
+			}));
+			for (const x of members) {
+				const m = byId.get(x.id);
+				if (m) m.family = { root: rootId, label: x.label, members };
+			}
+		}
+	} catch (err) {
+		console.warn("[eroera] gagal membaca _names.json:", err.message);
+	}
+}
+
+/**
+ * Mitao Utopia: satu karakter punya beberapa rig yang dinamai per peran
+ * (front/back/hfront/common/skill/hspecial_<id>). Tanpa ini semuanya tampil sebagai
+ * kartu terpisah di pustaka. Kelompokkan per suffix numerik, jadikan
+ * `front_<id>` sebagai root, dan sembunyikan sisanya di balik dropdown Varian.
+ * Kalau tidak ada front_<id>, grupnya tidak dibuat (biar tidak ada kartu yatim).
+ */
+function attachMitaoFamilies(models) {
+	const byId = new Map(models.map((m) => [m.id, m]));
+	const LABELS = {
+		front: "Utama", back: "Back", hfront: "H Front",
+		common: "Common", skill: "Skill", hspecial: "H Special",
+	};
+	const ORDER = { front: 0, back: 1, hfront: 2, common: 3, skill: 4, hspecial: 5 };
+	const groups = new Map();
+	for (const m of models) {
+		if ((m.game || "") !== "mitao-utopia" || m.family) continue;
+		const slug = String(m.id).slice("mitao-utopia/".length);
+		const mt = slug.match(/^(front|back|hfront|common|skill|hspecial)_(\d{4,6})$/);
+		if (!mt) continue;
+		const [, kind, num] = mt;
+		const g = groups.get(num) || [];
+		g.push({ id: m.id, kind });
+		groups.set(num, g);
+	}
+	for (const [num, raw] of groups) {
+		const rootId = `mitao-utopia/front_${num}`;
+		if (!byId.has(rootId) || raw.length < 2) continue;
+		raw.sort((a, b) => ORDER[a.kind] - ORDER[b.kind] ||
+			String(a.id).localeCompare(String(b.id)));
+		const members = raw.map((r) => ({ id: r.id, label: LABELS[r.kind] }));
+		for (const mem of members) {
+			const m = byId.get(mem.id);
+			if (m) m.family = { root: rootId, label: mem.label, members };
+		}
+	}
+	return models;
+}
+
+/**
+ * Mitao Utopia: nama karakter dari tabel lokalisasi di bundle iOS.
+ * data/mitao-names.json dibangun tools/mitao/refresh-names.py dari kunci
+ * HEROINFO_Name_<id> (LocalizeConfig_{CN,TW,JP}_Category.json). Versi EN masih
+ * placeholder, jadi `name` memakai ejaan Jepang asli; nameCN/nameTW disimpan
+ * sebagai metadata. Id model tetap dicantumkan dalam tanda kurung supaya
+ * `front_10001` masih bisa dicari.
+ */
+function applyMitaoNames(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "mitao-names.json"), "utf8"));
+	} catch {
+		return;
+	}
+	for (const m of models) {
+		if ((m.game || "") !== "mitao-utopia") continue;
+		const rec = map[String(m.id)];
+		if (!rec || !rec.name) continue;
+		m.character = {
+			name: rec.name,
+			nameCN: rec.nameCN || null,
+			nameTW: rec.nameTW || null,
+			source: rec.source || "LocalizeConfig_JP_Category.json",
+		};
+		const leaf = String(m.id).split("/").pop();
+		m.name = `${rec.name} (${leaf})`;
+	}
 }
 
 /**
@@ -1874,7 +2071,100 @@ function applyCznNames(models) {
 			const kind = rec.kind || "";
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
 			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
+			// Atribut wiki dipakai tab Combatants/Partner + filter ego/job/rarity
+			// di pustaka. Field ini sengaja ikut ke indeks ringan (bukan DENY),
+			// jadi tersedia sebelum detail model dimuat.
+			if (rec.charType) m.charType = rec.charType;
+			if (rec.ego) m.ego = rec.ego;
+			if (rec.job) m.job = rec.job;
+			if (typeof rec.rarity === "number") m.rarity = rec.rarity;
 		}
+	}
+}
+
+/**
+ * CrossCore: gabungkan rig Spine dan rig interaksi jadi SATU family.
+ *
+ * Kedua pohon aset (assets/crosscore/ dan assets/crosscore-interaction/)
+ * memakai nama folder yang sama untuk karakter yang sama, tapi resolveGame()
+ * mencocokkan awalan sehingga keduanya jatuh ke game "crosscore" dan tadinya
+ * tampil sebagai 827 kartu terpisah. 324 dari 325 folder interaksi punya
+ * pasangan, jadi hasilnya ratusan kartu lebih sedikit dengan dropdown
+ * "Spine / Interaksi".
+ *
+ * Folder ber-skeleton ganda diberi id "<folder>#<stem>" oleh scanModels();
+ * semuanya tetap masuk family yang sama agar tidak ada kartu yatim. Model
+ * interaksi tanpa pasangan dibiarkan berdiri sendiri.
+ *
+ * `label` di family bersifat PER MODEL (nilai yang dipilih di <select>),
+ * mengikuti pola attachEpic7CombatFamilies().
+ */
+function attachCrosscoreFamilies(models) {
+	const byId = new Map(models.map((m) => [m.id, m]));
+	const groups = new Map(); // folder dasar -> { spine: [], interaction: [] }
+	for (const m of models) {
+		const id = String(m.id || "");
+		const kind = id.startsWith("crosscore/") ? "spine"
+			: id.startsWith("crosscore-interaction/") ? "interaction" : null;
+		if (!kind || m.family) continue;
+		const folder = id.slice(id.indexOf("/") + 1).split("#")[0];
+		if (!folder) continue;
+		let g = groups.get(folder);
+		if (!g) {
+			g = { spine: [], interaction: [] };
+			groups.set(folder, g);
+		}
+		g[kind].push(id);
+	}
+	for (const [, g] of groups) {
+		if (!g.spine.length || !g.interaction.length) continue;
+		const root = g.spine.find((id) => !id.includes("#")) || g.spine[0];
+		const labelled = (ids, base) => ids.map((id, i) => ({
+			id,
+			label: ids.length > 1 ? `${base} ${i + 1}` : base,
+		}));
+		const members = [...labelled(g.spine, "Spine"),
+			...labelled(g.interaction, "Interaksi")];
+		for (const mem of members) {
+			const m = byId.get(mem.id);
+			if (m) m.family = { root, label: mem.label, members };
+		}
+	}
+}
+
+/**
+ * CrossCore: nama tampilan dari katalog ArtHub.
+ *
+ * `_names.json` ditulis tools/crosscore/refresh-meta.py dan dikunci oleh id
+ * model PENUH ("crosscore/<folder>" / "crosscore-interaction/<folder>"),
+ * karena kedua pohon aset jatuh ke game "crosscore" (resolveGame mencocokkan
+ * awalan) — memotong prefix per-game akan menabrak keduanya.
+ */
+function applyCrosscoreNames(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(ASSETS, "crosscore", "_names.json"), "utf8"));
+	} catch {
+		return; // katalog belum ada — kartu tetap memakai nama folder
+	}
+	for (const m of models) {
+		// Folder dengan beberapa skeleton diberi id "<folder>#<stem>" oleh
+		// scanModels(); katalog dikunci per folder, jadi fallback ke id dasar.
+		const baseId = String(m.id).split("#")[0];
+		const rec = map[m.id] || map[baseId];
+		if (!rec || !rec.name) continue;
+		m.name = rec.name;
+		m.character = {
+			name: rec.name,
+			plain: rec.name,
+			source: "arthub-viewer-web",
+			rarity: null,
+			class: rec.category || rec.group || null,
+			element: null,
+			skin: rec.title || null,
+			code: String(m.id).split("/").pop(),
+			rig: rec.game === "crosscore-interaction" ? "interaction" : "spine",
+		};
 	}
 }
 
@@ -2163,6 +2453,32 @@ function attachEpic7CombatFamilies(models) {
 }
 
 /**
+ * Craving Quest / Lusty Odyssey — nama karakter asli dari
+ * data/lustyodyssey-names.json (kunci: nama folder model).
+ *
+ * Folder asetnya wajib ASCII: klien membangun URL aset dari `model.id`, dan id
+ * itu adalah path relatif yang sudah disanitasi (`[^\w.\-/]` → "-"). Nama
+ * folder full Tionghoa runtuh jadi "-A-D" — id duplikat, dan permintaan
+ * atlasnya 404. Jadi CJK-nya dipulihkan di sini, bukan di disk.
+ */
+function applyLustyNames(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "lustyodyssey-names.json"), "utf8"));
+	} catch {
+		return;
+	}
+	const prefix = "lustyodyssey/";
+	for (const m of models) {
+		if (m.game !== "lustyodyssey") continue;
+		const id = String(m.id || "");
+		const slug = id.startsWith(prefix) ? id.slice(prefix.length) : id;
+		const rec = map[slug] || map[slug.replace(/^.*\//, "")];
+		if (rec && rec.name) m.name = rec.name;
+	}
+}
+
+/**
  * Make Drama (MAD) names + variants.
  *
  * Names come from assets/mad-drama/_names.json (unit -> {name, kind, store,
@@ -2188,7 +2504,24 @@ function applyMadNames(models) {
 		if (!rec) continue;
 		const kind = cap(rec.kind);
 		m.name = `${rec.name} — ${kind}`;
-		m.character = { name: rec.name, plain: rec.name, source: "anyabot/MAD-Viewer", skin: rec.kind, code: rec.character };
+		// Metadata karakter lengkap dari characters.json situs MAD Viewer:
+		// rarity/elemen/peran/divisi/CV/artis/deskripsi ikut ke tooltip kartu.
+		m.character = {
+			name: rec.name,
+			plain: rec.name,
+			source: rec.source || "mad.altterisk.cc",
+			skin: rec.kind,
+			code: rec.character,
+			rarity: rec.rarity || null,
+			element: rec.element || null,
+			class: rec.class || null,
+			position: rec.position || null,
+			division: rec.division || null,
+			faction: rec.faction || null,
+			artist: rec.artist || null,
+			cv: rec.cv || null,
+			desc: rec.desc || null,
+		};
 		m.store = rec.store || null;
 	}
 	// Group per character; the standing rig is the card, scenes its variants.
@@ -2420,6 +2753,12 @@ const RATE_LIMITED_PREFIXES = ["/api/update", "/api/export/finish", "/api/export
 // sequentially, so they get a generous tier of their own; the expensive steps
 // (ffmpeg in /finish, updater downloads) keep the strict one.
 const RATE_LIMIT_MAX = Number(process.env.RATE_LIMIT_MAX) || 30;
+// GET /api/models (indeks ringan) disajikan dari cache memori + gzip yang
+// sudah dihitung; tidak memindai disk, tidak spawn proses. Menggabungkannya
+// ke bucket ketat 30/menit bikin UI flaky: membuka beberapa game berurutan
+// atau smoke test 17 berkas kena 429, padahal beban server nol. `?refresh=1`
+// (rescan penuh) TETAP masuk bucket ketat.
+const MODEL_READ_MAX = Number(process.env.MODEL_READ_MAX) || 120;
 const FRAME_LIMIT_MAX = Number(process.env.FRAME_LIMIT_MAX) || 3000;
 // Unggah bisa menulis puluhan MB per panggilan ke disk yang sama, jadi
 // pantasnya punya langkah sendiri yang jauh lebih ketat daripada 30/menit.
@@ -2430,12 +2769,29 @@ const rateBuckets = new Map();
 function rateLimit(req, res, next) {
 	const isFrame = req.path.startsWith("/api/export/frame");
 	const isUpload = req.path.startsWith("/api/upload");
-	if (!isFrame && !isUpload && !RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p))) return next();
-	const max = isFrame ? FRAME_LIMIT_MAX : isUpload ? UPLOAD_LIMIT_MAX : RATE_LIMIT_MAX;
+	// GET /api/models/:id cuma mengambil satu entri dari Map yang sudah ada di
+	// memori — tidak memindai disk, tidak kompresi, tidak spawn proses. Yang
+	// mahal itu indeks penuh /api/models (apalagi ?refresh=1) dan endpoint
+	// updater/export. Kalau detail ikut kuota ketat 30/menit, membuka beberapa
+	// model berurutan (atau smoke test yang jalan beruntun) kena 429 padahal
+	// beban server nol. DELETE tetap dibatasi karena bersifat destruktif.
+	const isCheapDetail = req.method === "GET" &&
+		/^\/api\/models\/[^/]+\/?$/.test(req.path);
+	// Baca indeks pustaka dari cache = murah. Rescan (?refresh=1) mahal,
+	// jadi tetap di bucket ketat bersama updater/export.
+	const isModelRead = req.method === "GET" && req.path === "/api/models" &&
+		!req.query.refresh;
+	const limited = isFrame || isUpload ||
+		RATE_LIMITED_PREFIXES.some((p) => req.path.startsWith(p));
+	if (!limited || isCheapDetail) return next();
+	const max = isFrame ? FRAME_LIMIT_MAX : isUpload ? UPLOAD_LIMIT_MAX
+		: isModelRead ? MODEL_READ_MAX : RATE_LIMIT_MAX;
 	const now = Date.now();
 	// Separate bucket per tier: otherwise a long export would burn the strict
 	// budget and then block /finish.
-	const key = (req.ip || req.socket?.remoteAddress || "unknown") + "|" + (isFrame ? "frame" : isUpload ? "upload" : "strict");
+	const tier = isFrame ? "frame" : isUpload ? "upload"
+		: isModelRead ? "models" : "strict";
+	const key = (req.ip || req.socket?.remoteAddress || "unknown") + "|" + tier;
 	let bucket = rateBuckets.get(key);
 	if (!bucket || now > bucket.resetAt) {
 		bucket = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
@@ -2721,15 +3077,22 @@ function loadNewState() {
 			// known === null berarti file belum pernah ada (jalan pertama).
 			known: Array.isArray(raw.known) ? new Set(raw.known) : null,
 			flagged: raw.flagged && typeof raw.flagged === "object" ? raw.flagged : {},
+			// Bumped on every dismissal. The client compares it against the copy
+			// it cached, so a badge the user dismisses here also disappears from
+			// browsers that still hold the old list in localStorage.
+			rev: Number.isFinite(raw.rev) ? raw.rev : 0,
 		};
 	} catch {
-		return { known: null, flagged: {} };
+		return { known: null, flagged: {}, rev: 0 };
 	}
 }
 
 function saveNewState(state) {
 	const tmp = NEW_FILE + ".tmp";
-	fs.writeFileSync(tmp, JSON.stringify({ known: [...state.known], flagged: state.flagged }));
+	fs.writeFileSync(
+		tmp,
+		JSON.stringify({ known: [...state.known], flagged: state.flagged, rev: state.rev || 0 }),
+	);
 	fs.renameSync(tmp, NEW_FILE);
 }
 
@@ -2770,7 +3133,7 @@ app.get("/api/new-models", (_req, res) => {
 		for (const [id, ts] of Object.entries(state.flagged || {})) {
 			if (now - ts <= NEW_TTL_MS) out[id] = ts;
 		}
-		res.json({ new: out });
+		res.json({ new: out, rev: state.rev || 0 });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
@@ -2791,34 +3154,24 @@ app.post("/api/new-models/dismiss", (req, res) => {
 				}
 			}
 		}
-		if (changed) saveNewState(state);
-		res.json({ ok: true, removed: changed });
+		if (changed) {
+			state.rev = (state.rev || 0) + 1;
+			saveNewState(state);
+		}
+		res.json({ ok: true, removed: changed, rev: state.rev || 0 });
 	} catch (err) {
 		res.status(500).json({ error: err.message });
 	}
 });
 
 // --- API ---
-/* Respons /api/models berbobot 27 MB untuk 38.515 model (terukur). Baik
- * JSON.stringify (88 ms) maupun gzip (411 ms CPU) mahal kalau diulang tiap
- * request, jadi keduanya dihitung SEKALI per signature dan hasilnya
- * disimpan di memori. ETag-nya ikut dihitung sekali, sehingga muat-ulang
- * yang tidak berubah dijawab 304 tanpa menyentuh body sama sekali. */
-const gzipAsync = promisify(zlib.gzip);
-let modelsPayload = { key: "", body: null, gzPromise: null, etag: "" };
-
-function buildModelsPayload(models) {
-	const key = `${cache.signature}:${models.length}`;
-	if (modelsPayload.key === key && modelsPayload.body) return modelsPayload;
-	const body = JSON.stringify({ models });
-	modelsPayload = {
-		key,
-		body,
-		gzPromise: null,
-		etag: `W/"${body.length.toString(36)}-${crypto.createHash("sha1").update(body).digest("base64url").slice(0, 27)}"`,
-	};
-	return modelsPayload;
-}
+/* Respons /api/models berbobot puluhan MB (tergantung jumlah game yang
+ * terpasang). Baik JSON.stringify maupun gzip mahal kalau diulang tiap
+ * request, dan browser menghabiskan ratusan ms hanya untuk JSON.parse.
+ * Konstruksi body, ETag, dan kompresi dipindah ke src/models-payload.js:
+ * dua bentuk (full + lean) yang dihitung SEKALI per signature, dan
+ * muat-ulang dijawab 304 tanpa menyentuh body sama sekali. */
+const { payloadFor, gzipFor, modelIndex, leanModel } = require("./models-payload.js");
 
 /**
  * Data interaksi CrossCore.
@@ -2847,17 +3200,25 @@ app.get("/api/interaction/:game", (req, res) => {
 
 app.get("/api/models", (req, res) => {
 	try {
-		const models = getModels({ force: req.query.refresh === "1" });
+		const force = req.query.refresh === "1" || forceModelRescan;
+		forceModelRescan = false;
+		const models = getModels({ force });
 
 		// Filter per game. README sudah lama menjanjikan ?game=, tapi
 		// query-nya dilempar dan 38.515 model selalu dikirim utuh.
 		const game = typeof req.query.game === "string" ? req.query.game.trim() : "";
 		if (game) {
 			const sub = models.filter((m) => m.game === game || m.gameLabel === game);
-			return res.json({ models: sub, game, total: models.length });
+			return res.json({
+				models: req.query.lean === "1" ? sub.map(leanModel) : sub,
+				game,
+				total: models.length,
+			});
 		}
 
-		const payload = buildModelsPayload(models);
+		// ?lean=1 hanya membawa field yang dipakai pustaka; detail lengkap
+		// diambil per model lewat GET /api/models/:id saat model dibuka.
+		const payload = payloadFor(models, cache.signature, req.query.lean === "1");
 		res.setHeader("ETag", payload.etag);
 		res.setHeader("Cache-Control", "no-cache");
 		if (req.headers["if-none-match"] === payload.etag) return res.status(304).end();
@@ -2867,8 +3228,7 @@ app.get("/api/models", (req, res) => {
 			res.type("application/json");
 			return res.send(payload.body);
 		}
-		if (!payload.gzPromise) payload.gzPromise = gzipAsync(payload.body, { level: 6 });
-		payload.gzPromise.then(
+		gzipFor(payload).then(
 			(gz) => {
 				// Content-Encoding sudah diisi manual sehingga middleware
 				// compression melewati respons ini — gzip-nya memang hasil cache.
@@ -2887,6 +3247,24 @@ app.get("/api/models", (req, res) => {
 	} catch (err) {
 		console.error("[api] gagal menyusun /api/models:", err);
 		res.status(500).json({ error: "Gagal memindai folder aset." });
+	}
+});
+
+/* Satu entri LENGKAP untuk model yang dibuka. Klien memuat ?lean=1 saat
+ * boot, lalu menggabungkan hasil endpoint ini ke objek yang sama, jadi semua
+ * pencarian berdasarkan id (varian, A/B, permalink) tetap bekerja. Id boleh
+ * memuat '#' (beberapa skeleton dalam satu folder) — Express sudah
+ * mendekodekannya dari %23. */
+app.get("/api/models/:id", (req, res) => {
+	try {
+		const models = getModels();
+		const model = modelIndex(models, cache.signature).get(String(req.params.id));
+		if (!model) return res.status(404).json({ error: "Model tidak ditemukan." });
+		res.setHeader("Cache-Control", "no-cache");
+		res.json({ model });
+	} catch (err) {
+		console.error("[api] gagal membaca detail model:", err);
+		res.status(500).json({ error: "Gagal membaca detail model." });
 	}
 });
 
@@ -2922,14 +3300,19 @@ app.put("/api/favorites", express.json({ limit: "1mb" }), (req, res) => {
 /* Built offline by tools/fetch-thumbs.js. The manifest maps model id -> file
  * name; it's read once and cached because it only changes when the fetcher
  * runs again. Missing entries simply render the initial-letter fallback. */
-let thumbCache = { map: null, mtime: 0 };
+// Cache PER-GAME. Satu cache global dengan satu `mtime` itu cacat: karena
+// `newest` = mtime maksimum semua manifest, cuma satu game yang cocok dan
+// ia menyuntikkan SELURUH map lama — termasuk entri game lain yang manifest-
+// nya baru saja berubah. Hasilnya kunci thumbnail usang tidak pernah hilang
+// (Make Drama: 136 padahal harusnya 134). Kunci per nama game supaya
+// penambahan/penghapusan thumbnail langsung terbaca tanpa restart.
+let thumbCache = Object.create(null);
 
 function thumbManifest() {
 	// Merge every per-game manifest in public/thumbs/<game>/_manifest.json.
 	// Keys are already fully-qualified model ids, so a flat merge is safe and
 	// adding a new game needs no code change here.
 	const combined = {};
-	let newest = 0;
 	try {
 		for (const game of fs.readdirSync(THUMBS)) {
 			const file = path.join(THUMBS, game, "_manifest.json");
@@ -2939,30 +3322,34 @@ function thumbManifest() {
 			} catch {
 				continue; // game dir without a manifest
 			}
-			if (thumbCache.map && thumbCache.mtime === st.mtimeMs) {
-				Object.assign(combined, thumbCache.map);
-				continue;
-			}
-			try {
-				const raw = JSON.parse(fs.readFileSync(file, "utf8"));
-				for (const [k, v] of Object.entries(raw)) {
-					// Older manifests (Nikke) store a bare filename; newer ones
-					// may already be game-prefixed. Normalise to "<game>/<file>"
-					// so /thumbs/ can serve either without duplication.
-					const rel = typeof v === "string" && v.startsWith(game + "/")
-						? v
-						: `${game}/${v}`;
-					combined[k] = rel;
+			const hit = thumbCache[game];
+			let perGame;
+			if (hit && hit.mtime === st.mtimeMs) {
+				perGame = hit.map;
+			} else {
+				perGame = {};
+				try {
+					const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+					for (const [k, v] of Object.entries(raw)) {
+						// Older manifests (Nikke) store a bare filename; newer ones
+						// may already be game-prefixed. Normalise to "<game>/<file>"
+						// so /thumbs/ can serve either without duplication.
+						const rel = typeof v === "string" && v.startsWith(game + "/")
+							? v
+							: `${game}/${v}`;
+						perGame[k] = rel;
+					}
+					thumbCache[game] = { map: perGame, mtime: st.mtimeMs };
+				} catch {
+					/* unreadable manifest — keep last good map for this game */
+					perGame = hit ? hit.map : {};
 				}
-				newest = Math.max(newest, st.mtimeMs);
-			} catch {
-				/* unreadable manifest — skip it */
 			}
+			Object.assign(combined, perGame);
 		}
 	} catch {
 		return {};
 	}
-	if (newest) thumbCache = { map: combined, mtime: newest };
 	return combined;
 }
 
@@ -3150,6 +3537,100 @@ function bd2AssetKey(modelId, skeletonFile) {
 	if (leaf === "cutscene") return parts[parts.length - 2] || leaf;
 	if (leaf === "censored") return `${parts[parts.length - 2]}_c`;
 	return leaf;
+}
+
+/** Nama & metadata dari katalog ArtHub nikki (tools/nikke/refresh.py).
+ *  Dipanggil SETELAH attachCharacters() supaya nama baru menang atas peta
+ *  lama (data/nikke-*.json) yang kuncinya tidak lagi cocok dengan folder
+ *  hasil unduh ulang. */
+let nikkiNameCache = { data: null, mtime: 0 };
+function applyNikkiNames(models) {
+	let recs = null;
+	try {
+		const f = path.join(ASSETS, "nikke", "_names.json");
+		const st = fs.statSync(f);
+		if (nikkiNameCache.data && nikkiNameCache.mtime === st.mtimeMs) {
+			recs = nikkiNameCache.data;
+		} else {
+			recs = JSON.parse(fs.readFileSync(f, "utf8"));
+			nikkiNameCache = { data: recs, mtime: st.mtimeMs };
+		}
+	} catch {
+		return models;
+	}
+	for (const m of models) {
+		if ((m.game || "") !== "nikke") continue;
+		const r = recs[m.id];
+		if (!r) continue;
+		m.name = r.name;
+		m.character = {
+			name: r.characterName || r.name,
+			plain: r.characterName || r.name,
+			source: r.source || "nkas.pages.dev/nikkes",
+			code: r.characterCode || null,
+			kind: r.resourceType || null,
+			typeLabel: r.typeLabel || null,
+			nameSource: r.nameSource || null,
+		};
+	}
+	return models;
+}
+
+/**
+ * Nikke (ArtHub): jadikan rig aim / cover / skillcut VARIAN dari karakter
+ * dasarnya, bukan kartu terpisah. Pola id hasil unduh ulang:
+ *
+ *   c010_00                 -> root ("Utama", rig lobby)
+ *   c010_aim_00 / _01       -> "Aim 00" / "Aim 01"
+ *   c010_cover_00           -> "Cover 00"
+ *   c010_00_skillcut        -> "Skill Cut"
+ *   catalog-c010_00_skillcut-> "Katalog · Skill Cut"
+ *
+ * Tanpa ini 1399 model aim/cover/skillcut memenuhi pustaka sebagai kartu
+ * sendiri, padahal mereka satu karakter. Hanya grup yang root-nya benar-benar
+ * ada yang dibuat family; sisanya tetap berdiri sendiri.
+ */
+function nikkiVariantOf(slug) {
+	const cat = slug.startsWith("catalog-");
+	const s = cat ? slug.slice("catalog-".length) : slug;
+	let m;
+	if ((m = /^(c\d{3})_(\d{2})$/.exec(s)))
+		return { root: s, order: 0, base: "Utama", cat };
+	if ((m = /^(c\d{3})_aim_(\d{2})$/.exec(s)))
+		return { root: `${m[1]}_${m[2]}`, order: 1, base: `Aim ${m[2]}`, cat };
+	if ((m = /^(c\d{3})_cover_(\d{2})$/.exec(s)))
+		return { root: `${m[1]}_${m[2]}`, order: 2, base: `Cover ${m[2]}`, cat };
+	if ((m = /^(c\d{3})_(\d{2})_skillcut$/.exec(s)))
+		return { root: `${m[1]}_${m[2]}`, order: 3, base: "Skill Cut", cat };
+	return null;
+}
+
+function attachNikkiFamilies(models) {
+	const groups = new Map();
+	for (const m of models) {
+		if ((m.game || "") !== "nikke" || m.family) continue;
+		const slug = String(m.id).slice("nikke/".length);
+		const v = nikkiVariantOf(slug);
+		if (!v) continue;
+		const g = groups.get(v.root) || [];
+		g.push({ id: m.id, order: v.order, base: v.base, cat: v.cat });
+		groups.set(v.root, g);
+	}
+	const byId = new Map(models.map((m) => [m.id, m]));
+	for (const [rootSlug, raw] of groups) {
+		const rootId = `nikke/${rootSlug}`;
+		if (!byId.has(rootId) || raw.length < 2) continue;
+		raw.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+		const members = raw.map((r) => ({
+			id: r.id,
+			label: r.cat ? `Katalog · ${r.base}` : r.base,
+		}));
+		for (const mem of members) {
+			const m = byId.get(mem.id);
+			if (m) m.family = { root: rootId, label: mem.label, members };
+		}
+	}
+	return models;
 }
 
 /** Attach name + metadata to every model we can identify. */
@@ -3553,21 +4034,40 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-shoujoukaisen.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// PokerFate: APK resmi -> XENC -> UnityFS -> ekspor Spine. --check cuma
+	// HEAD + state (murah); --apply mengganti seluruh pohon aset sehingga
+	// perlu rescan paksa. --probe memverifikasi konstanta S/C lewat Range.
+	pokerfate: {
+		script: path.join(ROOT, "tools", "pokerfate", "update-pokerfate.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
 	"mitao-utopia": {
 		script: path.join(ROOT, "tools", "update-mitao.py"),
 		py: "/srv/venv-spine/bin/python",
+		// Pipeline iOS menulis model baru; paksa rescan /api/models setelah apply.
+		rescan: true,
 	},
+	// CrossCore: satu pembaru untuk 2 pohon model ArtHub + nama/thumbnail.
+	// tools/update-crosscore.py (mirror komunitas kmou424 / R2iCecho) tidak
+	// dipakai lagi: sumbernya sekarang github.com/Talors1225/arthub-viewer-web.
 	crosscore: {
-		script: path.join(ROOT, "tools", "update-crosscore.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "crosscore", "update.py"),
+		py: "python3",
+		// updater menulis 2 folder aset + _names.json + 2 manifest thumbnail.
+		rescan: true,
 	},
 	catshinobi: {
 		script: path.join(ROOT, "tools", "update-catshinobi.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// Brown Dust 2: satu pembaru untuk model (Zormolo/Brown-Dust-2-Assets)
+	// + thumbnail dari assets/ui/ repo yang sama. Wrapper menyimpan state di
+	// data/bd2-update-state.json dan butuh rescan karena menulis 2 root aset.
 	bd2: {
-		script: path.join(ROOT, "tools", "update-browndust.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "browndust", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
 	azurlane: {
 		script: path.join(ROOT, "tools", "update-azurlane.py"),
@@ -3582,9 +4082,14 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-azurlane-l2d.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// Nikke: diunduh ULANG dari nol (2026-11-07) karena data lama dobel.
+	// Sumber sekarang katalog ArtHub github.com/Talors1225/arthub-viewer-web/
+	// tree/main/nikki + bucket R2 spine_carved. tools/update-nikke.py (repo
+	// Nikke-db) sudah USANG — jangan dipakai, ia akan mengembalikan duplikat.
 	nikke: {
-		script: path.join(ROOT, "tools", "update-nikke.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "nikke", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
 	// 贤者同盟 / Alliance Sages: CDN hot-update terbuka
 	// (euwv.0577ai.com/ob/update/android). --check cukup baca `filelist`;
@@ -3607,16 +4112,24 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-girlwars.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
-	// Lost Sword video extractor: rows videos out of UnityDataAssetPack.
+	// Lost Sword: disinkronkan dari https://lost-sword-l2d-viewer.pages.dev/
+	// (287 model Spine + 87 video + 306 thumbnail WebP + 84 family karakter).
 	lostsword: {
-		script: path.join(ROOT, "tools", "update-lostsword.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "lostsword", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
 	"lostsword-video": {
-		script: path.join(ROOT, "tools", "extract-lostsword-video.py"),
+		script: path.join(ROOT, "tools", "lostsword", "update.py"),
+		py: "python3",
+		rescan: true,
+	},
+	// 欲洛降临 (EroEra — youdianse.com/game/detail/456): GameFramework hotupdate
+	// terbuka di res-01.eepgames.com (174 model Spine, 43 kartu root, 165 thumbnail).
+	eroera: {
+		script: path.join(ROOT, "tools", "eroera", "update.py"),
 		py: "/srv/venv-spine/bin/python",
-		// The extractor has no --check; the button runs it directly.
-		noCheck: true,
+		rescan: true,
 	},
 	dragontravelers: {
 		script: path.join(ROOT, "tools", "extract-dragontravelers.py"),
@@ -3626,24 +4139,40 @@ const UPDATERS = {
 		noCheck: true,
 		applyArgs: ["--pull"],
 	},
-	// Chaos Zero Nightmare: the source is the community model library
-	// BenNoSleep/czn-animation-viewer, not a game CDN. --check = git fetch +
-	// diff index.json; --apply = git pull, convert the new rigs, copy new
-	// cut-ins + thumbnails. One updater serves both czn-rigs and czn-cutins-cg.
-	// See tools/update-czn.py.
+	// Chaos Zero Nightmare: satu pembaru untuk czn-rigs + czn-cutins-cg.
+	// Sumbernya tiga: repo komunitas BenNoSleep/czn-animation-viewer (rig),
+	// dan dua daftar terenkripsi wiki (roster + kartu skill). Orchestrator-nya
+	// menjalankan tools/czn/refresh.py, fetch-icons.py, refresh-cards.py dan
+	// capture-thumbs.cjs lalu menyimpan state di data/czn-update-state.json.
+	// tools/update-czn.py lama DITINGGALKAN: ia bergantung pada clone git
+	// /opt/re-targets/czn-repo dan menimpa _names.json/_manifest.json dengan
+	// metadata lama (tanpa charType/ego/rarity).
+	// Interpreter sengaja "python3": /srv/venv-spine tidak punya cryptography.
 	"czn-rigs": {
-		script: path.join(ROOT, "tools", "update-czn.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "czn", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
 	"czn-cutins-cg": {
-		script: path.join(ROOT, "tools", "update-czn.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "czn", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
-	// Make Drama: source is the community MAD-Viewer catalogue repo; --check
-	// diffs skin keys, --apply pulls and extracts the new skins. See update-mad.py.
+	// Make Drama: katalog LIVE dari mad.altterisk.cc/viewer/ (bukan lagi clone
+	// git /opt/re-targets/mad-viewer). refresh.py menulis model + metadata +
+	// thumbnail; wrapper menyimpan state dan butuh rescan.
 	"mad-drama": {
-		script: path.join(ROOT, "tools", "update-mad.py"),
-		py: "/srv/venv-spine/bin/python",
+		script: path.join(ROOT, "tools", "mad-drama", "update.py"),
+		py: "python3",
+		rescan: true,
+	},
+	// Thumbnail マブラヴ ガールズガーデンX: diturunkan LOKAL dari game
+	// "muvluv-cg" (1170 PNG) ke 1243 rig Spine. Tidak ada unduhan jaringan.
+	// rescan supaya klien memuat ulang /api/thumbnails setelah apply.
+	"muvluv": {
+		script: path.join(ROOT, "tools", "muvluv", "update.py"),
+		py: "python3",
+		rescan: true,
 	},
 	// Epic Seven — satu pembaru untuk EMPAT sumber e7codex (lobby, combat,
 	// skill, wallpaper) plus katalog nama + thumbnail, karena semuanya harus
@@ -3652,10 +4181,18 @@ const UPDATERS = {
 	epic7: {
 		script: path.join(ROOT, "tools", "update-epic7.py"),
 		py: "/srv/venv-spine/bin/python",
+		// updater menulis 4 folder aset + _names.json + thumbnail; tanpa
+		// rescan model baru baru muncul setelah refresh manual.
+		rescan: true,
 	},
 };
 
 let updateJob = null; // { game, running, result, log, startedAt }
+// Di-set setelah pembaru yang menulis aset selesai. Request /api/models
+// berikutnya (dipicu refresh() klien) akan memaksa pindai sinkron. Sengaja
+// bukan request tambahan dari server supaya tidak menghabiskan kuota rate
+// limit saat klien sedang polling status.
+let forceModelRescan = false;
 const UPDATE_LOG_MAX = 400; // baris yang disimpan per job
 // stdout pembaru ditahan utuh lalu di-JSON.parse; pembaru yang nyangkut dan
 // terus menulis akan menggembungkan heap tanpa batas.
@@ -3769,6 +4306,11 @@ app.get("/api/update/:game", async (req, res) => {
 	});
 	updateJob.running = false;
 	updateJob.finishedAt = Date.now();
+	if (cfg.rescan && updateJob.result?.ok) {
+		forceModelRescan = true;
+		// index.json kartu baru harus terbaca tanpa menunggu cache 30 detik.
+		cznCardCache = { at: 0, data: null };
+	}
 });
 
 app.get("/api/update/:game/status", (_req, res) => {
@@ -3815,7 +4357,7 @@ app.get("/api/czn-cards", (_req, res) => {
 	// Hanya id + jumlah kartu; daftar berkas tetap di endpoint per karakter.
 	const chars = {};
 	for (const [id, rec] of Object.entries(cznCardCache.data)) {
-		chars[id] = { name: rec.name || null, count: (rec.cards || []).length };
+		chars[id] = { name: rec.name || null, ego: rec.ego || null, count: (rec.cards || []).length };
 	}
 	res.json({ chars });
 });
@@ -3850,9 +4392,23 @@ app.get("/api/czn-cards/:charid", (req, res) => {
 			video: !!c.video,
 			url: `${base}.webp`,
 			videoUrl: c.video ? `${base}.webm` : null,
+			// Metadata dari /api/czn/cards/list wiki. Panel kartu sengaja
+			// tanpa teks, tapi nama dipakai untuk tooltip/aria-label dan
+			// ego + rarity menentukan bingkai yang benar.
+			name: c.name || null,
+			ego: c.ego || rec.ego || null,
+			rarity: c.rarity || null,
+			cost: c.cost ?? null,
+			sort: c.sort || null,
+			// Deskripsi dari desc_display wiki: teks polos untuk tooltip,
+			// HTML aman untuk caption, dan semua varian epiphany.
+			desc: c.desc || null,
+			descHtml: c.descHtml || null,
+			descs: c.descs || [],
+			descCount: c.descCount ?? (c.descs || []).length,
 		};
 	});
-	res.json({ charid: id, name: rec.name || null, cards });
+	res.json({ charid: id, name: rec.name || null, ego: rec.ego || null, cards });
 });
 
 // --- upload: .json/.skel/.atlas/.png/.webp/... into assets/<folder>/ ---

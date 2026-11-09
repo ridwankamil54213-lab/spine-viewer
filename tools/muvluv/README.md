@@ -81,3 +81,27 @@ Keluaran: **1170 PNG** di `assets/muvluv-cg/` (nama = `<tag>_<id>.png`, mis.
 Sisa prefix `ui_catalog` yang **bukan** CG (jangan dimasukkan): `ICS`/`TMET`/
 `TAIT`/`TII` = ikon item/karakter (188–300px), `TAB`/`TMGIT`/`TQTB` = background
 & banner, `TSST` = banner langganan, `TCNP` = kartu nama.
+
+## Thumbnail untuk rig Spine
+
+1243 model di `assets/muvluv/` tidak punya thumbnail. `refresh-thumbs.py`
+memasangkannya dengan CG di atas dan menulis
+`public/thumbs/muvluv/<id>.webp` + `_manifest.json` (1107 pasangan, 136 model
+tanpa CG tetap fallback huruf). Prioritas: `illust_portrait_` → `cg_chara_` →
+`cg_h_` → `cg_episode_` → `cg_mecha_` → `cg_story_`. Semua keluarga dipakai
+(termasuk CG H eksplisit, sesuai keputusan user 2026-11-07).
+
+Bentuk **utuh tanpa crop**: diperkecil agar muat 300×300 dengan aspect ratio
+dijaga (`scale=300:300:force_original_aspect_ratio=decrease`), CSS kartu
+`object-fit: contain` yang menangani sisi kosong. Konversi `libwebp` lewat
+`/usr/bin/ffmpeg` — interpreter systemd tidak punya Pillow.
+
+```bash
+/usr/bin/python3 tools/muvluv/refresh-thumbs.py --limit 3   # uji
+/usr/bin/python3 tools/muvluv/update.py --check
+/usr/bin/python3 tools/muvluv/update.py --apply
+```
+
+`update.py` menyimpan state di `data/muvluv-update-state.json` dan terdaftar di
+`UPDATERS["muvluv"]` (`rescan: true`). Peta audit model → CG ada di
+`data/muvluv-thumb-sources.json`. Regresi: `tools/check-muvluv-thumbs.cjs`.

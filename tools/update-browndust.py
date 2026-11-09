@@ -169,6 +169,10 @@ def fetch_tree(saved):
         version = gh_get(f"{GH_API}/commits/{BRANCH}").get("sha", "")
     except Exception as e:  # noqa: BLE001
         _log("tak bisa baca commit sha: " + str(e)[:80])
+        # Kuota API habis / jaringan putus JANGAN dianggap "repo berubah":
+        # pakai SHA yang tersimpan supaya --check tidak memicu titik merah
+        # palsu dan pohon cache tetap dipakai (tanpa 7 panggilan tambahan).
+        version = saved.get("version", "") or ""
 
     cached = saved.get("tree") or {}
     if version and saved.get("version") == version and cached:

@@ -63,7 +63,7 @@ const ok = (label, cond, extra = "") =>
 
 	// Pilih model pertama
 	const modelName = await page.evaluate(() => {
-		const m = document.querySelector("#model-list .model");
+		const m = document.querySelector("#model-list li > button:not(.model-fav)");
 		if (m) { m.click(); return m.textContent.trim(); }
 		return null;
 	});

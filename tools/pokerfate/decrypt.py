@@ -29,6 +29,7 @@ payload sebenarnya.
 """
 
 import glob
+import json
 import os
 import struct
 import sys
@@ -102,8 +103,26 @@ def decrypt_bytes(data: bytes) -> tuple[bytes, bool]:
         return data, False
     nonce = data[4:20]
     body = data[20:]
-    plain = bytes(a ^ b for a, b in zip(body, keystream(nonce, len(body))))
+    ks = keystream(nonce, len(body))
+    # XOR big-int berjalan di C, jauh lebih cepat daripada generator Python
+    # per byte untuk total ~1,4 GB bundle (penting karena --apply dibatasi
+    # UPDATE_TIMEOUT_MS 30 menit di server).
+    plain = (int.from_bytes(body, "little") ^ int.from_bytes(ks, "little")) \
+        .to_bytes(len(body), "little")
     return plain, True
+
+
+def self_test() -> dict:
+    """Round-trip XENC sintetis: buktikan keystream + XOR konsisten."""
+    import os as _os
+    nonce = _os.urandom(16)
+    body = b"UnityFS\x00" + _os.urandom(4096)
+    ks = keystream(nonce, len(body))
+    ct = (int.from_bytes(body, "little") ^ int.from_bytes(ks, "little")) \
+        .to_bytes(len(body), "little")
+    plain, enc = decrypt_bytes(b"XENC" + nonce + ct)
+    return {"ok": bool(enc and plain == body), "magic": plain[:8].decode("latin1"),
+            "bytes": len(body)}
 
 
 def decrypt_file(src: str, dst: str) -> str:
@@ -123,8 +142,13 @@ def decrypt_file(src: str, dst: str) -> str:
 
 
 def main() -> int:
+    if len(sys.argv) >= 2 and sys.argv[1] == "--self-test":
+        result = self_test()
+        print(json.dumps(result))
+        return 0 if result["ok"] else 1
     if len(sys.argv) < 3:
-        print("pakai: decrypt.py <bundle-atau-direktori> <keluaran>", file=sys.stderr)
+        print("pakai: decrypt.py <bundle-atau-direktori> <keluaran> | --self-test",
+              file=sys.stderr)
         return 2
     src, dst = sys.argv[1], sys.argv[2]
 

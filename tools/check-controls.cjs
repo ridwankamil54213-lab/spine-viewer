@@ -71,7 +71,7 @@ const IDS = [
 	// labelnya memang tetap 100 dan uji zoom gagal palsu.
 	await page.click("#game-list .game");
 	await page.waitForTimeout(900);
-	await page.click("#model-list .model");
+	await page.click("#model-list li > button:not(.model-fav)");
 	await page.waitForTimeout(2500);
 
 	// Zoom buttons must change the label (and it must render as a number + %).

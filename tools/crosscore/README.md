@@ -1,5 +1,15 @@
 # CrossCore (交错战线) — asset updater
 
+> **Sumber aktif sekarang: https://github.com/Talors1225/arthub-viewer-web.**
+> Yang dipanggil server adalah `tools/crosscore/update.py` (lihat README
+> utama, section CrossCore). Dokumen di bawah ini menjelaskan pipeline
+> **lama** berbasis mirror GitHub + AssetBundle `prefabs_spine_*`; skripnya
+> (`tools/update-crosscore.py`) masih ada sebagai referensi, tetapi tidak
+> dipakai lagi karena indeks ArtHub lebih baru dan aset R2-nya bisa diakses
+> langsung tanpa harus mengekstrak UnityFS/FakeHeader.
+
+Rangkuman pipeline lama (arsip):
+
 CrossCore ships its Spine models as public AssetBundles on a resource CDN.
 `tools/update-crosscore.py` keeps the viewer's `assets/crosscore/` tree in sync.
 

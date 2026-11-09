@@ -8,23 +8,55 @@ tidak ada berkas yang diunggah ke mana pun.
 
 ## Menjalankan
 
+Updater ini **terdaftar di `UPDATERS["pokerfate"]`** (`src/server.js`, `rescan: true`),
+jadi tombol "Perbarui aset" di UI memanggilnya. Kontraknya sama seperti updater
+lain: `--check` cepat, `--apply` boleh lama (background), stdout **hanya** blok
+JSON, semua progres ke stderr.
+
 ```bash
-# APK sudah ada di /opt/games/pokerfate/PokerFate_Android.apk
-python3 tools/pokerfate/update-pokerfate.py
+PY=/srv/venv-spine/bin/python
 
-# atau unduh ulang APK dulu
-python3 tools/pokerfate/update-pokerfate.py --download
+$PY tools/pokerfate/update-pokerfate.py --check    # HEAD + state, ~0,6 dtk
+$PY tools/pokerfate/update-pokerfate.py --probe    # verifikasi XENC via Range, ~1,4 dtk
+$PY tools/pokerfate/update-pokerfate.py --apply    # idempoten kalau APK belum berubah
 
-# simpan direktori kerja untuk diperiksa
-python3 tools/pokerfate/update-pokerfate.py --keep-temp
-
-# ekspor saja, jangan pasang ke assets/
-python3 tools/pokerfate/update-pokerfate.py --skip-publish
+# paksa unduh + ekspor ulang, atau pakai APK lokal (uji/offline)
+$PY tools/pokerfate/update-pokerfate.py --apply --force
+$PY tools/pokerfate/update-pokerfate.py --apply --apk /path/PokerFate.apk \
+    --work /tmp/pf-work --assets /tmp/pf-assets --skip-publish --keep-temp
 ```
 
 Butuh: `UnityPy`, `lz4`, `Pillow` (sudah ada di `/srv/venv-spine`), dan `7z`.
+Direktori kerja & backup ada di luar repo (`POKERFATE_STATE`, default
+`/srv/spine-assets/pokerfate`); aset selalu relatif repo, bukan `/opt/games`.
 
-Waktu jalan: ~25 menit (dekripsi 1,4 GB + ekspor 529 bundle).
+## Cara kerja `--check` / `--apply`
+
+**Versi** = `ETag|Last-Modified|Content-Length` dari 1 request `HEAD` ke APK
+resmi. State disimpan di `data/pokerfate-update-state.json`; check pertama
+membootstrap baseline (178 model) supaya titik merah tidak menyala selamanya.
+`changed` menyala kalau tanda tangan versi berubah **atau** jumlah model di disk menyusut.
+
+**`--apply`** mengunduh APK 1,61 GiB hanya kalau versi berubah; kalau belum,
+balas `skipped: true` tanpa unduhan. Urutannya: `7z` ekstrak `assets/aa/*`
+→ **preflight**: dekrip satu bundle penuh dan buka dengan UnityPy (tutorial
+6530 memperingatkan cek 8 byte saja bisa tertipu "dekripsi palsu") → dekripsi
+529 bundle → `export_spine.py` → validasi staging (`.skel`+`.atlas`+`.png`,
+minimal `max(100, 80% model lama)`) → backup pohon lama ke
+`/srv/spine-assets/pokerfate/backup-<waktu>/` → pasang. Kalau ada tahap gagal,
+pohon aset lama dibiarkan utuh. Batas waktu server 30 menit; XOR dekripsi
+memakai big-int (C) supaya 1,4 GB data tidak makan jatah itu.
+
+**`--probe`** mengambil **satu** bundle lewat HTTP Range (central directory ZIP
+di ekor APK), mendekrip, dan membukanya dengan UnityPy — membuktikan konstanta
+`S/C` masih cocok dengan APK live tanpa mengunduh 1,6 GB. Dipakai
+`tools/check-pokerfate.cjs` sebagai regresi.
+
+Waktu jalan penuh terukur: **14,8 menit** (unduh 1,61 GiB + dekripsi 529
+bundle + ekspor 75 bundle ber-Spine → 178 model). Eksekusi penuh pertama
+menghasilkan 178 model yang **byte-identik** dengan pohon lama (beda cuma
+`_index.json` yang baru ditulis), jadi pipeline ini reproducible; backup pohon
+lama ada di `/srv/spine-assets/pokerfate/backup-<waktu>/`.
 
 ## Empat jebakan yang sudah ditangani
 
@@ -120,7 +152,8 @@ memindai ulang semuanya, bukan diasumsikan.
 | `decrypt.py` | Buka bungkus XENC |
 | `convert_atlas.py` | Atlas kustom → format Spine standar |
 | `export_spine.py` | Bundle → `.skel`/`.atlas`/`.png` |
-| `update-pokerfate.py` | Orkestrasi: unduh → ekstrak → dekripsi → ekspor → pasang |
+| `update-pokerfate.py` | Orkestrasi `--check` / `--probe` / `--apply` |
+| `../check-pokerfate.cjs` | 21 assertion regresi (CLI, HTTP, self-test, Range probe) |
 
 ## Lisensi dan etika
 

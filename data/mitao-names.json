@@ -1,0 +1,860 @@
+{
+ "mitao-utopia/back_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/back_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/back_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/back_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/back_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/back_10006": {
+  "name": "烏夜叉",
+  "nameCN": "乌夜叉",
+  "nameTW": "烏夜叉",
+  "source": "HEROINFO_Name_10006"
+ },
+ "mitao-utopia/back_10007": {
+  "name": "大神響",
+  "nameCN": "大神 響",
+  "nameTW": "大神 響",
+  "source": "HEROINFO_Name_10007"
+ },
+ "mitao-utopia/back_10008": {
+  "name": "猫宮眠音",
+  "nameCN": "猫宫 眠音",
+  "nameTW": "貓宮 眠音",
+  "source": "HEROINFO_Name_10008"
+ },
+ "mitao-utopia/back_10009": {
+  "name": "兎子尾如月",
+  "nameCN": "兔子尾 如月",
+  "nameTW": "兔子尾 如月",
+  "source": "HEROINFO_Name_10009"
+ },
+ "mitao-utopia/back_10010": {
+  "name": "サイキ·ローレンツ",
+  "nameCN": "赛琪·洛伦茨",
+  "nameTW": "賽琪·洛倫茨",
+  "source": "HEROINFO_Name_10010"
+ },
+ "mitao-utopia/back_10011": {
+  "name": "バフォメット",
+  "nameCN": "巴弗灭",
+  "nameTW": "巴弗滅",
+  "source": "HEROINFO_Name_10011"
+ },
+ "mitao-utopia/back_10012": {
+  "name": "リコ",
+  "nameCN": "莉可",
+  "nameTW": "莉可",
+  "source": "HEROINFO_Name_10012"
+ },
+ "mitao-utopia/back_10013": {
+  "name": "シャーリー·フラフィー",
+  "nameCN": "雪莉·绒绒",
+  "nameTW": "雪莉·絨絨",
+  "source": "HEROINFO_Name_10013"
+ },
+ "mitao-utopia/back_10014": {
+  "name": "リリム",
+  "nameCN": "莉莉姆",
+  "nameTW": "莉莉姆",
+  "source": "HEROINFO_Name_10014"
+ },
+ "mitao-utopia/back_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/back_10017": {
+  "name": "ヴィクトリア",
+  "nameCN": "维多利亚",
+  "nameTW": "維多利亞",
+  "source": "HEROINFO_Name_10017"
+ },
+ "mitao-utopia/back_10018": {
+  "name": "ガラハッド",
+  "nameCN": "加拉哈德",
+  "nameTW": "加拉哈德",
+  "source": "HEROINFO_Name_10018"
+ },
+ "mitao-utopia/back_10019": {
+  "name": "ヒュパティア",
+  "nameCN": "希帕蒂雅",
+  "nameTW": "希帕蒂雅",
+  "source": "HEROINFO_Name_10019"
+ },
+ "mitao-utopia/back_10020": {
+  "name": "刀使の巫女",
+  "nameCN": "刀使巫女",
+  "nameTW": "刀使巫女",
+  "source": "HEROINFO_Name_10020"
+ },
+ "mitao-utopia/back_10021": {
+  "name": "神楽巫女",
+  "nameCN": "神乐巫女",
+  "nameTW": "神樂巫女",
+  "source": "HEROINFO_Name_10021"
+ },
+ "mitao-utopia/back_10022": {
+  "name": "影巫女",
+  "nameCN": "影巫女",
+  "nameTW": "影巫女",
+  "source": "HEROINFO_Name_10022"
+ },
+ "mitao-utopia/back_10023": {
+  "name": "福音シスター",
+  "nameCN": "福音修女",
+  "nameTW": "福音修女",
+  "source": "HEROINFO_Name_10023"
+ },
+ "mitao-utopia/back_10024": {
+  "name": "看護シスター",
+  "nameCN": "护理修女",
+  "nameTW": "護理修女",
+  "source": "HEROINFO_Name_10024"
+ },
+ "mitao-utopia/back_10025": {
+  "name": "ナイトシスター",
+  "nameCN": "骑士修女",
+  "nameTW": "騎士修女",
+  "source": "HEROINFO_Name_10025"
+ },
+ "mitao-utopia/back_10026": {
+  "name": "サリエル",
+  "nameCN": "沙利叶",
+  "nameTW": "沙利葉",
+  "source": "HEROINFO_Name_10026"
+ },
+ "mitao-utopia/back_10040": {
+  "name": "月媃",
+  "nameCN": "月媃",
+  "nameTW": "月媃",
+  "source": "HEROINFO_Name_10040"
+ },
+ "mitao-utopia/common_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/common_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/common_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/common_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/common_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/cutin_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/cutin_10006": {
+  "name": "烏夜叉",
+  "nameCN": "乌夜叉",
+  "nameTW": "烏夜叉",
+  "source": "HEROINFO_Name_10006"
+ },
+ "mitao-utopia/cutin_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/flow_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/front_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/front_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/front_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/front_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/front_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/front_10006": {
+  "name": "烏夜叉",
+  "nameCN": "乌夜叉",
+  "nameTW": "烏夜叉",
+  "source": "HEROINFO_Name_10006"
+ },
+ "mitao-utopia/front_10007": {
+  "name": "大神響",
+  "nameCN": "大神 響",
+  "nameTW": "大神 響",
+  "source": "HEROINFO_Name_10007"
+ },
+ "mitao-utopia/front_10008": {
+  "name": "猫宮眠音",
+  "nameCN": "猫宫 眠音",
+  "nameTW": "貓宮 眠音",
+  "source": "HEROINFO_Name_10008"
+ },
+ "mitao-utopia/front_10009": {
+  "name": "兎子尾如月",
+  "nameCN": "兔子尾 如月",
+  "nameTW": "兔子尾 如月",
+  "source": "HEROINFO_Name_10009"
+ },
+ "mitao-utopia/front_10010": {
+  "name": "サイキ·ローレンツ",
+  "nameCN": "赛琪·洛伦茨",
+  "nameTW": "賽琪·洛倫茨",
+  "source": "HEROINFO_Name_10010"
+ },
+ "mitao-utopia/front_10011": {
+  "name": "バフォメット",
+  "nameCN": "巴弗灭",
+  "nameTW": "巴弗滅",
+  "source": "HEROINFO_Name_10011"
+ },
+ "mitao-utopia/front_10012": {
+  "name": "リコ",
+  "nameCN": "莉可",
+  "nameTW": "莉可",
+  "source": "HEROINFO_Name_10012"
+ },
+ "mitao-utopia/front_10013": {
+  "name": "シャーリー·フラフィー",
+  "nameCN": "雪莉·绒绒",
+  "nameTW": "雪莉·絨絨",
+  "source": "HEROINFO_Name_10013"
+ },
+ "mitao-utopia/front_10014": {
+  "name": "リリム",
+  "nameCN": "莉莉姆",
+  "nameTW": "莉莉姆",
+  "source": "HEROINFO_Name_10014"
+ },
+ "mitao-utopia/front_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/front_10017": {
+  "name": "ヴィクトリア",
+  "nameCN": "维多利亚",
+  "nameTW": "維多利亞",
+  "source": "HEROINFO_Name_10017"
+ },
+ "mitao-utopia/front_10018": {
+  "name": "ガラハッド",
+  "nameCN": "加拉哈德",
+  "nameTW": "加拉哈德",
+  "source": "HEROINFO_Name_10018"
+ },
+ "mitao-utopia/front_10019": {
+  "name": "ヒュパティア",
+  "nameCN": "希帕蒂雅",
+  "nameTW": "希帕蒂雅",
+  "source": "HEROINFO_Name_10019"
+ },
+ "mitao-utopia/front_10020": {
+  "name": "刀使の巫女",
+  "nameCN": "刀使巫女",
+  "nameTW": "刀使巫女",
+  "source": "HEROINFO_Name_10020"
+ },
+ "mitao-utopia/front_10021": {
+  "name": "神楽巫女",
+  "nameCN": "神乐巫女",
+  "nameTW": "神樂巫女",
+  "source": "HEROINFO_Name_10021"
+ },
+ "mitao-utopia/front_10022": {
+  "name": "影巫女",
+  "nameCN": "影巫女",
+  "nameTW": "影巫女",
+  "source": "HEROINFO_Name_10022"
+ },
+ "mitao-utopia/front_10023": {
+  "name": "福音シスター",
+  "nameCN": "福音修女",
+  "nameTW": "福音修女",
+  "source": "HEROINFO_Name_10023"
+ },
+ "mitao-utopia/front_10024": {
+  "name": "看護シスター",
+  "nameCN": "护理修女",
+  "nameTW": "護理修女",
+  "source": "HEROINFO_Name_10024"
+ },
+ "mitao-utopia/front_10025": {
+  "name": "ナイトシスター",
+  "nameCN": "骑士修女",
+  "nameTW": "騎士修女",
+  "source": "HEROINFO_Name_10025"
+ },
+ "mitao-utopia/front_10026": {
+  "name": "サリエル",
+  "nameCN": "沙利叶",
+  "nameTW": "沙利葉",
+  "source": "HEROINFO_Name_10026"
+ },
+ "mitao-utopia/front_10040": {
+  "name": "月媃",
+  "nameCN": "月媃",
+  "nameTW": "月媃",
+  "source": "HEROINFO_Name_10040"
+ },
+ "mitao-utopia/hfront_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/hfront_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/hfront_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/hfront_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/hfront_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/hfront_10006": {
+  "name": "烏夜叉",
+  "nameCN": "乌夜叉",
+  "nameTW": "烏夜叉",
+  "source": "HEROINFO_Name_10006"
+ },
+ "mitao-utopia/hfront_10007": {
+  "name": "大神響",
+  "nameCN": "大神 響",
+  "nameTW": "大神 響",
+  "source": "HEROINFO_Name_10007"
+ },
+ "mitao-utopia/hfront_10008": {
+  "name": "猫宮眠音",
+  "nameCN": "猫宫 眠音",
+  "nameTW": "貓宮 眠音",
+  "source": "HEROINFO_Name_10008"
+ },
+ "mitao-utopia/hfront_10009": {
+  "name": "兎子尾如月",
+  "nameCN": "兔子尾 如月",
+  "nameTW": "兔子尾 如月",
+  "source": "HEROINFO_Name_10009"
+ },
+ "mitao-utopia/hfront_10010": {
+  "name": "サイキ·ローレンツ",
+  "nameCN": "赛琪·洛伦茨",
+  "nameTW": "賽琪·洛倫茨",
+  "source": "HEROINFO_Name_10010"
+ },
+ "mitao-utopia/hfront_10011": {
+  "name": "バフォメット",
+  "nameCN": "巴弗灭",
+  "nameTW": "巴弗滅",
+  "source": "HEROINFO_Name_10011"
+ },
+ "mitao-utopia/hfront_10012": {
+  "name": "リコ",
+  "nameCN": "莉可",
+  "nameTW": "莉可",
+  "source": "HEROINFO_Name_10012"
+ },
+ "mitao-utopia/hfront_10013": {
+  "name": "シャーリー·フラフィー",
+  "nameCN": "雪莉·绒绒",
+  "nameTW": "雪莉·絨絨",
+  "source": "HEROINFO_Name_10013"
+ },
+ "mitao-utopia/hfront_10014": {
+  "name": "リリム",
+  "nameCN": "莉莉姆",
+  "nameTW": "莉莉姆",
+  "source": "HEROINFO_Name_10014"
+ },
+ "mitao-utopia/hfront_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/hfront_10017": {
+  "name": "ヴィクトリア",
+  "nameCN": "维多利亚",
+  "nameTW": "維多利亞",
+  "source": "HEROINFO_Name_10017"
+ },
+ "mitao-utopia/hfront_10018": {
+  "name": "ガラハッド",
+  "nameCN": "加拉哈德",
+  "nameTW": "加拉哈德",
+  "source": "HEROINFO_Name_10018"
+ },
+ "mitao-utopia/hfront_10019": {
+  "name": "ヒュパティア",
+  "nameCN": "希帕蒂雅",
+  "nameTW": "希帕蒂雅",
+  "source": "HEROINFO_Name_10019"
+ },
+ "mitao-utopia/hfront_10026": {
+  "name": "サリエル",
+  "nameCN": "沙利叶",
+  "nameTW": "沙利葉",
+  "source": "HEROINFO_Name_10026"
+ },
+ "mitao-utopia/hspecial_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/hspecial_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/hspecial_10007": {
+  "name": "大神響",
+  "nameCN": "大神 響",
+  "nameTW": "大神 響",
+  "source": "HEROINFO_Name_10007"
+ },
+ "mitao-utopia/hspecial_10008": {
+  "name": "猫宮眠音",
+  "nameCN": "猫宫 眠音",
+  "nameTW": "貓宮 眠音",
+  "source": "HEROINFO_Name_10008"
+ },
+ "mitao-utopia/hspecial_10011": {
+  "name": "バフォメット",
+  "nameCN": "巴弗灭",
+  "nameTW": "巴弗滅",
+  "source": "HEROINFO_Name_10011"
+ },
+ "mitao-utopia/hspecial_10014": {
+  "name": "リリム",
+  "nameCN": "莉莉姆",
+  "nameTW": "莉莉姆",
+  "source": "HEROINFO_Name_10014"
+ },
+ "mitao-utopia/hspecial_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/hspecial_10019": {
+  "name": "ヒュパティア",
+  "nameCN": "希帕蒂雅",
+  "nameTW": "希帕蒂雅",
+  "source": "HEROINFO_Name_10019"
+ },
+ "mitao-utopia/inside_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/loadingnested_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/loadingnested_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/loadingnested_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/monster_20001": {
+  "name": "冒涜尻目",
+  "nameCN": "亵渎尻目",
+  "nameTW": "褻瀆尻目",
+  "source": "HEROINFO_Name_20001"
+ },
+ "mitao-utopia/monster_20002": {
+  "name": "厄災紙鶴",
+  "nameCN": "厄运纸鹤",
+  "nameTW": "厄運紙鶴",
+  "source": "HEROINFO_Name_20002"
+ },
+ "mitao-utopia/monster_20003": {
+  "name": "幻音魔鈴",
+  "nameCN": "幻音魔铃",
+  "nameTW": "幻音魔鈴",
+  "source": "HEROINFO_Name_20003"
+ },
+ "mitao-utopia/monster_20006": {
+  "name": "堕の兜",
+  "nameCN": "堕落头盔",
+  "nameTW": "墮落頭盔",
+  "source": "HEROINFO_Name_20006"
+ },
+ "mitao-utopia/monster_20007": {
+  "name": "伪天使",
+  "nameCN": "伪天使",
+  "nameTW": "僞天使",
+  "source": "HEROINFO_Name_20007"
+ },
+ "mitao-utopia/monster_20008": {
+  "name": "黯天使",
+  "nameCN": "黯天使",
+  "nameTW": "黯天使",
+  "source": "HEROINFO_Name_20008"
+ },
+ "mitao-utopia/monster_20009": {
+  "name": "夜魇",
+  "nameCN": "夜魇蝠",
+  "nameTW": "夜魘蝠",
+  "source": "HEROINFO_Name_20009"
+ },
+ "mitao-utopia/monster_20010": {
+  "name": "秽網",
+  "nameCN": "秽网",
+  "nameTW": "穢網",
+  "source": "HEROINFO_Name_20010"
+ },
+ "mitao-utopia/monster_20011": {
+  "name": "不帰火",
+  "nameCN": "不归火",
+  "nameTW": "不歸火",
+  "source": "HEROINFO_Name_20011"
+ },
+ "mitao-utopia/monster_20012": {
+  "name": "怒号",
+  "nameCN": "怒嚎",
+  "nameTW": "怒嚎",
+  "source": "HEROINFO_Name_20012"
+ },
+ "mitao-utopia/monster_20013": {
+  "name": "残響律動",
+  "nameCN": "残音律动",
+  "nameTW": "殘音律動",
+  "source": "HEROINFO_Name_20013"
+ },
+ "mitao-utopia/monster_20014": {
+  "name": "鳴弦三味",
+  "nameCN": "鸣弦三味",
+  "nameTW": "鳴弦三味",
+  "source": "HEROINFO_Name_20014"
+ },
+ "mitao-utopia/monster_20015": {
+  "name": "氷封の女王",
+  "nameCN": "冰封女王",
+  "nameTW": "冰封女王",
+  "source": "HEROINFO_Name_20015"
+ },
+ "mitao-utopia/monster_20016": {
+  "name": "熒惑の心",
+  "nameCN": "荧惑之心",
+  "nameTW": "熒惑之心",
+  "source": "HEROINFO_Name_20016"
+ },
+ "mitao-utopia/monster_20017": {
+  "name": "監視者",
+  "nameCN": "监测者",
+  "nameTW": "監測者",
+  "source": "HEROINFO_Name_20017"
+ },
+ "mitao-utopia/monster_20018": {
+  "name": "終局の女王",
+  "nameCN": "终局女王",
+  "nameTW": "終局女王",
+  "source": "HEROINFO_Name_20018"
+ },
+ "mitao-utopia/monster_20019": {
+  "name": "聖匣守護者",
+  "nameCN": "圣匣守护者",
+  "nameTW": "聖匣守護者",
+  "source": "HEROINFO_Name_20019"
+ },
+ "mitao-utopia/monster_20020": {
+  "name": "窺視の眼",
+  "nameCN": "窥视之眼",
+  "nameTW": "窺視之眼",
+  "source": "HEROINFO_Name_20020"
+ },
+ "mitao-utopia/monster_20021": {
+  "name": "消えぬ姿",
+  "nameCN": "未熄之形",
+  "nameTW": "未熄之形",
+  "source": "HEROINFO_Name_20021"
+ },
+ "mitao-utopia/monster_20022": {
+  "name": "堕ちた神楽巫女",
+  "nameCN": "堕·神乐巫女",
+  "nameTW": "墮·神樂巫女",
+  "source": "HEROINFO_Name_20022"
+ },
+ "mitao-utopia/monster_20023": {
+  "name": "堕ちた真理子",
+  "nameCN": "堕·真理子",
+  "nameTW": "墮·真理子",
+  "source": "HEROINFO_Name_20023"
+ },
+ "mitao-utopia/monster_20024": {
+  "name": "堕ちた影巫女",
+  "nameCN": "堕·影巫女",
+  "nameTW": "墮·影巫女",
+  "source": "HEROINFO_Name_20024"
+ },
+ "mitao-utopia/monster_20025": {
+  "name": "堕ちた刀使巫女",
+  "nameCN": "堕·刀使巫女",
+  "nameTW": "墮·刀使巫女",
+  "source": "HEROINFO_Name_20025"
+ },
+ "mitao-utopia/monster_20026": {
+  "name": "堕ちた烏夜叉",
+  "nameCN": "堕·乌夜叉",
+  "nameTW": "墮·烏夜叉",
+  "source": "HEROINFO_Name_20026"
+ },
+ "mitao-utopia/monster_20027": {
+  "name": "堕ちた福音シスター",
+  "nameCN": "堕·福音修女",
+  "nameTW": "墮·福音修女",
+  "source": "HEROINFO_Name_20027"
+ },
+ "mitao-utopia/monster_20028": {
+  "name": "堕ちたローレンツ",
+  "nameCN": "堕·洛伦茨",
+  "nameTW": "墮·洛倫茨",
+  "source": "HEROINFO_Name_20028"
+ },
+ "mitao-utopia/monster_20029": {
+  "name": "堕ちたナイトシスター",
+  "nameCN": "堕·骑士修女",
+  "nameTW": "墮·騎士修女",
+  "source": "HEROINFO_Name_20029"
+ },
+ "mitao-utopia/monster_20030": {
+  "name": "堕ちたガラハッド",
+  "nameCN": "堕·加拉哈德",
+  "nameTW": "墮·加拉哈德",
+  "source": "HEROINFO_Name_20030"
+ },
+ "mitao-utopia/monster_20031": {
+  "name": "堕ちた惩戒シスター",
+  "nameCN": "堕·惩戒修女",
+  "nameTW": "墮·懲戒修女",
+  "source": "HEROINFO_Name_20031"
+ },
+ "mitao-utopia/monster_20033": {
+  "name": "堕ちた看護シスター",
+  "nameCN": "堕·护士修女",
+  "nameTW": "墮·護士修女",
+  "source": "HEROINFO_Name_20033"
+ },
+ "mitao-utopia/shop_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/skill_10001": {
+  "name": "綾乃 真理子",
+  "nameCN": "绫乃 真理子",
+  "nameTW": "綾乃 真理子",
+  "source": "HEROINFO_Name_10001"
+ },
+ "mitao-utopia/skill_10002": {
+  "name": "八重",
+  "nameCN": "八重",
+  "nameTW": "八重",
+  "source": "HEROINFO_Name_10002"
+ },
+ "mitao-utopia/skill_10003": {
+  "name": "春日朧",
+  "nameCN": "春日 胧",
+  "nameTW": "春日 朧",
+  "source": "HEROINFO_Name_10003"
+ },
+ "mitao-utopia/skill_10004": {
+  "name": "朝風祈",
+  "nameCN": "朝风 小祈",
+  "nameTW": "朝風 小祈",
+  "source": "HEROINFO_Name_10004"
+ },
+ "mitao-utopia/skill_10005": {
+  "name": "葛葉",
+  "nameCN": "葛叶",
+  "nameTW": "葛葉",
+  "source": "HEROINFO_Name_10005"
+ },
+ "mitao-utopia/skill_10006": {
+  "name": "烏夜叉",
+  "nameCN": "乌夜叉",
+  "nameTW": "烏夜叉",
+  "source": "HEROINFO_Name_10006"
+ },
+ "mitao-utopia/skill_10007": {
+  "name": "大神響",
+  "nameCN": "大神 響",
+  "nameTW": "大神 響",
+  "source": "HEROINFO_Name_10007"
+ },
+ "mitao-utopia/skill_10008": {
+  "name": "猫宮眠音",
+  "nameCN": "猫宫 眠音",
+  "nameTW": "貓宮 眠音",
+  "source": "HEROINFO_Name_10008"
+ },
+ "mitao-utopia/skill_10009": {
+  "name": "兎子尾如月",
+  "nameCN": "兔子尾 如月",
+  "nameTW": "兔子尾 如月",
+  "source": "HEROINFO_Name_10009"
+ },
+ "mitao-utopia/skill_10010": {
+  "name": "サイキ·ローレンツ",
+  "nameCN": "赛琪·洛伦茨",
+  "nameTW": "賽琪·洛倫茨",
+  "source": "HEROINFO_Name_10010"
+ },
+ "mitao-utopia/skill_10011": {
+  "name": "バフォメット",
+  "nameCN": "巴弗灭",
+  "nameTW": "巴弗滅",
+  "source": "HEROINFO_Name_10011"
+ },
+ "mitao-utopia/skill_10012": {
+  "name": "リコ",
+  "nameCN": "莉可",
+  "nameTW": "莉可",
+  "source": "HEROINFO_Name_10012"
+ },
+ "mitao-utopia/skill_10013": {
+  "name": "シャーリー·フラフィー",
+  "nameCN": "雪莉·绒绒",
+  "nameTW": "雪莉·絨絨",
+  "source": "HEROINFO_Name_10013"
+ },
+ "mitao-utopia/skill_10014": {
+  "name": "リリム",
+  "nameCN": "莉莉姆",
+  "nameTW": "莉莉姆",
+  "source": "HEROINFO_Name_10014"
+ },
+ "mitao-utopia/skill_10015": {
+  "name": "アンシア",
+  "nameCN": "安西娅",
+  "nameTW": "安西婭",
+  "source": "HEROINFO_Name_10015"
+ },
+ "mitao-utopia/skill_10017": {
+  "name": "ヴィクトリア",
+  "nameCN": "维多利亚",
+  "nameTW": "維多利亞",
+  "source": "HEROINFO_Name_10017"
+ },
+ "mitao-utopia/skill_10018": {
+  "name": "ガラハッド",
+  "nameCN": "加拉哈德",
+  "nameTW": "加拉哈德",
+  "source": "HEROINFO_Name_10018"
+ },
+ "mitao-utopia/skill_10019": {
+  "name": "ヒュパティア",
+  "nameCN": "希帕蒂雅",
+  "nameTW": "希帕蒂雅",
+  "source": "HEROINFO_Name_10019"
+ },
+ "mitao-utopia/skill_10026": {
+  "name": "サリエル",
+  "nameCN": "沙利叶",
+  "nameTW": "沙利葉",
+  "source": "HEROINFO_Name_10026"
+ },
+ "mitao-utopia/skill_10040": {
+  "name": "月媃",
+  "nameCN": "月媃",
+  "nameTW": "月媃",
+  "source": "HEROINFO_Name_10040"
+ }
+}

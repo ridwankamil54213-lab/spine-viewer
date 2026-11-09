@@ -7,9 +7,13 @@
  * Run: node tools/check-mad-ports.cjs
  */
 const { chromium } = require("playwright-core");
+const { openTools } = require("./smoke-helpers.cjs");
 
-const ok = (label, cond, extra = "") =>
+const failed = [];
+const ok = (label, cond, extra = "") => {
+	if (!cond) failed.push(label);
 	console.log(`${cond ? "ok  " : "FAIL"} ${label}${extra ? "  -> " + extra : ""}`);
+};
 
 (async () => {
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });
@@ -34,7 +38,7 @@ const ok = (label, cond, extra = "") =>
 	// Load a model: everything below needs one on stage.
 	await page.click("#game-list .game");
 	await page.waitForTimeout(900);
-	await page.click("#model-list .model");
+	await page.click("#model-list li > button:not(.model-fav)");
 	await page.waitForTimeout(3000);
 	ok("model loaded", await page.isVisible("#hud"));
 
@@ -52,7 +56,9 @@ const ok = (label, cond, extra = "") =>
 	ok("size is plausible", pw >= 2 && ph >= 2 && pw <= 8192 && ph <= 8192, `${pw}x${ph}`);
 
 	await page.click("#export-png");
-	await page.waitForTimeout(2500);
+	// Render 954x2160 + encode PNG bisa lebih dari 2,5 dtk saat suite penuh.
+	// Tunggu event download sungguhan, bukan timeout buta yang kadang keburu.
+	for (let i = 0; i < 80 && !downloads.length; i++) await page.waitForTimeout(250);
 	ok("png downloaded", downloads.some((n) => /\.png$/.test(n)), downloads.join(", ") || "none");
 	const fname = downloads.find((n) => /\.png$/.test(n)) || "";
 	// Filename carries the real dimensions; they must match the prediction.
@@ -122,6 +128,8 @@ const ok = (label, cond, extra = "") =>
 
 	console.log("\n--- 3. part picker (SkeletonBounds) ---");
 	ok("parts hidden by default", (await page.getAttribute("#parts-btn", "data-on")) === "false");
+	// The earlier export/playback clicks were outside the popover and closed it.
+	await openTools(page);
 	await page.click("#parts-btn");
 	await page.waitForTimeout(500);
 	ok("parts toggle on", (await page.getAttribute("#parts-btn", "data-on")) === "true");
@@ -152,6 +160,7 @@ const ok = (label, cond, extra = "") =>
 	ok("hover sweep survives", hits.sweep === 0 || true);
 
 	// The overlay must not break playback or throw when toggled repeatedly.
+	await openTools(page);
 	for (let i = 0; i < 4; i++) {
 		await page.click("#parts-btn");
 		await page.waitForTimeout(120);
@@ -159,6 +168,7 @@ const ok = (label, cond, extra = "") =>
 	ok("repeated toggles safe", errors.length === 0, errors.slice(0, 2).join(" | "));
 
 	console.log("\njs errors:", errors.length ? errors.slice(0, 5) : "none");
+	if (failed.length) console.error(`FAILED: ${failed.join(", ")}`);
 	await browser.close();
-	process.exit(errors.length ? 1 : 0);
+	process.exit(errors.length || failed.length ? 1 : 0);
 })();

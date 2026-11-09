@@ -39,7 +39,8 @@ import sys
 import urllib.parse
 import urllib.request
 
-INDEX = "https://talors1225.github.io/arthub-viewer-web/crosscore/crosscore_chars.json"
+INDEX = ("https://raw.githubusercontent.com/Talors1225/arthub-viewer-web/main"
+         "/crosscore/crosscore_chars.json")
 BUCKET = "https://pub-3be583976a374ca9aacd740e9d14ad96.r2.dev"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -125,11 +126,40 @@ def load_models() -> list[dict]:
     return out
 
 
+def atlas_candidates(name: str) -> list[str]:
+    """Beberapa berkas atlas di R2 memakai kapitalisasi berbeda dari indeks.
+
+    Contoh nyata: indeks menulis `60320_skin_dainslef03.atlas`, objeknya
+    `60320_skin_Dainslef03.atlas`. Coba varian kapital per token, bukan
+    sekadar lower/upper, supaya model ini tidak hilang selamanya.
+    """
+    stem, dot, ext = name.rpartition(".")
+    if not dot:
+        return [name]
+    parts = stem.split("_")
+    out = [name, name.lower(), name.upper()]
+    out.append("_".join(t[:1].upper() + t[1:] for t in parts) + dot + ext)
+    for i, t in enumerate(parts):
+        if any(ch.isalpha() for ch in t) and t[:1].islower():
+            alt = parts[:i] + [t[:1].upper() + t[1:]] + parts[i + 1:]
+            out.append("_".join(alt) + dot + ext)
+    return list(dict.fromkeys(out))
+
+
 def download_one(m: dict) -> tuple[str, int, str | None]:
     dest = os.path.join(OUT_DIR, m["name"])
     try:
         skel = fetch(remote(m["dir"] + m["skel"]))
-        atlas_raw = fetch(remote(m["dir"] + m["atlas"]))
+        atlas_raw = None
+        last = None
+        for cand in atlas_candidates(m["atlas"]):
+            try:
+                atlas_raw = fetch(remote(m["dir"] + cand))
+                break
+            except Exception as e:  # noqa: BLE001
+                last = e
+        if atlas_raw is None:
+            raise RuntimeError(f"atlas tidak ada: {last}")
     except Exception as e:  # noqa: BLE001
         return m["name"], 0, str(e)[:70]
 
@@ -179,16 +209,12 @@ def main() -> int:
     models = load_models()
     existing = {d for d in os.listdir(OUT_DIR) if os.path.isdir(os.path.join(OUT_DIR, d))}
 
-    # Cocokkan dengan nama folder ATAU nomor ID di awal nama. Viewer menyimpan
-    # 555 folder dengan nama folder sumber (mis. `20110_break_arpeggio_spine`),
-    # sementara index memakai nama berkas (`20110_Arpeggio_character`).
+    # Cocokkan nama folder yang memang ditulis skrip ini. Pencocokan awalan
+    # nomor ID dipakai dulu untuk rekonsiliasi dengan folder mirror lama, tapi
+    # sejak sumbernya ArtHub itu berbahaya: beberapa skin berbagi awalan
+    # "10010_" dan model baru dengan awalan sama akan dianggap sudah ada.
     def already(m: dict) -> bool:
-        if m["name"] in existing or m["dname"] in existing or m["stem"] in existing:
-            return True
-        prefix = m["stem"].split("_")[0]
-        if prefix.isdigit():
-            return any(e.startswith(prefix + "_") for e in existing)
-        return False
+        return m["name"] in existing or m["dname"] in existing or m["stem"] in existing
 
     todo = [m for m in models if not already(m)]
     log(f"index: {len(models)} | folder viewer: {len(existing)} | belum ada: {len(todo)}")

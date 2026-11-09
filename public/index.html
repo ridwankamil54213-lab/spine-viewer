@@ -78,14 +78,36 @@
 				<!-- Bentuk tampilan daftar model. Dua tombol, bukan satu
 				     tombol toggle, supaya mode aktif terlihat jelas. -->
 				<div class="view-switch" role="group" aria-label="Bentuk tampilan model">
-					<button id="view-list-btn" class="btn btn-icon btn-sm is-on" type="button"
-						aria-pressed="true" title="Tampilan daftar (V untuk ganti)">
+					<button id="view-list-btn" class="btn btn-icon btn-sm" type="button"
+						aria-pressed="false" title="Tampilan daftar (X untuk ganti)">
 						<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M4 5h4v4H4zm6 0h10v4H10zM4 11h4v3H4zm6 0h10v3H10zM4 16h4v3H4zm6 0h10v3H10z"/></svg>
 					</button>
-					<button id="view-grid-btn" class="btn btn-icon btn-sm" type="button"
-						aria-pressed="false" title="Tampilan galeri (V untuk ganti)">
+					<button id="view-grid-btn" class="btn btn-icon btn-sm is-on" type="button"
+						aria-pressed="true" title="Tampilan galeri (X untuk ganti)">
 						<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z"/></svg>
 					</button>
+				</div>
+			</div>
+
+			<!-- Filter khusus Chaos Zero Nightmare. Muncul hanya saat game
+			     czn-rigs dibuka; pilihan ego/job diisi dari data model. -->
+			<div id="czn-filters" class="czn-filters" hidden>
+				<div class="czn-tabs" role="tablist" aria-label="Jenis karakter">
+					<button class="czn-tab is-on" type="button" role="tab" data-group="all"
+						aria-selected="true">Semua <span class="czn-tab-count" data-count="all">0</span></button>
+					<button class="czn-tab" type="button" role="tab" data-group="combatant"
+						aria-selected="false">Combatants <span class="czn-tab-count" data-count="combatant">0</span></button>
+					<button class="czn-tab" type="button" role="tab" data-group="partner"
+						aria-selected="false">Partner <span class="czn-tab-count" data-count="partner">0</span></button>
+				</div>
+				<!-- Filter ikon, meniru baris filter ego/job/grade di wiki e7bot.
+				     Isinya dibangun syncCznFilters() dari atribut model. -->
+				<div class="czn-icon-filters">
+					<div class="czn-icon-row" data-kind="ego" role="group" aria-label="Filter ego"></div>
+					<div class="czn-icon-row" data-kind="job" role="group" aria-label="Filter job"></div>
+					<div class="czn-icon-row" data-kind="rarity" role="group" aria-label="Filter rarity"></div>
+					<button id="czn-reset" class="btn btn-sm btn-ghost czn-reset" type="button"
+						title="Hapus semua filter" aria-label="Hapus semua filter">↺</button>
 				</div>
 			</div>
 
@@ -121,6 +143,11 @@
 				<div id="ab-pane-b" class="ab-pane"><span class="ab-tag">B</span></div>
 			</div>
 			<div id="stage-bg" class="stage-bg" data-bg="dark" aria-hidden="true"></div>
+			<!-- Gambar latar (backdrop) opsional. Di atas warna latar, di bawah
+			     grid veil dan kanvas (z-index 0 vs kanvas 1). Di-toggle lewat
+			     #backdrop-btn / Shift+L; scene dipilih lewat #backdrop-select. -->
+			<div id="stage-backdrop" class="stage-backdrop" data-scene="aurora"
+				aria-hidden="true" hidden></div>
 			<div id="grid" class="grid" aria-hidden="true"></div>
 
 			<div id="empty" class="empty">
@@ -161,6 +188,40 @@
 				<canvas id="fps-graph" class="fps-graph" width="160" height="34"
 					aria-hidden="true"></canvas>
 				<button id="fps-reset" class="fps-reset" type="button" title="Reset min/avg">Reset</button>
+			</div>
+
+			<!-- Shared variant picker (semua game yang punya family). <=3 varian
+			     pakai tab segmented di atas stage; >3 varian pakai popup di tepi
+			     kanan dengan thumbnail per baris + preview hover. CZN sampai 7
+			     saudara, E7 Lobby/Combat/Skill 1..5 — dropdown inline terlalu
+			     sempit. <select id="variant-select"> tetap di DOM sebagai state
+			     holder: permalink, change handler, dan keyboard membacanya. -->
+			<button id="variant-btn" class="variant-btn" type="button" hidden
+				aria-haspopup="dialog" aria-expanded="false" aria-controls="variant-popup"
+				title="Pilih varian model ini">
+				<svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Zm0 2.3L19.2 7 12 9.7 4.8 7 12 4.3ZM2 12l10 5 10-5-1.6-.8L12 14.6 3.6 11.2 2 12Zm0 5 10 5 10-5-1.6-.8L12 19.6 3.6 16.2 2 17Z"/></svg>
+				<span class="variant-btn-label">Varian</span>
+				<span id="variant-count" class="variant-count">0</span>
+			</button>
+			<div id="variant-tabs" class="variant-tabs" role="group"
+				aria-label="Pilih varian model ini" hidden></div>
+			<div id="variant-preview" class="variant-preview" hidden aria-hidden="true">
+				<img id="variant-preview-img" alt="" />
+				<span id="variant-preview-label"></span>
+			</div>
+			<div id="variant-popup" class="variant-popup" role="dialog" aria-modal="false"
+				aria-labelledby="variant-popup-title" hidden>
+				<div class="variant-popup-head">
+					<div class="variant-popup-titlewrap">
+						<span class="variant-popup-kicker">Varian</span>
+						<strong id="variant-popup-title">—</strong>
+					</div>
+					<button id="variant-popup-close" class="variant-popup-close" type="button"
+						aria-label="Tutup daftar varian" title="Tutup (Esc)">×</button>
+				</div>
+				<div id="variant-list" class="variant-list" role="listbox"
+					aria-label="Varian model ini"></div>
+				<div class="variant-popup-foot">Klik varian untuk mengganti model.</div>
 			</div>
 		</div>
 
@@ -526,6 +587,16 @@
 							<option value="green">Hijau</option>
 						</select>
 					</div>
+					<div class="bg-image-group" role="group" aria-label="Gambar latar">
+						<button id="backdrop-btn" class="btn btn-toggle" data-on="false"
+							title="Nyalakan/matikan gambar latar (Shift+L)">Backdrop</button>
+						<select id="backdrop-select" class="btn btn-select" aria-label="Pilih gambar latar"
+							title="Pilih suasana gambar latar">
+							<option value="aurora">Aurora</option>
+							<option value="studio">Studio</option>
+							<option value="night">Malam</option>
+						</select>
+					</div>
 					<!-- Kartu tetap terlihat: ini fitur tontonan, bukan alat diagnostik. -->
 					<button id="cards-btn" class="btn" type="button" title="Lihat kartu skill karakter ini (K)" hidden>Kartu</button>
 
@@ -544,13 +615,13 @@
 									<button id="grid-btn" class="btn btn-toggle" data-on="true" title="Kisi latar (G)">Kisi</button>
 									<button id="bones-btn" class="btn btn-toggle" data-on="false" title="Tampilkan tulang (B)">Tulang</button>
 									<button id="parts-btn" class="btn btn-toggle" data-on="false" title="Area bagian — klik model untuk melihat namanya (R)">Bagian</button>
-									<button id="slot-tip-btn" class="btn btn-toggle" data-on="false" title="Tampilkan nama slot di dekat kursor saat menunjuk model (T)">Nama Slot</button>
+									<button id="slot-tip-btn" class="btn btn-toggle" data-on="false" title="Tampilkan nama slot di dekat kursor saat menunjuk model (Y)">Nama Slot</button>
 								</div>
 							</div>
 							<div class="tools-sec">
 								<span class="tools-sec-title">Periksa &amp; sunting</span>
 								<div class="tools-grid">
-									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (E)">Edit Tulang</button>
+									<button id="bone-edit-btn" class="btn btn-toggle" data-on="false" title="Edit bone — klik lalu geser untuk memutar tulang (Shift+E)">Edit Tulang</button>
 									<button id="ik-btn" class="btn btn-toggle" data-on="false" title="IK — klik tulang, lalu geser titik ujungnya (J)">IK</button>
 									<button id="bounds-btn" class="btn btn-toggle" data-on="false" title="Bounds — klik bagian model, lalu geser/ubah ukuran kotaknya (U)">Bounds</button>
 									<button id="vtx-btn" class="btn btn-toggle" data-on="false" title="Vertex — tarik titik mesh untuk mengubah bentuk (V)">Vertex</button>

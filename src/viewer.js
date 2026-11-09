@@ -40,6 +40,7 @@ import {
 } from "@esotericsoftware/spine-pixi-v7";
 import * as runtime43 from "@esotericsoftware/spine-pixi-v7";
 import { InteractionController } from "./interaction-core.js";
+import { libraryIndex } from "./library-index.js";
 import { loadTextures } from "@pixi/assets";
 import {
 	detectSpineVersion,
@@ -313,12 +314,28 @@ const el = {
 	viewListBtn: $("#view-list-btn"),
 	layoutEl: $(".layout"),
 	viewGridBtn: $("#view-grid-btn"),
+
+	// Filter CZN (tab Combatants/Partner + atribut wiki)
+	cznFilters: $("#czn-filters"),
+	cznReset: $("#czn-reset"),
 	favCount: $("#fav-count"),
 
 	animSelect: $("#anim-select"),
 	skinSelect: $("#skin-select"),
 	variantSelect: $("#variant-select"),
 	variantWrap: $("#variant-wrap"),
+	// BD2 variant popup (right stage edge) — replaces the inline dropdown there.
+	variantBtn: $("#variant-btn"),
+	variantCount: $("#variant-count"),
+	variantPopup: $("#variant-popup"),
+	variantList: $("#variant-list"),
+	variantPopTitle: $("#variant-popup-title"),
+	variantPopClose: $("#variant-popup-close"),
+	// Tab varian cepat (<=3 varian) + preview hover di popup.
+	variantTabs: $("#variant-tabs"),
+	variantPreview: $("#variant-preview"),
+	variantPreviewImg: $("#variant-preview-img"),
+	variantPreviewLabel: $("#variant-preview-label"),
 
 	// timeline
 	timeline: $("#timeline"),
@@ -446,6 +463,9 @@ const el = {
 	stageBg: $("#stage-bg"),
 	bgBtn: $("#bg-btn"),
 	bgSelect: $("#bg-select"),
+	stageBackdrop: $("#stage-backdrop"),
+	backdropBtn: $("#backdrop-btn"),
+	backdropSelect: $("#backdrop-select"),
 	toast: $("#toast"),
 	drop: $("#drop"),
 	file: $("#file"),
@@ -860,6 +880,10 @@ const state = {
 	showBones: false,
 	showGrid: true,
 	bg: "dark",
+	// Gambar latar (backdrop) opsional: `backdropOn` = tombol on/off,
+	// `backdrop` = scene terakhir yang dipilih (tetap diingat saat mati).
+	backdropOn: false,
+	backdrop: "aurora",
 	// Render pixel density. "auto" = devicePixelRatio capped at 2 (previous
 	// behaviour); a number overrides it, so the stage can be rendered at 3-4x
 	// for extra sharpness on zoomed-in art or high-DPI screens.
@@ -1020,25 +1044,64 @@ function renderCards(cards) {
 				media = img;
 			}
 			const isUnique = /^unique/i.test(c.file);
-			// Bingkai kartu: garis sisi kiri + ikon rarity + lapisan kilau.
-			// Panel ini sengaja TANPA TEKS sama sekali — hanya ilustrasi.
-			// Judul, caption, dan catatan status dibuang; label untuk pembaca
-			// layar tetap ada lewat atribut aria-label pada wadahnya.
-			//
-			// Urutan penting — `media.after()` hanya bekerja kalau media SUDAH
-			// jadi anak DOM. Versi pertama memanggilnya sebelum append,
-			// hasilnya elemen bingkai tidak pernah masuk pohon dan tidak
-			// terlihat sama sekali.
+			// Bingkai mengikuti data wiki, bukan hardcode: ego milik karakter dan
+			// rarity kartu (common/rare/legend/unique). Fallback aman kalau
+			// metadata lama belum punya field ini.
+			const EGO_FRAMES = ["instinct", "norms", "love", "creed", "narcissism"];
+			const RARITY_FRAMES = ["common", "rare", "legend", "unique"];
+			const ego = EGO_FRAMES.includes(String(c.ego || "").toLowerCase())
+				? String(c.ego).toLowerCase() : "creed";
+			const rarity = RARITY_FRAMES.includes(String(c.rarity || "").toLowerCase())
+				? String(c.rarity).toLowerCase() : (isUnique ? "unique" : "common");
+			const name = c.name || c.file.replace(/\.webp$/i, "");
+			const desc = c.desc || "";
+			fig.title = desc ? `${name}\n${desc}` : name;
+			fig.setAttribute("aria-label", desc ? `${name}. ${desc}` : name);
+
+			// Semua lapisan visual (media + bingkai + rarity + kilau) dibungkus
+			// supaya absolute positioning-nya berhenti di tepi ilustrasi dan
+			// tidak menutupi caption deskripsi di bawahnya.
+			const art = document.createElement("span");
+			art.className = "ct-art";
 			const frame = document.createElement("span");
 			frame.className = "ct-frame";
-			frame.style.backgroundImage = "url(/czn-frame/card_ego_creed.webp)";
+			frame.style.backgroundImage = `url(/czn-frame/card_ego_${ego}.webp)`;
 			const rar = document.createElement("img");
 			rar.className = "ct-rarity";
-			rar.src = `/czn-frame/card_rarity_${isUnique ? "unique" : "common"}.webp`;
+			rar.src = `/czn-frame/card_rarity_${rarity}.webp`;
 			rar.alt = "";
 			const shine = document.createElement("span");
 			shine.className = "ct-shine";
-			fig.append(media, frame, rar, shine);
+			art.append(media, frame, rar, shine);
+
+			// Deskripsi dari desc_display wiki. HTML-nya sudah disanitasi di
+			// tools/czn/refresh-cards.py: cuma <span style>, <u> dan <br>.
+			const variants = Array.isArray(c.descs) ? c.descs : [];
+			const cap = document.createElement("figcaption");
+			cap.className = "ct-caption";
+			const cost = typeof c.cost === "number"
+				? `<span class="ct-cost" title="Cost">${c.cost}</span>` : "";
+			const body = c.descHtml || escapeHtml(desc);
+			cap.innerHTML = `<span class="ct-name">${escapeHtml(name)}${cost}</span>` +
+				`<span class="ct-desc">${body}</span>`;
+			if (variants.length > 1) {
+				const more = document.createElement("button");
+				more.type = "button";
+				more.className = "ct-more";
+				more.textContent = `+${variants.length - 1} varian`;
+				more.addEventListener("click", (e) => {
+					e.stopPropagation();
+					const on = fig.classList.toggle("is-expanded");
+					more.textContent = on ? "Tutup varian" : `+${variants.length - 1} varian`;
+				});
+				cap.append(more);
+				const panel = document.createElement("div");
+				panel.className = "ct-variants";
+				panel.innerHTML = variants.map((v, i) =>
+					`<p><b>${i + 1}.</b> ${v.html || escapeHtml(v.text || "")}</p>`).join("");
+				art.append(panel);
+			}
+			fig.append(art, cap);
 			wireCardTilt(fig);
 			el.cardsGrid.append(fig);
 		}
@@ -3742,6 +3805,32 @@ async function loadImageModel(model) {
 let loadBusy = false;
 let pendingModel = null;
 
+/* Objek model yang sudah dilengkapi detail penuhnya. WeakSet sengaja
+ * dipakai, BUKAN Set berisi id: dua objek berbeda bisa punya id yang sama
+ * (mis. objek sintetis yang dikirim ke abStart dari permalink), dan objek
+ * baru otomatis dianggap belum lengkap tanpa perlu di-clear di refresh(). */
+const detailedModels = new WeakSet();
+
+/**
+ * Lengkapi satu entri indeks ringan dengan field yang hanya dipakai saat
+ * model dibuka (skeleton/atlas, daftar animasi, skin, ukuran, …).
+ *
+ * Hasilnya digabungkan ke OBJEK YANG SAMA, bukan diganti: `switchVariant()`,
+ * A/B, dan permalink semuanya mencari model dengan `models.find(m => m.id)`,
+ * jadi mengganti referensinya akan membuat mereka memegang entri lama yang
+ * masih ringan. Id boleh memuat '#', makanya dipakai encodeURIComponent.
+ */
+async function ensureModelDetail(model) {
+	if (!model || detailedModels.has(model)) return model;
+	const res = await fetch("/api/models/" + encodeURIComponent(model.id));
+	if (!res.ok) throw new Error(`Detail model tidak tersedia (HTTP ${res.status})`);
+	const data = await res.json();
+	if (!data.model) throw new Error("Detail model kosong");
+	Object.assign(model, data.model);
+	detailedModels.add(model);
+	return model;
+}
+
 async function loadModel(model) {
 	if (loadBusy) {
 		pendingModel = model;
@@ -3749,7 +3838,12 @@ async function loadModel(model) {
 	}
 	loadBusy = true;
 	try {
+		await ensureModelDetail(model);
 		await loadModelBody(model);
+	} catch (err) {
+		// loadModelBody menangani errornya sendiri; ini untuk kegagalan
+		// mengambil detail, yang terjadi sebelum overlay loading muncul.
+		showError(`Gagal memuat “${model?.name || model?.id}”: ${err?.message || err}`);
 	} finally {
 		loadBusy = false;
 		if (pendingModel) {
@@ -4265,18 +4359,239 @@ function setAnimation(name, restart = false) {
  * ------------------------------------------------------------------ */
 
 /**
- * Fills the "Varian" dropdown next to Skin. Hidden entirely for models with no
- * siblings — 843 of the 2007 models have nothing to switch to, and an empty
- * dropdown there is just noise.
+ * Character and skin of a BD2 model.
+ *
+ * The asset tree is mirrored from `/spine/character/<Karakter>/<Nama Skin>`,
+ * so on disk it is `assets/bd2-char/<Karakter>/<Nama Skin>[/<Jenis>]`. The id
+ * may carry a `#<stem>` suffix for several skeletons sharing one folder, so
+ * strip that before splitting.
+ */
+function bd2CharSkin(id) {
+	const parts = String(id || "").split("#")[0].split("/");
+	return { character: parts[1] || "", skin: parts[2] || "" };
+}
+
+const VARIANT_MAIN = "Utama";
+
+let variantPopupOpen = false;
+/** Klik chip "N varian" di kartu: buka picker begitu model selesai dimuat. */
+let pendingVariantOpen = false;
+
+function setVariantPopup(open) {
+	if (!el.variantPopup) return;
+	variantPopupOpen = !!open && !el.variantBtn?.hidden;
+	el.variantPopup.hidden = !variantPopupOpen;
+	el.variantBtn?.setAttribute("aria-expanded", String(variantPopupOpen));
+	if (!variantPopupOpen) hideVariantPreview();
+}
+
+/** Collation for names that mix ASCII, digits and CJK asset folder names. */
+const variantCollator = new Intl.Collator("id", { sensitivity: "base", numeric: true });
+
+/**
+ * Sort order for the popup: character name first, then skin, then "Utama"
+ * before the sibling variants of that skin (Skill Cutscene, Interaction, …).
+ */
+function compareVariants(a, b) {
+	const byChar = variantCollator.compare(a.character, b.character);
+	if (byChar) return byChar;
+	const bySkin = variantCollator.compare(a.skin, b.skin);
+	if (bySkin) return bySkin;
+	if (a.label === VARIANT_MAIN) return -1;
+	if (b.label === VARIANT_MAIN) return 1;
+	return variantCollator.compare(a.label, b.label);
+}
+
+/**
+ * Fills the shared right-edge variant picker with this model's siblings.
+ *
+ * Every game with a family uses this popup now; the inline <select> is kept
+ * populated but hidden, because the permalink reader, the change handler and
+ * the keyboard path all resolve the chosen variant through it.
+ *
+ * BD2 sorts by character › skin (its folder path carries that context);
+ * other games keep the order the server put in family.members, which is
+ * already meaningful (Lobby / Combat / Skill 1..5, Utama / Skin / …).
+ *
+ * Each row shows the model's thumbnail plus a small badge for non-Spine
+ * formats or rigs with many animations — no extra API call, both come from
+ * the lean library payload and /api/thumbnails already loaded at boot.
+ */
+/**
+ * Group header untuk daftar popup yang panjang (>3 varian). CZN bisa punya
+ * 7 saudara; tanpa pengelompokan semuanya jadi deretan teks yang sama bentuknya.
+ * BD2 sengaja tidak digrup supaya urutan karakter › skin-nya tidak berubah.
+ */
+const VARIANT_GROUPS = ["Model", "Aksi", "Potret", "Latar", "Varian"];
+function variantGroup(m) {
+	const s = String(m.label || "");
+	if (/^(Utama|Lobby|Spine|Interaksi|Model)\b/i.test(s)) return "Model";
+	if (/^(Combat|Battle|Aim|Cover|Skill|Cutscene|Interaction|Activity|Live Event|Battle Ready)/i.test(s)) return "Aksi";
+	if (/^(Portrait|Potret)/i.test(s)) return "Potret";
+	if (/^(Wallpaper|Latar)/i.test(s)) return "Latar";
+	return "Varian";
+}
+
+function variantBadge(full) {
+	if (!full) return "";
+	if (full.format === "video") return "Video";
+	if (full.format === "image") return "Gambar";
+	const n = full.animCount || 0;
+	return n >= 5 ? `${n} animasi` : "";
+}
+
+function hideVariantPreview() {
+	if (el.variantPreview) el.variantPreview.hidden = true;
+}
+
+/** Preview gambar besar saat kursor/hover berada di baris varian. */
+function showVariantPreview(m, full) {
+	if (!el.variantPreview) return;
+	const src = full ? thumbPathOf(full) : "";
+	if (!src) return hideVariantPreview();
+	el.variantPreviewImg.src = src;
+	el.variantPreviewLabel.textContent = m.label || m.id;
+	el.variantPreview.hidden = false;
+}
+
+/** Tab segmented untuk model dengan sedikit varian: satu klik, tanpa popup. */
+function renderVariantTabs(model, fam) {
+	el.variantTabs.innerHTML = "";
+	for (const m of fam.members) {
+		const b = document.createElement("button");
+		b.type = "button";
+		b.className = "variant-tab";
+		b.dataset.id = m.id;
+		b.textContent = m.label || m.id;
+		b.title = m.id;
+		b.setAttribute("aria-pressed", String(m.id === model.id));
+		if (m.id === model.id) b.classList.add("is-active");
+		b.addEventListener("click", () => switchVariant(m.id));
+		el.variantTabs.append(b);
+	}
+}
+
+function renderVariantPopup(model, fam) {
+	const game = model?.game || "";
+	const isBd2 = game === "bd2";
+	let members = isBd2
+		? fam.members.map((m) => ({ ...m, ...bd2CharSkin(m.id) })).sort(compareVariants)
+		: fam.members.slice();
+	const grouped = !isBd2 && members.length > 3;
+	if (grouped) {
+		members.sort((a, b) =>
+			VARIANT_GROUPS.indexOf(variantGroup(a)) - VARIANT_GROUPS.indexOf(variantGroup(b)));
+	}
+	const ctx = isBd2 ? bd2CharSkin(model.id) : { character: model?.name || "", skin: "" };
+	el.variantPopTitle.textContent = ctx.skin
+		? `${ctx.character} › ${ctx.skin}`
+		: ctx.character || "Varian";
+	el.variantCount.textContent = String(members.length);
+	el.variantBtn.title = `${members.length} varian untuk model ini — klik untuk memilih`;
+	el.variantList.innerHTML = "";
+	const byId = new Map(models.map((m) => [m.id, m]));
+	let lastGroup = null;
+	for (const m of members) {
+		if (grouped) {
+			const g = variantGroup(m);
+			if (g !== lastGroup) {
+				const head = document.createElement("div");
+				head.className = "variant-group-head";
+				head.textContent = g;
+				el.variantList.append(head);
+				lastGroup = g;
+			}
+		}
+		const item = document.createElement("button");
+		item.type = "button";
+		item.className = "variant-item";
+		item.dataset.id = m.id;
+		item.setAttribute("role", "option");
+		item.title = m.id;
+		if (m.id === model.id) {
+			item.classList.add("is-active");
+			item.setAttribute("aria-selected", "true");
+		}
+
+		const full = byId.get(m.id);
+		const thumbBox = document.createElement("span");
+		thumbBox.className = "variant-item-thumb";
+		const src = full ? thumbPathOf(full) : "";
+		if (src) {
+			const img = document.createElement("img");
+			img.src = src;
+			img.alt = "";
+			img.loading = "lazy";
+			thumbBox.append(img);
+		} else {
+			thumbBox.classList.add("is-empty");
+			thumbBox.textContent = String(m.label || m.id).slice(0, 1).toUpperCase();
+		}
+
+		const text = document.createElement("span");
+		text.className = "variant-item-text";
+		const label = document.createElement("span");
+		label.className = "variant-item-label";
+		label.textContent = m.label || m.id;
+		const meta = document.createElement("span");
+		meta.className = "variant-item-meta";
+		meta.textContent = isBd2
+			? [m.character, m.skin].filter(Boolean).join(" › ")
+			: m.id;
+		text.append(label, meta);
+
+		item.append(thumbBox, text);
+		const badge = variantBadge(full);
+		if (badge) {
+			const chip = document.createElement("span");
+			chip.className = "variant-item-badge";
+			chip.textContent = badge;
+			item.append(chip);
+		}
+		item.addEventListener("click", () => {
+			hideVariantPreview();
+			setVariantPopup(false);
+			switchVariant(m.id);
+		});
+		item.addEventListener("mouseenter", () => showVariantPreview(m, full));
+		item.addEventListener("mouseleave", hideVariantPreview);
+		item.addEventListener("focus", () => showVariantPreview(m, full));
+		item.addEventListener("blur", hideVariantPreview);
+		el.variantList.append(item);
+	}
+}
+
+/**
+ * Id varian model aktif, dipakai shortcut keyboard.
+ */
+function currentVariantIds() {
+	return current?.family?.members?.map((m) => m.id) || [];
+}
+
+function goToVariant(index) {
+	const ids = currentVariantIds();
+	if (!ids.length) return;
+	switchVariant(ids[((index % ids.length) + ids.length) % ids.length]);
+}
+
+/**
+ * Fills the "Varian" control. <=3 varian: tab segmented inline (satu klik).
+ * >3: popup di tepi stage. <select> selalu diisi sebagai state holder
+ * (permalink, change handler, keyboard).
  */
 function renderVariants(model) {
 	const fam = model?.family;
 	if (!fam || !fam.members?.length) {
 		el.variantWrap.hidden = true;
 		el.variantSelect.innerHTML = "";
+		el.variantBtn.hidden = true;
+		el.variantTabs.hidden = true;
+		el.variantTabs.innerHTML = "";
+		el.variantList.innerHTML = "";
+		setVariantPopup(false);
+		pendingVariantOpen = false;
 		return;
 	}
-	el.variantWrap.hidden = false;
 	fillSelect(
 		el.variantSelect,
 		fam.members.map((m) => m.label),
@@ -4288,6 +4603,20 @@ function renderVariants(model) {
 		if (match) opt.dataset.id = match.id;
 	}
 	el.variantSelect.title = `${fam.members.length} varian untuk model ini`;
+	const useTabs = fam.members.length <= 3;
+	el.variantWrap.hidden = true;
+	el.variantTabs.hidden = !useTabs;
+	el.variantBtn.hidden = useTabs;
+	if (useTabs) renderVariantTabs(model, fam);
+	else el.variantTabs.innerHTML = "";
+	renderVariantPopup(model, fam);
+	setVariantPopup(false);
+	if (pendingVariantOpen && !useTabs) {
+		pendingVariantOpen = false;
+		setVariantPopup(true);
+	} else {
+		pendingVariantOpen = false;
+	}
 }
 
 /**
@@ -5364,6 +5693,9 @@ async function abStart(modelB) {
 	AB.busy = true;
 	const seq = ++AB.seq;
 	try {
+		// Model B bisa berasal dari game lain (permalink / klik-kanan kartu),
+		// jadi detailnya belum tentu sudah diambil seperti model A.
+		await ensureModelDetail(modelB);
 		const parsed = await loadSkeletonDataFor(modelB);
 		if (seq !== AB.seq) return;
 		if (!parsed?.data?.bones?.length) throw new Error("Data skeleton tidak berisi tulang.");
@@ -6464,7 +6796,14 @@ const PAGE_SIZE = 60;
  * kartu galeri masih lebih ringkas daripada 60 baris daftar.
  */
 const PAGE_SIZE_GRID = 120;
-const browse = { view: "games", game: null, page: 1, favOnly: false, layout: "list" };
+const browse = {
+	view: "games", game: null, page: 1, favOnly: false,
+	// Galeri (petak) jadi default: thumbnail CZN 260x460 jauh lebih berguna
+	// daripada baris 44px. Preferensi "list" pengguna tetap dipulihkan.
+	layout: "grid",
+	// Filter khusus CZN: tab jenis karakter + atribut dari wiki.
+	cznGroup: "all", cznEgo: "", cznJob: "", cznRarity: "",
+};
 
 /**
  * Games, A→Z by display label.
@@ -6475,25 +6814,10 @@ const browse = { view: "games", game: null, page: 1, favOnly: false, layout: "li
  * before "Epic Seven", and sensitivity: "base" so accents don't reorder.
  */
 function gameBuckets() {
-	const seen = new Map();
-	for (const m of models) {
-		const key = m.game || "lainnya";
-		if (!seen.has(key)) seen.set(key, { key, label: m.gameLabel || "Lainnya", items: [] });
-		seen.get(key).items.push(m);
-	}
-	// Game "pendamping" (Epic Seven — Combat / Skill / Wallpaper) tidak
-	// ditampilkan sebagai kartu sendiri: isinya sudah menempel sebagai varian
-	// di kartu induknya. Modelnya tetap ada di `models` supaya switchVariant()
-	// bisa menemukannya saat varian dipilih.
-	const buckets = [...seen.values()]
-		.filter((g) => !g.items.every((m) => m.hiddenGame))
-		.sort((a, b) =>
-			(a.label || a.key).localeCompare(b.label || b.key, undefined, {
-				numeric: true,
-				sensitivity: "base",
-			})
-		);
-	return buckets;
+	// Grouping + pengurutan 46k model dipindah ke src/library-index.js dan
+	// di-cache per array `models`. Yang dinamis (favorit, NEW, pencarian)
+	// diterapkan di atasnya oleh pemanggil.
+	return libraryIndex(models).buckets;
 }
 
 /** One or two letters to stand in for a game with no logo. */
@@ -6541,12 +6865,19 @@ function modelTooltip(m) {
  * "725 model · +776 varian" — the grid lists characters only, so the hidden
  * variant count is spelled out instead of silently vanishing from the total.
  */
+const summaryCache = new WeakMap();
 function gameSummary(items) {
+	// `items` dari indeks itu array yang sama tiap render, jadi hasilnya
+	// bisa di-cache; array baru (mode Favorit) dihitung ulang wajar.
+	const cached = summaryCache.get(items);
+	if (cached !== undefined) return cached;
 	const roots = items.filter((m) => !m.family || m.family.root === m.id);
 	const variants = items.length - roots.length;
-	return variants
+	const out = variants
 		? `${roots.length} model · +${variants} varian`
 		: `${roots.length} model`;
+	summaryCache.set(items, out);
+	return out;
 }
 
 /**
@@ -6640,6 +6971,8 @@ function openGame(key) {
 	browse.game = key;
 	browse.page = 1;
 	el.search.value = "";
+	// Filter CZN tidak boleh terbawa dari game sebelumnya.
+	resetCznFilters();
 	// Must go through syncPanes: renderModels fills the grid, but the pane it
 	// lives in starts `hidden`, so calling renderModels directly renders into
 	// a container nobody can see.
@@ -6651,6 +6984,7 @@ function backToGames() {
 	browse.game = null;
 	browse.page = 1;
 	el.search.value = "";
+	resetCznFilters();
 	// Leaving a game must stop any playing video: a <video> keeps downloading
 	// and decoding off-screen, which stalls the library render.
 	if (videoStageActive()) {
@@ -6672,43 +7006,147 @@ function backToGames() {
 	renderLibrary();
 }
 
-/** Models of the current game, filtered by the search box. */
-function modelsInScope() {
+/** Models of the current game, filtered by the search box + CZN filters. */
+function modelsInScope(group = browse.cznGroup) {
+	const idx = libraryIndex(models);
 	const q = el.search.value.trim().toLowerCase();
-	const inGame = browse.game ? models.filter((m) => (m.game || "lainnya") === browse.game) : models;
+	// Daftar akar per game sudah dihitung sekali di src/library-index.js.
+	const base = browse.game ? idx.rootsByGame.get(browse.game) || [] : idx.rootsAll;
 	// "Favorit" filter: narrow to starred models before anything else, so it
 	// works from either the game grid or a single game's list.
-	const scoped = browse.favOnly ? inGame.filter((m) => favorites.has(m.id)) : inGame;
-	// Variants (nikke/c010/aim, /cover) are reachable from the stage's "Varian"
-	// dropdown, so listing them here too just tripled the grid — 776 of Nikke's
-	// 1501 entries were duplicates of a character already in the list.
-	const roots = scoped.filter((m) => !m.family || m.family.root === m.id);
-	// Models added by the updater float to the top so a fresh download is
-	// visible without hunting for it; newest first, then alphabetical.
-	const order = (list) =>
-		list.slice().sort((a, b) => {
-			const na = isNewModel(a) ? loadNewSet()[a.id] || 0 : 0;
-			const nb = isNewModel(b) ? loadNewSet()[b.id] || 0 : 0;
-			if (na || nb) {
-				if (na !== nb) return nb - na;      // baru lebih dulu
-				return a.id.localeCompare(b.id);
-			}
-			return a.id.localeCompare(b.id);
-		});
-	const hit = (m) =>
-		m.id.toLowerCase().includes(q) ||
-		(m.name || "").toLowerCase().includes(q) ||
-		// search must hit character names too — that's the whole point of
-		// loading them ("rapi" should find c010, "matis" finds the squad)
-		(m.character?.name || "").toLowerCase().includes(q) ||
-		(m.character?.squad || "").toLowerCase().includes(q);
-	return order(q ? roots.filter(hit) : roots);
+	const scoped = browse.favOnly ? base.filter((m) => favorites.has(m.id)) : base;
+	// Model baru mengapung ke atas (terbaru dulu), sisanya alfabetis. `base`
+	// SUDAH terurut per id, jadi cukup pisahkan yang ber-badge dan urutkan
+	// grup itu — hasilnya identik dengan comparator lama tanpa menyortir
+	// ulang ribuan entri pada setiap ketikan/render.
+	const fresh = [];
+	const rest = [];
+	const newSet = loadNewSet();
+	for (const m of scoped) {
+		const ts = newSet[m.id] || 0;
+		if (ts) fresh.push([m, ts]);
+		else rest.push(m);
+	}
+	if (fresh.length) fresh.sort((a, b) => b[1] - a[1] || a[0].id.localeCompare(b[0].id));
+	const list = fresh.map((x) => x[0]).concat(rest);
+	// Teks pencarian sudah diturunkan ke huruf kecil dan digabung per model.
+	let out = q ? list.filter((m) => (idx.search.get(m.id) || "").includes(q)) : list;
+	if (browse.game === "czn-rigs") {
+		if (group !== "all") {
+			const want = group === "combatant" ? "CHAR_COMBATANT" : "CHAR_SUPPORTER";
+			out = out.filter((m) => m.charType === want);
+		}
+		if (browse.cznEgo) out = out.filter((m) => m.ego === browse.cznEgo);
+		if (browse.cznJob) out = out.filter((m) => m.job === browse.cznJob);
+		if (browse.cznRarity) out = out.filter((m) => String(m.rarity) === browse.cznRarity);
+		// Urutan CZN: rarity tertinggi dulu, lalu nama. Ini menggantikan
+		// urutan "NEW dulu / alfabet id" yang dipakai game lain.
+		out = out.slice().sort((a, b) =>
+			(Number(b.rarity) || 0) - (Number(a.rarity) || 0) ||
+			String(a.name || a.id).localeCompare(String(b.name || b.id), undefined, { numeric: true }) ||
+			a.id.localeCompare(b.id));
+	}
+	return out;
 }
 
 /** How many variants are hidden from the grid for the current game. */
 function hiddenVariantCount() {
-	const inGame = browse.game ? models.filter((m) => (m.game || "lainnya") === browse.game) : models;
-	return inGame.filter((m) => m.family && m.family.root !== m.id).length;
+	const idx = libraryIndex(models);
+	if (browse.game) return idx.variantsByGame.get(browse.game) || 0;
+	let total = 0;
+	for (const n of idx.variantsByGame.values()) total += n;
+	return total;
+}
+
+const CZN_ICON = "/thumbs/czn-ui/";
+const EGO_ORDER = ["instinct", "norms", "love", "creed", "narcissism"];
+const JOB_ORDER = ["striker", "vanguard", "ranger", "hunter", "psionic", "controller"];
+const capWord = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
+
+/**
+ * Siapkan tab Combatants/Partner + filter IKON untuk game CZN.
+ *
+ * Filter-nya meniru baris `.filter-cell` di wiki e7bot: badge ego (latar
+ * gradien + ikon), badge job, dan deretan bintang untuk rarity — bukan
+ * dropdown teks. Aset ikon ada di public/thumbs/czn-ui (tools/czn/fetch-icons.py).
+ * Klik ikon yang sama lagi = matikan filter itu.
+ */
+function syncCznFilters() {
+	const box = el.cznFilters;
+	if (!box) return;
+	const show = browse.view === "models" && browse.game === "czn-rigs";
+	box.hidden = !show;
+	if (!show) return;
+
+	// Nilai diambil dari seluruh akar game (bukan hasil filter) supaya memilih
+	// satu ego tidak menghilangkan pilihan ego lainnya.
+	const roots = libraryIndex(models).rootsByGame.get("czn-rigs") || [];
+	const values = (field, order) => {
+		const have = new Set(roots.map((m) => m[field]).filter(Boolean));
+		return [...order.filter((v) => have.has(v)),
+			...[...have].filter((v) => !order.includes(v)).sort()];
+	};
+	const rarities = [...new Set(roots.map((m) => m.rarity).filter((v) => v != null))]
+		.sort((a, b) => b - a).map(String);
+	const rows = [
+		["ego", values("ego", EGO_ORDER), browse.cznEgo],
+		["job", values("job", JOB_ORDER), browse.cznJob],
+		["rarity", rarities, browse.cznRarity],
+	];
+	for (const [kind, vals, active] of rows) {
+		const row = box.querySelector(`.czn-icon-row[data-kind="${kind}"]`);
+		if (!row) continue;
+		const sig = `${kind}:${vals.join(",")}`;
+		if (row.dataset.sig !== sig) {
+			row.innerHTML = "";
+			for (const v of vals) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "czn-icon";
+				b.dataset.kind = kind;
+				b.dataset.value = v;
+				const label = kind === "rarity" ? `${v} bintang` : capWord(v);
+				b.title = label;
+				b.setAttribute("aria-label", label);
+				if (kind === "ego") {
+					b.innerHTML = `<span class="czn-ego" style="--ego-bg:url('${CZN_ICON}ego_bg_${v}.webp')"><img src="${CZN_ICON}ego_${v}.webp" alt="" /></span>`;
+				} else if (kind === "job") {
+					b.innerHTML = `<span class="czn-job"><img src="${CZN_ICON}job_${v}.webp" alt="" /></span>`;
+				} else {
+					b.innerHTML = `<span class="czn-stars">${`<img src="${CZN_ICON}star.png" alt="" />`.repeat(Number(v))}</span>`;
+				}
+				row.appendChild(b);
+			}
+			row.dataset.sig = sig;
+		}
+		for (const b of row.querySelectorAll(".czn-icon")) {
+			const on = b.dataset.value === active;
+			b.classList.toggle("is-on", on);
+			b.setAttribute("aria-pressed", String(on));
+		}
+	}
+
+	// Jumlah per tab dihitung dengan filter LAIN tetap aktif, tapi tanpa
+	// membatasi group — jadi angkanya tidak berbohong saat user mencari.
+	const all = modelsInScope("all");
+	const counts = {
+		all: all.length,
+		combatant: all.filter((m) => m.charType === "CHAR_COMBATANT").length,
+		partner: all.filter((m) => m.charType === "CHAR_SUPPORTER").length,
+	};
+	for (const btn of box.querySelectorAll(".czn-tab")) {
+		const on = btn.dataset.group === browse.cznGroup;
+		btn.classList.toggle("is-on", on);
+		btn.setAttribute("aria-selected", String(on));
+	}
+	for (const span of box.querySelectorAll(".czn-tab-count"))
+		span.textContent = String(counts[span.dataset.count] ?? 0);
+}
+
+/** Kosongkan filter CZN saat berpindah game. */
+function resetCznFilters() {
+	browse.cznGroup = "all";
+	browse.cznEgo = browse.cznJob = browse.cznRarity = "";
 }
 
 function renderModels() {
@@ -6732,7 +7170,10 @@ function renderModels() {
 
 	el.list.innerHTML = "";
 	if (!slice.length) {
-		el.list.innerHTML = `<li class="list-empty">Tidak ada model yang cocok.</li>`;
+		const filtered = browse.game === "czn-rigs" && (
+			browse.cznGroup !== "all" || browse.cznEgo || browse.cznJob || browse.cznRarity
+		);
+		el.list.innerHTML = `<li class="list-empty">Tidak ada model yang cocok.${filtered ? " Coba Reset filter." : ""}</li>`;
 	}
 	for (const m of slice) {
 		el.list.appendChild(browse.layout === "grid" ? galleryCard(m) : listCard(m));
@@ -6740,6 +7181,8 @@ function renderModels() {
 
 	el.count.textContent = String(list.length);
 	renderPager(pages, list.length, start, slice.length);
+	// Jumlah per tab ikut berubah saat pencarian / filter lain berubah.
+	syncCznFilters();
 	if (current) setActive(current.id);
 }
 
@@ -6752,6 +7195,14 @@ function thumbPathOf(m) {
 	// bare filename), so encode per segment: encoding the slash turned
 	// "azurlane/x.png" into one opaque segment and 404'd.
 	return "/thumbs/" + String(file).split("/").map(encodeURIComponent).join("/");
+}
+
+/** Chip jumlah varian di kartu pustaka (family sudah ada di payload lean). */
+function variantChip(m) {
+	const n = m.family?.members?.length || 0;
+	return n > 1
+		? `<span class="variant-chip" title="${n} varian — klik untuk membuka daftar">${n} varian</span>`
+		: "";
 }
 
 /** Satu baris daftar (layout lama): gambar kecil + nama + meta. */
@@ -6771,12 +7222,16 @@ function listCard(m) {
 	const details = modelSubLabel(m);
 	btn.title = modelTooltip(m);
 	const newTag = isNewModel(m) ? `<span class="badge-new" title="Baru ditambahkan">NEW</span>` : "";
+	// Indeks ringan hanya membawa animCount; entri yang sudah dimuat detailnya
+	// punya daftar animations yang sebenarnya.
+	const anims = typeof m.animCount === "number" ? m.animCount : (m.animations || []).length;
 	btn.innerHTML = `
 		${art}
 		<span class="model-text">
 			<span class="model-name">${escapeHtml(modelLabel(m))}${newTag}</span>
-			<span class="model-meta">${details ? escapeHtml(details) + " · " : ""}${m.animations.length ? m.animations.length + " animasi" : "—"}</span>
+			<span class="model-meta">${details ? escapeHtml(details) + " · " : ""}${anims ? anims + " animasi" : "—"}</span>
 		</span>
+		${variantChip(m)}
 		`;
 	wireCard(btn, m);
 	li.appendChild(btn);
@@ -6805,6 +7260,7 @@ function galleryCard(m) {
 	btn.innerHTML = `
 		<span class="gcard-art">${art}${newTag}</span>
 		<span class="gcard-name">${escapeHtml(modelLabel(m))}</span>
+		${variantChip(m)}
 		`;
 	wireCard(btn, m);
 	li.appendChild(btn);
@@ -6815,6 +7271,14 @@ function galleryCard(m) {
 /** Pasang klik muat-model + klik kanan panggung A/B pada sebuah kartu. */
 function wireCard(btn, m) {
 	btn.addEventListener("click", () => loadModel(m));
+	// Chip varian: muat modelnya lalu langsung buka daftar varian, supaya
+	// pengguna tidak perlu klik kartu dulu baru cari tombol Varian di stage.
+	const chip = btn.querySelector(".variant-chip");
+	if (chip) chip.addEventListener("click", (e) => {
+		e.stopPropagation();
+		pendingVariantOpen = true;
+		loadModel(m);
+	});
 	// Klik kanan (atau Alt+klik) memuat model ini sebagai B di panggung A/B.
 	btn.addEventListener("contextmenu", (e) => {
 		if (!AB.on && !e.altKey) return; // hanya saat mode A/B sudah aktif
@@ -6918,6 +7382,8 @@ function syncPanes() {
 	}
 
 	syncUpdater(inGame ? browse.game : null);
+	// Panel filter CZN ikut hilang saat kembali ke daftar game.
+	syncCznFilters();
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -6955,6 +7421,9 @@ const UPDATABLE = {
 	"czn-cutins-cg": "/api/update/czn-cutins-cg",
 	// Make Drama: pustaka komunitas anyabot/MAD-Viewer.
 	"mad-drama": "/api/update/mad-drama",
+	pokerfate: "/api/update/pokerfate",
+	muvluv: "/api/update/muvluv",
+	eroera: "/api/update/eroera",
 };
 
 /** Berapa berkas/model baru menurut laporan pemeriksa tiap game. */
@@ -7113,7 +7582,14 @@ function saveNewSet(set) {
 
 /** Tarik daftar "baru" dari server (sumber kebenaran) dan gabung ke cache
  *  localStorage. Ini yang membuat model yang ditambahkan updater CLI tetap
- *  mendapat badge, walau updater-nya tidak dijalankan dari browser ini. */
+ *  mendapat badge, walau updater-nya tidak dijalankan dari browser ini.
+ *
+ *  Server juga membawa `rev`, yang naik setiap ada badge yang di-dismiss di
+ *  mana pun. Kalau rev berubah, salinan lokal diganti utuh dengan milik
+ *  server — tanpa itu, badge yang sudah dihapus tetap nangkring di browser ini
+ *  sampai TTL seminggu habis. */
+const NEW_REV_KEY = "spine-stage:new-models-rev";
+
 async function syncNewFromServer() {
 	try {
 		const r = await fetch("/api/new-models");
@@ -7121,6 +7597,23 @@ async function syncNewFromServer() {
 		const d = await r.json();
 		const srv = d && d.new && typeof d.new === "object" ? d.new : null;
 		if (!srv) return;
+		const rev = Number.isFinite(d.rev) ? d.rev : null;
+		let localRev = null;
+		try {
+			localRev = Number(localStorage.getItem(NEW_REV_KEY));
+		} catch {
+			/* penyimpanan diblokir — anggap rev tak dikenal */
+		}
+		if (rev !== null && localRev !== rev) {
+			// Ada dismissal di tempat lain: server menang, ganti seluruhnya.
+			saveNewSet(srv);
+			try {
+				localStorage.setItem(NEW_REV_KEY, String(rev));
+			} catch {
+				/* badge tetap benar untuk sesi ini */
+			}
+			return;
+		}
 		// Server menang untuk apa yang ditandainya, tapi entri lokal yang belum
 		// sempat dipindai tetap dipertahankan (union).
 		saveNewSet({ ...loadNewSet(), ...srv });
@@ -7227,7 +7720,7 @@ async function autoCheckUpdate() {
 		// model/berkas baru. Shoujou Kaisen pernah melapor versi sama
 		// (0.820.48) tetapi masih punya 14 model yang belum diambil, jadi
 		// jangan hanya mengandalkan `changed`.
-		const hasNew = !!info.changed || !info.previous || pendingCount(info) > 0;
+		const hasNew = !!info.changed || ("previous" in info && !info.previous) || pendingCount(info) > 0;
 		updatePending = hasNew;
 		setUpdateDot(updatePending);
 	} catch {
@@ -7263,7 +7756,7 @@ async function checkUpdate() {
 		return;
 	}
 
-	const hasNew = !!info.changed || !info.previous || pendingCount(info) > 0;
+	const hasNew = !!info.changed || ("previous" in info && !info.previous) || pendingCount(info) > 0;
 	updatePending = hasNew;
 	setUpdateDot(updatePending);
 
@@ -7277,7 +7770,7 @@ async function checkUpdate() {
 	}
 	// Ada yang baru: tanya dulu sebelum mengunduh (bisa ratusan MB).
 	const n = pendingCount(info);
-	const what = updaterGame === "shoujoukaisen" || updaterGame === "mitao-utopia" ? "model" : "berkas";
+	const what = ["shoujoukaisen", "mitao-utopia", "lostsword", "pokerfate", "nikke", "mad-drama", "eroera"].includes(updaterGame) ? "model" : "berkas";
 	const detail = n > 0 ? `${n} ${what} baru` : "versi baru";
 	const label = info.version ?? info.catalog;
 	if (!confirm(`${label ? `Versi ${label}: ` : ""}${detail}. Unduh sekarang?`)) return;
@@ -7323,7 +7816,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.
@@ -7380,7 +7873,9 @@ function setActive(id) {
 
 async function refresh() {
 	try {
-		const res = await fetch("/api/models");
+		// Index ringan: field yang cuma dipakai saat model dibuka diambil
+		// terpisah lewat ensureModelDetail(). Lihat src/models-payload.js.
+		const res = await fetch("/api/models?lean=1");
 		const data = await res.json();
 		models = data.models || [];
 		// Ambil daftar "baru" dari server lebih dulu supaya badge muncul pada
@@ -7671,6 +8166,42 @@ el.variantSelect.addEventListener("change", () => {
 	const opt = el.variantSelect.selectedOptions[0];
 	switchVariant(opt?.dataset?.id);
 });
+
+// BD2 variant popup: the button toggles it, an item switches variant (and the
+// popup closes), Esc or a click outside closes it. Capture phase on Esc so the
+// global Esc handler (close dialog / leave fullscreen) doesn't also fire.
+//
+// pointerdown must not reach #canvas-wrap: that handler starts drag-to-pan and
+// takes a pointer capture, which re-targets the following `click` to the canvas
+// — the button then looks like it does nothing.
+el.variantBtn.addEventListener("pointerdown", (e) => e.stopPropagation());
+el.variantPopup.addEventListener("pointerdown", (e) => e.stopPropagation());
+// Tab segmented punya masalah yang sama: tanpa ini kliknya dicuri canvas.
+el.variantTabs.addEventListener("pointerdown", (e) => e.stopPropagation());
+el.variantTabs.addEventListener("click", (e) => e.stopPropagation());
+el.variantBtn.addEventListener("click", (e) => {
+	e.stopPropagation();
+	setVariantPopup(!variantPopupOpen);
+});
+el.variantPopClose.addEventListener("click", () => setVariantPopup(false));
+document.addEventListener(
+	"pointerdown",
+	(e) => {
+		if (!variantPopupOpen) return;
+		if (el.variantPopup.contains(e.target) || el.variantBtn.contains(e.target)) return;
+		setVariantPopup(false);
+	},
+	true
+);
+document.addEventListener(
+	"keydown",
+	(e) => {
+		if (e.key !== "Escape" || !variantPopupOpen) return;
+		e.stopPropagation();
+		setVariantPopup(false);
+	},
+	true
+);
 el.rateSelect.addEventListener("change", () => (state.rate = parseFloat(el.rateSelect.value)));
 
 el.scrub.addEventListener("pointerdown", () => (state.scrubbing = true));
@@ -8341,6 +8872,48 @@ el.bgBtn.addEventListener("click", () => {
 el.bgSelect.addEventListener("change", () => {
 	setStageBg(el.bgSelect.value);
 	toast(`Latar: ${BG_LABEL[el.bgSelect.value] || el.bgSelect.value}`);
+});
+
+/* --- gambar latar (backdrop) -------------------------------------------
+ * Berbeda dengan #bg-select yang cuma mengganti WARNA polos untuk diagnostik
+ * tepi/PMA, ini gambar suasana penuh di belakang model. Kanvas Pixi memakai
+ * backgroundAlpha 0, jadi lapisan CSS di z-index 0 langsung terlihat tanpa
+ * menyentuh rendering skeleton. Tombolnya murni on/off; scene terakhir tetap
+ * diingat supaya dinyalakan lagi bisa langsung balik ke suasana sebelumnya.
+ */
+const BACKDROP_SCENES = ["aurora", "studio", "night"];
+const BACKDROP_LABEL = { aurora: "Aurora", studio: "Studio", night: "Malam" };
+
+function setBackdrop(on, scene = state.backdrop, { persist = true } = {}) {
+	const picked = BACKDROP_SCENES.includes(scene) ? scene : "aurora";
+	state.backdropOn = !!on;
+	state.backdrop = picked;
+	el.stageBackdrop.dataset.scene = picked;
+	el.stageBackdrop.hidden = !on;
+	el.backdropSelect.value = picked;
+	el.backdropBtn.dataset.on = String(!!on);
+	el.backdropBtn.setAttribute("aria-label", on ? "Matikan gambar latar" : "Nyalakan gambar latar");
+	el.backdropBtn.title = `${on ? "Matikan" : "Nyalakan"} gambar latar (Shift+L)`;
+	if (!persist) return;
+	try {
+		localStorage.setItem("stageBackdrop", JSON.stringify({ on: !!on, scene: picked }));
+	} catch {
+		/* private mode — preference just won't stick */
+	}
+	// Shortcut Shift+L tidak memicu event "click", jadi tulis ?v= di sini
+	// supaya tautan yang dibagikan ikut membawa suasana latar.
+	schedulePermalinkWrite?.();
+}
+
+function toggleBackdrop() {
+	setBackdrop(!state.backdropOn);
+	toast(state.backdropOn ? `Backdrop: ${BACKDROP_LABEL[state.backdrop]}` : "Backdrop: mati");
+}
+
+el.backdropBtn.addEventListener("click", toggleBackdrop);
+el.backdropSelect.addEventListener("change", () => {
+	setBackdrop(true, el.backdropSelect.value);
+	toast(`Backdrop: ${BACKDROP_LABEL[el.backdropSelect.value] || el.backdropSelect.value}`);
 });
 
 el.pmaSelect.addEventListener("change", () => {
@@ -9529,11 +10102,36 @@ el.viewGridBtn?.addEventListener("click", () => setLayout("grid"));
 // pertama, supaya daftar tidak sempat tampil dalam bentuk yang salah.
 try {
 	const saved = localStorage.getItem(LAYOUT_KEY);
-	if (saved === "grid") browse.layout = "grid";
+	// Default sekarang grid; yang perlu dipulihkan tinggal preferensi "list".
+	if (saved === "list") browse.layout = "list";
 } catch {
 	/* private mode */
 }
 syncLayoutButtons();
+
+/* --- Filter CZN: tab Combatants/Partner + tombol ikon ------------------- */
+el.cznFilters?.addEventListener("click", (e) => {
+	const icon = e.target.closest?.(".czn-icon");
+	if (icon) {
+		const key = icon.dataset.kind === "ego" ? "cznEgo"
+			: icon.dataset.kind === "job" ? "cznJob" : "cznRarity";
+		const v = icon.dataset.value;
+		// Klik ikon yang sama lagi = matikan filter itu.
+		browse[key] = browse[key] === v ? "" : v;
+		browse.page = 1;
+		renderModels();
+		return;
+	}
+	const tab = e.target.closest?.(".czn-tab");
+	if (!tab) return;
+	browse.cznGroup = tab.dataset.group || "all";
+	browse.page = 1;
+	renderModels();
+});
+el.cznReset?.addEventListener("click", () => {
+	resetCznFilters();
+	renderModels();
+});
 
 /** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
 function closeTopmostModal() {
@@ -9569,7 +10167,27 @@ function closeTopmostModal() {
 
 window.addEventListener("keydown", (e) => {
 	if (e.target instanceof HTMLElement && e.target.matches("input, select, textarea")) return;
+	// Angka 1-9 lompat ke varian ke-N. Kalau model tidak ber-family, jangan
+	// rebut tombolnya supaya shortcut/browser lain tetap bekerja.
+	if (/^[1-9]$/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey &&
+		currentVariantIds().length) {
+		e.preventDefault();
+		goToVariant(Number(e.key) - 1);
+		return;
+	}
 	switch (e.key) {
+		case "[":
+			if (currentVariantIds().length) {
+				e.preventDefault();
+				goToVariant(currentVariantIds().indexOf(current.id) - 1);
+			}
+			break;
+		case "]":
+			if (currentVariantIds().length) {
+				e.preventDefault();
+				goToVariant(currentVariantIds().indexOf(current.id) + 1);
+			}
+			break;
 		case " ":
 			e.preventDefault();
 			setPlaying(!state.playing);
@@ -9598,16 +10216,21 @@ window.addEventListener("keydown", (e) => {
 		case "G":
 			el.gridBtn.click();
 			break;
-		case "v":
-		case "V":
-			// Ganti bentuk tampilan pustaka: daftar <-> galeri. G dan L sudah
-			// dipakai untuk kisi latar dan tombol latar.
+		case "x":
+		case "X":
+			// Ganti bentuk tampilan pustaka: daftar <-> galeri. Dulu ini
+			// memakai "v", duplikat dengan case editor vertex di bawah, dan
+			// aturan pertama yang menang — jadi vertex tak pernah tercapai.
+			// Sesuaikan README: X = layout, V/U/J = vertex/bounds/IK.
 			e.preventDefault();
 			setLayout(browse.layout === "grid" ? "list" : "grid");
 			break;
 		case "l":
 		case "L":
-			el.bgBtn.click();
+			// L = ganti WARNA latar (diagnostik tepi/PMA), Shift+L = on/off
+			// GAMBAR latar. Keduanya sengaja berpasangan di tombol yang berdekatan.
+			if (e.shiftKey) toggleBackdrop();
+			else el.bgBtn.click();
 			break;
 		case "f":
 		case "F":
@@ -9617,7 +10240,10 @@ window.addEventListener("keydown", (e) => {
 		case "e":
 		case "E":
 			e.preventDefault();
-			el.exportBtn?.click();
+			// E = export, Shift+E = edit tulang (sesuai README). Dulu ini dua
+			// case terpisah dengan kunci sama, jadi yang kedua tak pernah jalan.
+			if (e.shiftKey) el.boneEditBtn?.click();
+			else el.exportBtn?.click();
 			break;
 		case "z":
 		case "Z":
@@ -9659,6 +10285,14 @@ window.addEventListener("keydown", (e) => {
 			e.preventDefault();
 			el.inspectorBtn?.click();
 			break;
+		case "k":
+		case "K":
+			// Tooltip tombol Kartu sudah lama menjanjikan "K", tapi case-nya
+			// tidak pernah ada. Jangan memaksa buka kalau tombolnya tersembunyi
+			// (model bukan CZN / belum punya kartu).
+			e.preventDefault();
+			if (el.cardsBtn && !el.cardsBtn.hidden) el.cardsBtn.click();
+			break;
 		case "p":
 		case "P":
 			e.preventDefault();
@@ -9669,13 +10303,10 @@ window.addEventListener("keydown", (e) => {
 			e.preventDefault();
 			el.partsBtn?.click();
 			break;
-		case "e":
-		case "E":
-			e.preventDefault();
-			el.boneEditBtn?.click();
-			break;
-		case "t":
-		case "T":
+		case "y":
+		case "Y":
+			// Toggle nama slot. Dulu memakai "t", duplikat dengan timeline,
+			// sehingga shortcut ini tidak pernah aktif. README: Y = nama slot.
 			e.preventDefault();
 			el.slotTipBtn?.click();
 			break;
@@ -9931,6 +10562,8 @@ function permalinkState() {
 	if (fps.on) s.fps = 1;
 	if (parts.on) s.pt = 1;
 	if (state.bg !== "dark") s.bg = state.bg;
+	// Gambar latar: cukup simpan scene-nya; tidak ada kunci = mati.
+	if (state.backdropOn) s.bk = state.backdrop;
 	if (!el.timeline?.hidden) s.tl = 1;
 	if (!el.inspector?.hidden) s.insp = insp.tab;
 	if (document.querySelector(".layout")?.classList.contains("sidebar-hidden")) s.sb = 0;
@@ -10111,6 +10744,9 @@ async function applyPermalink(s) {
 	// A permalink that omits the backdrop means the default (dark) — reset it,
 	// so a shared link keeps its own look instead of inheriting a saved one.
 	setStageBg(s.bg && BG_ORDER.includes(s.bg) ? s.bg : "dark", { persist: false });
+	// Sama seperti warna latar: tautan tanpa `bk` berarti backdrop MATI, supaya
+	// tampilan yang dibagikan tidak mewarisi preferensi sesi sebelumnya.
+	setBackdrop(!!s.bk, s.bk || "aurora", { persist: false });
 	if (typeof s.sb === "boolean" || typeof s.sb === "number") setSidebarHidden(!s.sb, { persist: false });
 
 	// Load the model, if the link names one that still exists.
@@ -10456,6 +11092,15 @@ try {
 	if (savedBg && BG_ORDER.includes(savedBg)) setStageBg(savedBg, { persist: false });
 } catch {
 	/* private mode — keep the default */
+}
+// Pulihkan gambar latar (on/off + scene terakhir). bootPermalink() yang jalan
+// setelah ini akan menimpanya kalau tautan ?v= punya ketentuan sendiri.
+try {
+	const savedBackdrop = JSON.parse(localStorage.getItem("stageBackdrop") || "null");
+	if (savedBackdrop && typeof savedBackdrop === "object")
+		setBackdrop(!!savedBackdrop.on, savedBackdrop.scene, { persist: false });
+} catch {
+	/* private mode / JSON rusak — keep the default */
 }
 
 app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);

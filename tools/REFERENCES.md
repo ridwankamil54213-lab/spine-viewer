@@ -52,7 +52,14 @@ Pengunduh + pemeriksa validitas URL — berguna kalau daftar URL sudah ada.
 CounterSide, DestinyChild, GirlCafeGun2, IronSaga, OmniHeroes, Starward,
 TheMoonlitOath, illusionConnectRe, dll. Kandidat kalau mau tambah game baru.
 
-## Sumber aset Nikke (updater)
+## Sumber aset Nikke (ARSIP — tidak dipakai lagi sejak 2026-11-07)
+
+> **Data Nikke sekarang diunduh ulang dari nol lewat**
+> `https://github.com/Talors1225/arthub-viewer-web/tree/main/nikki`
+> (2104 model, tanpa duplikat). Lihat README utama section
+> **Nikke — unduh ulang dari ArtHub** dan `tools/nikke/README.md`.
+> Repo di bawah ini yang menyebabkan model dobel; `tools/update-nikke.py`
+> dibiarkan sebagai referensi tetapi **tidak terdaftar** di `UPDATERS` lagi.
 
 Repo **github.com/Nikke-db/Nikke-db.github.io** — mirror lengkap aset spine
 NIKKE (1544 .skel, 1544 .atlas, 3392 .png) yang layout-nya SAMA dengan viewer:
