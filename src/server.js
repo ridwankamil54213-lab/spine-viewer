@@ -561,6 +561,18 @@ const GAME_ROOTS = [
 		key: "czn-cutins-cg",
 		label: "Chaos Zero Nightmare — Cut-ins",
 	},
+	// 明日方舟 (Arknights): 3.112 folder Spine 3.8 dari isHarryh/Ark-Models.
+	// Nama Inggris + family skin dari ArknightsGameData EN, thumbnail ilustrasi
+	// (bukan halaman atlas) dari yuanyan3060/ArknightsGameResource.
+	// Lihat tools/arknights/update.py. Teksturnya di-PMA paksa oleh repo sumber
+	// walau .atlas tidak memuat baris `pma:true`.
+	{
+		match: "arknights",
+		key: "arknights",
+		label: "明日方舟 (Arknights)",
+		spineRuntime: "3.8",
+		pmaDefault: true,
+	},
 	// Make Drama (MAD) — standing / affection / desire / pleasure rigs from the
 	// anyabot/MAD-Viewer community library. Each skin is a folder of loose files
 	// (binary .skel + .atlas + PNG pages) fetched from the MAD-assets-1/2 GitHub
@@ -3821,6 +3833,53 @@ function attachCharacters(models) {
 		if (ivnHits) console.log(`  ivntight  : ${ivnHits} model diberi nama Jepang`);
 	}
 
+	// --- 明日方舟 (Arknights): nama Inggris + family skin -----------------
+	// data/arknights-names.json (leaf folder -> {name, character, skin, ...})
+	// dan data/arknights-family.json ditulis tools/arknights/update.py dari
+	// models_data.json + skin_table/enemy_handbook EN. Folder sengaja ASCII
+	// supaya id model tidak di-slug ulang server (nama asli banyak mengandung #).
+	{
+		const read = (f) => {
+			try { return JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8")); }
+			catch { return {}; }
+		};
+		const ark = read("arknights-names.json");
+		const fam = read("arknights-family.json");
+		const byId = new Map(models.map((m) => [m.id, m]));
+		let arkHits = 0;
+		for (const m of models) {
+			if ((m.game || "") !== "arknights") continue;
+			const leaf = String(m.id).split("/").pop().split("#")[0];
+			const rec = ark[leaf];
+			if (!rec) continue;
+			const stem = String(m.id).includes("#") ? String(m.id).split("#")[1] : "";
+			m.name = stem ? `${rec.name} · ${stem}` : rec.name;
+			m.character = {
+				name: rec.character || rec.name,
+				skin: rec.skin || null,
+				source: rec.source || "Ark-Models",
+				rarity: rec.rarity ?? null,
+				type: rec.type || null,
+			};
+			arkHits++;
+		}
+		let famHits = 0;
+		for (const f of Array.isArray(fam.families) ? fam.families : []) {
+			const present = (f.members || []).filter((x) => x && byId.has(x.id));
+			if (present.length < 2) continue;
+			const rootId = present.some((x) => x.id === f.root) ? f.root : present[0].id;
+			const members = present.map((x) => ({ id: x.id, label: x.label || "Varian" }));
+			for (const mem of members) {
+				const m = byId.get(mem.id);
+				if (m) m.family = { root: rootId, label: mem.label, members };
+			}
+			const root = byId.get(rootId);
+			if (root && f.name) root.name = f.name;
+			famHits++;
+		}
+		if (arkHits) console.log(`  arknights : ${arkHits} model diberi nama EN, ${famHits} family skin`);
+	}
+
 	// --- Girl Wars (少女ウォーズ): nama karakter + kostum -------------------
 	// Folder = id numerik; nama asli disimpan di data/girlwars-names.json
 	// hasil tools/update-girlwars.py. Berlaku utk Spine (girlwars/) maupun
@@ -4173,6 +4232,13 @@ const UPDATERS = {
 	// Spine baru ke assets/ivntight/, jadi /api/models wajib di-rescan.
 	ivntight: {
 		script: path.join(ROOT, "tools", "update-ivntight.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
+	// 明日方舟: Ark-Models (Spine 3.8) + game-data EN + ilustrasi WebP.
+	// Menulis 3.112 folder model + 2 data JSON + manifest thumbnail.
+	arknights: {
+		script: path.join(ROOT, "tools", "arknights", "update.py"),
 		py: "/srv/venv-spine/bin/python",
 		rescan: true,
 	},

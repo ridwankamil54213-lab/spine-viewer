@@ -1078,6 +1078,7 @@ node tools/check-lostsword.cjs    # Lost Sword: 287 model, 87 video, 84 family, 
 node tools/check-eroera.cjs       # 欲洛降临 (EroEra): 174 model, 43 family, Luban, thumb
 node tools/check-mercenary.cjs    # Mercenary: 98 model (89 CDN), 85 ilustrasi, 32 family
 node tools/check-ivntight.cjs     # IV-N-Tight: hash katalog live, 84 model, 0 404, render
+node tools/check-arknights.cjs    # Arknights: 3112 Spine 3.8, nama EN, 2776 ilustrasi, render
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 
