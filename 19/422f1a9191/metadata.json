@@ -1,0 +1,43 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "19422f1a9191",
+  "strategy": "manual-commit",
+  "branch": "master",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "README.md",
+    "data/arknights-family.json",
+    "data/arknights-names.json",
+    "package.json",
+    "public/thumbs/_game/arknights.png",
+    "src/server.js",
+    "src/viewer.js",
+    "tools/arknights/README.md",
+    "tools/arknights/refresh.py",
+    "tools/arknights/update.py",
+    "tools/check-arknights.cjs"
+  ],
+  "sessions": [
+    {
+      "metadata": "/19/422f1a9191/0/metadata.json",
+      "transcript": "/19/422f1a9191/0/full.jsonl",
+      "compact_transcript": "/19/422f1a9191/0/transcript.jsonl",
+      "content_hash": "/19/422f1a9191/0/content_hash.txt",
+      "prompt": "/19/422f1a9191/0/prompt.txt"
+    }
+  ],
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  }
+}
