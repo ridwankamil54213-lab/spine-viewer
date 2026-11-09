@@ -45,9 +45,44 @@ keys → a `CharacterBattleSpine_<id>.prefab` whose DependencyKey points at an
 /srv/venv-spine/bin/python tools/extract-ivntight.py --bundle /opt/ivntight/extract/data.unity3d
 
 # updater: downloads ALL bundles (Test2+Test3) and finds Spine by CONTENT
-/srv/venv-spine/bin/python tools/update-ivntight.py --check   # ~0.4 s, JSON
+/srv/venv-spine/bin/python tools/update-ivntight.py --check   # ~1 s, JSON
 /srv/venv-spine/bin/python tools/update-ivntight.py --apply    # download + scan + extract
+
+# regresi (server jalan di :3000)
+node tools/check-ivntight.cjs
 ```
+
+### Deteksi pembaruan: `catalog_0.0.1.hash`
+
+Unity Addressables menyimpan sidik jari rilis katalog di
+`catalog_0.0.1.hash` (32 hex, 2 GET kecil per `--check`). Hash ini **bukan**
+md5 dari `.json`, tapi berubah setiap katalog dirilis ulang. `--check` SELALU
+mengambilnya dari CDN: kalau hash `Test2`/`Test3` beda dengan yang menempel
+pada cache di `state.json`, katalog `.json` diunduh ulang (hanya tag yang
+berubah) supaya daftar bundle ikut berubah. Tanpa ini `--check` cuma membaca
+katalog lama dari state dan selamanya melaporkan "up to date".
+
+`version` = sha1 dari sha katalog **+** hash live. `version` di state adalah
+versi terakhir yang **di-APPLY**, bukan hasil `--check`: jadi titik merah
+`changed: true` tetap menyala sampai user benar-benar klik Apply. Kalau CDN
+sedang down, hash terakhir dipakai (tidak ada false positive).
+
+`--check` mengembalikan `{version, previous, changed, total, installed, new,
+catalogHashes}`. `total` = jumlah job `(tag, filename)`; `installed` =
+jumlah **nama berkas unik** yang sudah dipindai. Selisih keduanya (297) bukan
+bundle yang hilang: `Test2` dan `Test3` berbagi 297 nama bundle identik, jadi
+`new: 0` itu normal.
+
+### Folder wajib ASCII
+
+Server men-slug nama folder jadi id model (`CJK -> "-"`) dan viewer menyusun
+URL dari `/assets/<id>/<skeletonFile>`. Folder warisan dari
+`tools/extract-ivntight.py` bernama `000000_NPC_コハク_立ち絵_export` menghasilkan
+id `000000_NPC_-_-_export` → seluruh asetnya 404. `--apply` menjalankan
+`normalize_folders()`: folder + berkas + baris halaman atlas diganti ke slug
+ASCII, nama Jepang aslinya dipindahkan ke `data/ivntight-names.json`.
+Id model tidak berubah, jadi permalink aman. `src/server.js` juga menandai
+updater ini `rescan: true` supaya model baru langsung muncul di `/api/models`.
 
 `--apply` downloads **every** bundle (~3.8 GB across Test2+Test3), then scans
 each UnityFS bundle for a Spine JSON TextAsset. Filtering by catalog name is
@@ -58,12 +93,11 @@ Test3 bundles are duplicate copies of the same character data). The bundles are
 cached under `/srv/spine-assets/ivntight-update/bundles-all/` so re-runs are
 instant (scan-only, ~3 min).
 
-`--check` reports `{version, previous, changed, total, installed, new}`
-(catalog sha1 = version). `--apply` downloads each Spine bundle to
-`/srv/spine-assets/ivntight-update/bundles/` (kept, so re-runs are instant),
-extracts to `assets/ivntight/<safe-name>/`, and writes
-`data/ivntight-names.json` (safe-name → original Japanese name, which the
-server uses for the HUD). Re-running `--check` after `--apply` returns `new: 0`.
+`--check` reports `{version, previous, changed, total, installed, new,
+catalogHashes}` (see above). `--apply` extracts each Spine bundle into
+`assets/ivntight/<safe-name>/` and writes `data/ivntight-names.json`
+(safe-name → original Japanese name, which the server uses for the HUD).
+Re-running `--check` after `--apply` returns `new: 0`.
 
 ## Gotchas
 

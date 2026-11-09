@@ -4169,9 +4169,12 @@ const UPDATERS = {
 		script: path.join(ROOT, "tools", "update-mcs18.py"),
 		py: "/srv/venv-spine/bin/python",
 	},
+	// イヴンタイト: katalog Addressables Test2+Test3. --apply mengekstrak model
+	// Spine baru ke assets/ivntight/, jadi /api/models wajib di-rescan.
 	ivntight: {
 		script: path.join(ROOT, "tools", "update-ivntight.py"),
 		py: "/srv/venv-spine/bin/python",
+		rescan: true,
 	},
 	girlwars: {
 		script: path.join(ROOT, "tools", "update-girlwars.py"),

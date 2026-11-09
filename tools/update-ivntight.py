@@ -9,8 +9,12 @@ cara "filter nama" melewatkannya.
 Sumber (Unity Addressables remote):
     https://eventight-sb.webaccel.saikyo.biz/dmm4sb/Unity6/Addressable_Test2/WebGL/
     https://eventight-sb.webaccel.saikyo.biz/dmm4sb/Unity6/Addressable_Test3/WebGL/
-        catalog_0.0.1.json  +  <file>.bundle
+        catalog_0.0.1.hash  +  catalog_0.0.1.json  +  <file>.bundle
 (mirror S3: eventight-sb.s3.ap-northeast-1.amazonaws.com/dmm4sb/...)
+
+`.hash` (32 hex, 2 GET kecil) adalah sidik jari rilis katalog. --check SELALU
+membacanya dari CDN: kalau berubah, katalog .json diunduh ulang walau sudah
+ada cache di state.json. Tanpa ini updater buta terhadap rilis game baru.
 
 Model Spine (JSON 4.2.38/4.2.43) ada di dalam bundle sebagai TextAsset
 (`<nama>.json` + `<nama>.atlas`) dengan teksturnya Texture2D.
@@ -56,9 +60,22 @@ CDNS = {
         "https://eventight-sb.webaccel.saikyo.biz/dmm4sb/Unity6/Addressable_Test3/WebGL",
     ).rstrip("/"),
 }
+CATALOG_JSON = "catalog_0.0.1.json"
+CATALOG_HASH = "catalog_0.0.1.hash"
+HASH_RE = re.compile(r"^[0-9a-f]{32}$")
 UA = "spine-viewer-ivntight-updater/1.0"
 PAGE_RE = re.compile(r"\.(png|jpg|jpeg|webp)$", re.I)
 WORKERS = 12
+
+# AddressablesTools.parse_json masih dipakai (API `.Resources` beda dengan
+# penerus `addressablestools`), jadi sembunyikan warning depresiasi agar log
+# updater tetap bersih.
+import warnings  # noqa: E402
+
+warnings.filterwarnings(
+	"ignore", message="AddressablesTools.parse_json is deprecated",
+	category=DeprecationWarning,
+)
 
 
 def _log(m):
@@ -100,27 +117,68 @@ def save_state(d):
 	os.replace(tmp, STATE_FILE)
 
 
-def all_bundles(saved):
-	"""(jobs, sigs). jobs = [[tag, filename], ...] dari katalog Test2+Test3."""
+def remote_catalog_hashes(saved):
+	"""Sidik jari katalog LIVE dari CDN (2 GET x 32 byte).
+
+	Unity Addressables menaruh hash build di `catalog_0.0.1.hash`; isinya BUKAN
+	md5 dari file .json, tapi berubah setiap katalog dirilis ulang. Tanpa ini
+	`--check` cuma membaca katalog yang tersimpan di state.json dan akan
+	selamanya melaporkan "up to date" walau game sudah update.
+
+	Kalau CDN sedang down, fallback ke hash terakhir yang tersimpan supaya
+	versi tidak loncat-loncat (false positive `changed: true`).
+	"""
+	out = {}
+	for tag, base in CDNS.items():
+		try:
+			h = http_get(f"{base}/{CATALOG_HASH}", tries=2).decode(
+				"ascii", "replace").strip().lower()
+			if HASH_RE.fullmatch(h):
+				out[tag] = h
+			else:
+				_log(f"  {tag}: hash katalog tak dikenal, pakai cache")
+		except Exception as e:  # noqa: BLE001
+			_log(f"  {tag}: hash katalog gagal ({str(e)[:60]}), pakai cache")
+	for tag, c in (saved.get("catalogs") or {}).items():
+		if tag not in out and c.get("remoteHash"):
+			out[tag] = c["remoteHash"]
+	return out
+
+
+def all_bundles(saved, remote_hashes=None):
+	"""(jobs, sigs) dari katalog Test2+Test3; cache dipakai hanya bila hash
+	cocok dengan hash LIVE, kalau tidak katalog diunduh ulang dari CDN."""
 	import base64
 
 	import AddressablesTools as A
+
 	jobs = []
 	sigs = {}
 	catalogs = saved.get("catalogs") or {}
+	hashes = remote_hashes or {}
 	for tag, base in CDNS.items():
 		c = catalogs.get(tag) or {}
+		rh = hashes.get(tag) or c.get("remoteHash") or ""
+		live = bool(hashes.get(tag))
+		# Cache boleh dipakai kalau: ada isinya DAN (hash live tak terbaca ATAU
+		# hash live sama dengan hash yang menempel pada cache tersebut).
+		cache_ok = bool(c.get("b64")) and (not live or c.get("remoteHash") == rh)
 		raw = None
-		if c.get("b64"):
+		if cache_ok:
 			try:
 				raw = base64.b64decode(c["b64"])
 			except Exception:  # noqa: BLE001
 				raw = None
 		if raw is None:
-			raw = http_get(base + "/catalog_0.0.1.json")
+			_log(f"  {tag}: unduh {CATALOG_JSON} (hash {rh[:12] or 'n/a'})")
+			raw = http_get(f"{base}/{CATALOG_JSON}")
 		sha = hashlib.sha1(raw).hexdigest()[:12]
 		sigs[tag] = sha
-		catalogs[tag] = {"sha": sha, "b64": base64.b64encode(raw).decode()}
+		catalogs[tag] = {
+			"sha": sha,
+			"remoteHash": rh,
+			"b64": base64.b64encode(raw).decode(),
+		}
 		cat = A.parse_json(raw.decode("utf-8", "replace"))
 		names = set()
 		for k, v in cat.Resources.items():
@@ -133,7 +191,7 @@ def all_bundles(saved):
 					names.add(iid.rsplit("/", 1)[-1])
 		for f in sorted(names):
 			jobs.append([tag, f])
-		_log(f"  katalog {tag}: {len(names)} bundle (sha {sha})")
+		_log(f"  katalog {tag}: {len(names)} bundle (sha {sha}, hash {rh[:12] or 'n/a'})")
 	saved["catalogs"] = catalogs
 	return jobs, sigs
 
@@ -315,6 +373,63 @@ def write_names(names):
 	return len(disk)
 
 
+# Sama persis dengan aturan id di src/server.js:
+#   rel.replace(/[^\w.\-/]+/g, "-")   (\w = ASCII [A-Za-z0-9_])
+LEGACY_BAD = re.compile(r"[^A-Za-z0-9_.\-/]+")
+
+
+def normalize_folders():
+	"""Perbaiki folder warisan yang namanya masih non-ASCII.
+
+	Server men-slug nama folder jadi id model, tapi viewer menyusun URL aset
+	dari id itu. Jadi folder `000000_NPC_コハク_立ち絵_export` menghasilkan id
+	`000000_NPC_-_-_export` dan SEMUA berkasnya 404. Konvensi repo: folder
+	ASCII + nama Jepang asli disimpan di data/ivntight-names.json.
+
+	Dijalankan di --apply supaya hasil tools/extract-ivntight.py (yang menulis
+	nama asli) otomatis tertata ulang. Mengembalikan {slug: nama_asli}.
+	"""
+	if not os.path.isdir(OUT):
+		return {}
+	fixed = {}
+	for old in sorted(os.listdir(OUT)):
+		src = os.path.join(OUT, old)
+		if not os.path.isdir(src) or old.isascii():
+			continue
+		slug = LEGACY_BAD.sub("-", old)
+		if slug == old:
+			continue
+		dst = os.path.join(OUT, slug)
+		if os.path.exists(dst):
+			_log(f"  LEWATI normalisasi {old}: {slug} sudah ada")
+			continue
+		os.rename(src, dst)
+		for f in os.listdir(dst):
+			fp = os.path.join(dst, f)
+			if not os.path.isfile(fp):
+				continue
+			nf = f.replace(old, slug)
+			if nf != f:
+				os.rename(fp, os.path.join(dst, nf))
+			if nf.lower().endswith(".atlas"):
+				# newline="" supaya CRLF atlas Unity tetap utuh (yang berubah
+				# cuma nama halaman, bukan seluruh berkas).
+				with open(os.path.join(dst, nf), encoding="utf-8", newline="") as fh:
+					txt = fh.read()
+				# Hanya baris nama halaman gambar yang boleh diubah; region
+				# atlas boleh saja beraksara Jepang.
+				lines = []
+				for ln in txt.splitlines(True):
+					if re.match(r"^[^\r\n]+\.(png|jpg|jpeg|webp)\s*$", ln, re.I):
+						ln = ln.replace(old, slug)
+					lines.append(ln)
+				with open(os.path.join(dst, nf), "w", encoding="utf-8", newline="") as fh:
+					fh.write("".join(lines))
+		fixed[slug] = old
+		_log(f"  normalisasi folder: {old} -> {slug}")
+	return fixed
+
+
 def main():
 	ap = argparse.ArgumentParser()
 	ap.add_argument("--check", action="store_true")
@@ -325,8 +440,13 @@ def main():
 		a.check = True
 
 	saved = load_state()
-	jobs, sigs = all_bundles(saved)
-	ver = hashlib.sha1(json.dumps(sigs, sort_keys=True).encode()).hexdigest()[:12]
+	hashes = remote_catalog_hashes(saved)
+	jobs, sigs = all_bundles(saved, hashes)
+	# Hash LIVE ikut masuk versi: kalau Unity merilis ulang katalog dengan isi
+	# .json yang kebetulan sama, versi tetap berubah dan UI kasih titik merah.
+	ver = hashlib.sha1(json.dumps(
+		{"catalogs": sigs, "hashes": hashes}, sort_keys=True,
+	).encode()).hexdigest()[:12]
 	done = set(saved.get("scanned") or [])
 	pending = [j for j in jobs if j[1] not in done]
 
@@ -339,15 +459,26 @@ def main():
 		"total": len(jobs),
 		"installed": len(done),
 		"new": len(pending),
+		"catalogHashes": {k: v[:12] for k, v in sorted(hashes.items())},
 		"ids": [f for _, f in pending[:60]],
 	}
 
 	if a.check:
-		saved["version"] = ver
+		# JANGAN simpan `version` di sini. Versi = katalog TERAKHIR YANG
+		# DITERAPKAN; kalau --check menimpanya, titik merah `changed` hilang
+		# setelah satu kali klik walau user belum pernah Apply.
+		# Yang disimpan cuma katalog segar + checkedAt (biar --apply tak
+		# mengunduh 7 MB katalog dua kali).
+		saved["catalogs"] = saved.get("catalogs") or {}
 		saved["checkedAt"] = int(time.time())
 		save_state(saved)
 		print(json.dumps(result, ensure_ascii=False, indent=1))
 		return 0
+
+	# ---- apply: rapikan folder warisan non-ASCII ---------------------------
+	# Harus sebelum write_names(): nama Jepang aslinya dipindahkan ke kunci
+	# slug yang dipakai server sebagai id model.
+	renamed = normalize_folders()
 
 	# ---- apply: unduh semua, scan isi, ekstrak yang ber-Spine -------------
 	_log("unduh semua bundle (cache) ...")
@@ -365,6 +496,7 @@ def main():
 
 	os.makedirs(OUT, exist_ok=True)
 	names = saved.get("names") or {}
+	names.update(renamed)  # folder hasil normalisasi -> nama Jepang asli
 	new_ids = []
 	extracted = 0
 	for i, (fname, tag) in enumerate(sorted(found.items()), 1):
@@ -386,14 +518,17 @@ def main():
 	done.update(j[1] for j in cand)
 
 	nf = write_names(names)
-	st = load_state()
-	st.update({"version": ver, "appliedAt": int(time.time()),
-	           "scanned": sorted(done), "names": names})
-	save_state(st)
+	# Pakai `saved` (bukan load_state() lagi) supaya katalog segar + remoteHash
+	# hasil all_bundles() ikut tersimpan; kalau dibaca ulang dari disk, katalog
+	# yang baru diunduh hilang dan --check berikutnya mengunduh 7 MB lagi.
+	saved.update({"version": ver, "appliedAt": int(time.time()),
+	              "scanned": sorted(done), "names": names})
+	save_state(saved)
 
 	result.update({
 		"added": extracted,
 		"extracted": extracted,
+		"normalized": len(renamed),
 		"spineBundles": len(found),
 		"failedFiles": fail,
 		"new": 0,
