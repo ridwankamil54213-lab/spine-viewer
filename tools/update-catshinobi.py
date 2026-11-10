@@ -55,6 +55,12 @@ WORK = os.environ.get("CS_WORK", "/srv/spine-assets/catshinobi-update")
 APK_CACHE = os.path.join(WORK, "UnityDataAssetPack.apk")
 BUNDLE_ROOT = os.path.join(WORK, "bundles")
 BUNDLE_DIR = os.path.join(BUNDLE_ROOT, "assets", "aa", "Android")
+# Hasil scan bundle (daftar skeleton + jumlah tekstur) untuk SATU ukuran APK.
+# Tanpa ini setiap --check mengekstrak ulang APK 648 MB dan mem-parse semua
+# bundle dengan UnityPy (~17 dtk), yang sering keburu diputus proxy/tunnel
+# sebelum sempat membalas JSON. Kuncinya ukuran APK — penanda versi yang juga
+# dipakai `version` di bawah — jadi APK baru otomatis membatalkan cache.
+SCAN_CACHE = os.path.join(WORK, "scan-cache.json")
 
 # Sumber resmi APK: APKPure melayani XAPK (zip berisi beberapa APK). Yang kita
 # butuhkan hanya UnityDataAssetPack.apk di dalamnya — 548 MB dari total 710 MB.
@@ -307,10 +313,42 @@ def scan_bundles():
     return texts, tex_objs
 
 
+def apk_key() -> str:
+	"""Penanda versi APK (dipakai juga sebagai `version` di hasil --check)."""
+	try:
+		return "apk-%d" % os.path.getsize(APK_CACHE)
+	except OSError:
+		return "apk"
+
+
+def load_scan_cache(key: str):
+	"""Hasil scan lama bila masih untuk APK yang sama."""
+	try:
+		with open(SCAN_CACHE, encoding="utf-8") as f:
+			d = json.load(f)
+		if d.get("key") == key and isinstance(d.get("skels"), list) and d["skels"]:
+			return d
+	except (OSError, ValueError, TypeError):
+		pass
+	return None
+
+
+def save_scan_cache(key: str, skels: list, textures: int) -> None:
+	try:
+		os.makedirs(WORK, exist_ok=True)
+		tmp = SCAN_CACHE + ".part"
+		with open(tmp, "w", encoding="utf-8") as f:
+			json.dump({"key": key, "skels": skels, "textures": textures,
+			           "at": int(time.time())}, f)
+		os.replace(tmp, SCAN_CACHE)
+	except OSError as exc:
+		_log(f"gagal menyimpan cache scan: {exc}")
+
+
 def installed():
-    if not os.path.isdir(ASSET_DIR):
-        return set()
-    return {n for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
+	if not os.path.isdir(ASSET_DIR):
+		return set()
+	return {n for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
 
 
 def discover():
@@ -320,29 +358,43 @@ def discover():
 
 
 def check(apk_path=None, force=False):
-    try:
-        pull_bundles(apk_path=apk_path, force=force)
-        texts, tex_objs, skels = discover()
-    except Exception as exc:  # noqa: BLE001
-        return {"ok": False, "error": str(exc)[:200], "new": 0, "installed": len(installed())}
-    have = installed()
-    names = {s.rsplit(".", 1)[0] for s in skels}
-    baru = sorted(names - have)
-    _log(f"ditemukan {len(names)} skeleton, {len(have)} sudah ada, {len(baru)} baru")
-    try:
-        ver = "apk-%d" % os.path.getsize(APK_CACHE)
-    except OSError:
-        ver = "apk"
-    return {
-        "ok": True,
-        "version": ver,
-        "total": len(names),
-        "installed": len(have),
-        "new": len(baru),
-        "changed": bool(baru),
-        "samples": baru[:20],
-        "textures": len(tex_objs),
-    }
+	cached = None
+	try:
+		# Probe versi TETAP dilakukan (HTTP Range ~3 MB, ~1 dtk) supaya rilis
+		# baru ketahuan. Yang mahal — ekstrak APK 648 MB + parse semua bundle
+		# dengan UnityPy (~17 dtk) — dilewati kalau hasil scan untuk APK ini
+		# sudah ada. Ini juga yang mencegah proxy memutus request sebelum JSON
+		# sempat terkirim ("Unexpected end of JSON input" di frontend).
+		if not apk_path and not force and os.path.exists(APK_CACHE):
+			download_latest_apk(force=False)
+			cached = load_scan_cache(apk_key())
+		if cached:
+			skels = cached["skels"]
+			textures = cached["textures"]
+			_log(f"cache scan {cached['key']} dipakai ({len(skels)} skeleton)…")
+		else:
+			pull_bundles(apk_path=apk_path, force=force)
+			texts, tex_objs, skels = discover()
+			textures = len(tex_objs)
+			if not apk_path:
+				save_scan_cache(apk_key(), skels, textures)
+	except Exception as exc:  # noqa: BLE001
+		return {"ok": False, "error": str(exc)[:200], "new": 0, "installed": len(installed())}
+	have = installed()
+	names = {s.rsplit(".", 1)[0] for s in skels}
+	baru = sorted(names - have)
+	_log(f"ditemukan {len(names)} skeleton, {len(have)} sudah ada, {len(baru)} baru")
+	return {
+		"ok": True,
+		"version": apk_key(),
+		"total": len(names),
+		"installed": len(have),
+		"new": len(baru),
+		"changed": bool(baru),
+		"samples": baru[:20],
+		"textures": textures,
+		"scanCache": "hit" if cached else "miss",
+	}
 
 
 def apply_update(limit=0, apk_path=None, force=False):

@@ -7488,8 +7488,7 @@ function openUpdateLog(fetchStatus = true) {
 	// Ambil status terakhir supaya panel tidak kosong kalau dibuka setelah selesai.
 	fetchLog().then(() => {
 		// Kalau ada pembaruan yang sedang jalan, ikuti terus secara live.
-		fetch(`${updaterBase}/status`)
-			.then((r) => r.json())
+		fetchUpdateJSON(`${updaterBase}/status`)
 			.then((st) => {
 				if (st?.running) startLogPolling();
 			})
@@ -7506,7 +7505,7 @@ let logPollTimer = null;
 async function fetchLog() {
 	if (!updaterBase) return;
 	try {
-		const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
+		const st = await fetchUpdateJSON(`${updaterBase}/status`);
 		updateLogSet(st.log);
 		if (st.running) {
 			updateLogStatus(`Berjalan… (${st.game || ""})`, "running");
@@ -7526,7 +7525,7 @@ function startLogPolling() {
 	stopLogPolling();
 	logPollTimer = setInterval(async () => {
 		await fetchLog();
-		const st = await fetch(`${updaterBase}/status`).then((r) => r.json()).catch(() => ({}));
+		const st = await fetchUpdateJSON(`${updaterBase}/status`).catch(() => ({}));
 		if (!st.running) stopLogPolling();
 	}, 2000);
 }
@@ -7638,7 +7637,7 @@ async function loadHealth(url) {
 	healthSetBusy(true);
 	healthStatus("Memeriksa…", "running");
 	try {
-		const data = await fetch(url).then((r) => r.json());
+		const data = await fetchUpdateJSON(url);
 		if (data.error) throw new Error(data.error);
 		renderHealth(data);
 		healthStatus(`Selesai · ${healthTime(data.at)}`, "done");
@@ -7674,14 +7673,14 @@ async function applyPendingUpdaters() {
 		const base = `/api/update/${encodeURIComponent(r.game)}`;
 		healthLogPush(`▶ ${r.label} (${r.game})`);
 		try {
-			const start = await fetch(`${base}?mode=apply`).then((x) => x.json());
+			const start = await fetchUpdateJSON(`${base}?mode=apply`);
 			if (!start.started) {
 				healthLogPush(`  dilewati: ${start.reason || "pembaruan lain masih berjalan"}`);
 				continue;
 			}
 			for (;;) {
 				await new Promise((res) => setTimeout(res, 1200));
-				const st = await fetch(`${base}/status`).then((x) => x.json());
+				const st = await fetchUpdateJSON(`${base}/status`);
 				const lines = st.log || [];
 				if (lines.length) healthLogPush(`  ${lines[lines.length - 1]}`);
 				if (!st.running) {
@@ -7882,6 +7881,29 @@ function syncUpdater(game) {
 	autoCheckUpdate();
 }
 
+/**
+ * Ambil JSON dari endpoint updater dengan aman.
+ *
+ * r.json() melempar "Unexpected end of JSON input" kalau server / proxy
+ * membalas BODY KOSONG — 304 Not Modified dari ETag Express, 502/504 tunnel,
+ * atau koneksi putus di tengah jalan. Baca dulu sebagai teks supaya pesannya
+ * jelas, dan paksa no-store supaya browser tidak pernah revalidasi cache.
+ */
+async function fetchUpdateJSON(url, opts = {}) {
+	const r = await fetch(url, { cache: "no-store", ...opts });
+	const text = await r.text();
+	let data = null;
+	if (text) {
+		try { data = JSON.parse(text); } catch { /* ditangani di bawah */ }
+	}
+	if (!data || typeof data !== "object") {
+		const hint = text ? `: ${text.slice(0, 60)}` : ", body kosong";
+		throw new Error(`Server tidak mengirim JSON (HTTP ${r.status}${hint}). Coba lagi sebentar.`);
+	}
+	if (!r.ok && !data.error) data.error = `HTTP ${r.status}`;
+	return data;
+}
+
 let autoChecked = {};
 
 async function autoCheckUpdate() {
@@ -7893,7 +7915,7 @@ async function autoCheckUpdate() {
 	}
 	autoChecked[updaterGame] = true;
 	try {
-		const info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
+		const info = await fetchUpdateJSON(`${updaterBase}?mode=check`);
 		if (info.error) return;
 		// Ada yang belum diunduh kalau versinya berubah ATAU masih tersisa
 		// model/berkas baru. Shoujou Kaisen pernah melapor versi sama
@@ -7916,7 +7938,7 @@ async function checkUpdate() {
 
 	let info;
 	try {
-		info = await fetch(`${updaterBase}?mode=check`).then((r) => r.json());
+		info = await fetchUpdateJSON(`${updaterBase}?mode=check`);
 		// Tampilkan log pemeriksaan (server mengirimnya di field `log`) supaya
 		// pengguna bisa melihat langkah apa yang dilewati saat check.
 		if (Array.isArray(info.log) && info.log.length) {
@@ -7968,7 +7990,7 @@ async function applyUpdate() {
 	updateLogSet([]);
 	updateLogStatus("Memulai…", "running");
 	try {
-		const started = await fetch(`${updaterBase}?mode=apply`).then((r) => r.json());
+		const started = await fetchUpdateJSON(`${updaterBase}?mode=apply`);
 		if (!started.started) {
 			toast?.(started.reason || "Tidak bisa memulai unduhan.");
 			updateLogStatus(started.reason || "Tidak bisa memulai.", "fail");
@@ -7979,7 +8001,7 @@ async function applyUpdate() {
 		startLogPolling();
 		for (let i = 0; i < 600; i++) {
 			await new Promise((r) => setTimeout(r, 3000));
-			const st = await fetch(`${updaterBase}/status`).then((r) => r.json());
+			const st = await fetchUpdateJSON(`${updaterBase}/status`);
 			if (st.running) {
 				updateLogSet(st.log);
 				continue;

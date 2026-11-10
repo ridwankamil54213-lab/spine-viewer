@@ -4460,6 +4460,29 @@ function runUpdater(game, args, onLog, opts = {}) {
 	});
 }
 
+/* Endpoint updater TIDAK boleh pernah menjawab 304.
+ *
+ * Express memberi ETag pada res.json(). Kalau browser mengirim ulang
+ * If-None-Match (cache revalidation), Express membalas 304 dengan BODY
+ * KOSONG — frontend yang memanggil r.json() lalu melempar
+ * "Unexpected end of JSON input". Hasil --check juga selalu baru, jadi
+ * conditional caching memang tidak masuk akal di sini.
+ *
+ * Dua lapis: buang header conditional dari request DAN kirim no-store.
+ */
+app.use(["/api/update", "/api/updaters"], (req, res, next) => {
+	delete req.headers["if-none-match"];
+	delete req.headers["if-modified-since"];
+	res.set("Cache-Control", "no-store, no-cache, must-revalidate");
+	res.set("Pragma", "no-cache");
+	next();
+});
+
+// Dua klik berurutan pada game yang sama tidak boleh menyalakan dua proses
+// --check (catshinobi bisa makan belasan detik). Yang kedua ikut hasil yang
+// pertama, tanpa cache TTL supaya tidak pernah menyajikan status basi.
+const checkInFlight = new Map();
+
 app.get("/api/update/:game", async (req, res) => {
 	const game = req.params.game;
 	const cfg = UPDATERS[game];
@@ -4473,8 +4496,17 @@ app.get("/api/update/:game", async (req, res) => {
 	const mode = req.query.mode === "apply" ? "apply" : "check";
 	// A check is quick; a download is not, so it goes to the background.
 	if (mode === "check") {
-		const log = [];
-		const result = await runUpdater(game, ["--check"], (l) => log.length < UPDATE_LOG_MAX && log.push(l));
+		let job = checkInFlight.get(game);
+		if (!job) {
+			const log = [];
+			job = runUpdater(game, ["--check"],
+				(l) => log.length < UPDATE_LOG_MAX && log.push(l))
+				.then((result) => ({ result: result || { error: "Pembaru tidak mengembalikan hasil." }, log }))
+				.catch((err) => ({ result: { error: err.message }, log }))
+				.finally(() => checkInFlight.delete(game));
+			checkInFlight.set(game, job);
+		}
+		const { result, log } = await job;
 		res.json({ ...result, log });
 		return;
 	}

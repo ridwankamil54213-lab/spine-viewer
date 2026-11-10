@@ -219,6 +219,39 @@ per-game. Apply sengaja tidak pernah dijalankan otomatis.
 Regresi: `node tools/check-updater-dashboard.cjs` (39 assertion), termasuk
 bukti bahwa updater tanpa field `ok` tidak lagi dilaporkan gagal.
 
+### Tombol updater & "Unexpected end of JSON input"
+
+Gejala: klik **Perbarui aset** → toast `Gagal memeriksa pembaruan: Failed to
+execute 'json' on 'Response': Unexpected end of JSON input`. Itu bukan bug
+Python, tapi frontend memanggil `r.json()` pada **respons tanpa body**. Dua
+sumbernya:
+
+1. **304 dari ETag Express.** `res.json()` otomatis memberi ETag; browser yang
+   revalidasi (`If-None-Match`) menerima `304 Not Modified` dengan **0 byte**.
+   Endpoint `/api/update*` dan `/api/updaters*` sekarang membuang header
+   conditional dan mengirim `Cache-Control: no-store`. Hasil `--check` memang
+   selalu baru, jadi caching kondisional tidak masuk akal di sini.
+2. **Request keburu putus.** `--check` Cat Shinobi mengekstrak APK 648 MB dan
+   mem-parse semua bundle UnityPy **setiap kali** (~17–20 dtk), sehingga
+   proxy/tunnel bisa memutus koneksi sebelum JSON terkirim.
+   `tools/update-catshinobi.py` kini menyimpan daftar skeleton + jumlah
+   tekstur di `scan-cache.json` dengan kunci **ukuran APK** (penanda versi
+   yang sama dengan `version`). Tetap ada probe versi lewat HTTP Range ~3 MB,
+   jadi rilis baru tetap ketahuan dan otomatis membatalkan cache.
+   **20,7 dtk → 1,5 dtk.**
+
+Lapisan ketiga: `fetchUpdateJSON()` di `src/viewer.js` membaca respons sebagai
+teks dulu, memakai `cache: "no-store"`, dan kalau body kosong memberi pesan
+`Server tidak mengirim JSON (HTTP …, body kosong). Coba lagi sebentar.`
+Semua jalur updater (check, apply, polling status, dashboard) memakainya.
+Server juga menggabungkan dua `--check` yang jalan barengan lewat
+`checkInFlight`, jadi klik dobel tidak menyalakan dua proses berat.
+
+Regresi: `node tools/check-update-json.cjs` (31 assertion) — termasuk uji
+`If-None-Match: *` tidak lagi 304, kecepatan cache, dan **simulasi body
+kosong di browser** yang harus menghasilkan toast yang jelas, bukan error
+samar.
+
 ## Ark Re:Code: model "bukan Spine"
 
 `catalog_116031` membawa 20 bundle hero baru. 18 di antaranya (`H169`,
@@ -1148,6 +1181,7 @@ node tools/check-zonenova.cjs     # Zone Nova: 188 Spine 4.1 CDN, katalog XOR, i
 node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilustrasi, render
 node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
 node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
+node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 
