@@ -11,13 +11,19 @@
  * Tidak ada satupun jalur Spine/Live2D yang diubah oleh modul ini.
  *
  * Kontrak: window.Model3DStage = { mount, dispose, play, listAnimations,
- *                                  capture, state, resize }
+ *                                  capture, state, resize, debug }
  */
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 let S = null;
+
+// GLB animasi Stella Sora menyimpan ROOT MOTION: clip "Attack" menggeser
+// node "Root" sampai ~14,7 unit, padahal modelnya cuma ~2,5 unit. Kalau track
+// ini diputar apa adanya, karakter meleset keluar frustum dan layar terlihat
+// kosong ("animasinya nggak ada"). Putar clip in-place: buang translasi Root.
+const ROOT_MOTION = /(?:^|[./])Root\.position$/i;
 
 function stopLoop() {
 	if (!S) return;
@@ -90,6 +96,7 @@ function state() {
 		ready: true,
 		id: S.id,
 		current: S.current || "Bind pose",
+		paused: !!S.paused,
 		animations: ["Bind pose", ...Object.keys(S.animUrls)],
 		meshes: S.meshCount,
 		triangles: S.triangles,
@@ -101,10 +108,61 @@ function listAnimations() {
 	return state().animations;
 }
 
+/** Diagnostik: apakah clip benar-benar ter-binding dan menggerakkan node. */
+function debug() {
+	if (!S) return { ready: false };
+	const box = new THREE.Box3().setFromObject(S.animatedRoot);
+	const size = box.getSize(new THREE.Vector3());
+	const center = box.getCenter(new THREE.Vector3());
+	const actions = (S.mixer?._actions || []).map((a) => ({
+		name: a.getClip?.().name,
+		running: !!a.isRunning(),
+		time: +Number(a.time || 0).toFixed(3),
+		weight: a.getEffectiveWeight(),
+		// PropertyBinding dibuat lazim saat mixer.update() pertama. Kalau 0,
+		// nama node di GLB animasi tidak cocok dengan model -> gambar diam.
+		bindings: a._propertyBindings?.length || 0,
+		tracks: a.getClip?.().tracks?.length || 0,
+	}));
+	let firstBone = null;
+	S.animatedRoot.traverse((o) => {
+		if (!firstBone && o.name && (o.isBone || o.type === "Object3D") && o.name !== "Root") {
+			firstBone = {
+				name: o.name,
+				pos: o.position.toArray().map((v) => +v.toFixed(4)),
+				quat: o.quaternion.toArray().map((v) => +v.toFixed(4)),
+			};
+		}
+	});
+	return {
+		ready: true, current: S.current, actions, firstBone,
+		box: { min: box.min.toArray().map((v) => +v.toFixed(2)),
+			max: box.max.toArray().map((v) => +v.toFixed(2)),
+			size: size.toArray().map((v) => +v.toFixed(2)),
+			center: center.toArray().map((v) => +v.toFixed(2)) },
+	};
+}
+
 function capture() {
 	if (!S) return null;
 	S.renderer.render(S.scene, S.camera);
 	return S.canvas.toDataURL("image/png");
+}
+
+/** stopAllAction() TIDAK mengembalikan tulang ke pose awal. Tanpa snapshot
+ *  ini, clip yang punya track lebih sedikit meninggalkan sisa pose clip
+ *  sebelumnya (model "nyangkut"/hilang saat berpindah animasi). */
+function restoreBindPose() {
+	if (!S?.bindPose) return;
+	for (const [obj, p] of S.bindPose) {
+		obj.position.copy(p.position);
+		obj.quaternion.copy(p.quaternion);
+		obj.scale.copy(p.scale);
+	}
+}
+
+function setPaused(p) {
+	if (S) S.paused = !!p;
 }
 
 /** Putar clip dari GLB animasi terpisah (retarget ke skeleton model utama). */
@@ -112,19 +170,36 @@ async function play(name) {
 	if (!S) return false;
 	if (!name || name === "Bind pose") {
 		S.mixer.stopAllAction();
+		S.mixer.uncacheRoot?.(S.animatedRoot);
+		restoreBindPose();
 		S.current = "Bind pose";
 		return true;
 	}
 	const url = S.animUrls[name];
 	if (!url) return false;
 	const gltf = await S.loader.loadAsync(url);
-	const clip = gltf.animations && gltf.animations[0];
-	if (!clip) throw new Error(`Clip 3D "${name}" tidak punya animasi`);
+	// Model bisa diganti selagi clip diunduh — jangan menyentuh state lama.
+	if (!S) return false;
+	const src = gltf.animations && gltf.animations[0];
+	if (!src) throw new Error(`Clip 3D "${name}" tidak punya animasi`);
+	// Clone supaya GLB sumber tidak diubah; buang HANYA translasi Root. Track
+	// tulang (Bip001, Weapon_Root, ...) tetap diputar supaya gerakannya utuh.
+	const clip = src.clone();
+	clip.tracks = clip.tracks.filter((t) => !ROOT_MOTION.test(t.name));
 	S.mixer.stopAllAction();
+	S.mixer.uncacheRoot?.(S.animatedRoot);
+	restoreBindPose();
 	const action = S.mixer.clipAction(clip, S.animatedRoot);
 	action.reset().setLoop(THREE.LoopRepeat, Infinity).play();
 	S.current = name;
+	S.paused = false;
 	return true;
+}
+
+/** Clip idle/stand dipilih lebih dulu supaya model tidak membuka diam. */
+function preferredClip() {
+	const names = Object.keys(S.animUrls);
+	return names.find((n) => /(idle|stand|wait|breath|lobby|relax)/i.test(n)) || names[0] || null;
 }
 
 async function mount({ wrap, modelUrl, anims = {}, id = "" }) {
@@ -160,7 +235,8 @@ async function mount({ wrap, modelUrl, anims = {}, id = "" }) {
 	S = {
 		wrap, canvas, renderer, scene, camera, controls, id,
 		animUrls: anims, loader: new GLTFLoader(), mixer: null,
-		animatedRoot: null, holder: null, current: "Bind pose",
+		animatedRoot: null, holder: null, bindPose: null,
+		current: "Bind pose", paused: false,
 		raf: 0, ro: null, meshCount: 0, triangles: 0, size: null,
 	};
 	resize();
@@ -174,6 +250,13 @@ async function mount({ wrap, modelUrl, anims = {}, id = "" }) {
 	S.holder.add(gltf.scene);
 	scene.add(S.holder);
 	S.mixer = new THREE.AnimationMixer(gltf.scene);
+	// Snapshot pose awal SELURUH node, sebelum clip apapun menyentuhnya.
+	S.bindPose = new Map();
+	gltf.scene.traverse((o) => S.bindPose.set(o, {
+		position: o.position.clone(),
+		quaternion: o.quaternion.clone(),
+		scale: o.scale.clone(),
+	}));
 	let tris = 0;
 	gltf.scene.traverse((o) => {
 		if (!o.isMesh) return;
@@ -184,17 +267,33 @@ async function mount({ wrap, modelUrl, anims = {}, id = "" }) {
 	S.triangles = Math.round(tris);
 	fitCamera(gltf.scene, camera, controls);
 
-	const clock = new THREE.Clock();
+	// Timer manual (THREE.Clock sudah deprecated di r187) dan pause guard.
+	let last = performance.now();
 	const tick = () => {
 		if (!S) return;
 		S.raf = requestAnimationFrame(tick);
-		const dt = Math.min(clock.getDelta(), 0.1);
-		if (S.mixer) S.mixer.update(dt);
+		const now = performance.now();
+		const dt = Math.min((now - last) / 1000, 0.1);
+		last = now;
+		if (S.mixer && !S.paused) S.mixer.update(dt);
 		controls.update();
 		renderer.render(scene, camera);
 	};
 	tick();
+
+	// Model 3D HARUS langsung bergerak saat dibuka. Tanpa ini stage-nya diam
+	// di "Bind pose" dan pengguna mengira animasinya tidak ada.
+	const first = preferredClip();
+	if (first) {
+		try {
+			await play(first);
+		} catch (err) {
+			console.warn("[model3d] auto-play gagal:", err);
+		}
+	}
 	return state();
 }
 
-window.Model3DStage = { mount, dispose, play, listAnimations, capture, state, resize };
+window.Model3DStage = {
+	mount, dispose, play, listAnimations, capture, state, resize, debug, setPaused,
+};

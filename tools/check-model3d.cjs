@@ -6,9 +6,10 @@
  *      dimuat lazy lewat /dist/model3d.js.
  *   2. Server mendeteksi model.glb -> format model3d, nama/family/thumbnail.
  *   3. Aset & ilustrasi resolve 200 (bukan atlas).
- *   4. Browser: model 3D benar-benar RENDER (kanvas tidak blank), clip animasi
- *      dari GLB terpisah bisa diputar, HUD khusus 3D muncul, dan kembali ke
- *      model Spine 2D tetap bekerja (stage 3D ter-dispose).
+ *   4. Browser: model 3D LANGSUNG beranimasi saat dibuka (auto-play idle),
+ *      binding track nyata, frame berubah dari waktu ke waktu, root motion
+ *      tidak membuat model hilang, jeda/lanjut bekerja, dan kembali ke model
+ *      Spine 2D tetap bersih (stage 3D ter-dispose).
  *   5. 0 aset 404, 0 JS error.
  *
  * Run: node tools/check-model3d.cjs   (server on :3000)
@@ -177,6 +178,9 @@ const get = (u) => fetch(BASE + u).then((r) => r.json());
 		canvas: !!document.querySelector("canvas.model3d-canvas"),
 		is3d: document.getElementById("canvas-wrap")?.classList.contains("is-3d"),
 		hud: document.getElementById("hud-stats")?.textContent || "",
+		current: window.Model3DStage?.state?.().current,
+		select: document.getElementById("anim-select")?.value,
+		playDisabled: document.getElementById("play-btn")?.disabled,
 	}));
 	ok("model 3D render (mesh + triangle nyata)",
 		st.id === wanted && st.meshes > 0 && st.triangles > 0 && st.canvas && st.is3d,
@@ -202,12 +206,77 @@ const get = (u) => fetch(BASE + u).then((r) => r.json());
 	});
 	ok("kanvas 3D tidak blank", px.std > 6, JSON.stringify(px));
 
-	// Clip dari GLB terpisah harus bisa di-retarget ke skeleton model utama.
-	const pick = st.anims.find((a) => a !== "Bind pose");
+	// Regresi keluhan "animasinya nggak ada": model harus BERGERAK sejak dibuka,
+	// bukan cuma state `current` yang berubah. Ukur tanda tangan piksel + jumlah
+	// piksel terang (model) dari waktu ke waktu.
+	const sample = () => page.evaluate(() => {
+		const c = document.querySelector("canvas.model3d-canvas");
+		window.Model3DStage.capture();
+		const s = document.createElement("canvas"); s.width = s.height = 96;
+		const x = s.getContext("2d"); x.drawImage(c, 0, 0, 96, 96);
+		const d = x.getImageData(0, 0, 96, 96).data;
+		let bright = 0, hash = 2166136261;
+		for (let i = 0; i < d.length; i += 4) {
+			const v = (d[i] + d[i + 1] + d[i + 2]) / 3;
+			if (v > 60) bright++;
+			hash ^= d[i] + d[i + 1] * 3 + d[i + 2] * 7;
+			hash = Math.imul(hash, 16777619);
+		}
+		return { bright, hash: hash >>> 0 };
+	});
+
+	ok("auto-play clip idle, UI tersinkron (bukan Bind pose statis)",
+		!!st.current && st.current !== "Bind pose" && st.select === st.current &&
+		st.playDisabled === false,
+		`runtime=${st.current} select=${st.select} playDisabled=${st.playDisabled}`);
+	const dbg = await page.evaluate(() => window.Model3DStage.debug());
+	ok("AnimationMixer punya action berjalan dengan track ter-binding",
+		dbg.actions?.some((a) => a.running && a.tracks > 0 && a.bindings > 0),
+		JSON.stringify(dbg.actions));
+
+	const a1 = await sample();
+	await page.waitForTimeout(650);
+	const a2 = await sample();
+	ok("animasi benar-benar mengubah gambar (frame A != frame B)",
+		a1.hash !== a2.hash && a1.bright > 200 && a2.bright > 200,
+		JSON.stringify({ a1: a1.bright, a2: a2.bright }));
+
+	// Clip "Attack" punya translasi Root ~14,7 unit (model cuma ~2,5). Tanpa
+	// pembuangan root motion, model meleset keluar kamera => 0 piksel terang.
+	const pick = st.anims.find((n) => /attack/i.test(n)) ||
+		st.anims.find((n) => n !== "Bind pose");
 	await page.selectOption("#anim-select", pick);
-	await page.waitForFunction((n) => window.model3dStage?.current === n,
+	await page.waitForFunction((n) => window.model3dStage?.current === n &&
+		window.Model3DStage?.state?.().current === n,
 		pick, { timeout: 30000 });
-	ok("clip animasi 3D diputar", true, pick);
+	const series = [];
+	for (let i = 0; i < 5; i++) {
+		series.push((await sample()).bright);
+		await page.waitForTimeout(320);
+	}
+	ok("clip 3D diputar (retarget dari GLB terpisah)", true, pick);
+	ok("root motion tidak membuat model hilang (0 piksel)",
+		series.every((n) => n > 200), JSON.stringify(series));
+
+	// Ganti clip lagi: pose clip lama tidak boleh nempel (dulu bikin frame 0).
+	await page.selectOption("#anim-select", "idle");
+	await page.waitForFunction(() => window.model3dStage?.current === "idle",
+		null, { timeout: 30000 });
+	await page.waitForTimeout(400);
+	const back = await sample();
+	ok("ganti clip memulihkan bind pose (model tetap terlihat)", back.bright > 200,
+		String(back.bright));
+
+	// Tombol Play = jeda / lanjut mixer, bukan setAnimation() Spine.
+	await page.locator("#play-btn").click();
+	const p1 = await sample();
+	await page.waitForTimeout(600);
+	const p2 = await sample();
+	ok("tombol jeda membekukan animasi", p1.hash === p2.hash);
+	await page.locator("#play-btn").click();
+	await page.waitForTimeout(600);
+	const p3 = await sample();
+	ok("tombol lanjut menggerakkan animasi lagi", p3.hash !== p2.hash);
 
 	// Kembali ke model 2D: stage 3D harus benar-benar dilepas.
 	await page.locator("#back-btn").click();

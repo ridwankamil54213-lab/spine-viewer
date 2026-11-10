@@ -336,8 +336,13 @@ Implementasinya sengaja **terpisah** supaya 43 ribu model 2D tidak tersentuh.
   Live2D), bukan potongan atlas dan bukan tangkapan 3D.
 - Kanvas PIXI cuma disembunyikan; `dispose3D()` melepas renderer/controls/
   mixer saat kembali ke model 2D. HUD menampilkan `3D · glTF` + mesh/triangle.
-  Ekspor PNG memakai `Model3DStage.capture()`; ekspor video & A/B compare
+  Export PNG memakai `Model3DStage.capture()`; ekspor video & A/B compare
   sengaja tidak didukung untuk 3D (ada pesan jelas, bukan crash).
+- **Animasi langsung jalan saat model dibuka** (auto-play `idle`, bukan pose
+  statis). Root motion clip seperti `Attack` dibuang supaya karakter tidak
+  meleset keluar kamera; bind pose dipulihkan tiap ganti clip; tombol Play jadi
+  jeda/lanjut `AnimationMixer`. Regresi `check-model3d.cjs` mengukur perubahan
+  frame dari waktu ke waktu dan memastikan model tetap terlihat (0 piksel = gagal).
 
 Regenerasi: `tools/model3d/update.py --check|--apply`, `refresh.py` untuk mode
 offline, `npm run build` (dua bundle), lalu `?refresh=1`. Detail lengkap di

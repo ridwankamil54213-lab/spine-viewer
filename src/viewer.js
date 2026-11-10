@@ -4151,9 +4151,13 @@ function ensure3DScript() {
 }
 
 function dispose3D() {
+	// Jika 3D sedang dijeda, jangan biarkan model 2D berikutnya ikut ter-jeda:
+	// state.playing itu global, sedangkan dispose3D dipanggil tiap ganti model.
+	const wasPaused3D = !!window.model3dStage && !state.playing;
 	try { window.Model3DStage?.dispose(); } catch { /* already gone */ }
 	window.model3dStage = null;
 	el.canvasWrap?.classList.remove("is-3d");
+	if (wasPaused3D) setPlaying(true);
 }
 
 /** Render satu model .glb + clip animasinya. Mirip loadImageModel(), tapi
@@ -4179,6 +4183,10 @@ async function load3DModel(model) {
 	atlasSaysPMA = false;
 
 	if (el.timeline && !el.timeline.hidden) el.timeline.hidden = true;
+	// mount() sudah memutar clip idle otomatis — UI harus mengikuti, jangan
+	// memaksa kembali ke "Bind pose" (itulah yang bikin model terlihat diam).
+	const activeAnim = info.current && info.animations.includes(info.current)
+		? info.current : "Bind pose";
 	if (el.animSelect) {
 		el.animSelect.innerHTML = "";
 		for (const name of info.animations) {
@@ -4188,19 +4196,23 @@ async function load3DModel(model) {
 			el.animSelect.appendChild(o);
 		}
 		el.animSelect.disabled = info.animations.length <= 1;
-		el.animSelect.value = "Bind pose";
+		el.animSelect.value = activeAnim;
 	}
 	if (el.skinSelect) {
 		el.skinSelect.innerHTML = "";
 		el.skinSelect.disabled = true;
 	}
-	if (el.playBtn) el.playBtn.disabled = true;
+	// Tombol Play kini aktif untuk 3D: jeda/lanjut AnimationMixer.
+	if (el.playBtn) {
+		el.playBtn.disabled = false;
+		setPlaying(true);
+	}
 	if (el.scrub) el.scrub.disabled = true;
 	if (el.timeDur) el.timeDur.textContent = "3D";
 	if (el.timeCur) el.timeCur.textContent = "0.00s";
 	window.model3dStage = {
 		id: model.id, animations: info.animations,
-		current: "Bind pose", ready: true,
+		current: activeAnim, ready: true,
 		meshes: info.meshes, triangles: info.triangles,
 	};
 	renderVariants(model);
@@ -8381,6 +8393,13 @@ el.playBtn.addEventListener("click", () => {
 		}
 		return;
 	}
+	// 3D: jeda/lanjut AnimationMixer, jangan masuk setAnimation() Spine.
+	if (is3D(current)) {
+		const next = !state.playing;
+		setPlaying(next);
+		window.Model3DStage?.setPaused(!next);
+		return;
+	}
 	setPlaying(!state.playing);
 });
 el.loopBtn.addEventListener("click", () => {
@@ -8424,6 +8443,7 @@ el.animSelect.addEventListener("change", () => {
 	// anims/*.glb terpisah, jadi jangan pernah masuk setAnimation() Spine.
 	if (is3D(current)) {
 		const pick = el.animSelect.value;
+		setPlaying(true);
 		window.Model3DStage?.play(pick === "Bind pose" ? null : pick)
 			.catch((err) => toast?.(`Clip 3D gagal: ${err.message}`));
 		if (window.model3dStage) window.model3dStage.current = pick;
