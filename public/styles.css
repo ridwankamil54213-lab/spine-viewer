@@ -1053,6 +1053,24 @@ input:focus-visible {
 	background: #0b0d12;
 }
 
+/* --- Model 3D (glTF/GLB) --------------------------------------------------
+ * Kanvas WebGL three.js ditumpuk di atas PIXI, pola yang sama dengan
+ * image-stage. Kanvas PIXI disembunyikan (bukan dicabut) supaya ticker dan
+ * state viewer tetap utuh saat pengguna kembali ke model 2D.
+ */
+.canvas-wrap.is-3d { cursor: grab; }
+.canvas-wrap.is-3d:active { cursor: grabbing; }
+.canvas-wrap.is-3d > canvas:not(.model3d-canvas) { visibility: hidden; }
+.model3d-canvas {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: radial-gradient(ellipse at 50% 40%, #1b2233 0%, #0b0d12 75%);
+}
+
 /* Stage backdrop — sits under the grid veil and the canvas content.
  * Distinct backgrounds are the quickest way to judge edge quality and whether
  * premultiplied alpha is being handled correctly: a dark or light haloing

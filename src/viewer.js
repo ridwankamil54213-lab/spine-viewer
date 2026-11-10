@@ -4121,6 +4121,98 @@ async function loadSkeletonDataFor(model) {
 }
 
 
+/* --- Model 3D (glTF/GLB) ---------------------------------------------------
+ * Runtime-nya three.js, dibangun terpisah di public/dist/model3d.js dan
+ * dimuat lewat <script> SEKALI saat model 3D pertama dibuka. Dengan begitu
+ * bundle viewer.js (4,1 MB) tidak ikut membawa three.js dan 43 ribu model
+ * 2D tidak terpengaruh. Lihat src/model3d-stage.js.
+ */
+const is3D = (m) => !!m && m.format === "model3d";
+let model3dScriptPromise = null;
+
+function ensure3DScript() {
+	if (window.Model3DStage) return Promise.resolve(window.Model3DStage);
+	if (!model3dScriptPromise) {
+		model3dScriptPromise = new Promise((resolve, reject) => {
+			const s = document.createElement("script");
+			s.src = "/dist/model3d.js";
+			s.async = true;
+			s.onload = () => window.Model3DStage
+				? resolve(window.Model3DStage)
+				: reject(new Error("Runtime 3D gagal diinisialisasi"));
+			s.onerror = () => {
+				model3dScriptPromise = null;
+				reject(new Error("Gagal memuat runtime 3D (/dist/model3d.js)"));
+			};
+			document.head.appendChild(s);
+		});
+	}
+	return model3dScriptPromise;
+}
+
+function dispose3D() {
+	try { window.Model3DStage?.dispose(); } catch { /* already gone */ }
+	window.model3dStage = null;
+	el.canvasWrap?.classList.remove("is-3d");
+}
+
+/** Render satu model .glb + clip animasinya. Mirip loadImageModel(), tapi
+ *  dropdown animasi tetap hidup karena clip-nya nyata (bukan stub). */
+async function load3DModel(model) {
+	const Stage = await ensure3DScript();
+	const base = "/assets/" + String(model.id).split("#")[0]
+		.split("/").map(encodeURIComponent).join("/");
+	const anims = {};
+	for (const a of model.animationFiles || []) {
+		if (a && a.name && a.file) anims[a.name] = `${base}/anims/${encodeURIComponent(a.file)}`;
+	}
+	const info = await Stage.mount({
+		wrap: el.canvasWrap,
+		modelUrl: `${base}/${encodeURIComponent(model.modelFile || "model.glb")}`,
+		anims,
+		id: model.id,
+	});
+
+	destroyCurrent();
+	current = model;
+	atlas = null;
+	atlasSaysPMA = false;
+
+	if (el.timeline && !el.timeline.hidden) el.timeline.hidden = true;
+	if (el.animSelect) {
+		el.animSelect.innerHTML = "";
+		for (const name of info.animations) {
+			const o = document.createElement("option");
+			o.value = name;
+			o.textContent = name;
+			el.animSelect.appendChild(o);
+		}
+		el.animSelect.disabled = info.animations.length <= 1;
+		el.animSelect.value = "Bind pose";
+	}
+	if (el.skinSelect) {
+		el.skinSelect.innerHTML = "";
+		el.skinSelect.disabled = true;
+	}
+	if (el.playBtn) el.playBtn.disabled = true;
+	if (el.scrub) el.scrub.disabled = true;
+	if (el.timeDur) el.timeDur.textContent = "3D";
+	if (el.timeCur) el.timeCur.textContent = "0.00s";
+	window.model3dStage = {
+		id: model.id, animations: info.animations,
+		current: "Bind pose", ready: true,
+		meshes: info.meshes, triangles: info.triangles,
+	};
+	renderVariants(model);
+	renderAudio(model);
+	el.empty.hidden = true;
+	setActive(model.id);
+	renderHud();
+	if (fps.on) fpsResetStats();
+	el.loading.hidden = true;
+	return info;
+}
+
 async function loadModelBody(model) {
 	showError(null);
 	// A previous video left the play button (and selects) disabled; a skeleton
@@ -4163,6 +4255,7 @@ async function loadModelBody(model) {
 		teardownLegacyViewer();
 		disposeVideo();
 		disposeImage();
+		dispose3D();
 
 		// Lost Sword cutscene movies are plain .mp4/.m4v files — no skeleton.
 		if (model.format === "video") {
@@ -4173,6 +4266,11 @@ async function loadModelBody(model) {
 		// skeleton and no atlas either.
 		if (model.format === "image") {
 			return await loadImageModel(model);
+		}
+
+		// Model 3D glTF/GLB: runtime three.js terpisah, bukan pixi-spine.
+		if (is3D(model)) {
+			return await load3DModel(model);
 		}
 
 		// Live2D Cubism models (.moc3) take a completely different path —
@@ -6016,6 +6114,23 @@ function renderHud() {
 		el.gridLink.hidden = false;
 		return;
 	}
+	// Model 3D glTF: HUD menampilkan ukuran aset + jumlah mesh/triangle,
+	// bukan versi Spine (model ini tidak punya skeleton Spine sama sekali).
+	if (is3D(current)) {
+		const mb = current.bytes ? (current.bytes / 1048576).toFixed(1) : "?";
+		const st = window.Model3DStage?.state?.() || {};
+		el.hud.hidden = false;
+		$("#hud-model").textContent = current.name;
+		$("#hud-stats").innerHTML =
+			`<span><b>${mb}</b> MB</span><span><b>3D · glTF</b></span>` +
+			`<span><b>${st.meshes || 0}</b> mesh</span>` +
+			`<span><b>${(st.triangles || 0).toLocaleString("id-ID")}</b> tris</span>` +
+			(current.family ? `<span><b>${current.family.members.length}</b> varian</span>` : "");
+		$("#title-model").textContent = current.name;
+		document.title = current.name + " — Spine Stage";
+		el.gridLink.hidden = false;
+		return;
+	}
 	// Model 2.1 (Epic Seven, Project QT) tidak pernah mengisi `spine` — yang
 	// ada `spine21`. Tanpa cabang ini, renderHud (termasuk yang dipanggil dari
 	// dropdown PMA, yang berlaku untuk SEMUA model) menyembunyikan HUD yang
@@ -7418,6 +7533,7 @@ const UPDATABLE = {
 	zonenova: "/api/update/zonenova",
 	stellasora: "/api/update/stellasora",
 	"stellasora-l2d": "/api/update/stellasora",
+	"stellasora-3d": "/api/update/stellasora-3d",
 	girlwars: "/api/update/girlwars",
 	lostsword: "/api/update/lostsword",
 	"lostsword-video": "/api/update/lostsword-video",
@@ -8020,7 +8136,7 @@ async function applyUpdate() {
 			const added = res.new_ids || res.new_models || [];
 			if (added.length) {
 				// Prefix harus sama dengan id model di library (“<game>/<folder>”).
-				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", arknights: "arknights", zonenova: "zonenova", stellasora: "stellasora", "stellasora-l2d": "stellasora-l2d", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera", mercenary: "mercenary" };
+				const NEW_PREFIX = { shoujoukaisen: "shoujoukaisen", "mitao-utopia": "mitao-utopia", crosscore: "crosscore", catshinobi: "catshinobi", bd2: "bd2", ivntight: "ivntight", arknights: "arknights", zonenova: "zonenova", stellasora: "stellasora", "stellasora-l2d": "stellasora-l2d", "stellasora-3d": "stellasora-3d", lostsword: "lostsword", dragontravelers: "dragontravelers", nikke: "nikke", alliancesages: "alliancesages", mcs18: "mcs18", pokerfate: "pokerfate", eroera: "eroera", mercenary: "mercenary" };
 				const prefix = NEW_PREFIX[updaterGame] || "arkrecode";
 				// new_ids sudah lengkap ("bd2/Alec/..." atau "bd2-char/..."),
 				// jadi jangan ditambahi prefix lagi.
@@ -8304,6 +8420,15 @@ function stepAnimation(dir) {
 }
 
 el.animSelect.addEventListener("change", () => {
+	// Model 3D memakai AnimationMixer three.js; clip-nya dimuat dari
+	// anims/*.glb terpisah, jadi jangan pernah masuk setAnimation() Spine.
+	if (is3D(current)) {
+		const pick = el.animSelect.value;
+		window.Model3DStage?.play(pick === "Bind pose" ? null : pick)
+			.catch((err) => toast?.(`Clip 3D gagal: ${err.message}`));
+		if (window.model3dStage) window.model3dStage.current = pick;
+		return;
+	}
 	// Cubism motions are played by the Cubism motion manager, not by a Spine
 	// AnimationState. Cubism models must never reach setAnimation() — they
 	// have no spine.state, so it would throw.
@@ -9688,6 +9813,12 @@ function setExportProgress(done, total) {
 
 async function runExport() {
 	if (EXPORT_STATE.busy) return;
+	// three.js tidak punya jalur ekstraksi frame-by-frame PIXI; arahkan ke
+	// tombol PNG yang menangkap kanvas WebGL langsung.
+	if (is3D(current)) {
+		toast("Ekspor video belum didukung untuk model 3D — pakai tombol PNG.");
+		return;
+	}
 	// CG / illust stills are not animated, so the frame-by-frame exporter is
 	// meaningless — just save the PNG itself.
 	if (current && current.format === "image") {
@@ -9996,6 +10127,24 @@ function tightCrop(canvas) {
  * less throws away detail that does.
  */
 async function exportPng({ background = "transparent" } = {}) {
+	// Kanvas three.js punya preserveDrawingBuffer, jadi cukup toDataURL().
+	// Tidak boleh masuk jalur app.renderer.extract() karena yang terekam di
+	// sana adalah kanvas PIXI yang sedang disembunyikan.
+	if (is3D(current)) {
+		const url = window.Model3DStage?.capture();
+		if (!url) {
+			toast("Model 3D belum siap diekspor.");
+			return;
+		}
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = ((current.name || "model3d").replace(/[^\w.-]+/g, "_") || "model3d") + ".png";
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		toast("Tangkapan 3D diunduh.");
+		return;
+	}
 	if (!spine) {
 		toast("Pilih model dulu sebelum mengekspor.");
 		return;

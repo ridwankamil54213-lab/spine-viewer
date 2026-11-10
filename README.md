@@ -317,6 +317,34 @@ Regenerasi: `/srv/venv-spine/bin/python tools/catshinobi/refresh.py` (offline,
 karena server menyimpan cache model persisten. `public/thumbs/catshinobi/`
 ada di luar git. Regresi `node tools/check-catshinobi.cjs` (37 assertion).
 
+## Dukungan model 3D (glTF / GLB)
+
+Bisa, tapi **bukan "tambah satu flag"**: PIXI 7 itu renderer 2D orthographic
+(tanpa depth / lighting / skinning), jadi 3D butuh konteks WebGL terpisah.
+Implementasinya sengaja **terpisah** supaya 43 ribu model 2D tidak tersentuh.
+
+- **Runtime**: `three@0.187` + `GLTFLoader` + `OrbitControls` di
+  **`public/dist/model3d.js` (645 KB)**, IIFE mandiri yang di-*lazy load* lewat
+  `<script>` saat model 3D pertama dibuka. `viewer.js` tetap **4,1 MB**.
+- **Format generik** `format: "model3d"`: `scanModels()` mendeteksi
+  `model.glb` + `anims/*.glb` di root game mana pun. Tidak hardcode Stella Sora.
+- **Pilot**: `stellasora-3d` dari `StellaSoraWiki/StellaSoraModels` —
+  **59 model / 177 clip / 295 MB**, 19 family varian, 58 thumbnail.
+  GLB utama berisi mesh+skin+tekstur tanpa clip; `AnimationMixer` me-retarget
+  clip dari GLB terpisah berdasarkan nama node.
+- **Thumbnail tetap gambar ilustrasi 2D** (potret AVG yang dipakai root
+  Live2D), bukan potongan atlas dan bukan tangkapan 3D.
+- Kanvas PIXI cuma disembunyikan; `dispose3D()` melepas renderer/controls/
+  mixer saat kembali ke model 2D. HUD menampilkan `3D · glTF` + mesh/triangle.
+  Ekspor PNG memakai `Model3DStage.capture()`; ekspor video & A/B compare
+  sengaja tidak didukung untuk 3D (ada pesan jelas, bukan crash).
+
+Regenerasi: `tools/model3d/update.py --check|--apply`, `refresh.py` untuk mode
+offline, `npm run build` (dua bundle), lalu `?refresh=1`. Detail lengkap di
+`tools/model3d/README.md`. Regresi `node tools/check-model3d.cjs` (37
+assertion) membuktikan kanvas tidak blank, clip bisa diputar, dan kembali ke
+Spine 2D tetap bersih.
+
 ## Ark Re:Code: model "bukan Spine"
 
 `catalog_116031` membawa 20 bundle hero baru. 18 di antaranya (`H169`,
@@ -1249,6 +1277,7 @@ node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 buka
 node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
 node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilustrasi, render
 node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa reload
+node tools/check-model3d.cjs    # 3D glTF: 59 model, render, clip, balik ke 2D
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

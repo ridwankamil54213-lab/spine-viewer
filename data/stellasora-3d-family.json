@@ -1,0 +1,278 @@
+{
+ "families": [
+  {
+   "root": "stellasora-3d/amber",
+   "name": "Amber",
+   "members": [
+    {
+     "id": "stellasora-3d/amber",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/amber__ease_into_an_unhurried_summer",
+     "label": "Ease Into an Unhurried Summer"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/chitose",
+   "name": "Chitose",
+   "members": [
+    {
+     "id": "stellasora-3d/chitose",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/chitose__when_morning_glories_bloom_her_eyes_open",
+     "label": "When Morning Glories Bloom Her Eyes Open"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/chixia",
+   "name": "Chixia",
+   "members": [
+    {
+     "id": "stellasora-3d/chixia",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/chixia__crimson_reflection_of_queen_of_hearts",
+     "label": "Crimson Reflection of Queen of Hearts"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/coronis",
+   "name": "Coronis",
+   "members": [
+    {
+     "id": "stellasora-3d/coronis",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/springseek_coronis",
+     "label": "Springseek"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/firenze",
+   "name": "Firenze",
+   "members": [
+    {
+     "id": "stellasora-3d/firenze",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/firenze__deadly_beauty_unparalleled_allure",
+     "label": "Deadly Beauty Unparalleled Allure"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/flora",
+   "name": "Flora",
+   "members": [
+    {
+     "id": "stellasora-3d/flora",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/flora__my_stage_my_creation",
+     "label": "My Stage My Creation"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/freesia",
+   "name": "Freesia",
+   "members": [
+    {
+     "id": "stellasora-3d/freesia",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/freesia__the_gift_of_falling_snow",
+     "label": "The Gift of Falling Snow"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/fuyuka",
+   "name": "Fuyuka",
+   "members": [
+    {
+     "id": "stellasora-3d/fuyuka",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/fuyuka__probation_period_cleared",
+     "label": "Probation Period Cleared"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/gerie",
+   "name": "Gerie",
+   "members": [
+    {
+     "id": "stellasora-3d/gerie",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/gerie__promise_beyond_the_thaw",
+     "label": "Promise Beyond the Thaw"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/iris",
+   "name": "Iris",
+   "members": [
+    {
+     "id": "stellasora-3d/iris",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/iris__drifting_together_on_gentle_waves",
+     "label": "Drifting Together on Gentle Waves"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/laru",
+   "name": "Laru",
+   "members": [
+    {
+     "id": "stellasora-3d/laru",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/snowish_laru",
+     "label": "Snowish"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/minova",
+   "name": "Minova",
+   "members": [
+    {
+     "id": "stellasora-3d/minova",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/minova__rippling_void_of_the_darkest_heartbreak",
+     "label": "Rippling Void of the Darkest Heartbreak"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/mistique",
+   "name": "Mistique",
+   "members": [
+    {
+     "id": "stellasora-3d/mistique",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/mistique__carefree_in_the_golden_glow",
+     "label": "Carefree in the Golden Glow"
+    },
+    {
+     "id": "stellasora-3d/mistique__cocoa_night_sweetheart",
+     "label": "Cocoa Night Sweetheart"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/nanoha",
+   "name": "Nanoha",
+   "members": [
+    {
+     "id": "stellasora-3d/nanoha",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/nanoha__when_distant_winds_rise",
+     "label": "When Distant Winds Rise"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/nazuka",
+   "name": "Nazuka",
+   "members": [
+    {
+     "id": "stellasora-3d/nazuka",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/nazuka__a_dip_of_fresh_summer",
+     "label": "A Dip of Fresh Summer"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/nazuna",
+   "name": "Nazuna",
+   "members": [
+    {
+     "id": "stellasora-3d/nazuna",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/nazuna__quirky_tea_party",
+     "label": "Quirky Tea Party"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/noya",
+   "name": "Noya",
+   "members": [
+    {
+     "id": "stellasora-3d/noya",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/firstlight_noya",
+     "label": "Firstlight"
+    },
+    {
+     "id": "stellasora-3d/noya__lingering_sunlight",
+     "label": "Lingering Sunlight"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/shia",
+   "name": "Shia",
+   "members": [
+    {
+     "id": "stellasora-3d/shia",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/shia__call_of_the_coral_sea",
+     "label": "Call of the Coral Sea"
+    }
+   ]
+  },
+  {
+   "root": "stellasora-3d/tilia",
+   "name": "Tilia",
+   "members": [
+    {
+     "id": "stellasora-3d/tilia",
+     "label": "Default"
+    },
+    {
+     "id": "stellasora-3d/tilia__shining_bright_spirits_high",
+     "label": "Shining Bright Spirits High"
+    }
+   ]
+  }
+ ]
+}

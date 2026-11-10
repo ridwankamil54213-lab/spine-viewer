@@ -1,0 +1,415 @@
+{
+ "allie": {
+  "charId": "13901",
+  "character": "Allie",
+  "name": "Allie",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "amber": {
+  "charId": "10301",
+  "character": "Amber",
+  "name": "Amber",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "amber__ease_into_an_unhurried_summer": {
+  "charId": "10304",
+  "character": "Amber",
+  "name": "Amber — Ease Into an Unhurried Summer",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Ease Into an Unhurried Summer"
+ },
+ "ann": {
+  "charId": "12301",
+  "character": "Ann",
+  "name": "Ann",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "canace": {
+  "charId": "12001",
+  "character": "Canace",
+  "name": "Canace",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "caramel": {
+  "charId": "14701",
+  "character": "Caramel",
+  "name": "Caramel",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "chaton": {
+  "charId": "11401",
+  "character": "Chaton",
+  "name": "Chaton",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "chitose": {
+  "charId": "14401",
+  "character": "Chitose",
+  "name": "Chitose",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "chitose__when_morning_glories_bloom_her_eyes_open": {
+  "charId": "14403",
+  "character": "Chitose",
+  "name": "Chitose — When Morning Glories Bloom Her Eyes Open",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "When Morning Glories Bloom Her Eyes Open"
+ },
+ "chixia": {
+  "charId": "14101",
+  "character": "Chixia",
+  "name": "Chixia",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "chixia__crimson_reflection_of_queen_of_hearts": {
+  "charId": "14103",
+  "character": "Chixia",
+  "name": "Chixia — Crimson Reflection of Queen of Hearts",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Crimson Reflection of Queen of Hearts"
+ },
+ "coronis": {
+  "charId": "11801",
+  "character": "Coronis",
+  "name": "Coronis",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "cosette": {
+  "charId": "14201",
+  "character": "Cosette",
+  "name": "Cosette",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "donna": {
+  "charId": "13001",
+  "character": "Donna",
+  "name": "Donna",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "eleanor": {
+  "charId": "13701",
+  "character": "Eleanor",
+  "name": "Eleanor",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "firefly": {
+  "charId": "11501",
+  "character": "Firefly",
+  "name": "Firefly",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "firenze": {
+  "charId": "11001",
+  "character": "Firenze",
+  "name": "Firenze",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "firenze__deadly_beauty_unparalleled_allure": {
+  "charId": "11003",
+  "character": "Firenze",
+  "name": "Firenze — Deadly Beauty Unparalleled Allure",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Deadly Beauty Unparalleled Allure"
+ },
+ "firstlight_noya": {
+  "charId": "16201",
+  "character": "Noya",
+  "name": "Noya — Firstlight",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Firstlight"
+ },
+ "flora": {
+  "charId": "12601",
+  "character": "Flora",
+  "name": "Flora",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "flora__my_stage_my_creation": {
+  "charId": "12603",
+  "character": "Flora",
+  "name": "Flora — My Stage My Creation",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "My Stage My Creation"
+ },
+ "freesia": {
+  "charId": "12501",
+  "character": "Freesia",
+  "name": "Freesia",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "freesia__the_gift_of_falling_snow": {
+  "charId": "12503",
+  "character": "Freesia",
+  "name": "Freesia — The Gift of Falling Snow",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "The Gift of Falling Snow"
+ },
+ "fuyuka": {
+  "charId": "13401",
+  "character": "Fuyuka",
+  "name": "Fuyuka",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "fuyuka__probation_period_cleared": {
+  "charId": "13403",
+  "character": "Fuyuka",
+  "name": "Fuyuka — Probation Period Cleared",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Probation Period Cleared"
+ },
+ "gerie": {
+  "charId": "14901",
+  "character": "Gerie",
+  "name": "Gerie",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "gerie__promise_beyond_the_thaw": {
+  "charId": "14903",
+  "character": "Gerie",
+  "name": "Gerie — Promise Beyond the Thaw",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Promise Beyond the Thaw"
+ },
+ "iris": {
+  "charId": "11101",
+  "character": "Iris",
+  "name": "Iris",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "iris__drifting_together_on_gentle_waves": {
+  "charId": "11104",
+  "character": "Iris",
+  "name": "Iris — Drifting Together on Gentle Waves",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Drifting Together on Gentle Waves"
+ },
+ "jinglin": {
+  "charId": "11701",
+  "character": "Jinglin",
+  "name": "Jinglin",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "karin": {
+  "charId": "15701",
+  "character": "Karin",
+  "name": "Karin",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "kasimira": {
+  "charId": "10801",
+  "character": "Kasimira",
+  "name": "Kasimira",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "laru": {
+  "charId": "15001",
+  "character": "Laru",
+  "name": "Laru",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "minova": {
+  "charId": "13201",
+  "character": "Minova",
+  "name": "Minova",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "minova__rippling_void_of_the_darkest_heartbreak": {
+  "charId": "13204",
+  "character": "Minova",
+  "name": "Minova — Rippling Void of the Darkest Heartbreak",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Rippling Void of the Darkest Heartbreak"
+ },
+ "mistique": {
+  "charId": "13501",
+  "character": "Mistique",
+  "name": "Mistique",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "mistique__carefree_in_the_golden_glow": {
+  "charId": "13504",
+  "character": "Mistique",
+  "name": "Mistique — Carefree in the Golden Glow",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Carefree in the Golden Glow"
+ },
+ "mistique__cocoa_night_sweetheart": {
+  "charId": "13503",
+  "character": "Mistique",
+  "name": "Mistique — Cocoa Night Sweetheart",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Cocoa Night Sweetheart"
+ },
+ "nanoha": {
+  "charId": "11901",
+  "character": "Nanoha",
+  "name": "Nanoha",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "nanoha__when_distant_winds_rise": {
+  "charId": "11903",
+  "character": "Nanoha",
+  "name": "Nanoha — When Distant Winds Rise",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "When Distant Winds Rise"
+ },
+ "nazuka": {
+  "charId": "13301",
+  "character": "Nazuka",
+  "name": "Nazuka",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "nazuka__a_dip_of_fresh_summer": {
+  "charId": "13303",
+  "character": "Nazuka",
+  "name": "Nazuka — A Dip of Fresh Summer",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "A Dip of Fresh Summer"
+ },
+ "nazuna": {
+  "charId": "15601",
+  "character": "Nazuna",
+  "name": "Nazuna",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "nazuna__quirky_tea_party": {
+  "charId": "15603",
+  "character": "Nazuna",
+  "name": "Nazuna — Quirky Tea Party",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Quirky Tea Party"
+ },
+ "noya": {
+  "charId": "11201",
+  "character": "Noya",
+  "name": "Noya",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "noya__lingering_sunlight": {
+  "charId": "11203",
+  "character": "Noya",
+  "name": "Noya — Lingering Sunlight",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Lingering Sunlight"
+ },
+ "otoha": {
+  "charId": "14501",
+  "character": "Otoha",
+  "name": "Otoha",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "ridge": {
+  "charId": "11601",
+  "character": "Ridge",
+  "name": "Ridge",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "shia": {
+  "charId": "15501",
+  "character": "Shia",
+  "name": "Shia",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "shia__call_of_the_coral_sea": {
+  "charId": "15503",
+  "character": "Shia",
+  "name": "Shia — Call of the Coral Sea",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Call of the Coral Sea"
+ },
+ "shimiao": {
+  "charId": "11301",
+  "character": "Shimiao",
+  "name": "Shimiao",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "snowish_laru": {
+  "charId": "15801",
+  "character": "Laru",
+  "name": "Laru — Snowish",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Snowish"
+ },
+ "sparkla": {
+  "charId": "14001",
+  "character": "Sparkla",
+  "name": "Sparkla",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "springseek_coronis": {
+  "charId": "15901",
+  "character": "Coronis",
+  "name": "Coronis — Springseek",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Springseek"
+ },
+ "suntide_willow": {
+  "charId": "16001",
+  "character": "Willow",
+  "name": "Willow — Suntide",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Suntide"
+ },
+ "teresa": {
+  "charId": "12701",
+  "character": "Teresa",
+  "name": "Teresa",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "tilia": {
+  "charId": "10701",
+  "character": "Tilia",
+  "name": "Tilia",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ },
+ "tilia__shining_bright_spirits_high": {
+  "charId": "10704",
+  "character": "Tilia",
+  "name": "Tilia — Shining Bright Spirits High",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Shining Bright Spirits High"
+ },
+ "wraith": {
+  "charId": "14301",
+  "character": "Wraith",
+  "name": "Wraith",
+  "source": "StellaSoraWiki/StellaSoraModels · ilustrasi Stella Sora AVG",
+  "variant": "Default"
+ }
+}

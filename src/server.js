@@ -577,6 +577,10 @@ const GAME_ROOTS = [
 	// resolveGame cocokkan startsWith, jadi "-l2d" harus lebih dulu.
 	// Live2D Cubism 4 dideteksi server dari .moc3; Spine event 4.2.43
 	// memakai runtime spine-pixi-v7-42. Lihat tools/stellasora/.
+	// Model 3D (glTF/GLB) Stella Sora — root terpisah dari Spine/Live2D karena
+	// runtime-nya three.js, bukan pixi-spine / Cubism. `format: "model3d"`
+	// dipasang scanModels() saat melihat model.glb, bukan di sini.
+	{ match: "stellasora-3d", key: "stellasora-3d", label: "Stella Sora — 3D" },
 	{ match: "stellasora-l2d", key: "stellasora-l2d", label: "Stella Sora — Live2D" },
 	{
 		match: "stellasora",
@@ -1752,6 +1756,53 @@ function scanModels() {
 				bones: null,
 				slots: null,
 			});
+		}
+
+		// --- Model 3D (glTF/GLB) -------------------------------------------
+		// Satu folder = satu model: model.glb (mesh+skin+tekstur, tanpa clip)
+		// plus anims/*.glb yang berisi AnimationClip terpisah. _meta.json
+		// ditulis tools/model3d/update.py (nama karakter, varian, daftar clip).
+		// Kembalikan lebih awal supaya subfolder anims/ tidak ikut dipindai
+		// sebagai model tersendiri.
+		const glb = files.find((f) => f.toLowerCase() === "model.glb");
+		if (glb) {
+			const rel = path.relative(ASSETS, dir).split(path.sep).join("/");
+			const id = rel.replace(/[^\w.\-/]+/g, "-");
+			const { game, gameLabel } = resolveGame(rootRel, id);
+			let meta = {};
+			try {
+				meta = JSON.parse(fs.readFileSync(path.join(dir, "_meta.json"), "utf8"));
+			} catch { /* metadata opsional */ }
+			let clips = [];
+			try {
+				clips = fs.readdirSync(path.join(dir, "anims"))
+					.filter((f) => f.toLowerCase().endsWith(".glb"))
+					.sort();
+			} catch { /* model tanpa animasi tetap bisa ditampilkan */ }
+			const names = clips.map((f) => f.replace(/\.glb$/i, ""));
+			const leaf = path.basename(dir);
+			const title = leaf.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+			models.push({
+				id,
+				game,
+				gameLabel,
+				format: "model3d",
+				name: meta.name || title,
+				group: rel.split("/").slice(0, -1).join(" / ") || "",
+				modelFile: glb,
+				animationFiles: clips.map((f) => ({
+					name: f.replace(/\.glb$/i, ""), file: f,
+				})),
+				animations: names.length ? ["Bind pose", ...names] : ["Bind pose"],
+				skins: [],
+				bones: null,
+				slots: null,
+				spine: null,
+				runtime: "gltf2",
+				files: files.sort(),
+				bytes: dirBytes(dir),
+			});
+			return;
 		}
 
 		if (skel.length && atlas.length) {
@@ -3865,6 +3916,7 @@ function attachCharacters(models) {
 		{ game: "zonenova", names: "zonenova-names.json", family: "zonenova-family.json" },
 		{ game: "stellasora", names: "stellasora-names.json", family: "stellasora-family.json" },
 		{ game: "stellasora-l2d", names: "stellasora-l2d-names.json", family: "stellasora-l2d-family.json" },
+		{ game: "stellasora-3d", names: "stellasora-3d-names.json", family: "stellasora-3d-family.json" },
 		// Cat Shinobi punya loader nama sendiri (kuncinya id lengkap, bukan
 		// leaf folder), jadi di sini cuma family/varian yang dilekatkan.
 		{ game: "catshinobi", names: null, family: "catshinobi-family.json" },
@@ -4276,6 +4328,13 @@ const UPDATERS = {
 	// Stella Sora: satu updater menulis 2 root (Spine event + Live2D).
 	stellasora: {
 		script: path.join(ROOT, "tools", "stellasora", "update.py"),
+		py: "/srv/venv-spine/bin/python",
+		rescan: true,
+	},
+	// Model 3D Stella Sora (glTF/GLB dari StellaSoraWiki/StellaSoraModels).
+	// Satu updater menulis assets/stellasora-3d/ + nama/family + thumbnail.
+	"stellasora-3d": {
+		script: path.join(ROOT, "tools", "model3d", "update.py"),
 		py: "/srv/venv-spine/bin/python",
 		rescan: true,
 	},

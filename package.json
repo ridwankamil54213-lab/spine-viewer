@@ -5,11 +5,11 @@
   "description": "Spine2D skeleton viewer — assets served from this server, rendered with pixi-spine.",
   "main": "src/server.js",
   "scripts": {
-    "build": "esbuild src/viewer.js --bundle --format=iife --outfile=public/dist/viewer.js --target=es2020 --sourcemap",
+    "build": "esbuild src/viewer.js --bundle --format=iife --outfile=public/dist/viewer.js --target=es2020 --sourcemap && esbuild src/model3d-stage.js --bundle --format=iife --outfile=public/dist/model3d.js --target=es2020 --minify",
     "watch": "npm run build -- --watch",
     "start": "node src/server.js",
     "dev": "npm run build && node src/server.js",
-    "test:smoke": "node tools/check-controls.cjs && node tools/check-toolbar.cjs && node tools/check-fps.cjs && node tools/check-mad-ports.cjs && node tools/check-permalink.cjs && node tools/check-cherrytale.cjs && node tools/check-lean-library.cjs && node tools/check-czn.cjs && node tools/check-czn-cards.cjs && node tools/check-epic7.cjs && node tools/check-crosscore.cjs && node tools/check-bd2.cjs && node tools/check-mad-drama.cjs && node tools/check-backdrop-fullscreen.cjs && node tools/check-aurora-stars.cjs && node tools/check-muvluv-thumbs.cjs && node tools/check-nikke.cjs && node tools/check-mitao.cjs && node tools/check-mitao-variants.cjs && node tools/check-pokerfate.cjs && node tools/check-lostsword.cjs && node tools/check-eroera.cjs && node tools/check-mercenary.cjs && node tools/check-ivntight.cjs && node tools/check-arknights.cjs && node tools/check-zonenova.cjs && node tools/check-stellasora.cjs && node tools/check-updater-dashboard.cjs && node tools/check-arkrecode.cjs && node tools/check-update-json.cjs && node tools/check-catshinobi.cjs && node tools/check-update-refresh.cjs && node tools/check-variant-picker.cjs",
+    "test:smoke": "node tools/check-controls.cjs && node tools/check-toolbar.cjs && node tools/check-fps.cjs && node tools/check-mad-ports.cjs && node tools/check-permalink.cjs && node tools/check-cherrytale.cjs && node tools/check-lean-library.cjs && node tools/check-czn.cjs && node tools/check-czn-cards.cjs && node tools/check-epic7.cjs && node tools/check-crosscore.cjs && node tools/check-bd2.cjs && node tools/check-mad-drama.cjs && node tools/check-backdrop-fullscreen.cjs && node tools/check-aurora-stars.cjs && node tools/check-muvluv-thumbs.cjs && node tools/check-nikke.cjs && node tools/check-mitao.cjs && node tools/check-mitao-variants.cjs && node tools/check-pokerfate.cjs && node tools/check-lostsword.cjs && node tools/check-eroera.cjs && node tools/check-mercenary.cjs && node tools/check-ivntight.cjs && node tools/check-arknights.cjs && node tools/check-zonenova.cjs && node tools/check-stellasora.cjs && node tools/check-updater-dashboard.cjs && node tools/check-arkrecode.cjs && node tools/check-update-json.cjs && node tools/check-catshinobi.cjs && node tools/check-update-refresh.cjs && node tools/check-model3d.cjs && node tools/check-variant-picker.cjs",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -21,7 +21,8 @@
     "pixi-spine": "^4.0.6",
     "pixi.js": "^7.4.3",
     "spine-core42": "npm:@esotericsoftware/spine-core@^4.2.120",
-    "spine-pixi-v7-42": "npm:@esotericsoftware/spine-pixi-v7@^4.2.120"
+    "spine-pixi-v7-42": "npm:@esotericsoftware/spine-pixi-v7@^4.2.120",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
