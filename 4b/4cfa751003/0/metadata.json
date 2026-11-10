@@ -1,0 +1,50 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "4b4cfa751003",
+  "session_id": "local-4f9a98b18d1316e64dbe0800eee7d5829d86472a6d80ff07ffccaf4f9e718882",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-10T10:50:15.276189632Z",
+  "branch": "master",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "README.md",
+    "data/stellasora-3d-family.json",
+    "data/stellasora-3d-names.json",
+    "package-lock.json",
+    "package.json",
+    "public/styles.css",
+    "public/thumbs/_game/stellasora-3d.png",
+    "src/model3d-stage.js",
+    "src/server.js",
+    "src/viewer.js",
+    "tools/check-crosscore.cjs",
+    "tools/check-model3d.cjs",
+    "tools/check-nikke.cjs",
+    "tools/model3d/README.md",
+    "tools/model3d/refresh.py",
+    "tools/model3d/update.py"
+  ],
+  "agent": "Hermes Agent",
+  "model": "sas",
+  "turn_id": "257060661cd4",
+  "checkpoint_transcript_start": 1344,
+  "transcript_lines_at_start": 1344,
+  "compact_transcript_start": 198,
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 95
+  }
+}
