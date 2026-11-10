@@ -97,10 +97,12 @@ const getJSON = async (url) => {
 	ok("tidak ada false-fail pada updater tanpa field ok",
 		games.filter((g) => !g.ok).length <= 1,
 		`${s.failed} gagal: ${games.filter((g) => !g.ok).map((g) => g.game).join(",")}`);
+	// Regresi normalisasi: updater tanpa field `ok` tidak boleh dianggap gagal.
+	// Jangan gantung pada `new > 0` — itu berubah begitu user klik Apply.
 	ok("shoujoukaisen terbaca sukses (tanpa ok di JSON)",
-		!!games.find((g) => g.game === "shoujoukaisen" && g.ok && g.new > 0));
+		!!games.find((g) => g.game === "shoujoukaisen" && g.ok && !g.error && !!g.version));
 	ok("catshinobi tidak kena timeout",
-		!!games.find((g) => g.game === "catshinobi" && g.ok && g.new > 0));
+		!!games.find((g) => g.game === "catshinobi" && g.ok && !g.error && !!g.version));
 
 	// --- 2. Cache -----------------------------------------------------------
 	const b = await getJSON("/api/updaters/health");

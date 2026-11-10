@@ -252,6 +252,35 @@ Regresi: `node tools/check-update-json.cjs` (31 assertion) — termasuk uji
 kosong di browser** yang harus menghasilkan toast yang jelas, bukan error
 samar.
 
+## Cat Shinobi: nama karakter, varian, thumbnail
+
+596 model `catshinobi/` dulu cuma punya 260 nama, tanpa picker varian dan
+tanpa thumbnail sama sekali. Sekarang semuanya dibangun **offline** dari APK
+resmi yang sudah diekstrak (lihat `tools/catshinobi/README.md`):
+
+| | Hasil | Sumber |
+| --- | --- | --- |
+| Nama karakter | **260 → 307** model | tabel Unity Localization game sendiri (`UI_CHARACTER_NAME_*`, `UI_COSTUME_NO_*`, en/id/ja) |
+| Varian | **186 family / 519 anggota** | id numerik sama lintas bentuk (`Char_`, `Char_SD_`, `Char_LD_`, `cat_battle_mode_`, `cat_front_mode_`, `cat_ninja_`) |
+| Thumbnail | **188 WebP / 517 model** | Sprite ilustrasi `CharThumb_*`, `CharInfoThumb_*`, `char_*`, `Icon_Profile_*` |
+
+- **Thumbnail bukan halaman atlas.** Sprite yang dipilih berlatar transparan
+  (semua WebP punya chunk `ALPH`; 0 gambar fully opaque), bukan `Texture2D`
+  2048² yang dipakai skeleton. Ini sesuai preferensi gambar ilustrasi karakter.
+- **Nama tidak dikarang.** `cat_*_mode_*` dan `monster_*` sengaja dibiarkan
+  tanpa nama karena angkanya indeks animasi/musuh, bukan id karakter.
+  Perbaikan `costume->base` membuat `Char_1003` → *Akari Mayoneko —
+  Summer・Shinobis*, `Char_15002` → *Sena Kisaragi — Noble Frost*, dll.
+- Tiap entri nama membawa `variant` (`Battle`, `SD (Chibi)`, `LD`,
+  `Cat · Battle`, `Monster`, `· Skill`), diteruskan ke `m.character.variant`.
+  Family dibaca loader umum di `src/server.js`, jadi picker varian yang sama
+  dengan Arknights / Zone Nova / Stella Sora langsung jalan.
+
+Regenerasi: `/srv/venv-spine/bin/python tools/catshinobi/refresh.py` (offline,
+~4 detik) lalu `systemctl restart spine-viewer` + `/api/models?refresh=1`
+karena server menyimpan cache model persisten. `public/thumbs/catshinobi/`
+ada di luar git. Regresi `node tools/check-catshinobi.cjs` (37 assertion).
+
 ## Ark Re:Code: model "bukan Spine"
 
 `catalog_116031` membawa 20 bundle hero baru. 18 di antaranya (`H169`,
@@ -1182,6 +1211,7 @@ node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilus
 node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
 node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
 node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
+node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilustrasi, render
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

@@ -24,9 +24,15 @@ import sys
 
 import UnityPy
 
-BUNDLE_DIR = "/srv/spine-assets/catshinobi-apk/bundles/assets/aa/Android"
-ASSETS = "/srv/spine-assets/catshinobi"
-OUT = "/srv/spine-viewer/data/catshinobi-names.json"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Bundle hasil ekstraksi tools/update-catshinobi.py. Bisa dioverride supaya
+# skrip ini tetap jalan kalau cache dipindah; tidak ada akses jaringan.
+BUNDLE_DIR = os.environ.get(
+	"CS_BUNDLE_DIR",
+	"/srv/spine-assets/catshinobi-update/bundles/assets/aa/Android",
+)
+ASSETS = os.environ.get("CS_ASSETS", os.path.join(ROOT, "assets", "catshinobi"))
+OUT = os.environ.get("CS_NAMES_OUT", os.path.join(ROOT, "data", "catshinobi-names.json"))
 MONOBEHAVIOUR = 114
 
 LOCALES = {"en": "(en)", "id": "(id)", "ja": "(ja)"}
@@ -103,6 +109,31 @@ def load_locale(frag):
     return m
 
 
+def form_label(folder: str) -> str:
+	"""Label varian dari bentuk folder, dipakai chip picker varian.
+
+	Char_*        = model battle biasa
+	Char_SD_*     = chibi / super-deformed
+	Char_LD_*     = versi LD (large display)
+	cat_*_mode_*  = bentuk kucing di battle / front / ninja
+	monster_*     = musuh
+	"""
+	low = folder.lower()
+	if low.startswith("char_sd_"): base = "SD (Chibi)"
+	elif low.startswith("char_ld_"): base = "LD"
+	elif low.startswith("char_"): base = "Battle"
+	elif low.startswith("cat_battle_mode_"): base = "Cat · Battle"
+	elif low.startswith("cat_front_mode_"): base = "Cat · Front"
+	elif low.startswith("cat_ninja_"): base = "Cat · Ninja"
+	elif low.startswith("monster_ld_"): base = "Monster LD"
+	elif low.startswith("monster_sd_"): base = "Monster SD"
+	elif low.startswith("monster_"): base = "Monster"
+	else: base = "Lainnya"
+	if re.search(r"_(skill|signatureskill|signature_skill)$", low):
+		base += " · Skill"
+	return base
+
+
 def clean(v):
     if not isinstance(v, str):
         return None
@@ -155,6 +186,18 @@ def main():
 
     base_ids = sorted(chars, key=lambda x: int(x))
 
+    def shared_base(n):
+        """Karakter dasar untuk id turunan (10003 -> 10001, 15011 -> 15001).
+
+        Syaratnya ketat: panjang sama, tiga angka depan sama, dan si kandidat
+        berakhir '01'. Ini mencegah 10100 (sub-seri lain) ikut tercantum
+        sebagai Mei Kaminari.
+        """
+        for b in base_ids:
+            if len(b) == len(n) and b != n and b.endswith("01") and b[:3] == n[:3]:
+                return b
+        return None
+
     def resolve(n):
         """Folder id -> (character entry, costume entry, how).
 
@@ -176,15 +219,17 @@ def main():
             for b in (n, n[:-1], n[:4], n[:3]):
                 if b in chars:
                     return chars[b], cost, "costume->base"
+            # Bug lama: kalau id kostum tidak punya pasangan karakter lewat
+            # potongan awal (mis. 1003 = "Summer Shinobis" milik 1001),
+            # fungsi ini langsung balik "costume-only" dan tidak pernah
+            # mencoba aturan shared_base. Akibatnya Char_1003, Char_2004,
+            # Char_6002, ... tetap tanpa nama padahal karakternya jelas.
+            b = shared_base(n)
+            if b:
+                return chars[b], cost, f"costume->base({b})"
             return None, cost, "costume-only"
-        # Share the character's base id: 10003/10011/10020 all belong to
-        # 10001. The rule is the first THREE digits must match, so 10100
-        # (a different sub-series) does NOT inherit Mei Kaminari -- it stays
-        # unnamed rather than being given a name it has no claim to.
-        for b in base_ids:
-            if len(b) == len(n) and b != n and b.endswith("01") and b[:3] == n[:3]:
-                return chars[b], None, f"base({b})"
-        return None, None, None
+        b = shared_base(n)
+        return (chars[b], None, f"base({b})") if b else (None, None, None)
 
     folders = sorted(os.listdir(ASSETS))
     out_models = {}
@@ -218,6 +263,7 @@ def main():
                     "ja": ja_name,
                     "id_local": ch.get("id"),
                     "match": how,
+                    "variant": form_label(f),
                 }
                 key = how.split("(")[0]
                 stats[key if key in stats else "none"] = stats.get(

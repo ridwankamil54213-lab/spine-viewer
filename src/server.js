@@ -3865,12 +3865,15 @@ function attachCharacters(models) {
 		{ game: "zonenova", names: "zonenova-names.json", family: "zonenova-family.json" },
 		{ game: "stellasora", names: "stellasora-names.json", family: "stellasora-family.json" },
 		{ game: "stellasora-l2d", names: "stellasora-l2d-names.json", family: "stellasora-l2d-family.json" },
+		// Cat Shinobi punya loader nama sendiri (kuncinya id lengkap, bukan
+		// leaf folder), jadi di sini cuma family/varian yang dilekatkan.
+		{ game: "catshinobi", names: null, family: "catshinobi-family.json" },
 	]) {
 		const read = (f) => {
 			try { return JSON.parse(fs.readFileSync(path.join(DATA, f), "utf8")); }
 			catch { return {}; }
 		};
-		const nameMap = read(cfg.names);
+		const nameMap = cfg.names ? read(cfg.names) : {};
 		const fam = read(cfg.family);
 		const byId = new Map(models.map((m) => [m.id, m]));
 		let hits = 0;
@@ -3904,7 +3907,7 @@ function attachCharacters(models) {
 			if (root && f.name) root.name = f.name;
 			famHits++;
 		}
-		if (hits) console.log(`  ${cfg.game} : ${hits} model diberi nama EN, ${famHits} family`);
+		if (hits || famHits) console.log(`  ${cfg.game} : ${hits} model diberi nama EN, ${famHits} family`);
 	}
 
 	// --- Girl Wars (少女ウォーズ): nama karakter + kostum -------------------
@@ -4033,6 +4036,7 @@ function attachCharacters(models) {
 			costume: costume || null,
 			ja: rec.ja || null,
 			match: rec.match || null,
+			variant: rec.variant || null,
 			squad: null,
 			rarity: null,
 			class: null,

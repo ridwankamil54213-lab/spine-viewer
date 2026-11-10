@@ -1,0 +1,3196 @@
+{
+ "families": [
+  {
+   "root": "catshinobi/Char_LD_1001",
+   "name": "Akari Mayoneko",
+   "members": [
+    {
+     "id": "catshinobi/Char_LD_1001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_1001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1003",
+   "name": "Akari Mayoneko — Summer・Shinobis",
+   "members": [
+    {
+     "id": "catshinobi/Char_1003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_1003",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_1003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1004",
+   "name": "Akari Mayoneko — Night Bunny",
+   "members": [
+    {
+     "id": "catshinobi/Char_1004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_1004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1006",
+   "name": "Akari Mayoneko — Autumn Days",
+   "members": [
+    {
+     "id": "catshinobi/Char_1006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_1006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1007",
+   "name": "Akari Mayoneko — Galaxy Maid",
+   "members": [
+    {
+     "id": "catshinobi/Char_1007",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_1007",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1009",
+   "name": "Akari Mayoneko — Merry Reonamas",
+   "members": [
+    {
+     "id": "catshinobi/Char_1009",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_1009",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_1009",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1100",
+   "name": "Set 1100",
+   "members": [
+    {
+     "id": "catshinobi/Char_1100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_1100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_1100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1200",
+   "name": "Set 1200",
+   "members": [
+    {
+     "id": "catshinobi/Char_1200",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_1200",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_1900",
+   "name": "Set 1900",
+   "members": [
+    {
+     "id": "catshinobi/Char_1900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_1900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_1900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2003",
+   "name": "Reona Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_2003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_2003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2004",
+   "name": "Reona Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_2004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_2004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2006",
+   "name": "Reona Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_2006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_2006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2008",
+   "name": "Reona Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_2008",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_2008",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_2008",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2009",
+   "name": "Reona Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_2009",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_2009",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2010",
+   "name": "Set 2010",
+   "members": [
+    {
+     "id": "catshinobi/Char_2010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_2010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_2010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2020",
+   "name": "Set 2020",
+   "members": [
+    {
+     "id": "catshinobi/Char_2020",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_2020",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_2020",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2040",
+   "name": "Set 2040",
+   "members": [
+    {
+     "id": "catshinobi/Char_2040",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_2040",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2100",
+   "name": "Set 2100",
+   "members": [
+    {
+     "id": "catshinobi/Char_2100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_2100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_2100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_2900",
+   "name": "Set 2900",
+   "members": [
+    {
+     "id": "catshinobi/Char_2900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_2900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_2900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3002",
+   "name": "Taiga Fuyumi",
+   "members": [
+    {
+     "id": "catshinobi/Char_3002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_3002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3003",
+   "name": "Taiga Fuyumi",
+   "members": [
+    {
+     "id": "catshinobi/Char_3003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_3003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3004",
+   "name": "Taiga Fuyumi",
+   "members": [
+    {
+     "id": "catshinobi/Char_3004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_3004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3006",
+   "name": "Taiga Fuyumi",
+   "members": [
+    {
+     "id": "catshinobi/Char_3006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_3006",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_3006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3009",
+   "name": "Taiga Fuyumi",
+   "members": [
+    {
+     "id": "catshinobi/Char_3009",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_3009",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3010",
+   "name": "Set 3010",
+   "members": [
+    {
+     "id": "catshinobi/Char_3010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_3010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_3010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_3100",
+   "name": "Set 3100",
+   "members": [
+    {
+     "id": "catshinobi/Char_3100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_3100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_3100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4002",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4003",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4004",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4006",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4007",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4007",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_4007",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_4007",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4009",
+   "name": "Ryo Nakatsukami",
+   "members": [
+    {
+     "id": "catshinobi/Char_4009",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4009",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4010",
+   "name": "Set 4010",
+   "members": [
+    {
+     "id": "catshinobi/Char_4010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_4010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_4010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4040",
+   "name": "Set 4040",
+   "members": [
+    {
+     "id": "catshinobi/Char_4040",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_4040",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4100",
+   "name": "Set 4100",
+   "members": [
+    {
+     "id": "catshinobi/Char_4100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_4100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_4100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_4900",
+   "name": "Set 4900",
+   "members": [
+    {
+     "id": "catshinobi/Char_4900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_4900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_4900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5003",
+   "name": "Hisui Nanagi",
+   "members": [
+    {
+     "id": "catshinobi/Char_5003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_5003",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_5003",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5003",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5004",
+   "name": "Hisui Nanagi",
+   "members": [
+    {
+     "id": "catshinobi/Char_5004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_5004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5006",
+   "name": "Hisui Nanagi",
+   "members": [
+    {
+     "id": "catshinobi/Char_5006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_5006",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_5006",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5006",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/monster_5009",
+   "name": "Set 5009 (5001)",
+   "members": [
+    {
+     "id": "catshinobi/monster_5009",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5009",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5010",
+   "name": "Set 5010",
+   "members": [
+    {
+     "id": "catshinobi/Char_5010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_5010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_5010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/monster_5012",
+   "name": "Set 5012",
+   "members": [
+    {
+     "id": "catshinobi/monster_5012",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5012",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/monster_5015",
+   "name": "Set 5015",
+   "members": [
+    {
+     "id": "catshinobi/monster_5015",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5015",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/monster_5018",
+   "name": "Set 5018",
+   "members": [
+    {
+     "id": "catshinobi/monster_5018",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5018",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/monster_5021",
+   "name": "Set 5021",
+   "members": [
+    {
+     "id": "catshinobi/monster_5021",
+     "label": "Monster"
+    },
+    {
+     "id": "catshinobi/monster_LD_5021",
+     "label": "Monster LD"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5100",
+   "name": "Set 5100",
+   "members": [
+    {
+     "id": "catshinobi/Char_5100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_5100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_5100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_5300",
+   "name": "Set 5300",
+   "members": [
+    {
+     "id": "catshinobi/Char_5300",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_5300",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6001",
+   "name": "Kuroko Morimi",
+   "members": [
+    {
+     "id": "catshinobi/Char_6001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_6001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_6001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6002",
+   "name": "Kuroko Morimi",
+   "members": [
+    {
+     "id": "catshinobi/Char_6002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_6002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6003",
+   "name": "Kuroko Morimi",
+   "members": [
+    {
+     "id": "catshinobi/Char_6003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_6003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6004",
+   "name": "Kuroko Morimi",
+   "members": [
+    {
+     "id": "catshinobi/Char_6004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_6004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6006",
+   "name": "Kuroko Morimi",
+   "members": [
+    {
+     "id": "catshinobi/Char_6006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_6006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6010",
+   "name": "Set 6010",
+   "members": [
+    {
+     "id": "catshinobi/Char_6010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_6010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_6010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6011",
+   "name": "Set 6011",
+   "members": [
+    {
+     "id": "catshinobi/Char_6011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_6011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_6011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6050",
+   "name": "Set 6050",
+   "members": [
+    {
+     "id": "catshinobi/Char_6050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_6050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6100",
+   "name": "Set 6100",
+   "members": [
+    {
+     "id": "catshinobi/Char_6100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_6100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_6100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_6900",
+   "name": "Set 6900",
+   "members": [
+    {
+     "id": "catshinobi/Char_6900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_6900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_6900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7001",
+   "name": "Madoka Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_7001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_7001",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7002",
+   "name": "Madoka Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_7002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_7002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7003",
+   "name": "Madoka Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_7003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7003",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7003",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_7003",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7004",
+   "name": "Madoka Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_7004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7004",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7006",
+   "name": "Madoka Hino",
+   "members": [
+    {
+     "id": "catshinobi/Char_7006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_7006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7010",
+   "name": "Set 7010",
+   "members": [
+    {
+     "id": "catshinobi/Char_7010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7012",
+   "name": "Set 7012",
+   "members": [
+    {
+     "id": "catshinobi/Char_7012",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7012",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7012",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7050",
+   "name": "Set 7050",
+   "members": [
+    {
+     "id": "catshinobi/Char_7050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_7050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7100",
+   "name": "Set 7100",
+   "members": [
+    {
+     "id": "catshinobi/Char_7100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_7900",
+   "name": "Set 7900",
+   "members": [
+    {
+     "id": "catshinobi/Char_7900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_7900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_7900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8001",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_8001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_8001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8002",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8003",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8004",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8005",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8005",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_8005",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_8005",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8006",
+   "name": "Nene Sunaoka",
+   "members": [
+    {
+     "id": "catshinobi/Char_8006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8010",
+   "name": "Set 8010",
+   "members": [
+    {
+     "id": "catshinobi/Char_8010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8011",
+   "name": "Set 8011",
+   "members": [
+    {
+     "id": "catshinobi/Char_8011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_8011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_8011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8050",
+   "name": "Set 8050",
+   "members": [
+    {
+     "id": "catshinobi/Char_8050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8051",
+   "name": "Set 8051",
+   "members": [
+    {
+     "id": "catshinobi/Char_8051",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8051",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8100",
+   "name": "Set 8100",
+   "members": [
+    {
+     "id": "catshinobi/Char_8100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_8100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_8100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_8300",
+   "name": "Set 8300",
+   "members": [
+    {
+     "id": "catshinobi/Char_8300",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_8300",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9001",
+   "name": "Akane Mayoneko",
+   "members": [
+    {
+     "id": "catshinobi/Char_9001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_9001",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9002",
+   "name": "Akane Mayoneko",
+   "members": [
+    {
+     "id": "catshinobi/Char_9002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_9002",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_9002",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9003",
+   "name": "Akane Mayoneko",
+   "members": [
+    {
+     "id": "catshinobi/Char_9003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_9003",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_9003",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9006",
+   "name": "Akane Mayoneko",
+   "members": [
+    {
+     "id": "catshinobi/Char_9006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9006",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9006",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/monster_9006",
+     "label": "Monster"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9010",
+   "name": "Set 9010",
+   "members": [
+    {
+     "id": "catshinobi/Char_9010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9012",
+   "name": "Set 9012",
+   "members": [
+    {
+     "id": "catshinobi/Char_9012",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9012",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9012",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9050",
+   "name": "Set 9050",
+   "members": [
+    {
+     "id": "catshinobi/Char_9050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_9050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9100",
+   "name": "Set 9100",
+   "members": [
+    {
+     "id": "catshinobi/Char_9100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_9101",
+   "name": "Set 9101",
+   "members": [
+    {
+     "id": "catshinobi/Char_9101",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_9101",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_9101",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10001",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_10001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_10001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10003",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_10003",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_10003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10006",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_10006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10007",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10007",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_10007",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10011",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_10011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_10011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10020",
+   "name": "Mei Kaminari",
+   "members": [
+    {
+     "id": "catshinobi/Char_10020",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_10020",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_10020",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_10100",
+   "name": "Set 10100",
+   "members": [
+    {
+     "id": "catshinobi/Char_10100",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_10100",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_10100",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11001",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11002",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11002",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11006",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11006",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11007",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11007",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_11007",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11010",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11011",
+   "name": "Enma Yozakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_11011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_11300",
+   "name": "Set 11300",
+   "members": [
+    {
+     "id": "catshinobi/Char_11300",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_11300",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_11300",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_12001",
+   "name": "Shy",
+   "members": [
+    {
+     "id": "catshinobi/Char_12001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_12001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_12001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_13001",
+   "name": "Spirit",
+   "members": [
+    {
+     "id": "catshinobi/Char_13001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_13001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_13001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_14001",
+   "name": "Ai Tennoji",
+   "members": [
+    {
+     "id": "catshinobi/Char_14001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_14001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_14001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15001",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_LD_15001_Skill",
+     "label": "LD · Skill"
+    },
+    {
+     "id": "catshinobi/Char_SD_15001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15002",
+   "name": "Sena Kisaragi — Noble Frost",
+   "members": [
+    {
+     "id": "catshinobi/Char_15002",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_15002",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15006",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_15006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15010",
+   "name": "Sena Kisaragi — May Marry Me",
+   "members": [
+    {
+     "id": "catshinobi/Char_15010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15010",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15011",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15012",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15012",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15012",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15012",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15013",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15013",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15013",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15013",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15030",
+   "name": "Sena Kisaragi",
+   "members": [
+    {
+     "id": "catshinobi/Char_15030",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15030",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15030",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_15900",
+   "name": "Set 15900",
+   "members": [
+    {
+     "id": "catshinobi/Char_15900",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_15900",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_15900",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_16001",
+   "name": "“Blessed White Light” Akari Mayoneko — Blessed White Light",
+   "members": [
+    {
+     "id": "catshinobi/Char_16001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_16001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_16001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_17001",
+   "name": "Ryo Nakatsukami — Summer Violet",
+   "members": [
+    {
+     "id": "catshinobi/Char_17001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_17001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_17001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18001",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_18001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_18001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18003",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_18003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18004",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_18004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18005",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18005",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_18005",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_18005",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18006",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_18006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18011",
+   "name": "July Yonaha",
+   "members": [
+    {
+     "id": "catshinobi/Char_18011",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_18011",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_18011",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_18060",
+   "name": "July Yonaha — Soccerholic (Yellow)",
+   "members": [
+    {
+     "id": "catshinobi/Char_18060",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_18060",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_19001",
+   "name": "Taiga Fuyumi — Midnight Blue",
+   "members": [
+    {
+     "id": "catshinobi/Char_19001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_19001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_19001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_20001",
+   "name": "Kuroko Morimi — Onyx Tiger",
+   "members": [
+    {
+     "id": "catshinobi/Char_20001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_20001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_20001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21001",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_LD_21001_signature_skill",
+     "label": "LD · Skill"
+    },
+    {
+     "id": "catshinobi/Char_SD_21001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/Char_SD_21001_Maka",
+     "label": "SD (Chibi) 2"
+    },
+    {
+     "id": "catshinobi/Char_SD_21001_Waka",
+     "label": "SD (Chibi) 3"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21003",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21003",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21005",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21005",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21005",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21005",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21006",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21006",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21010",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21010",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_21010",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21012",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21012",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21012",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21012",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21050",
+   "name": "Chico Onikasa",
+   "members": [
+    {
+     "id": "catshinobi/Char_21050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21050",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21200",
+   "name": "Set 21200",
+   "members": [
+    {
+     "id": "catshinobi/Char_21200",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_21200",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_21300",
+   "name": "Set 21300",
+   "members": [
+    {
+     "id": "catshinobi/Char_21300",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_21300",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_21300",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_22001",
+   "name": "Reona Hino — Lion Rouge",
+   "members": [
+    {
+     "id": "catshinobi/Char_22001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_22001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_22001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_23001",
+   "name": "Nene Sunaoka — Twilight Ruby",
+   "members": [
+    {
+     "id": "catshinobi/Char_23001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_23001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_23001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_24001",
+   "name": "Ayame Hanakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_24001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_24001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_24001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_24003",
+   "name": "Ayame Hanakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_24003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_24003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_24004",
+   "name": "Ayame Hanakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_24004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_24004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_24006",
+   "name": "Ayame Hanakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_24006",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_24006",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_24013",
+   "name": "Ayame Hanakura",
+   "members": [
+    {
+     "id": "catshinobi/Char_24013",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_24013",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_24013",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_25001",
+   "name": "Mei Kaminari — Night Sapphire",
+   "members": [
+    {
+     "id": "catshinobi/Char_25001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_25001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_25001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26001",
+   "name": "Shizuku Hinawa",
+   "members": [
+    {
+     "id": "catshinobi/Char_26001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_26001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_LD_26001_signature_skill",
+     "label": "LD · Skill"
+    },
+    {
+     "id": "catshinobi/Char_SD_26001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26003",
+   "name": "Shizuku Hinawa",
+   "members": [
+    {
+     "id": "catshinobi/Char_26003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_26003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26020",
+   "name": "Shizuku Hinawa — Frontline·Absolute Defense",
+   "members": [
+    {
+     "id": "catshinobi/Char_26020",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_26020",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_26020",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26050",
+   "name": "Shizuku Hinawa",
+   "members": [
+    {
+     "id": "catshinobi/Char_26050",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_26050",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_26050",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26060",
+   "name": "Shizuku Hinawa — Soccerholic (Blue)",
+   "members": [
+    {
+     "id": "catshinobi/Char_26060",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_26060",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26070",
+   "name": "Shizuku Hinawa",
+   "members": [
+    {
+     "id": "catshinobi/Char_26070",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_26070",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_26070",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_26300",
+   "name": "Set 26300",
+   "members": [
+    {
+     "id": "catshinobi/Char_26300",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_26300",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_26300",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_27001",
+   "name": "Hisui Nanagi – — Cotton Siesta",
+   "members": [
+    {
+     "id": "catshinobi/Char_27001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_27001_signature_skill",
+     "label": "Battle · Skill"
+    },
+    {
+     "id": "catshinobi/Char_LD_27001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_27001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_28001",
+   "name": "Hino Madoka — Cherry Beat",
+   "members": [
+    {
+     "id": "catshinobi/Char_28001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_28001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_28001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_29001",
+   "name": "Fuyumi Taiga — Vanilla Groove",
+   "members": [
+    {
+     "id": "catshinobi/Char_29001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_29001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_29001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_30001",
+   "name": "Mashiro Azuki",
+   "members": [
+    {
+     "id": "catshinobi/Char_30001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_30001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_LD_30001_signatureskill",
+     "label": "LD · Skill"
+    },
+    {
+     "id": "catshinobi/Char_SD_30001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_30003",
+   "name": "Mashiro Azuki",
+   "members": [
+    {
+     "id": "catshinobi/Char_30003",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_30003",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_30003",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_30004",
+   "name": "Mashiro Azuki",
+   "members": [
+    {
+     "id": "catshinobi/Char_30004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_30004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_30020",
+   "name": "Mashiro Azuki — Off the Record 'Mashiro'",
+   "members": [
+    {
+     "id": "catshinobi/Char_30020",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_30020",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_30060",
+   "name": "Mashiro Azuki — Soccerholic (Red)",
+   "members": [
+    {
+     "id": "catshinobi/Char_30060",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_30060",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_32001",
+   "name": "Akane Mayoneko — Soleil Marina",
+   "members": [
+    {
+     "id": "catshinobi/Char_32001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_32001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_32001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/cat_battle_mode_32001",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_32001",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_32001",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_32002",
+   "name": "Set 32002 (32001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_32002",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_32002",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_32002",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_33001",
+   "name": "Sena Kisaragi — Secret Rivière",
+   "members": [
+    {
+     "id": "catshinobi/Char_33001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_33001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_33001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/cat_battle_mode_33001",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_33001",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_33001",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_33002",
+   "name": "Set 33002 (33001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_33002",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_33002",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_33002",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_34001",
+   "name": "Enma Yozakura — Moonlight Bunny",
+   "members": [
+    {
+     "id": "catshinobi/Char_34001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_34001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_34001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/cat_battle_mode_34001",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34001",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34001",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34002",
+   "name": "Set 34002 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34002",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34002",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34002",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34003",
+   "name": "Set 34003 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34003",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34003",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34003",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34004",
+   "name": "Set 34004 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34004",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34004",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34004",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34005",
+   "name": "Set 34005 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34005",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34005",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34005",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34006",
+   "name": "Set 34006 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34006",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34006",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34006",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34007",
+   "name": "Set 34007 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34007",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34007",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34007",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34008",
+   "name": "Set 34008 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34008",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34008",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34008",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34009",
+   "name": "Set 34009 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34009",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34009",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34009",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34010",
+   "name": "Set 34010 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34010",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34010",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34010",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_34011",
+   "name": "Set 34011 (34001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_34011",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_34011",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_34011",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_35001",
+   "name": "Chisa Inagae — Pure-White Abyss Costume",
+   "members": [
+    {
+     "id": "catshinobi/Char_35001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_35001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_35001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_35004",
+   "name": "Chisa Inagae — Crescent Bunny",
+   "members": [
+    {
+     "id": "catshinobi/Char_35004",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_35004",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_35004",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_35020",
+   "name": "Chisa Inagae — The Old Ways of the House「Chisa」",
+   "members": [
+    {
+     "id": "catshinobi/Char_35020",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_SD_35020",
+     "label": "SD (Chibi)"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_36001",
+   "name": "July Yonaha — Comet Maiden",
+   "members": [
+    {
+     "id": "catshinobi/Char_36001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_36001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_36001",
+     "label": "SD (Chibi)"
+    },
+    {
+     "id": "catshinobi/cat_battle_mode_36001",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36001",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36001",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36002",
+   "name": "Set 36002 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36002",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36002",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36002",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36003",
+   "name": "Set 36003 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36003",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36003",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36003",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36004",
+   "name": "Set 36004 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36004",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36004",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36004",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36005",
+   "name": "Set 36005 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36005",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36005",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36005",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36006",
+   "name": "Set 36006 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36006",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36006",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36006",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36007",
+   "name": "Set 36007 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36007",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36007",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36007",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36008",
+   "name": "Set 36008 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36008",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36008",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36008",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36009",
+   "name": "Set 36009 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36009",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36009",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36009",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/cat_battle_mode_36010",
+   "name": "Set 36010 (36001)",
+   "members": [
+    {
+     "id": "catshinobi/cat_battle_mode_36010",
+     "label": "Cat · Battle"
+    },
+    {
+     "id": "catshinobi/cat_front_mode_36010",
+     "label": "Cat · Front"
+    },
+    {
+     "id": "catshinobi/cat_ninja_36010",
+     "label": "Cat · Ninja"
+    }
+   ]
+  },
+  {
+   "root": "catshinobi/Char_37001",
+   "name": "Chico Onikasa — Dawn Maiden",
+   "members": [
+    {
+     "id": "catshinobi/Char_37001",
+     "label": "Battle"
+    },
+    {
+     "id": "catshinobi/Char_LD_37001",
+     "label": "LD"
+    },
+    {
+     "id": "catshinobi/Char_SD_37001",
+     "label": "SD (Chibi)"
+    }
+   ]
+  }
+ ]
+}
