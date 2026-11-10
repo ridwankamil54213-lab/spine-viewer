@@ -7696,6 +7696,9 @@ async function applyPendingUpdaters() {
 	healthLogPush("Menyegarkan ringkasan…");
 	healthSetBusy(false);
 	await loadHealth("/api/updaters/health?refresh=1");
+	// Apply massal juga menulis aset: muat ulang pustaka supaya model baru
+	// langsung tampil tanpa menunggu reload halaman berikutnya.
+	refresh().then(syncNewFromServer).then(() => renderLibrary()).catch(() => {});
 }
 
 function initUpdaterHealth() {
@@ -8023,9 +8026,13 @@ async function applyUpdate() {
 				// jadi jangan ditambahi prefix lagi.
 				markNew(res.new_ids ? added : added.map((n) => `${prefix}/${n}`));
 			}
-			// Muat ulang daftar model otomatis supaya yang baru langsung muncul
-			// (badge NEW + urutan teratas) tanpa perlu refresh manual.
-			if (!res.error && (added.length || res.extracted)) {
+			// Muat ulang daftar model SETELAH apply sukses. Server kini
+			// menyegarkan indeks sebelum menurunkan `running`, jadi refresh()
+			// pertama sudah menerima daftar yang benar. Jangan lagi syaratkan
+			// pada daftar id baru atau jumlah ekstraksi: banyak updater
+			// melaporkan hasil dengan field lain, dan model tetap bisa
+			// bertambah walau laporan hasilnya kosong.
+			if (!res.error) {
 				refresh()
 					.then(syncNewFromServer)
 					.then(() => renderLibrary())
@@ -8077,8 +8084,14 @@ async function refresh() {
 		// Index ringan: field yang cuma dipakai saat model dibuka diambil
 		// terpisah lewat ensureModelDetail(). Lihat src/models-payload.js.
 		const res = await fetch("/api/models?lean=1");
-		const data = await res.json();
-		models = data.models || [];
+		// /api/models memakai ETag + Cache-Control: no-cache. Kalau tidak ada
+		// perubahan, server menjawab 304 tanpa body; res.json() saat itu
+		// melempar "Unexpected end of JSON input" dan seluruh refresh gagal
+		// diam-diam. 304 memang berarti daftar lama masih berlaku.
+		if (res.status !== 304) {
+			const data = await res.json();
+			models = data.models || [];
+		}
 		// Ambil daftar "baru" dari server lebih dulu supaya badge muncul pada
 		// render pertama, bukan setelah satu putaran lagi.
 		await syncNewFromServer();

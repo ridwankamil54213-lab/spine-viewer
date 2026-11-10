@@ -252,6 +252,42 @@ Regresi: `node tools/check-update-json.cjs` (31 assertion) — termasuk uji
 kosong di browser** yang harus menghasilkan toast yang jelas, bukan error
 samar.
 
+Regresi: `node tools/check-update-refresh.cjs` (21 assertion), termasuk uji
+**model tiruan** yang ditambahkan ke `assets/` lalu harus langsung muncul
+tanpa `?refresh=1` begitu apply selesai.
+
+### Kenapa model baru dulu telat muncul setelah update
+
+Gejala: apply selesai, tapi model baru baru tampil beberapa menit kemudian /
+setelah reload berulang. Tiga lapis yang saling menumpuk:
+
+1. `scanTree()` menyimpan signature `assets/` selama `SCAN_TREE_TTL_MS`
+   (15 dtk), dan endpoint `/api/update/:game?mode=apply` **tidak pernah**
+   memanggil `invalidateScan()` (padahal upload & delete sudah memanggilnya).
+2. `forceModelRescan` hanya dinyalakan untuk updater berflag `rescan`
+   (**18 dari 27**). Lebih parah, `getModels()` saat signature berubah
+   sengaja mengembalikan `cache.models` **LAMA** sambil menjadwalkan
+   `scheduleScan()` di latar — jadi perlu beberapa request lagi sebelum
+   daftar benar-benar berganti.
+3. Frontend cuma memanggil `refresh()` kalau hasil apply punya
+   `new_models` atau `extracted` (banyak updater memakai field lain), dan
+   `res.json()` pada `/api/models?lean=1` bisa meledak kalau server menjawab
+   **304 ETag** tanpa body — refresh gagal diam-diam.
+
+Perbaikannya: **server menyegarkan indeks SEBELUM menurunkan
+`updateJob.running = false`**. `invalidateScan()` + `getModels({force:true})`
+dijalankan untuk **semua** updater (semuanya menulis ke `assets/`), dengan
+normalisasi `applyOk` karena sebagian `--apply` tidak mengirim field `ok`
+(mis. Ark Re:Code). Jadi `refresh()` pertama yang dipicu frontend setelah
+status "Selesai" sudah menerima daftar segar. Frontend sekarang **selalu**
+refresh setelah apply sukses, toleran 304, dan apply-massal lewat dashboard
+juga ikut memuat ulang pustaka.
+
+Terukur: model baru tampil dalam **9–11 detik** (waktu apply + pindai ulang
+~5 dtk), bukan beberapa menit. Konsekuensi jujur: pindai ulang itu sinkron,
+jadi event loop server tertahan beberapa detik sekali saja per apply — itu
+sebabnya polling `/status` bisa sempat terputus dan client perlu retry.
+
 ## Cat Shinobi: nama karakter, varian, thumbnail
 
 596 model `catshinobi/` dulu cuma punya 260 nama, tanpa picker varian dan
@@ -1212,6 +1248,7 @@ node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirr
 node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
 node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
 node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilustrasi, render
+node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa reload
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

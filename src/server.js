@@ -4524,13 +4524,38 @@ app.get("/api/update/:game", async (req, res) => {
 		updateJob.log.push(l);
 		if (updateJob.log.length > UPDATE_LOG_MAX) updateJob.log.shift();
 	});
+	/* Aset baru BELUM terlihat hanya karena sudah ada di disk: scanTree()
+	 * menyimpan signature pohon selama SCAN_TREE_TTL_MS (15 dtk), dan
+	 * getModels() yang melihat signature berubah sengaja mengembalikan
+	 * `cache.models` LAMA sambil memindai ulang di latar. Kalau `running`
+	 * diturunkan sekarang, frontend langsung memanggil refresh() tetapi
+	 * menerima daftar lama — model baru baru muncul setelah beberapa
+	 * request / reload (keluhan "nunggu beberapa menit").
+	 *
+	 * Jadi: segarkan indeks DULU, baru laporkan selesai. Dipaksa sinkron
+	 * (?refresh=1 setara) supaya refresh() PERTAMA setelah apply sudah
+	 * mendapat daftar yang benar. Berlaku untuk SEMUA updater, bukan cuma
+	 * yang berflag `rescan` — semuanya menulis ke assets/.
+	 */
+	// Kontrak --apply tidak seragam: sebagian updater (arkrecode, dll) tidak
+	// mengirim field `ok` sama sekali. Yang menandakan GAGAL itu `ok:false`
+	// eksplisit atau field `error` — bukan "tidak ada ok".
+	const applyOk = !!updateJob.result &&
+		updateJob.result.ok !== false && !updateJob.result.error;
+	if (applyOk) {
+		updateJob.log.push("menyegarkan indeks model…");
+		try {
+			invalidateScan();
+			getModels({ force: true });
+			cznCardCache = { at: 0, data: null };
+			forceModelRescan = false;   // sudah segar, hindari pindai dobel
+		} catch (err) {
+			console.warn("[update] gagal menyegarkan indeks:", err.message);
+			forceModelRescan = true;    // fallback: request /api/models berikutnya
+		}
+	}
 	updateJob.running = false;
 	updateJob.finishedAt = Date.now();
-	if (cfg.rescan && updateJob.result?.ok) {
-		forceModelRescan = true;
-		// index.json kartu baru harus terbaca tanpa menunggu cache 30 detik.
-		cznCardCache = { at: 0, data: null };
-	}
 });
 
 app.get("/api/update/:game/status", (_req, res) => {
