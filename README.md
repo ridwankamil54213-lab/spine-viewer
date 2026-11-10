@@ -219,6 +219,39 @@ per-game. Apply sengaja tidak pernah dijalankan otomatis.
 Regresi: `node tools/check-updater-dashboard.cjs` (39 assertion), termasuk
 bukti bahwa updater tanpa field `ok` tidak lagi dilaporkan gagal.
 
+## Ark Re:Code: model "bukan Spine"
+
+`catalog_116031` membawa 20 bundle hero baru. 18 di antaranya (`H169`,
+`H191`…`H210`, `H611`) ternyata **bukan model Spine** — isinya cuma prefab,
+ikon, dan `ParticleSystem`, **0 `TextAsset`**. Bandingkan `H189` lama yang
+punya halaman atlas `Assets/Game/Hero/H189/H189/H189.png`. Dua model
+sisanya (`M001`, `M020`) memang Spine dan diekstrak jadi `M_001_1` /
+`M_020_1`.
+
+Log lama menulis `→ ? (tanpa atlas)`, yang terkesan seperti berkas rusak.
+Sekarang: `→ bukan Spine (0 TextAsset)`.
+
+Tiga perbaikan di `tools/update-arkrecode.py`:
+
+1. **State disimpan SETELAH ekstraksi.** Versi lama menulis
+   `state["processed"]` sebelum loop, jadi model yang gagal (berkas tak
+   terunduh / extractor error) ikut dicatat "selesai" dan tidak pernah
+   dicoba lagi.
+2. **`processed_v2` menyimpan signature bundle** (SHA-1 dari relpath URL,
+   yang mengandung hash konten), bukan id polos. Kalau game belakangan
+   menambahkan skeleton ke `H191`, hash bundle-nya berubah → model itu
+   otomatis muncul lagi sebagai "baru". Format lama `processed` dibuang.
+3. **`stem_installed()` mengenali `M001` → `M_001_1`** (alias underscore).
+   Tanpa ini `M001` diunduh ulang terus meski `M_001_2` sudah ada.
+
+`--check` juga tidak lagi mencampur folder lama dengan model katalog:
+`installed` kini dihitung dari model yang benar-benar punya folder, bukan
+`len(installed | processed)` yang dulu menghasilkan `609/268` di dashboard.
+
+Hasil sekarang: **268 model · 250 terpasang · 18 bukan Spine · 0 baru**,
+idempoten. Regresi `node tools/check-arkrecode.cjs` (36 assertion) mencakup
+unit signature, state, dashboard, 0 aset 404, dan render `M_001_1`.
+
 ## Deteksi runtime
 
 Bukan cuma `.skel` vs `.json`. `src/spine-version.cjs` membaca bytes header
@@ -1114,6 +1147,7 @@ node tools/check-arknights.cjs    # Arknights: 3112 Spine 3.8, nama EN, 2777 ilu
 node tools/check-zonenova.cjs     # Zone Nova: 188 Spine 4.1 CDN, katalog XOR, ilustrasi, render
 node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilustrasi, render
 node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
+node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 ```
 

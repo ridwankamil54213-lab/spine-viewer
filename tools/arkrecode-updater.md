@@ -57,6 +57,19 @@ Entri ini **harus sebelum** `arkrecode` (prefix match).
 
 Skrip: `/opt/arkupd/check-skel.py`, `/opt/arkupd/extract-ark.py`.
 
+## Catatan pembaruan (catalog_116031)
+
+`tools/update-arkrecode.py` adalah jalur updater yang **aktif** sekarang
+(dokumen di atas merangkum riset awal untuk `arkrecode-h`). 20 bundle hero
+baru di catalog ini: 18 di antaranya (`H169`, `H191`…`H210`, `H611`) cuma
+berisi prefab/ikon/`ParticleSystem` tanpa `TextAsset`, jadi **bukan Spine**;
+hanya `M001`/`M020` yang menghasilkan `M_001_1`/`M_020_1`.
+
+State `processed_v2` menyimpan signature hash bundle, bukan id polos, supaya
+model yang belum punya skeleton tetap bisa muncul lagi kalau game menambahkannya.
+State ditulis **setelah** ekstraksi. Detail lengkap + regresi
+`tools/check-arkrecode.cjs` ada di `README.md` → "Ark Re:Code: model bukan Spine".
+
 ## Catatan
 
 Ark Re:Code yang sudah ada di viewer (597 model, `arkrecode/`) mencakup

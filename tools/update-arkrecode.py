@@ -18,6 +18,7 @@ Bisa juga dijalankan langsung:
     /srv/venv-spine/bin/python tools/update-arkrecode.py --apply
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -122,18 +123,36 @@ def model_id_for(i: str):
 	return None
 
 
+def model_signature(models: dict, files: dict, mid: str) -> str:
+	"""Sidik jari kumpulan bundle untuk satu model.
+
+	URL bundle Addressables menyertakan hash isinya. Kalau game belakangan
+	menambahkan skeleton/atlas ke model yang sekarang cuma punya prefab,
+	hash bundle-nya berubah dan model itu HARUS dianggap baru lagi. Karena
+	itu `processed` menyimpan signature, bukan sekadar id model.
+	"""
+	rels = sorted(files[n] for n in models.get(mid, []) if n in files)
+	return hashlib.sha1("|".join(rels).encode()).hexdigest()[:12]
+
+
 def stem_installed(stem: str, have: set) -> bool:
 	"""True bila model untuk `stem` sudah ada.
 
 	Satu bundle hero bisa memuat beberapa skeleton dengan nama berbeda dari
-	stem-nya (H004 -> CG_H004_a/CG_H004_b; B001 -> B001/B001_1), jadi 'sudah
-	ada' mencakup: folder stem itu sendiri, turunannya (<stem>_<n>), atau
-	folder ber-prefix CG_<stem>_."""
+	stem-nya (H004 -> CG_H004_a/CG_H004_b; B001 -> B001/B001_1; M001 ->
+	M_001_1/M_001_2). Tanpa alias underscore, M001 diunduh ulang terus
+	meski M_001_2 sudah lama ada di assets/arkrecode.
+	"""
 	s = stem.upper()
-	if s in have or any(h.startswith(s + "_") for h in have):
-		return True
-	return any(h.startswith("CG_" + s + "_") for h in have)
-
+	m = re.match(r"^([A-Z]+)(\d+)$", s)
+	alias = f"{m.group(1)}_{m.group(2)}_" if m else None
+	for h in have:
+		H = h.upper()
+		if H == s or H.startswith(s + "_") or H.startswith("CG_" + s + "_"):
+			return True
+		if alias and H.startswith(alias):
+			return True
+	return False
 
 
 def installed_models() -> set:
@@ -142,14 +161,18 @@ def installed_models() -> set:
 	return {n.upper() for n in os.listdir(ASSET_DIR) if os.path.isdir(os.path.join(ASSET_DIR, n))}
 
 
-def processed_models() -> set:
-	"""Id yang SUDAH diproses (punya Spine ATAU terbukti bukan Spine).
+def processed_signatures(state: dict, models: dict, files: dict) -> dict:
+	"""Model yang sudah diverifikasi -> signature bundle saat diverifikasi.
 
-	Banyak bundle CG Ark Re:Code ternyata ilustrasi Live2D (Texture2D+Sprite),
-	bukan Spine, jadi tidak pernah menghasilkan folder. Tanpa catatan ini
-	mereka akan diunduh+dieksktrak ulang setiap kali — lambat dan sia-sia.
+	State lama (`processed`: daftar id polos) dikonversi di memori supaya
+	upgrade tidak membuat 20 model "baru" muncul lagi. Format lama sengaja
+	tidak dipertahankan: ia mencatat model yang GAGAL diekstrak seolah
+	selesai, dan tidak bisa mendeteksi bundle yang berubah.
 	"""
-	return {str(x).upper() for x in load_state().get("processed", [])}
+	if "processed_v2" in state:
+		return {str(k).upper(): str(v) for k, v in state["processed_v2"].items()}
+	old = {str(x).upper() for x in state.get("processed", [])}
+	return {m: model_signature(models, files, m) for m in old if m in models}
 
 
 def model_bundles(urls: dict):
@@ -309,9 +332,20 @@ def check() -> dict:
 			f.write(raw)
 	urls = bundle_urls(local)  # nama berkas -> relpath
 	models, model_files = model_bundles(urls)
-	have = installed_models() | processed_models()
-	missing = sorted(m for m in models if not stem_installed(m, have))
-	_log(f"catalog {meta['catalog']}: {len(models)} model, {len(have)} ada, {len(missing)} baru")
+	installed = installed_models()
+	sigs = processed_signatures(state, models, model_files)
+
+	def pending(mid: str) -> bool:
+		"""Belum punya folder DAN belum diverifikasi untuk bundle yang ini."""
+		if stem_installed(mid, installed):
+			return False
+		return sigs.get(mid.upper()) != model_signature(models, model_files, mid)
+
+	missing = sorted(m for m in models if pending(m))
+	installed_count = sum(1 for m in models if stem_installed(m, installed))
+	non_spine = len(models) - installed_count - len(missing)
+	_log(f"catalog {meta['catalog']}: {len(models)} model, {installed_count} terpasang, "
+	     f"{non_spine} bukan Spine, {len(missing)} baru")
 	return {
 		"ok": True,
 		"catalog": meta["catalog"],
@@ -319,7 +353,8 @@ def check() -> dict:
 		"changed": bool(missing) or state.get("catalog") != meta["catalog"],
 		"versions": meta.get("versions", []),
 		"total": len(models),
-		"installed": len(have),
+		"installed": installed_count,
+		"nonSpine": non_spine,
 		"new": len(missing),
 		"samples": missing[:10],
 		"new_models": missing[:10],
@@ -365,9 +400,16 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 	os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 	urls = bundle_urls(os.path.join(CATALOG_DIR, info["catalog"] + ".json"))
 	models, files = model_bundles(urls)
-	have = installed_models() | processed_models()
+	state = load_state()
+	installed = installed_models()
+	sigs = processed_signatures(state, models, files)
 
-	todo = sorted(m for m in models if not stem_installed(m, have))
+	def pending(mid: str) -> bool:
+		if stem_installed(mid, installed):
+			return False
+		return sigs.get(mid.upper()) != model_signature(models, files, mid)
+
+	todo = sorted(m for m in models if pending(m))
 	if limit:
 		todo = todo[:limit]
 	_log(f"mengunduh {len(todo)} model baru (workers={workers})")
@@ -408,19 +450,15 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 				if done % 25 == 0:
 					_log(f"unduh {done}/{len(todo)} model")
 
-	state = load_state()
-	state["catalog"] = info["catalog"]
-	state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
-	# Semua model dalam `todo` sudah dicoba: yang menghasilkan Spine punya
-	# folder, sisanya terbukti bukan Spine. Catat supaya tidak diulang.
-	state["processed"] = sorted(set(state.get("processed", [])) | {m for m in todo})
-	save_state(state)
-
-	# Ekstrak per model supaya progres terlihat dan tiap langkah pendek.
+	# JANGAN simpan state di sini. Versi lama menulis `processed` SEBELUM
+	# ekstraksi, sehingga model yang gagal (berkas tak terunduh / extractor
+	# error) ikut dicatat "selesai" dan tidak pernah dicoba lagi.
 	os.makedirs(ASSET_DIR, exist_ok=True)
 	extracted = 0
 	seen_new = []
 	extract_errors = []
+	non_spine = []
+	verified_non_spine = {}
 	for i, mid in enumerate(todo, 1):
 		members = [f for f in models.get(mid, []) if os.path.exists(os.path.join(DOWNLOAD_DIR, f))]
 		if not members:
@@ -433,13 +471,35 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 			extract_errors.append(f"{mid}: {exc}")
 			_log(f"ekstrak {i}/{len(todo)} {mid}: GAGAL {str(exc)[:70]}")
 			continue
-		doc = next((r for r in results if r.get("ok")), results[0] if results else None)
-		_log(f"ekstrak {i}/{len(todo)} {mid} → {doc.get('name') if doc else '?'} "
-		     f"({'skel+atlas' if (doc and doc.get('atlas')) else 'tanpa atlas'})")
-		if doc and doc.get("ok"):
+		sig = model_signature(models, files, mid)
+		good = [r for r in results if r.get("ok")]
+		if good:
+			doc = good[0]
+			label = doc.get("name") or mid
+			kind = "skel+atlas" if doc.get("atlas") else "skel tanpa atlas"
+			_log(f"ekstrak {i}/{len(todo)} {mid} → {label} ({kind})")
 			extracted += 1
 			if len(seen_new) < 50:
-				seen_new.append(doc.get("name") or mid)
+				seen_new.append(label)
+		else:
+			# results kosong = extractor jalan normal, tapi bundle tidak punya
+			# TextAsset (.skel/.atlas). Ini BUKAN kegagalan: model memang
+			# belum punya Spine (cuma prefab/ikon/partikel). Catat signature
+			# bundle-nya supaya tidak diulang, TAPI kalau game menambahkan
+			# skeleton nanti hash bundle berubah -> model muncul lagi.
+			non_spine.append(mid)
+			verified_non_spine[mid.upper()] = sig
+			_log(f"ekstrak {i}/{len(todo)} {mid} → bukan Spine (0 TextAsset)")
+
+	fresh = installed_models()
+	merged = {**sigs, **verified_non_spine}
+	state["processed_v2"] = {
+		k: v for k, v in merged.items() if not stem_installed(k, fresh)
+	}
+	state.pop("processed", None)  # format lama: id polos, tidak ada signature
+	state["catalog"] = info["catalog"]
+	state["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S")
+	save_state(state)
 
 	return {
 		"catalog": info["catalog"],
@@ -449,8 +509,10 @@ def apply_update(limit: int = 0, workers: int = 8) -> dict:
 		"downloaded": done,
 		"failed": failed,
 		"extracted": extracted,
+		"nonSpine": len(non_spine),
+		"verified": len(verified_non_spine) + extracted,
 		"new_models": seen_new,
-		"already_had": len(have),
+		"already_had": len(installed),
 		"asset_dir": ASSET_DIR,
 		"extract_errors": extract_errors[:10],
 		"errors": errors,
