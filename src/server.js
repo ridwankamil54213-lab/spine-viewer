@@ -536,30 +536,17 @@ const GAME_ROOTS = [
 		key: "xingjie",
 		label: "性界大战",
 	},
-	// Chaos Zero Nightmare — portraits / standees from the community model
-	// library BenNoSleep/czn-animation-viewer. 1143 rigs, each a plain Spine
-	// 3.8.79 JSON skeleton + .atlas + a .webp page (converted by tools/czn-rigs.py:
-	// skeleton.json(gzip)-> <slug>.json, skeleton.atlas-> <slug>.atlas). The
-	// repo's index.json names live in assets/czn-rigs/_names.json (slug -> name,
-	// kind, subtype).
-	//
-	// This REPLACES the older game-side extraction (game key "chaoszero", the
-	// Yuna .scsp/.sct pipeline in tools/chaoszero/) which has been removed from
-	// the viewer — so Chaos Zero Nightmare now carries the plain game label.
+	// Chaos Zero Nightmare — ekstraksi game-side (pipeline Yuna .scsp/.sct,
+	// tools/chaoszero/). 1.527 model berupa skeleton JSON Spine 3.8.79 + .atlas
+	// tanpa baris `pma:` (straight alpha), tersimpan di assets/chaoszero/.
+	// Atas permintaan user, pustaka komunitas czn-rigs dan galeri cut-ins
+	// czn-cutins-cg dipensiunkan; foldernya diarsipkan ke /srv/spine-assets/.
 	{
-		match: "czn-rigs",
-		key: "czn-rigs",
+		match: "chaoszero",
+		key: "chaoszero",
 		label: "Chaos Zero Nightmare",
 		spineRuntime: "3.8",
 		pmaDefault: false,
-	},
-	// CZN cut-ins (FHD / collapse / UX) — 951 WebP stills from the same library.
-	// A "-cg" folder, so it renders through the image-gallery path; thumbnails
-	// live in public/thumbs/czn-cutins-cg.
-	{
-		match: "czn-cutins-cg",
-		key: "czn-cutins-cg",
-		label: "Chaos Zero Nightmare — Cut-ins",
 	},
 	// 明日方舟 (Arknights): 3.112 folder Spine 3.8 dari isHarryh/Ark-Models.
 	// Nama Inggris + family skin dari ArknightsGameData EN, thumbnail ilustrasi
@@ -1905,12 +1892,10 @@ function scanModels() {
 	// CG / illust galleries: flat PNG folders (a "<game>-cg" GAME_ROOTS entry)
 	// that no skeleton scan would surface. One entry per image, format "image".
 	scanImageGalleries(models);
-	// CZN rigs/cutins come from a community model library; label each model with
-	// its character name (slug -> name from assets/<game>/_names.json).
+	// Chaos Zero Nightmare: nama + atribut dari roster wiki, lalu gabungkan
+	// semua rig per karakter jadi SATU kartu dengan dropdown Varian.
 	applyCznNames(models);
-	// Fold each CZN character's rigs (model / portrait / live event / skin /
-	// battle) into ONE card with a variant dropdown.
-	attachCznFamilies(models);
+	attachChaoszeroFamilies(models);
 	// Make Drama: name each skin from the library catalog and fold a character's
 	// standing/affection/desire rigs into one card with a variant dropdown.
 	applyMadNames(models);
@@ -2200,7 +2185,7 @@ function applyCznNames(models) {
 			.replace(/_/g, " ")
 			.replace(/\b\w/g, (c) => c.toUpperCase())
 			.trim();
-	for (const game of ["czn-rigs", "czn-cutins-cg"]) {
+	for (const game of ["chaoszero"]) {
 		let map;
 		try {
 			map = JSON.parse(fs.readFileSync(path.join(ASSETS, game, "_names.json"), "utf8"));
@@ -2219,7 +2204,8 @@ function applyCznNames(models) {
 			}
 			const kind = rec.kind || "";
 			m.name = kind && kind !== "cutin" ? `${rec.name} — ${kind}` : rec.name;
-			m.character = { name: rec.name, source: "czn-animation-viewer", skin: rec.subtype || null };
+			m.character = { name: rec.name, source: rec.source || "czn-animation-viewer", skin: rec.subtype || null };
+			if (rec.charId) m.cznCharId = rec.charId;
 			// Atribut wiki dipakai tab Combatants/Partner + filter ego/job/rarity
 			// di pustaka. Field ini sengaja ikut ke indeks ringan (bukan DENY),
 			// jadi tersedia sebelum detail model dimuat.
@@ -2711,75 +2697,80 @@ function applyMadNames(models) {
 }
 
 /**
- * Chaos Zero Nightmare rig variants. One character ships as several rigs, all
- * carrying the same display name (e.g. Rei = model_1056, portrait_1056,
- * liveevent_1056, 1056_01, model_1056_battle_ready …). Group them into one
- * family whose ROOT is the plain character model (`model_<id>`, else the first
- * rig), with every other rig as a dropdown variant — so "Rei" is one card, not
- * seven. Applies to czn-rigs only (cut-ins stay a gallery).
+ * Chaos Zero Nightmare (assets/chaoszero): satukan semua rig milik SATU
+ * karakter jadi satu kartu root + dropdown Varian. Kuncinya `charId` hasil
+ * pemetaan roster wiki (bukan tebakan angka), jadi "Nia" = model/1003,
+ * face/portrait/1003, 1003_battle_ready, liveevent_1003 … tetap satu kartu.
+ * Model tanpa nama karakter (monster/event) sengaja dibiarkan berdiri sendiri.
  */
-function attachCznFamilies(models) {
-	const czn = models.filter((m) => (m.game || "") === "czn-rigs");
-	if (czn.length < 2) return;
-	// Group by the character's numeric id parsed from the slug (portrait_1056,
-	// liveevent_1028, model_1001002 … all share their id). The name catalog only
-	// covers ~107 characters; grouping by id folds the other ~1000 rigs too.
-	const idOf = (m) => {
-		const slug = String(m.id).split("/").pop();
-		const mm = slug.match(/(\d{3,})/);
-		return mm ? mm[1] : (m.character?.name || null);
-	};
+function attachChaoszeroFamilies(models) {
 	const byChar = new Map();
-	for (const m of czn) {
-		const key = idOf(m);
-		if (!key) continue;
-		if (!byChar.has(key)) byChar.set(key, []);
-		byChar.get(key).push(m);
+	for (const m of models) {
+		if ((m.game || "") !== "chaoszero" || !m.cznCharId) continue;
+		if (!byChar.has(m.cznCharId)) byChar.set(m.cznCharId, []);
+		byChar.get(m.cznCharId).push(m);
 	}
-	const cap = (s) => s.replace(/[-_]+/g, " ").trim().replace(/\b\w/g, (c) => c.toUpperCase());
-	const baseLabel = (slug) => {
-		if (/^\d+_\d+$/.test(slug)) return "Skin";
-		if (/^liveevent_/.test(slug)) return "Live Event";
-		if (/_battle_ready$/.test(slug)) return "Battle Ready";
-		let m;
-		if ((m = slug.match(/^portrait_(?:.*?)_(\w+)$/))) return `Portrait ${cap(m[1])}`;
-		if (/^portrait_/.test(slug)) return "Portrait";
-		if ((m = slug.match(/^model_.*?_(\w+)$/))) return cap(m[1]);
-		if (/_battle$/.test(slug)) return "Battle";
-		if (/^npc_/.test(slug)) return "NPC";
-		if (/^god_/.test(slug)) return "God";
-		return cap(slug.replace(/^[a-z]+_/, "")) || "Varian";
+	const describe = (rest) => {
+		let s = String(rest).replace(/[_-]+/g, " ").trim();
+		const rules = [
+			[/\bbattle ready\b/gi, "Battle Ready"],
+			[/\bbg b\b/gi, "Latar Belakang"],
+			[/\bbg f\b/gi, "Latar Depan"],
+			[/\bskill x\b/gi, "Skill"],
+			[/\bliveevent\b/gi, "Live Event"],
+			[/\bfront\b/gi, "Depan"],
+			[/\bsecred\b/gi, "Secret"],
+			[/\bfade\b/gi, "Fade"],
+			[/\bintro\b/gi, "Intro"],
+			[/\bf\b/gi, "Depan"],
+			[/\bb\b/gi, "Belakang"],
+			[/\beff?\b/gi, "Efek"],
+		];
+		for (const [re, label] of rules) s = s.replace(re, label);
+		s = s.replace(/\b\d+\b/g, " ").replace(/\s+/g, " ").trim();
+		// Sisa token tak dikenal (unique, limited, debuff, play …) dirapikan
+		// jadi Title Case supaya dropdown varian konsisten.
+		return s.replace(/\b[a-z]/g, (c) => c.toUpperCase());
+	};
+	const variantLabel = (m) => {
+		const slug = String(m.id).split("/").slice(1).join("/");
+		const leaf = slug.split("/").pop();
+		const kind = slug.startsWith("face/portrait/") ? "Potret" : "Model";
+		const rest = leaf.replace(new RegExp("^" + m.cznCharId), "");
+		const detail = describe(rest);
+		return detail ? `${kind} \u00b7 ${detail}` : kind;
 	};
 	const rootRank = (m) => {
-		const slug = String(m.id).split("/").pop();
-		if (/^model_\d+$/.test(slug)) return 0;
-		if (m.kind === "model" && !/_battle_ready$/.test(slug)) return 1;
-		if (/^battle_/.test(slug)) return 2;
-		if (/^model_/.test(slug)) return 3;
-		if (/^liveevent_/.test(slug)) return 4;
-		if (/^portrait_/.test(slug)) return 5;
-		return 6;
+		const slug = String(m.id).split("/").slice(1).join("/");
+		const leaf = slug.split("/").pop();
+		if (slug.startsWith("model/") && leaf === m.cznCharId) return 0;
+		if (slug.startsWith("model/") && leaf.startsWith(String(m.cznCharId) + "_")) return 1;
+		if (slug.startsWith("face/portrait/") && leaf === m.cznCharId) return 2;
+		if (slug.startsWith("model/")) return 3;
+		return 4;
 	};
 	for (const [, members] of byChar) {
 		if (members.length < 2) continue;
-		const root = [...members].sort((a, b) => rootRank(a) - rootRank(b) || String(a.id).localeCompare(b.id))[0];
+		const root = [...members].sort(
+			(a, b) => rootRank(a) - rootRank(b) || String(a.id).localeCompare(String(b.id)),
+		)[0];
 		const ordered = [root, ...members.filter((m) => m !== root)];
 		const used = new Map();
-		const membersList = ordered.map((m) => {
-			if (m.id === root.id) return { id: m.id, label: "Utama" };
-			const b = baseLabel(String(m.id).split("/").pop());
-			const n = (used.get(b) || 0) + 1;
-			used.set(b, n);
-			return { id: m.id, label: n === 1 ? b : `${b} ${n}` };
+		const list = ordered.map((m) => {
+			if (m === root) return { id: m.id, label: "Utama" };
+			const base = variantLabel(m);
+			const n = (used.get(base) || 0) + 1;
+			used.set(base, n);
+			return { id: m.id, label: n === 1 ? base : `${base} ${n}` };
 		});
-		const byId = new Map(membersList.map((x) => [x.id, x.label]));
+		const labels = new Map(list.map((x) => [x.id, x.label]));
 		for (const m of members) {
-			m.family = { root: root.id, label: byId.get(m.id) || "Utama", members: membersList };
+			m.family = { root: root.id, label: labels.get(m.id) || "Utama", members: list };
 		}
-		// The card reads just the character name when the catalog has one.
-		if (root.character?.name) root.name = root.character.name;
+		if (root.character && root.character.name) root.name = root.character.name;
 	}
 }
+
 
 /**
  * CG / illust galleries. Some games ship their 2D still art as plain
@@ -4382,25 +4373,10 @@ const UPDATERS = {
 		noCheck: true,
 		applyArgs: ["--pull"],
 	},
-	// Chaos Zero Nightmare: satu pembaru untuk czn-rigs + czn-cutins-cg.
-	// Sumbernya tiga: repo komunitas BenNoSleep/czn-animation-viewer (rig),
-	// dan dua daftar terenkripsi wiki (roster + kartu skill). Orchestrator-nya
-	// menjalankan tools/czn/refresh.py, fetch-icons.py, refresh-cards.py dan
-	// capture-thumbs.cjs lalu menyimpan state di data/czn-update-state.json.
-	// tools/update-czn.py lama DITINGGALKAN: ia bergantung pada clone git
-	// /opt/re-targets/czn-repo dan menimpa _names.json/_manifest.json dengan
-	// metadata lama (tanpa charType/ego/rarity).
-	// Interpreter sengaja "python3": /srv/venv-spine tidak punya cryptography.
-	"czn-rigs": {
-		script: path.join(ROOT, "tools", "czn", "update.py"),
-		py: "python3",
-		rescan: true,
-	},
-	"czn-cutins-cg": {
-		script: path.join(ROOT, "tools", "czn", "update.py"),
-		py: "python3",
-		rescan: true,
-	},
+	// Chaos Zero Nightmare kini memakai aset game-side di assets/chaoszero/
+	// (lihat GAME_ROOTS). Pembaru pustaka komunitas czn-rigs + czn-cutins-cg
+	// sengaja dinonaktifkan supaya "Perbarui aset" tidak mengunduh ulang folder
+	// yang sudah dipensiunkan. tools/czn/update.py tetap ada sebagai arsip.
 	// Make Drama: katalog LIVE dari mad.altterisk.cc/viewer/ (bukan lagi clone
 	// git /opt/re-targets/mad-viewer). refresh.py menulis model + metadata +
 	// thumbnail; wrapper menyimpan state dan butuh rescan.

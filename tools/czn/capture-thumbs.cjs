@@ -19,8 +19,10 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 const { chromium } = require("playwright-core");
 
-const OUT = path.resolve(__dirname, "../../public/thumbs/czn-rigs");
+const OUT = path.resolve(__dirname, "../../public/thumbs/chaoszero");
 const PAGES = [
+	// `#/czn/` cuma halaman landing (tidak merender kartu); daftar Combatant
+	// ada di `#/czn/combatant`, Partner di `#/czn/partner`.
 	["combatant", "https://wiki.e7bot.top/#/czn/combatant"],
 	["partner", "https://wiki.e7bot.top/#/czn/partner"],
 ];
@@ -48,6 +50,7 @@ const PAGES = [
 		deviceScaleFactor: DSF,
 	});
 	const seen = new Map();
+	const meta = [];
 	for (const [label, url] of PAGES) {
 		// A fresh page per route: navigating between hash routes in the same
 		// document does not remount the picker, so the Partner list would still
@@ -74,10 +77,14 @@ const PAGES = [
 			if (!handle) continue;
 			await handle.screenshot({ path: path.join(OUT, `${id}.png`) });
 			seen.set(id, label);
+			// Nama potret (mis. 30134.webp) bukan id karakter roster; simpan
+			// `alt` kartu supaya build-thumb-manifest.py bisa memetakannya.
+			meta.push({ id, name: (await img.getAttribute("alt")) || "", page: label });
 		}
 		await page.close();
 	}
 	await browser.close();
+	fs.writeFileSync(path.join(OUT, "cards.json"), JSON.stringify(meta, null, 1));
 	console.log(`tersimpan ${seen.size} thumbnail di ${OUT}`);
 	const missing = [];
 	for (const id of seen.keys()) {

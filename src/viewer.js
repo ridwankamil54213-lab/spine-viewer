@@ -937,7 +937,7 @@ const spine21 = {
  * kartu (diambil sekali dari /api/czn-cards), supaya "01" pada "1056_01"
  * tidak salah dianggap id karakter.
  * ------------------------------------------------------------------ */
-const CZN_CHAR_RE = /^czn-(?:rigs|cutins-cg)\//;
+const CZN_CHAR_RE = /^(?:czn-(?:rigs|cutins-cg)|chaoszero)\//;
 
 /** Set id karakter yang punya kartu, diisi sekali lewat ensureCznCharIds(). */
 let cznCharIds = null;
@@ -7168,7 +7168,7 @@ function modelsInScope(group = browse.cznGroup) {
 	const list = fresh.map((x) => x[0]).concat(rest);
 	// Teks pencarian sudah diturunkan ke huruf kecil dan digabung per model.
 	let out = q ? list.filter((m) => (idx.search.get(m.id) || "").includes(q)) : list;
-	if (browse.game === "czn-rigs") {
+	if (browse.game === "chaoszero") {
 		if (group !== "all") {
 			const want = group === "combatant" ? "CHAR_COMBATANT" : "CHAR_SUPPORTER";
 			out = out.filter((m) => m.charType === want);
@@ -7211,13 +7211,13 @@ const capWord = (s) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 function syncCznFilters() {
 	const box = el.cznFilters;
 	if (!box) return;
-	const show = browse.view === "models" && browse.game === "czn-rigs";
+	const show = browse.view === "models" && browse.game === "chaoszero";
 	box.hidden = !show;
 	if (!show) return;
 
 	// Nilai diambil dari seluruh akar game (bukan hasil filter) supaya memilih
 	// satu ego tidak menghilangkan pilihan ego lainnya.
-	const roots = libraryIndex(models).rootsByGame.get("czn-rigs") || [];
+	const roots = libraryIndex(models).rootsByGame.get("chaoszero") || [];
 	const values = (field, order) => {
 		const have = new Set(roots.map((m) => m[field]).filter(Boolean));
 		return [...order.filter((v) => have.has(v)),
@@ -7307,7 +7307,7 @@ function renderModels() {
 
 	el.list.innerHTML = "";
 	if (!slice.length) {
-		const filtered = browse.game === "czn-rigs" && (
+		const filtered = browse.game === "chaoszero" && (
 			browse.cznGroup !== "all" || browse.cznEgo || browse.cznJob || browse.cznRarity
 		);
 		el.list.innerHTML = `<li class="list-empty">Tidak ada model yang cocok.${filtered ? " Coba Reset filter." : ""}</li>`;
@@ -7557,10 +7557,8 @@ const UPDATABLE = {
 	// Epic Seven: satu pembaru untuk lobby + combat + skill + wallpaper
 	// (semua dari e7codex). Lihat tools/update-epic7.py.
 	epic7: "/api/update/epic7",
-	// Chaos Zero Nightmare: pustaka komunitas BenNoSleep/czn-animation-viewer
-	// (satu pembaru melayani czn-rigs + czn-cutins-cg).
-	"czn-rigs": "/api/update/czn-rigs",
-	"czn-cutins-cg": "/api/update/czn-cutins-cg",
+	// Chaos Zero Nightmare memakai aset game-side assets/chaoszero/;
+	// pembaru pustaka komunitas czn-rigs + cut-ins sudah dinonaktifkan.
 	// Make Drama: pustaka komunitas anyabot/MAD-Viewer.
 	"mad-drama": "/api/update/mad-drama",
 	pokerfate: "/api/update/pokerfate",

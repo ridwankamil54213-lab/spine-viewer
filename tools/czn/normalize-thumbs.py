@@ -20,7 +20,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parents[2] / "public" / "thumbs" / "czn-rigs"
+OUT = Path(__file__).resolve().parents[2] / "public" / "thumbs" / "chaoszero"
 SIZE = (260, 460)
 
 
