@@ -2224,11 +2224,17 @@ function applyCznNames(models) {
  * CrossCore: gabungkan rig Spine dan rig interaksi jadi SATU family.
  *
  * Kedua pohon aset (assets/crosscore/ dan assets/crosscore-interaction/)
- * memakai nama folder yang sama untuk karakter yang sama, tapi resolveGame()
- * mencocokkan awalan sehingga keduanya jatuh ke game "crosscore" dan tadinya
- * tampil sebagai 827 kartu terpisah. 324 dari 325 folder interaksi punya
- * pasangan, jadi hasilnya ratusan kartu lebih sedikit dengan dropdown
- * "Spine / Interaksi".
+ * jatuh ke game "crosscore" (resolveGame mencocokkan awalan), sehingga tanpa
+ * pengelompokan ratusan model tampil sebagai kartu terpisah.
+ *
+ * PENTING: nama folder di dua pohon itu TIDAK identik. Pohon interaksi
+ * memakai huruf kecil dan akhiran `_spine`, misalnya
+ *   crosscore/10010_skin_Alps03
+ *   crosscore-interaction/10010_skin_alps03_spine
+ * Ada pula suffix `_pos_main` / `_pos_toushi`, perbedaan `03` vs `3`, dan
+ * beberapa rig Spine yang ikut berakhiran `_spine`. Mencocokkan nama folder
+ * mentah cuma menyatukan 18 dari 899 model --- itulah regresi yang diperbaiki
+ * di sini: kunci grup dinormalisasi dulu lewat crosscoreKey().
  *
  * Folder ber-skeleton ganda diberi id "<folder>#<stem>" oleh scanModels();
  * semuanya tetap masuk family yang sama agar tidak ada kartu yatim. Model
@@ -2237,26 +2243,41 @@ function applyCznNames(models) {
  * `label` di family bersifat PER MODEL (nilai yang dipilih di <select>),
  * mengikuti pola attachEpic7CombatFamilies().
  */
+function crosscoreKey(id) {
+	const slash = id.indexOf("/");
+	if (slash < 0) return "";
+	let slug = id.slice(slash + 1).split("#")[0].toLowerCase();
+	slug = slug.replace(/(?:_spine)+$/, "");
+	slug = slug.replace(/_pos_(?:main|toushi).*$/, "");
+	slug = slug.replace(/_+$/, "");
+	// Samakan "03" dengan "3"; id karakter seperti 10010 tidak berubah.
+	slug = slug.replace(/\d+/g, (n) => String(Number(n)));
+	return slug;
+}
+
 function attachCrosscoreFamilies(models) {
 	const byId = new Map(models.map((m) => [m.id, m]));
-	const groups = new Map(); // folder dasar -> { spine: [], interaction: [] }
+	const groups = new Map(); // kunci ternormalisasi -> { spine, interaction }
 	for (const m of models) {
 		const id = String(m.id || "");
 		const kind = id.startsWith("crosscore/") ? "spine"
 			: id.startsWith("crosscore-interaction/") ? "interaction" : null;
 		if (!kind || m.family) continue;
-		const folder = id.slice(id.indexOf("/") + 1).split("#")[0];
-		if (!folder) continue;
-		let g = groups.get(folder);
+		const key = crosscoreKey(id);
+		if (!key) continue;
+		let g = groups.get(key);
 		if (!g) {
 			g = { spine: [], interaction: [] };
-			groups.set(folder, g);
+			groups.set(key, g);
 		}
 		g[kind].push(id);
 	}
+	const rank = (id) => (id.includes("#") ? 1 : 0);
 	for (const [, g] of groups) {
 		if (!g.spine.length || !g.interaction.length) continue;
-		const root = g.spine.find((id) => !id.includes("#")) || g.spine[0];
+		g.spine.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+		g.interaction.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+		const root = g.spine[0];
 		const labelled = (ids, base) => ids.map((id, i) => ({
 			id,
 			label: ids.length > 1 ? `${base} ${i + 1}` : base,

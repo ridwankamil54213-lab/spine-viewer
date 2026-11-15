@@ -728,10 +728,18 @@ dan asetnya disajikan lewat Cloudflare R2 yang bisa diakses langsung.
 | `thumbs/index.json` + `thumbs/crosscore/*.webp` | 761 potret WebP 400 px (23 MB) | `public/thumbs/crosscore*/` |
 
 Kedua pohon aset jatuh ke game **`crosscore`** (`resolveGame` mencocokkan
-awalan). `attachCrosscoreFamilies()` lalu menggabungkan folder yang sama dari
-kedua pohon jadi satu family "Spine / Interaksi": **827 model tetap dikirim ke
-klien, tapi cuma 502 kartu root** yang tampil di pustaka (324 pasangan +
-beberapa folder ber-skeleton ganda). Lihat section **Variant picker** di bawah.
+awalan). `attachCrosscoreFamilies()` lalu menggabungkan keduanya jadi satu
+family "Spine / Interaksi": **899 model tetap dikirim ke klien, tapi cuma 583
+kartu root** yang tampil di pustaka (**312 family / 628 model ber-family**).
+Lihat section **Variant picker** di bawah.
+
+Nama folder di dua pohon itu **tidak identik**: pohon interaksi memakai huruf
+kecil dan akhiran `_spine` (`10010_skin_Alps03` lawan
+`10010_skin_alps03_spine`), ada suffix `_pos_main`/`_pos_toushi`, serta beda
+`03` vs `3`. `crosscoreKey()` menormalisasi semua itu sebelum mengelompokkan;
+mencocokkan nama mentah cuma menyatukan 18 dari 899 model. 13 rig interaksi
+yang memang tidak punya pasangan dibiarkan berdiri sendiri. Regresi:
+`node tools/check-crosscore-variants.cjs`.
 `_names.json` dikunci oleh **id model penuh** supaya keduanya tidak tabrak;
 `applyCrosscoreNames()` memetakannya ke `name` + `character`. 55 prefab
 interaksi tidak punya entri di `models[]` katalog, jadi model itu tetap
@@ -1361,6 +1369,7 @@ node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
 node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
+node tools/check-crosscore-variants.cjs # varian Spine / Interaksi CrossCore
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):

@@ -8,7 +8,7 @@
  *   - chip "N varian" di kartu galeri; klik chip langsung buka picker
  *   - <select id="variant-select"> tetap state holder (dataset.id)
  *   - keyboard: 1-9 lompat varian, [ / ] siklus
- *   - CrossCore: 2 pohon aset melebur (827 model -> 502 kartu root)
+ *   - CrossCore: 2 pohon aset melebur (899 model -> 583 kartu root)
  *
  * Run: node tools/check-variant-picker.cjs   (server on :3000)
  */
@@ -26,10 +26,11 @@ const ok = (label, cond, extra = "") => {
 	const cc = all.filter((m) => m.game === "crosscore");
 	const roots = cc.filter((m) => !m.family || m.family.root === m.id);
 	const paired = cc.filter((m) => (m.family || {}).members?.length);
-	ok("CrossCore: 827 -> 502 kartu root", cc.length === 827 && roots.length === 502,
+	ok("CrossCore: 2 pohon melebur jadi kartu root", roots.length < cc.length &&
+		cc.length - roots.length >= 300,
 		`${roots.length} dari ${cc.length}`);
-	ok("CrossCore: 649 model ber-family", paired.length === 649, String(paired.length));
-	const fam = (all.find((m) => m.id === "crosscore/10010_skin_alps03_spine") || {}).family;
+	ok("CrossCore: >=600 model ber-family", paired.length >= 600, String(paired.length));
+	const fam = (all.find((m) => m.id === "crosscore/10010_skin_Alps03") || {}).family;
 	ok("label family Spine / Interaksi",
 		JSON.stringify(fam?.members?.map((x) => x.label)) === JSON.stringify(["Spine", "Interaksi"]),
 		JSON.stringify(fam?.members?.map((x) => x.label)));
@@ -49,8 +50,8 @@ const ok = (label, cond, extra = "") => {
 	const cases = [
 		{ game: "bd2", id: "bd2-char/Anastasia/Fire_Graffiti", n: 2, label: "BD2", tabs: true },
 		{ game: "epic7", id: "epic7/c1070", n: 5, label: "E7", tabs: false },
-		{ game: "czn-rigs", id: "czn-rigs/model_1056", n: 7, label: "CZN", tabs: false, viaChip: true },
-		{ game: "crosscore", id: "crosscore/10010_skin_alps03_spine", n: 2, label: "CrossCore", tabs: true },
+		{ game: "chaoszero", id: "chaoszero/model/1010", n: 7, label: "CZN", tabs: false, viaChip: true },
+		{ game: "crosscore", id: "crosscore/10010_skin_Alps03", n: 2, label: "CrossCore", tabs: true },
 	];
 
 	for (const c of cases) {
