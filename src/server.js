@@ -14,6 +14,8 @@ const { Worker } = require("worker_threads");
 // Jalan menyusuri assets/ dipindah ke modul terpisah supaya bisa dipakai
 // dari dua tempat: jalur sinkron di sini dan worker thread (lihat bawah).
 const { walkAssets } = require("./scan-tree");
+// Unggah hasil --apply ke GDrive, masih di job yang sama (lihat modulnya).
+const { uploadAfterApply } = require("./gdrive-upload");
 
 /** Same API surface across runtimes, so pick by detected version. */
 const RUNTIMES = {
@@ -4571,12 +4573,15 @@ app.get("/api/update/:game", async (req, res) => {
 		res.json({ started: false, reason: "Pembaruan masih berjalan." });
 		return;
 	}
+	// Tanda waktu buat deteksi berkas yang disentuh apply ini saja.
+	const uploadSince = Date.now();
 	updateJob = { game, running: true, result: null, log: [], startedAt: Date.now() };
-	res.json({ started: true });
-	updateJob.result = await runUpdater(game, cfg.applyArgs || ["--apply"], (l) => {
+	const pushLog = (l) => {
 		updateJob.log.push(l);
 		if (updateJob.log.length > UPDATE_LOG_MAX) updateJob.log.shift();
-	});
+	};
+	res.json({ started: true });
+	updateJob.result = await runUpdater(game, cfg.applyArgs || ["--apply"], pushLog);
 	/* Aset baru BELUM terlihat hanya karena sudah ada di disk: scanTree()
 	 * menyimpan signature pohon selama SCAN_TREE_TTL_MS (15 dtk), dan
 	 * getModels() yang melihat signature berubah sengaja mengembalikan
@@ -4606,6 +4611,26 @@ app.get("/api/update/:game", async (req, res) => {
 			console.warn("[update] gagal menyegarkan indeks:", err.message);
 			forceModelRescan = true;    // fallback: request /api/models berikutnya
 		}
+	}
+	/* Unggah hasil apply ke GDrive, MASIH di job yang sama supaya panel log
+	 * menampilkan progresnya dan klien baru memanggil refresh() setelah backup
+	 * selesai. Upload sengaja tidak membatalkan apply: asetnya sudah aman di
+	 * disk lokal, kegagalan jaringan cuma perlu terlihat di log + result.
+	 */
+	if (applyOk) {
+		pushLog("mengunggah perubahan ke GDrive…");
+		try {
+			const gdrive = await uploadAfterApply(game, uploadSince, pushLog);
+			updateJob.result = { ...(updateJob.result || {}), gdrive };
+		} catch (err) {
+			pushLog(`[gdrive] gagal: ${err.message}`);
+			updateJob.result = {
+				...(updateJob.result || {}),
+				gdrive: { ok: false, error: err.message },
+			};
+		}
+	} else {
+		pushLog("[gdrive] dilewati: apply gagal, tidak ada yang diunggah.");
 	}
 	updateJob.running = false;
 	updateJob.finishedAt = Date.now();

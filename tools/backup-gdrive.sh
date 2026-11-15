@@ -1,6 +1,6 @@
 #!/bin/bash
 # Backup model spine-viewer yang BELUM ada di Google Drive.
-# Tujuan: shared drive "saf:" folder 1zRly3eeewcrgdIe3bOUQUmyWUXXIwnzo
+# Tujuan: shared drive "gdrive:" folder 1zRly3eeewcrgdIe3bOUQUmyWUXXIwnzo
 # (library model; berisi root per-game seperti azurlane/, bd2/, crosscore/, ...).
 set -u
 ID=1zRly3eeewcrgdIe3bOUQUmyWUXXIwnzo
@@ -19,7 +19,7 @@ for r in $roots; do
   [ -d "$SRC/$r" ] || { echo "SKIP (tidak ada): $r" | tee -a "$LOG"; continue; }
   sz=$(du -sh "$SRC/$r" | cut -f1)
   echo "--- $r ($sz) $(date -Is) ---" | tee -a "$LOG"
-  rclone copy "$SRC/$r" "saf:$r" "${OPTS[@]}" 2>&1 | tail -2 | tee -a "$LOG"
+  rclone copy "$SRC/$r" "gdrive:$r" "${OPTS[@]}" 2>&1 | tail -2 | tee -a "$LOG"
   echo "    exit=$? $r" | tee -a "$LOG"
 done
 echo "=== BACKUP SELESAI $(date -Is) ===" | tee -a "$LOG"

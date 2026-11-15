@@ -219,6 +219,35 @@ per-game. Apply sengaja tidak pernah dijalankan otomatis.
 Regresi: `node tools/check-updater-dashboard.cjs` (39 assertion), termasuk
 bukti bahwa updater tanpa field `ok` tidak lagi dilaporkan gagal.
 
+### Backup otomatis ke GDrive setelah apply
+
+Setiap `/api/update/:game?mode=apply` yang **sukses** langsung mengunggah
+hasilnya ke Shared Drive, masih di dalam job yang sama. Jadi tidak perlu
+lagi ingat backup manual (kasus BD2 yang dulu kelewat saat diunduh ulang).
+
+- Modul: `src/gdrive-upload.js`. Dipanggil setelah indeks model disegarkan,
+  sebelum `updateJob.running` diturunkan, sehingga panel log menampilkan
+  baris `[gdrive] …` dan klien baru memanggil `refresh()` setelah backup
+  selesai. Hasilnya juga masuk ke `result.gdrive` di `/status`.
+- Root yang diunggah = gabungan **peta statis per updater** (`STATIC_ROOTS`)
+  dan **deteksi dinamis** berkas dengan mtime sejak apply dimulai (satu
+  proses `find`). Deteksi dinamis menangkap folder yang baru pertama kali
+  ada; peta statis menangkap unduhan yang mempertahankan timestamp lama.
+- Per root dijalankan `rclone copy` ke `gdrive:<root>` atau
+  `gdrive:thumbs/<root>` dengan `--drive-root-folder-id=1zRly3eeewcrgdIe3bOUQUmyWUXXIwnzo`.
+  **`copy`, bukan `sync`**: tidak pernah menghapus berkas di remote. rclone
+  membandingkan size + mtime, jadi root besar (mis. `assets/chaoszero` 9,3 GB)
+  tetap murah — dry-run menunjukkan cuma 1 berkas yang perlu pindah.
+- Kegagalan upload **tidak membatalkan apply** (aset sudah aman di disk),
+  tapi wajib terlihat di log + `result.gdrive.ok = false`. Apply yang gagal
+  tidak mengunggah apa pun.
+
+Kredensial tetap di `~/.config/rclone/rclone.conf` (0600), tidak ada di repo.
+Konfigurasi opsional via env: `GDRIVE_UPLOAD=0` (matikan), `GDRIVE_REMOTE`,
+`GDRIVE_ROOT_ID`, `RCLONE_BIN`, `GDRIVE_UPLOAD_TIMEOUT_MS` (default 30 menit).
+
+Regresi lokal tanpa jaringan: `node tools/check-gdrive-upload.cjs`.
+
 ### Tombol updater & "Unexpected end of JSON input"
 
 Gejala: klik **Perbarui aset** → toast `Gagal memeriksa pembaruan: Failed to
@@ -1305,6 +1334,7 @@ node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa r
 node tools/check-model3d.cjs    # 3D glTF: 59 model, render, clip, balik ke 2D
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
+node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):
