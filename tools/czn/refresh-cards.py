@@ -309,6 +309,25 @@ def main() -> None:
             })
         index[cid] = {"name": roster[cid], "ego": next(iter(items.values()))["ego"],
                       "cards": entries}
+    # Jangan buang entri lama yang masih punya berkas di disk. Daftar wiki
+    # bisa menyusut (karakter Partner / kartu unique yang tidak lagi
+    # terdaftar), padahal asetnya sudah terunduh dan dipakai /api/czn-cards.
+    try:
+        old_index = json.loads((OUT / "index.json").read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        old_index = {}
+    for cid, old_rec in old_index.items():
+        if cid not in index:
+            if any((OUT / cid / e.get("file", "")).exists()
+                   for e in old_rec.get("cards", [])):
+                index[cid] = old_rec
+            continue
+        have = {e.get("file") for e in index[cid]["cards"]}
+        for e in old_rec.get("cards", []):
+            f = e.get("file")
+            if f and f not in have and (OUT / cid / f).exists():
+                index[cid]["cards"].append(e)
+                have.add(f)
     (OUT / "index.json").write_text(
         json.dumps(index, ensure_ascii=False, indent=1, sort_keys=True), encoding="utf-8"
     )

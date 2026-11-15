@@ -1,25 +1,34 @@
 #!/usr/bin/env python3
-"""Satu pembaru untuk seluruh data Chaos Zero Nightmare.
+"""Satu pembaru untuk metadata Chaos Zero Nightmare (game `chaoszero`).
 
-Menggantikan tools/update-czn.py lama (git fetch + czn-rigs.py/czn-thumbs.py)
-yang bergantung pada clone lokal /opt/re-targets/czn-repo dan akan MENIMPA
-_names.json / _manifest.json baru dengan metadata versi lama.
+Model Spinenya ADA di assets/chaoszero/ (aset game-side, dipulihkan dari
+GDrive) dan TIDAK diunduh updater ini. Yang disegarkan cuma metadata wiki:
+ikon filter, kartu skill, potret/thumbnail, dan _manifest.json yang
+memetakan tiap model chaoszero ke potret karakternya.
+
+PENTING: tools/czn/refresh.py TIDAK boleh dijalankan sebagai skrip di sini.
+Skrip itu mengunduh rig komunitas ke assets/czn-rigs/ (pustaka lama yang
+sudah diarsipkan atas permintaan user). refresh.py hanya dipakai sebagai
+modul oleh build-thumb-manifest.py untuk fungsi wiki_roster().
 
 Sumber yang dipantau:
-  GitHub  BenNoSleep/czn-animation-viewer  index.json + commit main
+  GitHub  BenNoSleep/czn-animation-viewer  index.json + commit main (versi)
   wiki    /api/czn/characters/list        roster (terenkripsi AES)
   wiki    /api/czn/cards/list             kartu skill (terenkripsi AES)
 
 Kontrak server (lihat runUpdater di src/server.js):
   --check : cepat, TANPA mengunduh aset. Bandingkan tanda tangan sumber +
-            himpunan id terhadap data/czn-update-state.json. Cetak JSON ke
-            stdout, progres ke stderr.
-  --apply : jalankan berurutan tools/czn/refresh.py, fetch-icons.py,
-            refresh-cards.py, capture-thumbs.cjs, lalu simpan state baru.
+            himpunan id terhadap data/chaoszero-update-state.json. Cetak JSON
+            ke stdout, progres ke stderr.
+  --apply : jalankan berurutan fetch-icons.py, refresh-cards.py,
+            capture-thumbs.cjs, normalize-thumbs.py, build-thumb-manifest.py,
+            lalu simpan state baru.
 
-State disimpan di data/czn-update-state.json (data/*-state.json diabaikan
-git). Kalau state belum ada, --check melakukan bootstrap: catat kondisi
-sekarang sebagai baseline supaya tidak langsung melapor "semua baru".
+State disimpan di data/chaoszero-update-state.json (data/*-state.json
+diabaikan git). State lama data/czn-update-state.json sengaja ditinggalkan
+karena masih memakai skema `rigs` milik pustaka komunitas. Kalau state belum
+ada, --check melakukan bootstrap: catat kondisi sekarang sebagai baseline
+supaya tidak langsung melapor "semua baru".
 
 Usage:
     python3 tools/czn/update.py --check
@@ -32,7 +41,6 @@ import base64
 import hashlib
 import json
 import os
-import re
 import subprocess
 import sys
 import time
@@ -45,25 +53,30 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 VIEW = Path(__file__).resolve().parents[2]
 HERE = VIEW / "tools" / "czn"
-STATE = VIEW / "data" / "czn-update-state.json"
+STATE = VIEW / "data" / "chaoszero-update-state.json"
 WIKI = "https://wiki.e7bot.top"
 GH_RAW = "https://raw.githubusercontent.com/BenNoSleep/czn-animation-viewer/main/index.json"
 GH_COMMIT = "https://api.github.com/repos/BenNoSleep/czn-animation-viewer/commits/main"
 KEY = b"2egkWEkLvR9idARLvjqfJdWKfR24HJgY"
 HEADERS = {
-    "User-Agent": "spine-viewer-czn-updater/1.0",
+    "User-Agent": "spine-viewer-chaoszero-updater/1.0",
     "Referer": WIKI + "/",
     "Accept": "*/*",
 }
+
+# Urutan penting: capture menulis <portraitId>.png + cards.json, normalize
+# menyamakan ukurannya, build-thumb-manifest mengganti nama jadi <charId>.png
+# dan membangun _manifest.json untuk SELURUH model chaoszero.
 STEPS = [
-    ("roster + rig + manifest", [sys.executable, str(HERE / "refresh.py")]),
     ("ikon filter", [sys.executable, str(HERE / "fetch-icons.py")]),
     ("kartu skill", [sys.executable, str(HERE / "refresh-cards.py")]),
-    ("thumbnail dari web", ["node", str(HERE / "capture-thumbs.cjs")]),
+    ("thumbnail dari wiki", ["node", str(HERE / "capture-thumbs.cjs")]),
+    ("normalisasi thumbnail", [sys.executable, str(HERE / "normalize-thumbs.py")]),
+    ("manifest thumbnail chaoszero", [sys.executable, str(HERE / "build-thumb-manifest.py")]),
 ]
-# Ikon & thumbnail bersifat kosmetik: kalau wiki sedang rewel, jangan gagalkan
-# seluruh pembaruan model/kartu yang sudah berhasil.
-COSMETIC = {1, 3}
+# refresh-cards.py (i=1) adalah data utama; sisanya kosmetik dan boleh
+# dilewati kalau wiki/Chromium sedang rewel, tanpa menggagalkan apply.
+COSMETIC = {0, 2, 3, 4}
 
 
 def fetch(url: str, tries: int = 5) -> bytes:
@@ -102,19 +115,23 @@ def wiki_data(url: str) -> tuple[bytes, list]:
     return raw, data
 
 
-def char_id(rec: dict) -> str | None:
-    m = re.match(r"^(\d+)", str(rec.get("id") or rec.get("slug") or ""))
-    return m.group(1) if m else None
-
-
 def disk_counts() -> dict:
-    def n(p: Path, suffixes: tuple[str, ...]) -> int:
-        return sum(1 for f in p.rglob("*") if f.is_file() and f.name.lower().endswith(suffixes)) if p.is_dir() else 0
+    def n(p: Path, suffixes: tuple[str, ...], skip: str = "") -> int:
+        if not p.is_dir():
+            return 0
+        return sum(1 for f in p.rglob("*")
+                   if f.is_file() and f.name.lower().endswith(suffixes)
+                   and f.name != skip)
+
+    chaos = VIEW / "assets" / "chaoszero"
+    models = n(chaos, (".json",), skip="_names.json")
     return {
-        "rigs": n(VIEW / "assets/czn-rigs", (".json", ".atlas", ".webp")),
-        "cards": n(VIEW / "assets/czn-cards", (".webp", ".webm")),
-        "thumbs": n(VIEW / "public/thumbs/czn-rigs", (".png",)),
-        "icons": n(VIEW / "public/thumbs/czn-ui", (".webp", ".png")),
+        "models": models,
+        # Cuma .webp: .webm adalah video duplikat untuk kartu yang sama,
+        # jadi jumlah berkas akan selalu lebih besar dari jumlah kartu.
+        "cards": n(VIEW / "assets" / "czn-cards", (".webp",)),
+        "thumbs": n(VIEW / "public" / "thumbs" / "chaoszero", (".png",)),
+        "icons": n(VIEW / "public" / "thumbs" / "czn-ui", (".webp", ".png")),
     }
 
 
@@ -133,16 +150,13 @@ def save_state(s: dict) -> None:
 
 
 def snapshot() -> dict:
-    """Ambil tanda tangan + himpunan id dari ketiga sumber (tanpa unduh aset)."""
+    """Ambil tanda tangan + himpunan id dari sumber (tanpa unduh aset)."""
     gh_index = fetch(GH_RAW)
     commit = json.loads(fetch(GH_COMMIT)).get("sha", "")
     roster_raw, roster = wiki_data("/api/czn/characters/list?lang=en")
     cards_raw, cards = wiki_data("/api/czn/cards/list?lang=en")
 
     roster_ids = {str(c["id"]) for c in roster}
-    idx = json.loads(gh_index)
-    rig_slugs = {r.get("slug") or r.get("id") for r in idx.get("rigs", [])
-                 if char_id(r) in roster_ids}
     card_stems = {
         f"{bc}/{str(c.get('sct_name') or '')}"
         for c in cards
@@ -150,21 +164,23 @@ def snapshot() -> dict:
         and c.get("sct_name")
     }
     sig = hashlib.sha256(gh_index + roster_raw + cards_raw).hexdigest()[:16]
+    counts = disk_counts()
     return {
         "sig": sig,
         "commit": commit,
         "roster": sorted(roster_ids),
-        "rigs": sorted(rig_slugs),
         "cards": sorted(card_stems),
-        "counts": disk_counts(),
-        "detail": {"roster": len(roster_ids), "rigs": len(rig_slugs),
-                   "cards": len(card_stems)},
+        "counts": counts,
+        "detail": {"roster": len(roster_ids), "cards": len(card_stems),
+                   "models": counts["models"]},
     }
 
 
 def version(s: dict) -> str:
     d = s.get("detail", {})
-    return f"{(s.get('commit') or '')[:8]} · {d.get('roster', 0)} karakter / {d.get('rigs', 0)} rig / {d.get('cards', 0)} kartu"
+    thumbs = (s.get("counts") or {}).get("thumbs", 0)
+    return (f"{(s.get('commit') or '')[:8]} · {d.get('roster', 0)} karakter / "
+            f"{d.get('cards', 0)} kartu / {thumbs} thumbnail")
 
 
 def check() -> dict:
@@ -176,15 +192,17 @@ def check() -> dict:
         return {"ok": True, "mode": "check", "changed": False, "new": 0,
                 "new_ids": [], "previous": (snap["commit"] or "")[:8],
                 "version": version(snap), "detail": snap["detail"],
+                "expected": snap["detail"]["cards"],
+                "have": snap["counts"]["cards"],
                 "bootstrap": True}
 
-    new_rigs = sorted(set(snap["rigs"]) - set(state.get("rigs", [])))
     new_cards = sorted(set(snap["cards"]) - set(state.get("cards", [])))
     new_chars = sorted(set(snap["roster"]) - set(state.get("roster", [])))
     # Berkas hilang di disk juga berarti perlu dipulihkan.
     drift = snap["counts"] != state.get("counts")
-    changed = snap["sig"] != state.get("sig") or bool(new_rigs) or bool(new_cards) or drift
-    new_ids = [f"czn-rigs/{s}" for s in new_rigs]
+    changed = (snap["sig"] != state.get("sig") or bool(new_cards)
+               or bool(new_chars) or drift)
+    new_ids = [f"czn-cards/{s}" for s in new_cards]
     return {
         "ok": True,
         "mode": "check",
@@ -192,11 +210,12 @@ def check() -> dict:
         "commit": snap["commit"],
         "previous": (state.get("commit") or "")[:8],
         "changed": changed,
-        "new": len(new_rigs) + len(new_cards) + len(new_chars),
+        "new": len(new_cards) + len(new_chars),
         "new_ids": new_ids,
-        "detail": {**snap["detail"], "new_rigs": len(new_rigs),
-                   "new_cards": len(new_cards), "new_chars": len(new_chars),
-                   "disk": snap["counts"]},
+        "expected": snap["detail"]["cards"],
+        "have": snap["counts"]["cards"],
+        "detail": {**snap["detail"], "new_cards": len(new_cards),
+                   "new_chars": len(new_chars), "disk": snap["counts"]},
         "sources": {"github": snap["sig"], "wiki": "roster+cards"},
     }
 
@@ -218,7 +237,8 @@ def apply_update() -> dict:
                                stderr=sys.stderr, timeout=1800)
         except Exception as e:  # noqa: BLE001
             if i in COSMETIC:
-                print(f"  peringatan: {label} gagal ({e}), dilewati", file=sys.stderr, flush=True)
+                print(f"  peringatan: {label} gagal ({e}), dilewati",
+                      file=sys.stderr, flush=True)
                 continue
             return {"ok": False, "error": f"{label} gagal: {e}"}
         if r.returncode != 0:
@@ -233,17 +253,22 @@ def apply_update() -> dict:
     try:
         snap = snapshot()
     except Exception as e:  # noqa: BLE001
-        print(f"  peringatan: tidak bisa menyegarkan state: {e}", file=sys.stderr, flush=True)
+        print(f"  peringatan: tidak bisa menyegarkan state: {e}",
+              file=sys.stderr, flush=True)
         snap = snap_before
     save_state({**snap, "updated_at": int(time.time())})
 
     new_ids = pre.get("new_ids", [])
+    # Kalau apply dijalankan tepat setelah bootstrap check(), new_ids masih
+    # kosong walau refresh-cards.py mengunduh kartu baru. Pakai selisih berkas
+    # kartu sebagai fallback supaya dashboard tidak melapor "0 padahal ada".
+    new_count = len(new_ids) or max(0, after["cards"] - before["cards"])
     return {
         "ok": True,
         "mode": "apply",
         "version": version(snap),
         "commit": snap.get("commit"),
-        "new": len(new_ids),
+        "new": new_count,
         "new_ids": new_ids,
         "new_models": new_ids,
         "downloaded": downloaded,

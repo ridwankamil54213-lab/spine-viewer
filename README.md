@@ -444,8 +444,14 @@ Catatan endpoint:
 
 ## Chaos Zero Nightmare (CZN)
 
-Model CZN diambil dari dua sumber yang sengaja diiris, jadi pustakanya isi
-**cuma karakter yang benar-benar ada di wiki**:
+Model CZN sekarang memakai **aset game-side di `assets/chaoszero/`** (1.527
+model Spine 3.8, dipulihkan dari GDrive). Pustaka komunitas `czn-rigs` dan
+cut-ins `czn-cutins-cg` sudah diarsipkan ke `/srv/spine-assets/`. Repo dan wiki
+di bawah tetap dipakai sebagai **sumber metadata** (nama, roster, kartu,
+thumbnail, ikon), bukan sebagai sumber model.
+
+Rig komunitas itu dulu diiris supaya pustakanya isi **cuma karakter yang
+benar-benar ada di wiki**:
 
 | Sumber | Isi |
 | --- | --- |
@@ -547,37 +553,51 @@ Tool lama (`download-czn-cards.py`, `download-czn-card-videos.py`,
 
 ### Pembaru (tombol "Perbarui aset")
 
-`tools/czn/update.py` menyatukan keempat tool di atas jadi **satu updater**
-untuk `czn-rigs` dan `czn-cutins-cg`. Tombol di header pustaka otomatis muncul
-saat membuka game CZN; titik merah muncul kalau ada yang berubah.
+`tools/czn/update.py` adalah **satu updater untuk `chaoszero`** (kunci game
+yang dipakai sekarang). Tombol di header pustaka otomatis muncul saat membuka
+Chaos Zero Nightmare; titik merah muncul kalau ada yang berubah.
+
+Model Spine **tidak diunduh updater ini**: `assets/chaoszero/` berisi aset
+game-side yang dipulihkan dari GDrive. Yang disegarkan cuma metadata wiki:
+ikon filter, kartu skill, potret/thumbnail, dan `public/thumbs/chaoszero/
+_manifest.json` yang memetakan tiap model (root maupun varian) ke potret
+karakternya. Pustaka komunitas `czn-rigs` / `czn-cutins-cg` sudah diarsipkan;
+`tools/czn/refresh.py` **tidak pernah dijalankan sebagai skrip** oleh updater
+(ia cuma dipakai sebagai modul untuk `wiki_roster()`).
 
 - `--check` (cepat, tanpa unduh aset): bandingkan tanda tangan tiga sumber —
   `index.json` + commit `main` GitHub, roster wiki, dan daftar kartu wiki —
   serta himpunan id dan jumlah berkas di disk terhadap
-  `data/czn-update-state.json` (diabaikan git). Check pertama melakukan
+  `data/chaoszero-update-state.json` (diabaikan git). Check pertama melakukan
   *bootstrap* supaya tidak langsung melapor "semua baru".
-- `--apply` (background, ada panel log): jalankan berurutan `refresh.py` →
-  `fetch-icons.py` → `refresh-cards.py` → `capture-thumbs.cjs`, lalu simpan
-  state. Ikon & thumbnail bersifat kosmetik: kalau wiki sedang rewel mereka
-  cuma diperingatkan, tidak menggagalkan model/kartu.
+- `--apply` (background, ada panel log): jalankan berurutan `fetch-icons.py` →
+  `refresh-cards.py` → `capture-thumbs.cjs` → `normalize-thumbs.py` →
+  `build-thumb-manifest.py`, lalu simpan state. `refresh-cards.py` adalah data
+  utama; ikon & thumbnail bersifat kosmetik dan boleh dilewati kalau wiki /
+  Chromium sedang rewel, tanpa menggagalkan apply.
 - Server menandai `forceModelRescan` setelah apply sukses, jadi `/api/models`
-  berikutnya (dipicu `refresh()` klien) langsung pindai ulang tanpa request
-  tambahan yang menghabiskan kuota rate limit. Cache `index.json` kartu juga
-  di-reset.
+  berikutnya (dipicu `refresh()` klien) langsung pindai ulang. Cache
+  `index.json` kartu juga di-reset.
 
-`tools/update-czn.py` lama **tidak dipakai lagi**: ia butuh clone git
-`/opt/re-targets/czn-repo` dan akan menimpa `_names.json` / `_manifest.json`
-dengan metadata lama (tanpa `charType`/`ego`/`rarity`). Interpreter updater
-sengaja `python3`, bukan `/srv/venv-spine/bin/python` yang tidak punya
-`cryptography`.
+Interpreter updater sengaja `python3` (`/usr/bin/python3`, punya
+`cryptography` untuk mendekrip payload wiki), bukan venv build. Di dashboard,
+`have` bisa lebih besar dari `expected`: `expected` adalah jumlah kartu unik
+di daftar wiki saat ini, sementara `have` menghitung semua `.webp` di disk —
+`refresh-cards.py` melakukan **merge** (kartu lama yang tidak lagi terdaftar
+tetap disimpan), jadi data yang sudah terunduh tidak pernah hilang.
+
+`normalize-thumbs.py` butuh `ffmpeg`. Kalau binary-nya tidak ada di PATH
+systemd, skrip itu cuma memperingatkan dan keluar 0 supaya
+`capture-thumbs.cjs` tidak ikut gagal; pasang/symlink ffmpeg ke
+`/usr/local/bin/ffmpeg` untuk normalisasi 260x460 yang sebenarnya.
 
 Cek manual:
 
 ```bash
 python3 tools/czn/update.py --check
-curl 'http://127.0.0.1:3000/api/update/czn-rigs?mode=check'
-curl 'http://127.0.0.1:3000/api/update/czn-rigs?mode=apply'   # background
-curl 'http://127.0.0.1:3000/api/update/czn-rigs/status'
+curl 'http://127.0.0.1:3000/api/update/chaoszero?mode=check'
+curl 'http://127.0.0.1:3000/api/update/chaoszero?mode=apply'   # background
+curl 'http://127.0.0.1:3000/api/update/chaoszero/status'
 ```
 
 ## Epic Seven (E7)

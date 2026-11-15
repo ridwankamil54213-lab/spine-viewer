@@ -4404,6 +4404,16 @@ const UPDATERS = {
 		// rescan model baru baru muncul setelah refresh manual.
 		rescan: true,
 	},
+	// Chaos Zero Nightmare: model Spinenya ADA di assets/chaoszero/ (aset
+	// game-side dari GDrive), jadi updater ini TIDAK mengunduh model. Ia cuma
+	// menyegarkan metadata wiki: ikon filter, kartu skill, thumbnail, dan
+	// _manifest.json. refresh.py (rig komunitas czn-rigs) sengaja tidak
+	// dijalankan. Lihat tools/czn/update.py.
+	"chaoszero": {
+		script: path.join(ROOT, "tools", "czn", "update.py"),
+		py: "python3",
+		rescan: true,
+	},
 };
 
 // Stella Sora punya DUA root aset (stellasora + stellasora-l2d) tapi SATU

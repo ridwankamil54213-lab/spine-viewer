@@ -7557,8 +7557,9 @@ const UPDATABLE = {
 	// Epic Seven: satu pembaru untuk lobby + combat + skill + wallpaper
 	// (semua dari e7codex). Lihat tools/update-epic7.py.
 	epic7: "/api/update/epic7",
-	// Chaos Zero Nightmare memakai aset game-side assets/chaoszero/;
-	// pembaru pustaka komunitas czn-rigs + cut-ins sudah dinonaktifkan.
+	// Chaos Zero Nightmare: aset game-side assets/chaoszero/. Updater-nya
+	// menyegarkan metadata wiki (ikon / kartu / thumbnail), bukan model.
+	chaoszero: "/api/update/chaoszero",
 	// Make Drama: pustaka komunitas anyabot/MAD-Viewer.
 	"mad-drama": "/api/update/mad-drama",
 	pokerfate: "/api/update/pokerfate",
