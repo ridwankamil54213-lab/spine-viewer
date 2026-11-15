@@ -4406,6 +4406,14 @@ const UPDATERS = {
 	},
 };
 
+// Stella Sora punya DUA root aset (stellasora + stellasora-l2d) tapi SATU
+// updater. Frontend sudah memetakan keduanya ke /api/update/stellasora;
+// alias ini membuat tautan langsung / alat eksternal yang memakai kunci game
+// tidak lagi 404. Sengaja TIDAK dimasukkan ke UPDATERS supaya health dashboard
+// tidak menjalankan skrip yang sama dua kali.
+const UPDATER_ALIASES = { "stellasora-l2d": "stellasora" };
+const updaterKey = (g) => UPDATER_ALIASES[g] || g;
+
 let updateJob = null; // { game, running, result, log, startedAt }
 // Di-set setelah pembaru yang menulis aset selesai. Request /api/models
 // berikutnya (dipicu refresh() klien) akan memaksa pindai sinkron. Sengaja
@@ -4523,7 +4531,7 @@ app.use(["/api/update", "/api/updaters"], (req, res, next) => {
 const checkInFlight = new Map();
 
 app.get("/api/update/:game", async (req, res) => {
-	const game = req.params.game;
+	const game = updaterKey(req.params.game);
 	const cfg = UPDATERS[game];
 	if (!cfg) return res.status(404).json({ error: `Tidak ada pembaru untuk ${game}.` });
 	// Extractor-only jobs (e.g. Lost Sword video) have no --check; a "check"
@@ -4740,8 +4748,8 @@ function ensureHealth() {
 app.get("/api/updaters/health", async (req, res) => {
 	try {
 		if (healthRunning) await healthRunning.catch(() => {});
-		const one = typeof req.query.game === "string" && UPDATERS[req.query.game]
-			? req.query.game : null;
+		const key = typeof req.query.game === "string" ? updaterKey(req.query.game) : "";
+		const one = key && UPDATERS[key] ? key : null;
 		if (req.query.refresh === "1" || one) {
 			res.json(await runHealthChecks(one ? [one] : Object.keys(UPDATERS)));
 			return;
