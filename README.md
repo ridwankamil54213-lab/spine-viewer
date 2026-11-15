@@ -1284,6 +1284,7 @@ node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilust
 node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa reload
 node tools/check-model3d.cjs    # 3D glTF: 59 model, render, clip, balik ke 2D
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
+node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):

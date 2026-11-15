@@ -7589,15 +7589,36 @@ function setUpdateDot(on) {
 /* --- Log proses pembaruan ---------------------------------------------
  * Server mengalirkan stdout/stderr pembaru lewat /api/update/<game>/status,
  * jadi panel ini menampilkan prosesnya secara live, bukan hanya hasil akhir.
+ *
+ * Dua poller jalan bersamaan (interval 2 dtk + loop apply 3 dtk) dan `--check`
+ * juga membawa field `log`. Respons yang datang terlambat sempat menimpa
+ * baris yang sudah tampil dengan array kosong — itulah keluhan "log hilang
+ * sebelum selesai". Penjaganya:
+ *  - tiap sesi log punya `logEpoch`; respons dari sesi lama dibuang;
+ *  - sekali log terisi, respons tanpa / ber-`log` kosong TIDAK mengosongkannya;
+ *  - polling berhenti hanya saat server bilang `running:false`, bukan saat
+ *    satu request gagal atau body-nya kosong.
  */
-let logShownAt = 0;
+let logEpoch = 0;
+let logBuffer = [];
+let applyInFlight = false;
 
-function updateLogSet(lines) {
-	if (!el.updateLogView) return;
+function updateLogSet(lines, epoch = logEpoch) {
+	if (!el.updateLogView || epoch !== logEpoch) return;
+	// Jangan pernah mengganti isi yang sudah ada dengan respons kosong/basi.
+	if (Array.isArray(lines) && (lines.length || !logBuffer.length)) {
+		logBuffer = lines.slice();
+	}
 	const atBottom =
 		el.updateLogView.scrollTop + el.updateLogView.clientHeight >= el.updateLogView.scrollHeight - 24;
-	el.updateLogView.textContent = (lines || []).join("\n");
+	el.updateLogView.textContent = logBuffer.join("\n");
 	if (atBottom) el.updateLogView.scrollTop = el.updateLogView.scrollHeight;
+}
+
+function resetLogSession() {
+	logEpoch += 1;
+	logBuffer = [];
+	updateLogSet([], logEpoch);
 }
 
 function updateLogStatus(text, kind) {
@@ -7609,16 +7630,10 @@ function updateLogStatus(text, kind) {
 function openUpdateLog(fetchStatus = true) {
 	if (!el.updateLogModal) return;
 	el.updateLogModal.hidden = false;
-	logShownAt = Date.now();
 	if (!fetchStatus) return;
-	// Ambil status terakhir supaya panel tidak kosong kalau dibuka setelah selesai.
-	fetchLog().then(() => {
-		// Kalau ada pembaruan yang sedang jalan, ikuti terus secara live.
-		fetchUpdateJSON(`${updaterBase}/status`)
-			.then((st) => {
-				if (st?.running) startLogPolling();
-			})
-			.catch(() => {});
+	const epoch = logEpoch;
+	fetchLog(epoch).then((st) => {
+		if (epoch === logEpoch && st?.running) startLogPolling(epoch);
 	});
 }
 
@@ -7628,31 +7643,40 @@ function closeUpdateLog() {
 
 let logPollTimer = null;
 
-async function fetchLog() {
-	if (!updaterBase) return;
+/** Ambil status; kembalikan null kalau request gagal (itu BUKAN "selesai"). */
+async function fetchLog(epoch = logEpoch) {
+	if (!updaterBase || epoch !== logEpoch) return null;
 	try {
 		const st = await fetchUpdateJSON(`${updaterBase}/status`);
-		updateLogSet(st.log);
+		if (epoch !== logEpoch) return null;
+		updateLogSet(st.log, epoch);
 		if (st.running) {
 			updateLogStatus(`Berjalan… (${st.game || ""})`, "running");
 		} else if (st.result?.error) {
 			updateLogStatus(`Gagal: ${st.result.error}`, "fail");
 		} else if (st.result) {
 			updateLogStatus("Selesai.", "done");
-		} else {
+		} else if (!logBuffer.length) {
 			updateLogStatus("Belum ada proses pembaruan di sesi ini.", "");
 		}
+		return st;
 	} catch {
-		/* biarkan isi terakhir */
+		return null; // biarkan isi terakhir, jangan kosongkan panel
 	}
 }
 
-function startLogPolling() {
+function startLogPolling(epoch = logEpoch) {
 	stopLogPolling();
+	if (epoch !== logEpoch) return;
 	logPollTimer = setInterval(async () => {
-		await fetchLog();
-		const st = await fetchUpdateJSON(`${updaterBase}/status`).catch(() => ({}));
-		if (!st.running) stopLogPolling();
+		if (epoch !== logEpoch) {
+			stopLogPolling();
+			return;
+		}
+		const st = await fetchLog(epoch);
+		if (epoch !== logEpoch) return;
+		// Satu request gagal / body kosong BUKAN berarti job selesai.
+		if (st && st.running === false) stopLogPolling();
 	}, 2000);
 }
 
@@ -7670,7 +7694,10 @@ function initUpdateLog() {
 	el.updateLogModal?.addEventListener("click", (e) => {
 		if (e.target?.dataset?.close) closeUpdateLog();
 	});
-	el.updateLogClear?.addEventListener("click", () => updateLogSet([]));
+	el.updateLogClear?.addEventListener("click", () => {
+		logBuffer = [];
+		updateLogSet([], logEpoch);
+	});
 }
 
 /* --- Updater Health Dashboard ---------------------------------------------
@@ -8070,9 +8097,11 @@ async function checkUpdate() {
 		info = await fetchUpdateJSON(`${updaterBase}?mode=check`);
 		// Tampilkan log pemeriksaan (server mengirimnya di field `log`) supaya
 		// pengguna bisa melihat langkah apa yang dilewati saat check.
-		if (Array.isArray(info.log) && info.log.length) {
+		// Jangan timpa log apply yang masih berjalan dengan log --check.
+		if (!applyInFlight && Array.isArray(info.log) && info.log.length) {
+			resetLogSession();
 			openUpdateLog(false);
-			updateLogSet(info.log);
+			updateLogSet(info.log, logEpoch);
 			updateLogStatus("Pemeriksaan selesai.", "done");
 		}
 	} catch (err) {
@@ -8115,8 +8144,10 @@ async function applyUpdate() {
 	toast?.("Mengunduh pembaruan… ini bisa beberapa menit.");
 	// Buka panel log + pantau prosesnya supaya pengguna bisa melihat apa
 	// yang sedang dikerjakan (unduh/ekstrak) alih-alih menunggu buta.
-	openUpdateLog();
-	updateLogSet([]);
+	openUpdateLog(false);
+	resetLogSession();
+	applyInFlight = true;
+	const epoch = logEpoch;
 	updateLogStatus("Memulai…", "running");
 	try {
 		const started = await fetchUpdateJSON(`${updaterBase}?mode=apply`);
@@ -8125,17 +8156,23 @@ async function applyUpdate() {
 			updateLogStatus(started.reason || "Tidak bisa memulai.", "fail");
 			btn.disabled = false;
 			btn.classList.remove("is-checking");
+			applyInFlight = false;
 			return;
 		}
-		startLogPolling();
+		startLogPolling(epoch);
 		for (let i = 0; i < 600; i++) {
 			await new Promise((r) => setTimeout(r, 3000));
-			const st = await fetchUpdateJSON(`${updaterBase}/status`);
+			let st;
+			try {
+				st = await fetchUpdateJSON(`${updaterBase}/status`);
+			} catch {
+				continue; // request gagal != job selesai
+			}
 			if (st.running) {
-				updateLogSet(st.log);
+				updateLogSet(st.log, epoch);
 				continue;
 			}
-			updateLogSet(st.log);
+			updateLogSet(st.log, epoch);
 			const res = st.result || {};
 			updatePending = false;
 			setUpdateDot(false);
@@ -8175,6 +8212,7 @@ async function applyUpdate() {
 			);
 			btn.disabled = false;
 			btn.classList.remove("is-checking");
+			applyInFlight = false;
 			stopLogPolling();
 			updateLogStatus(
 				res.error ? `Gagal: ${res.error}` : "Selesai.",
@@ -8187,6 +8225,7 @@ async function applyUpdate() {
 		toast?.(`Gagal mengunduh: ${err.message}`);
 		updateLogStatus(`Gagal: ${err.message}`, "fail");
 	}
+	applyInFlight = false;
 	stopLogPolling();
 	btn.disabled = false;
 	btn.classList.remove("is-checking");
