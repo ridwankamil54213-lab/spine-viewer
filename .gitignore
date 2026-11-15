@@ -28,6 +28,8 @@ __pycache__/
 
 # Cache hasil --check agregat Updater Health Dashboard (ditulis runtime).
 data/updaters-health.json
+data/change-logs.json
+data/change-logs.json.tmp
 
 # Extracted game assets (assets/<game>/<model>/{skel,atlas,png,moc3,...}).
 #

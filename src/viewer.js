@@ -420,6 +420,13 @@ const el = {
 	updateLogClose: $("#update-log-close"),
 	updateLogClose2: $("#update-log-close2"),
 	updateLogClear: $("#update-log-clear"),
+	changeLogBtn: $("#change-log-btn"),
+	changeLogModal: $("#change-log-modal"),
+	changeLogGame: $("#change-log-game"),
+	changeLogStatus: $("#change-log-status"),
+	changeLogBody: $("#change-log-body"),
+	changeLogClose: $("#change-log-close"),
+	changeLogClose2: $("#change-log-close2"),
 	healthBtn: $("#health-btn"),
 	healthModal: $("#updater-health-modal"),
 	healthRows: $("#health-rows"),
@@ -7519,6 +7526,9 @@ function syncPanes() {
 	}
 
 	syncUpdater(inGame ? browse.game : null);
+	// Riwayat pembaruan tersedia untuk SEMUA game, termasuk yang tidak punya
+	// updater; di daftar game tombolnya menampilkan ringkasan lintas-game.
+	syncChangeLog(inGame ? browse.game : null);
 	// Panel filter CZN ikut hilang saat kembali ke daftar game.
 	syncCznFilters();
 }
@@ -7698,6 +7708,164 @@ function initUpdateLog() {
 	el.updateLogClear?.addEventListener("click", () => {
 		logBuffer = [];
 		updateLogSet([], logEpoch);
+	});
+}
+
+/* --- Change log per game --------------------------------------------------
+ * Tombol di header pustaka membuka riwayat: tanggal + model yang baru masuk.
+ * Sumbernya /api/change-logs (lihat src/change-log.js). Entri `apply` berisi
+ * diff id model sebelum/sesudah apply; entri `restore` berisi model yang
+ * pertama kali terdeteksi saat pemulihan pustaka dari GDrive.
+ */
+let changeLogGame = null;
+
+function syncChangeLog(game) {
+	changeLogGame = game || null;
+	// Sengaja SELALU tampil: di daftar game tombolnya merangkum semua game,
+	// di dalam game ia menampilkan riwayat game itu saja.
+	if (el.changeLogBtn) el.changeLogBtn.hidden = false;
+}
+
+function closeChangeLog() {
+	if (el.changeLogModal) el.changeLogModal.hidden = true;
+}
+
+function clText(tag, cls, text) {
+	const n = document.createElement(tag);
+	if (cls) n.className = cls;
+	if (text != null) n.textContent = String(text);
+	return n;
+}
+
+function clFmtDate(iso) {
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return String(iso || "-");
+	return d.toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" });
+}
+
+function clModelName(id) {
+	const m = models.find((x) => x.id === id);
+	return m ? (m.name || id) : String(id).split("/").pop();
+}
+
+function clRenderModels(box, ids, total) {
+	if (!ids.length) return;
+	const wrap = clText("div", "cl-models");
+	for (const id of ids) {
+		const m = models.find((x) => x.id === id);
+		const chip = clText("button", "cl-model", clModelName(id));
+		chip.type = "button";
+		chip.title = id;
+		if (!m) {
+			chip.classList.add("is-gone");
+			chip.disabled = true;
+			chip.title = `${id} (sudah tidak ada)`;
+		} else {
+			chip.addEventListener("click", () => {
+				closeChangeLog();
+				loadModel(m);
+			});
+		}
+		wrap.appendChild(chip);
+	}
+	box.appendChild(wrap);
+	if (total > ids.length) {
+		box.appendChild(clText("div", "cl-more",
+			`… dan ${(total - ids.length).toLocaleString("id-ID")} model lainnya`));
+	}
+}
+
+function clRenderEntry(e) {
+	const box = clText("div", "cl-entry");
+	const head = clText("div", "cl-head");
+	head.appendChild(clText("span", "cl-date", clFmtDate(e.at)));
+	head.appendChild(clText("span", `cl-kind is-${e.kind || "apply"}`,
+		e.kind === "restore" ? "Pemulihan aset" : "Pembaruan aset"));
+	box.appendChild(head);
+
+	const bits = [];
+	if (e.kind === "restore") {
+		bits.push(`${(e.addedCount || 0).toLocaleString("id-ID")} model pertama kali terdeteksi`);
+	} else {
+		bits.push(`${(e.addedCount || 0).toLocaleString("id-ID")} model baru`);
+		if (e.removedCount) bits.push(`${e.removedCount} model hilang`);
+		if (!e.diffAvailable) bits.push("diff indeks tidak tersedia");
+		if (e.reportedNew) bits.push(`${e.reportedNew} item dilaporkan updater`);
+	}
+	if (e.version) bits.push(`versi ${e.version}`);
+	if (e.gdrive === true) bits.push("ter-backup ke GDrive");
+	else if (e.gdrive === false) bits.push("backup GDrive gagal");
+	box.appendChild(clText("div", "cl-meta", bits.join(" · ")));
+
+	clRenderModels(box, e.added || [], e.addedCount || 0);
+	if ((e.removed || []).length) {
+		box.appendChild(clText("div", "cl-meta", "Model yang tidak ada lagi:"));
+		const w = clText("div", "cl-models");
+		for (const id of e.removed) {
+			w.appendChild(clText("span", "cl-model is-gone", clModelName(id)));
+		}
+		box.appendChild(w);
+	}
+	return box;
+}
+
+async function openChangeLog(gameOverride) {
+	if (!el.changeLogModal) return;
+	if (typeof gameOverride === "string") changeLogGame = gameOverride;
+	el.changeLogModal.hidden = false;
+	el.changeLogGame.textContent = changeLogGame
+		? (gameBuckets().find((g) => g.key === changeLogGame)?.label || changeLogGame)
+		: "Semua game";
+	el.changeLogStatus.className = "cl-status";
+	el.changeLogStatus.textContent = "Memuat riwayat…";
+	el.changeLogBody.replaceChildren();
+	try {
+		const url = changeLogGame
+			? `/api/change-logs?game=${encodeURIComponent(changeLogGame)}`
+			: "/api/change-logs";
+		const r = await fetch(url, { cache: "no-store" });
+		const d = await r.json();
+		if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+		el.changeLogBody.replaceChildren();
+		if (changeLogGame) {
+			const entries = d.entries || [];
+			if (!entries.length) {
+				el.changeLogBody.appendChild(clText("div", "cl-empty",
+					"Belum ada riwayat pembaruan untuk game ini."));
+			} else {
+				for (const e of entries) el.changeLogBody.appendChild(clRenderEntry(e));
+			}
+			el.changeLogStatus.textContent = `${entries.length} entri · klik nama model untuk membukanya`;
+		} else {
+			const games = d.games || [];
+			if (!games.length) {
+				el.changeLogBody.appendChild(clText("div", "cl-empty", "Belum ada riwayat pembaruan."));
+			}
+			for (const g of games) {
+				const row = clText("button", "cl-game-row");
+				row.type = "button";
+				row.appendChild(clText("span", "", g.label || g.game));
+				row.appendChild(clText("small", "",
+					`${g.count} entri · ${(g.newModels || 0).toLocaleString("id-ID")} model · ${clFmtDate(g.lastAt)}`));
+				row.addEventListener("click", () => openChangeLog(g.game));
+				el.changeLogBody.appendChild(row);
+			}
+			el.changeLogStatus.textContent = `${games.length} game punya riwayat · pilih salah satu`;
+		}
+	} catch (err) {
+		el.changeLogStatus.className = "cl-status is-fail";
+		el.changeLogStatus.textContent = `Gagal memuat riwayat: ${err.message}`;
+		el.changeLogBody.replaceChildren(clText("div", "cl-empty", "Coba lagi sebentar."));
+	}
+}
+
+function initChangeLog() {
+	// Arrow function supaya event click tidak ikut terkirim sebagai gameOverride.
+	el.changeLogBtn?.addEventListener("click", () => openChangeLog());
+	el.changeLogClose?.addEventListener("click", closeChangeLog);
+	el.changeLogClose2?.addEventListener("click", closeChangeLog);
+	el.changeLogModal?.addEventListener("click", (e) => {
+		if (e.target?.dataset?.close) closeChangeLog();
 	});
 }
 
@@ -10583,6 +10751,11 @@ function closeTopmostModal() {
 		closeHealth();
 		return true;
 	}
+	const changeLogModal = document.getElementById("change-log-modal");
+	if (changeLogModal && !changeLogModal.hidden) {
+		closeChangeLog();
+		return true;
+	}
 	const log = document.getElementById("update-log-modal");
 	if (log && !log.hidden) {
 		document.getElementById("update-log-close")?.click();
@@ -11359,6 +11532,7 @@ initFullscreen();
 initExport();
 initFavorites();
 initUpdateLog();
+initChangeLog();
 initUpdaterHealth();
 /* --- Menu "Alat" ------------------------------------------------------
  * Alat lanjutan (kisi, tulang, bagian, edit tulang, nama slot, FPS, waktu,

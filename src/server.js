@@ -16,6 +16,7 @@ const { Worker } = require("worker_threads");
 const { walkAssets } = require("./scan-tree");
 // Unggah hasil --apply ke GDrive, masih di job yang sama (lihat modulnya).
 const { uploadAfterApply } = require("./gdrive-upload");
+const changeLog = require("./change-log");
 
 /** Same API surface across runtimes, so pick by detected version. */
 const RUNTIMES = {
@@ -4575,6 +4576,15 @@ app.get("/api/update/:game", async (req, res) => {
 	}
 	// Tanda waktu buat deteksi berkas yang disentuh apply ini saja.
 	const uploadSince = Date.now();
+	// Potret id model SEBELUM apply: beda dengan sesudah apply = model baru
+	// yang benar-benar muncul (bukan sekadar angka `new` dari skrip updater).
+	let beforeIds = null;
+	let afterIds = null;
+	try {
+		beforeIds = new Set(getModels().map((m) => m.id));
+	} catch (err) {
+		console.warn("[change-log] tidak bisa memotret indeks awal:", err.message);
+	}
 	updateJob = { game, running: true, result: null, log: [], startedAt: Date.now() };
 	const pushLog = (l) => {
 		updateJob.log.push(l);
@@ -4604,7 +4614,8 @@ app.get("/api/update/:game", async (req, res) => {
 		updateJob.log.push("menyegarkan indeks model…");
 		try {
 			invalidateScan();
-			getModels({ force: true });
+			const fresh = getModels({ force: true });
+			afterIds = new Set(fresh.map((m) => m.id));
 			cznCardCache = { at: 0, data: null };
 			forceModelRescan = false;   // sudah segar, hindari pindai dobel
 		} catch (err) {
@@ -4632,6 +4643,22 @@ app.get("/api/update/:game", async (req, res) => {
 	} else {
 		pushLog("[gdrive] dilewati: apply gagal, tidak ada yang diunggah.");
 	}
+	/* Catat riwayat per-game SETELAH upload (supaya status backup ikut
+	 * tersimpan di entri). Cuma apply yang sukses; apply gagal tidak boleh
+	 * meninggalkan jejak "model baru" palsu.
+	 */
+	if (applyOk) {
+		try {
+			changeLog.recordApply({
+				game, beforeIds, afterIds,
+				result: updateJob.result || {},
+				gdrive: updateJob.result?.gdrive || null,
+			});
+			pushLog("[change-log] riwayat pembaruan dicatat.");
+		} catch (err) {
+			pushLog(`[change-log] gagal mencatat: ${err.message}`);
+		}
+	}
 	updateJob.running = false;
 	updateJob.finishedAt = Date.now();
 });
@@ -4645,6 +4672,26 @@ app.get("/api/update/:game/status", (_req, res) => {
 		log: updateJob.log,
 		startedAt: updateJob.startedAt,
 		finishedAt: updateJob.finishedAt || null,
+	});
+});
+
+/* --- Change log per game ------------------------------------------------
+ * Tanpa ?game= : ringkasan semua game yang punya riwayat (dipakai saat
+ * pustaka masih di daftar game). Dengan ?game= : entri lengkap untuk game
+ * itu, terbaru dulu. Lihat src/change-log.js.
+ */
+app.get("/api/change-logs", (req, res) => {
+	res.setHeader("Cache-Control", "no-store");
+	const game = typeof req.query.game === "string" ? req.query.game.trim() : "";
+	if (game) {
+		return res.json({
+			game,
+			label: healthLabel(game),
+			entries: changeLog.forGame(game),
+		});
+	}
+	return res.json({
+		games: changeLog.summary().map((g) => ({ ...g, label: healthLabel(g.game) })),
 	});
 });
 

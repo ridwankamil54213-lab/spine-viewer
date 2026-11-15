@@ -219,6 +219,31 @@ per-game. Apply sengaja tidak pernah dijalankan otomatis.
 Regresi: `node tools/check-updater-dashboard.cjs` (39 assertion), termasuk
 bukti bahwa updater tanpa field `ok` tidak lagi dilaporkan gagal.
 
+### Change log per game
+
+Tombol jam di header pustaka (`#change-log-btn`) membuka **riwayat pembaruan**.
+Di daftar game ia menampilkan ringkasan semua game yang punya riwayat; di dalam
+satu game ia menampilkan entri terbaru-dulu dengan **tanggal**, jumlah model
+baru, versi updater, status backup GDrive, dan **chip nama model yang bisa
+diklik** untuk langsung membuka modelnya.
+
+- Sumber: `src/change-log.js`, tersimpan di `data/change-logs.json` (di luar git).
+- `GET /api/change-logs` → ringkasan `[{game,label,count,lastAt,newModels}]`.
+  `GET /api/change-logs?game=<key>` → `{game,label,entries}` terbaru dulu.
+- Entri **`apply`**: dibuat setiap `/api/update/:game?mode=apply` sukses.
+  Server memotret himpunan id model sebelum dan sesudah apply, jadi yang
+  tampil adalah model yang *benar-benar* baru muncul, bukan sekadar angka
+  `new` dari skrip. Apply gagal tidak meninggalkan entri palsu.
+- Entri **`restore`**: di-seed satu kali dari `data/new-models.json` (`flagged`
+  = waktu model pertama kali terdeteksi), supaya riwayat tidak kosong sebelum
+  apply pertama. Dikelompokkan per game per tanggal.
+- Daftar id per entri dibatasi 40 chip ditambah `addedCount` penuh, jadi entri
+  restore berisi puluhan ribu model tetap ringan. Maksimal 60 entri per game.
+- Entri apply juga mencatat apakah upload GDrive berhasil (`gdrive`).
+
+Path bisa di-override lewat `CHANGE_LOG_FILE` / `NEW_MODELS_FILE` (dipakai
+regresi `tools/check-change-log.cjs` supaya data produksi aman).
+
 ### Backup otomatis ke GDrive setelah apply
 
 Setiap `/api/update/:game?mode=apply` yang **sukses** langsung mengunggah
@@ -1335,6 +1360,7 @@ node tools/check-model3d.cjs    # 3D glTF: 59 model, render, clip, balik ke 2D
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
+node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):
