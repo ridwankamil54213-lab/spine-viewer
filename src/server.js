@@ -1477,6 +1477,39 @@ function attachPrydwenMeta(models) {
 	return models;
 }
 
+/**
+ * NIKKE: metadata Prydwen (rarity/class/element/weapon/manufacturer/burst) untuk
+ * filter ala https://www.prydwen.gg/nikke/characters. Ditulis
+ * tools/nikke/import-prydwen.py; `models` memetakan id model -> kode cNNN dan
+ * `byCode` memegang atribut per kode. Ikut ke indeks lean lewat DENY list.
+ */
+function attachPrydwenNikke(models) {
+	let data;
+	try {
+		data = JSON.parse(fs.readFileSync(
+			path.join(DATA, "nikke-prydwen.json"), "utf8"));
+	} catch {
+		return models; // belum diimpor — filter NIKKE tidak aktif
+	}
+	const byCode = data && data.byCode;
+	const codes = data && data.models;
+	if (!byCode || !codes) return models;
+	for (const m of models) {
+		if ((m.game || "") !== "nikke") continue;
+		const info = byCode[codes[m.id]];
+		if (!info) continue;
+		m.nkRarity = info.rarity || null;
+		m.nkClass = info.class || null;
+		m.nkElement = info.element || null;
+		m.nkWeapon = info.weapon || null;
+		m.nkManufacturer = info.manufacturer || null;
+		m.nkBurst = info.burst || null;
+		m.nkSquad = info.squad || null;
+		m.nkCard = info.image || null;
+	}
+	return models;
+}
+
 function attachLostSwordFamilies(models, videos) {
 	const ls = models.filter((m) => (m.game || "") === "lostsword");
 	if (!ls.length) return models;
@@ -1955,6 +1988,8 @@ function scanModels() {
 		lsVideos);
 	// Prydwen: rarity/kelas/elemen/posisi untuk filter Lost Sword.
 	attachPrydwenMeta(out);
+	// Prydwen: rarity/class/element/weapon/manufacturer/burst untuk NIKKE.
+	attachPrydwenNikke(out);
 	// Mitao Utopia: front_<id> jadi kartu root; back/hfront/common/skill/
 	// hspecial_<id> jadi baris varian di picker yang sama. Prefix lain
 	// (monster, loading, ...) sengaja dibiarkan sebagai kartu berdiri sendiri.
@@ -3528,7 +3563,7 @@ function thumbManifest() {
 	// Folder overlay diproses TERAKHIR supaya nilainya menang atas manifest
 	// reguler dengan kunci id model yang sama (tidak bergantung urutan
 	// fs.readdirSync). Dipakai potret karakter Prydwen untuk Lost Sword.
-	const overlays = ["lostsword-prydwen"];
+	const overlays = ["lostsword-prydwen", "nikke-prydwen"];
 	try {
 		for (const game of fs.readdirSync(THUMBS)) {
 			if (overlays.includes(game)) continue;

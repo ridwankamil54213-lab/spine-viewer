@@ -322,6 +322,9 @@ const el = {
 	lsFilters: $("#ls-filters"),
 	lsReset: $("#ls-reset"),
 	lsCount: $("#ls-count"),
+	nkFilters: $("#nk-filters"),
+	nkReset: $("#nk-reset"),
+	nkCount: $("#nk-count"),
 	favCount: $("#fav-count"),
 
 	animSelect: $("#anim-select"),
@@ -6956,6 +6959,9 @@ const browse = {
 	cznGroup: "all", cznEgo: "", cznJob: "", cznRarity: "",
 	// Filter khusus Lost Sword: atribut Prydwen (nilai kosong = semua).
 	lsRarity: "", lsClass: "", lsElement: "", lsPosition: "",
+	// Filter khusus NIKKE: atribut Prydwen (nilai kosong = semua).
+	nkRarity: "", nkClass: "", nkElement: "",
+	nkWeapon: "", nkManufacturer: "", nkBurst: "",
 };
 
 /**
@@ -7127,6 +7133,7 @@ function openGame(key) {
 	// Filter CZN tidak boleh terbawa dari game sebelumnya.
 	resetCznFilters();
 	resetLsFilters();
+	resetNkFilters();
 	// Must go through syncPanes: renderModels fills the grid, but the pane it
 	// lives in starts `hidden`, so calling renderModels directly renders into
 	// a container nobody can see.
@@ -7140,6 +7147,7 @@ function backToGames() {
 	el.search.value = "";
 	resetCznFilters();
 	resetLsFilters();
+	resetNkFilters();
 	// Leaving a game must stop any playing video: a <video> keeps downloading
 	// and decoding off-screen, which stalls the library render.
 	if (videoStageActive()) {
@@ -7213,6 +7221,29 @@ function modelsInScope(group = browse.cznGroup) {
 		]) {
 			if (want) out = out.filter((m) => String(m[field] ?? "") === String(want));
 		}
+	}
+	// Filter NIKKE (Prydwen): 6 dimensi, diterapkan pada kartu ROOT. Model
+	// non-karakter (event scene, monster, background) tidak punya atribut ini
+	// sehingga tersingkir saat filter aktif — sesuai daftar karakter Prydwen.
+	if (browse.game === "nikke") {
+		for (const [field, want] of [
+			["nkRarity", browse.nkRarity],
+			["nkClass", browse.nkClass],
+			["nkElement", browse.nkElement],
+			["nkWeapon", browse.nkWeapon],
+			["nkManufacturer", browse.nkManufacturer],
+			["nkBurst", browse.nkBurst],
+		]) {
+			if (want) out = out.filter((m) => String(m[field] ?? "") === String(want));
+		}
+		// Pustaka NIKKE juga berisi 1.390 aset non-karakter (event scene,
+		// monster, background) yang secara alfabetis mendahului kode cNNN.
+		// Tanpa ini halaman pertama isinya bukan karakter dan potret Prydwen
+		// baru kelihatan di halaman sekian. Karakter didahulukan, sisanya
+		// tetap urut alfabetis.
+		out = out.slice().sort((a, b) =>
+			(!!a.nkRarity === !!b.nkRarity ? 0 : (a.nkRarity ? -1 : 1)) ||
+			a.id.localeCompare(b.id));
 	}
 	return out;
 }
@@ -7408,6 +7439,105 @@ function resetLsFilters() {
 	browse.lsRarity = browse.lsClass = browse.lsElement = browse.lsPosition = "";
 }
 
+/* --- Filter NIKKE (Prydwen) ----------------------------------------------
+ * 227 karakter dengan rarity/class/element/weapon/manufacturer/burstType
+ * dari https://www.prydwen.gg/nikke/characters. Diimpor oleh
+ * tools/nikke/import-prydwen.py, ditempelkan server sebagai field nk*.
+ */
+const NK_ICON_DIR = "/thumbs/nikke-prydwen/";
+const NK_ICON = {
+	rarity: () => null,
+	class: (v) => ({
+		Attacker: "class_attacker.webp",
+		Defender: "class_defender.webp",
+		Supporter: "class_support.webp",
+	}[v] || null),
+	element: (v) => `element_${String(v).toLowerCase()}.webp`,
+	weapon: (v) => ({
+		"Assault Rifle": "weapon_ar.webp",
+		"Rocket Launcher": "weapon_rocket.webp",
+		"Sniper Rifle": "weapon_sniper.webp",
+		Shotgun: "weapon_shotgun.webp",
+		SMG: "weapon_smg.webp",
+		Minigun: "weapon_minigun.webp",
+	}[v] || null),
+	manufacturer: () => null,
+	burst: (v) => `type_${v}.webp`,
+};
+const NK_DEFS = [
+	["rarity", "nkRarity", "Rarity", ["SSR", "SR", "R"], (v) => String(v)],
+	["class", "nkClass", "Class", ["Attacker", "Defender", "Supporter"], (v) => String(v)],
+	["element", "nkElement", "Element",
+		["Fire", "Water", "Wind", "Electric", "Iron"], (v) => String(v)],
+	["weapon", "nkWeapon", "Weapon",
+		["Assault Rifle", "SMG", "Shotgun", "Sniper Rifle", "Minigun", "Rocket Launcher"],
+		(v) => String(v)],
+	["manufacturer", "nkManufacturer", "Manufacturer",
+		["Elysion", "Missilis", "Tetra", "Pilgrim", "Abnormal"], (v) => String(v)],
+	["burst", "nkBurst", "Burst", ["1", "2", "3"],
+		(v) => ({ 1: "I", 2: "II", 3: "III" }[v] || String(v))],
+];
+
+function syncNkFilters() {
+	const box = el.nkFilters;
+	if (!box) return;
+	const show = browse.view === "models" && browse.game === "nikke";
+	box.hidden = !show;
+	if (!show) return;
+	const roots = libraryIndex(models).rootsByGame.get("nikke") || [];
+	let any = false;
+	for (const [kind, field, label, order, text] of NK_DEFS) {
+		const row = box.querySelector(`.ls-row[data-kind="${kind}"]`);
+		if (!row) continue;
+		const have = [...new Set(roots
+			.map((m) => m[field])
+			.filter((v) => v !== null && v !== undefined && v !== "")
+			.map(String))];
+		const vals = [...order.filter((v) => have.includes(v)),
+			...have.filter((v) => !order.includes(v)).sort()];
+		const active = String(browse[field] || "");
+		const sig = `${kind}:${vals.join(",")}`;
+		if (row.dataset.sig !== sig) {
+			row.innerHTML = `<span class="ls-label">${label}</span>`;
+			for (const v of vals) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "ls-chip";
+				b.dataset.kind = kind;
+				b.dataset.value = v;
+				const icon = NK_ICON[kind](v);
+				const n = roots.filter((m) => String(m[field]) === v).length;
+				b.innerHTML = icon
+					? `<img src="${NK_ICON_DIR}${icon}" alt="" />`
+					: `<span class="ls-chip-text">${text(v)}</span>`;
+				b.innerHTML += `<small>${n}</small>`;
+				b.title = `${label}: ${text(v)} (${n} karakter)`;
+				b.setAttribute("aria-label", b.title);
+				row.appendChild(b);
+			}
+			row.dataset.sig = sig;
+		}
+		for (const b of row.querySelectorAll(".ls-chip")) {
+			const on = b.dataset.value === active;
+			b.classList.toggle("is-on", on);
+			b.setAttribute("aria-pressed", String(on));
+		}
+		if (active) any = true;
+	}
+	if (el.nkReset) el.nkReset.disabled = !any;
+	if (el.nkCount) {
+		const shown = modelsInScope();
+		const chars = shown.filter((m) => m.nkRarity).length;
+		el.nkCount.textContent = `Menampilkan ${shown.length} model · ${chars} karakter`;
+	}
+}
+
+/** Kosongkan filter NIKKE saat berpindah game. */
+function resetNkFilters() {
+	browse.nkRarity = browse.nkClass = browse.nkElement = "";
+	browse.nkWeapon = browse.nkManufacturer = browse.nkBurst = "";
+}
+
 function renderModels() {
 	const list = modelsInScope();
 	const perPage = browse.layout === "grid" ? PAGE_SIZE_GRID : PAGE_SIZE;
@@ -7443,6 +7573,7 @@ function renderModels() {
 	// Jumlah per tab ikut berubah saat pencarian / filter lain berubah.
 	syncCznFilters();
 	syncLsFilters();
+	syncNkFilters();
 	if (current) setActive(current.id);
 }
 
@@ -7535,8 +7666,27 @@ function galleryCard(m) {
 		return `<span class="ls-card-badges"><span class="ls-card-stars">`
 			+ `${"★".repeat(Number(m.lsRarity))}</span>${icons}</span>`;
 	})();
+	// NIKKE: rarity SSR/SR/R + ikon elemen/kelas/senjata/burst (Prydwen).
+	if (m.game === "nikke") {
+		btn.classList.add("is-nk");
+		if (m.nkRarity) btn.dataset.nkRarity = String(m.nkRarity);
+	}
+	const nkBadges = (() => {
+		if (m.game !== "nikke" || !m.nkRarity) return "";
+		const icons = ["element", "class", "weapon", "burst"].map((kind) => {
+			const field = { element: "nkElement", class: "nkClass",
+				weapon: "nkWeapon", burst: "nkBurst" }[kind];
+			const v = m[field];
+			const icon = v ? NK_ICON[kind](v) : null;
+			return icon
+				? `<img class="ls-badge-icon" src="${NK_ICON_DIR}${icon}" alt="" title="${escapeHtml(String(v))}" />`
+				: "";
+		}).join("");
+		return `<span class="ls-card-badges"><span class="ls-card-rarity">`
+			+ `${escapeHtml(String(m.nkRarity))}</span>${icons}</span>`;
+	})();
 	btn.innerHTML = `
-		<span class="gcard-art">${art}${lsBadges}${newTag}</span>
+		<span class="gcard-art">${art}${lsBadges}${nkBadges}${newTag}</span>
 		<span class="gcard-name">${escapeHtml(modelLabel(m))}</span>
 		${variantChip(m)}
 		`;
@@ -7666,6 +7816,7 @@ function syncPanes() {
 	// Panel filter CZN ikut hilang saat kembali ke daftar game.
 	syncCznFilters();
 	syncLsFilters();
+	syncNkFilters();
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -10943,6 +11094,7 @@ el.cznFilters?.addEventListener("click", (e) => {
 el.cznReset?.addEventListener("click", () => {
 	resetCznFilters();
 	resetLsFilters();
+	resetNkFilters();
 	renderModels();
 });
 
@@ -10959,6 +11111,23 @@ el.lsFilters?.addEventListener("click", (e) => {
 });
 el.lsReset?.addEventListener("click", () => {
 	resetLsFilters();
+	browse.page = 1;
+	renderModels();
+});
+
+/* --- Filter NIKKE: klik chip = toggle field nk*, Reset = kosongkan --- */
+el.nkFilters?.addEventListener("click", (e) => {
+	const chip = e.target.closest?.(".ls-chip");
+	if (!chip) return;
+	const def = NK_DEFS.find((d) => d[0] === chip.dataset.kind);
+	if (!def) return;
+	const key = def[1];
+	browse[key] = browse[key] === chip.dataset.value ? "" : chip.dataset.value;
+	browse.page = 1;
+	renderModels();
+});
+el.nkReset?.addEventListener("click", () => {
+	resetNkFilters();
 	browse.page = 1;
 	renderModels();
 });

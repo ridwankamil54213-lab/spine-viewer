@@ -185,9 +185,11 @@ const pageLines = (atlasPath) => {
 		return img ? { src: img.getAttribute("src"), complete: img.complete,
 			w: img.naturalWidth } : null;
 	});
+	// Kartu karakter bisa memakai potret Prydwen (override manifest) atau
+	// thumbnail ArtHub lama untuk aset non-karakter; dua-duanya valid.
 	ok("thumbnail ter-render di kartu Nikke",
 		cardThumb && cardThumb.complete && cardThumb.w > 0 &&
-		/\/thumbs\/nikke\//.test(cardThumb.src), JSON.stringify(cardThumb));
+		/\/thumbs\/nikke(?:-prydwen)?\//.test(cardThumb.src), JSON.stringify(cardThumb));
 
 	for (const wanted of ["nikke/c010_00", "nikke/Glass_Front", "nikke/Chapter4_Glass_Back2"]) {
 		await page.fill("#search", wanted);

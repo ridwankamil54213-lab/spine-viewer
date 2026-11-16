@@ -140,6 +140,23 @@
 				</div>
 			</div>
 
+			<!-- Filter khusus NIKKE, meniru Prydwen: Rarity/Class/Element/
+			     Weapon/Manufacturer/Burst. Memakai kelas CSS yang sama dengan
+			     filter Lost Sword; isinya dibangun syncNkFilters(). -->
+			<div id="nk-filters" class="ls-filters" hidden>
+				<div class="ls-row" data-kind="rarity" role="group" aria-label="Filter rarity"></div>
+				<div class="ls-row" data-kind="class" role="group" aria-label="Filter class"></div>
+				<div class="ls-row" data-kind="element" role="group" aria-label="Filter element"></div>
+				<div class="ls-row" data-kind="weapon" role="group" aria-label="Filter weapon"></div>
+				<div class="ls-row" data-kind="manufacturer" role="group" aria-label="Filter manufacturer"></div>
+				<div class="ls-row" data-kind="burst" role="group" aria-label="Filter burst"></div>
+				<div class="ls-foot">
+					<button id="nk-reset" class="btn btn-sm btn-ghost ls-reset" type="button"
+						title="Hapus semua filter" aria-label="Hapus semua filter">↺ Reset</button>
+					<span id="nk-count" class="ls-count"></span>
+				</div>
+			</div>
+
 			<!-- view 1: games -->
 			<ul id="game-list" class="game-list"></ul>
 

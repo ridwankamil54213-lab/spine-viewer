@@ -110,6 +110,26 @@ Regresi: `tools/check-nikke.cjs` (39 assertion, termasuk nama NKAS tanpa CJK,
 anti-false-positive "EVE", updater berbasis NKAS, family, thumbnail,
 render 3 model dan 0 aset 404).
 
+## Potret & filter Prydwen
+
+```sh
+python3 tools/nikke/import-prydwen.py
+node tools/check-nikke-prydwen.cjs
+```
+
+Mengambil 227 karakter dari `https://www.prydwen.gg/nikke/characters` (blob
+JSON di HTML SSR, bukan API), mengunduh potret `*_card.webp` + ikon ke
+`public/thumbs/nikke-prydwen/`, dan menulis `data/nikke-prydwen.json`
+(`byCode` kode `cNNN` → atribut, `models` id model → kode). Pencocokan lewat
+`data/nikke-characters.json`: `slug`/`name` Prydwen → `url`/`name` katalog →
+`img` (`si_c010_00_s`) → `c010`. Idempoten; daftar id model diambil dari
+`/api/models?game=nikke&lean=1` dengan fallback ke `assets/nikke/_names.json`.
+
+Server menempelkan field `nkRarity`/`nkClass`/`nkElement`/`nkWeapon`/
+`nkManufacturer`/`nkBurst` (ikut ke indeks lean), dan `thumbManifest()`
+menerapkan manifest `nikke-prydwen` paling akhir. Filter bar `#nk-filters`
+dan kartu 262:358 ada di `src/viewer.js` / `public/styles.css`.
+
 ## Arsip
 
 - `tools/update-nikke.py` — **USANG**, jangan dipakai (sumber Nikke-db,
