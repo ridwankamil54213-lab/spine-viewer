@@ -318,6 +318,10 @@ const el = {
 	// Filter CZN (tab Combatants/Partner + atribut wiki)
 	cznFilters: $("#czn-filters"),
 	cznReset: $("#czn-reset"),
+	// Filter Lost Sword (Rarity/Class/Element/Position ala Prydwen)
+	lsFilters: $("#ls-filters"),
+	lsReset: $("#ls-reset"),
+	lsCount: $("#ls-count"),
 	favCount: $("#fav-count"),
 
 	animSelect: $("#anim-select"),
@@ -6950,6 +6954,8 @@ const browse = {
 	layout: "grid",
 	// Filter khusus CZN: tab jenis karakter + atribut dari wiki.
 	cznGroup: "all", cznEgo: "", cznJob: "", cznRarity: "",
+	// Filter khusus Lost Sword: atribut Prydwen (nilai kosong = semua).
+	lsRarity: "", lsClass: "", lsElement: "", lsPosition: "",
 };
 
 /**
@@ -7120,6 +7126,7 @@ function openGame(key) {
 	el.search.value = "";
 	// Filter CZN tidak boleh terbawa dari game sebelumnya.
 	resetCznFilters();
+	resetLsFilters();
 	// Must go through syncPanes: renderModels fills the grid, but the pane it
 	// lives in starts `hidden`, so calling renderModels directly renders into
 	// a container nobody can see.
@@ -7132,6 +7139,7 @@ function backToGames() {
 	browse.page = 1;
 	el.search.value = "";
 	resetCznFilters();
+	resetLsFilters();
 	// Leaving a game must stop any playing video: a <video> keeps downloading
 	// and decoding off-screen, which stalls the library render.
 	if (videoStageActive()) {
@@ -7192,6 +7200,19 @@ function modelsInScope(group = browse.cznGroup) {
 			(Number(b.rarity) || 0) - (Number(a.rarity) || 0) ||
 			String(a.name || a.id).localeCompare(String(b.name || b.id), undefined, { numeric: true }) ||
 			a.id.localeCompare(b.id));
+	}
+	// Filter Lost Sword (Prydwen): diterapkan pada kartu ROOT. Family tanpa
+	// metadata Prydwen (NPC, dll) tersingkir saat filter aktif — wajar, karena
+	// atributnya memang tidak diketahui.
+	if (browse.game === "lostsword") {
+		for (const [field, want] of [
+			["lsRarity", browse.lsRarity],
+			["lsClass", browse.lsClass],
+			["lsElement", browse.lsElement],
+			["lsPosition", browse.lsPosition],
+		]) {
+			if (want) out = out.filter((m) => String(m[field] ?? "") === String(want));
+		}
 	}
 	return out;
 }
@@ -7296,6 +7317,97 @@ function resetCznFilters() {
 	browse.cznEgo = browse.cznJob = browse.cznRarity = "";
 }
 
+/* --- Filter Lost Sword (Prydwen) -----------------------------------------
+ * Atribut rarity/class/element/position ditanam server dari
+ * data/lostsword-prydwen.json (tools/lostsword/import-prydwen.py). Ikon dan
+ * potret karakter disajikan dari /thumbs/lostsword-prydwen/.
+ */
+const LS_ICON_DIR = "/thumbs/lostsword-prydwen/";
+const LS_ICON = {
+	rarity: () => null,
+	class: (v) => `class_${String(v).toLowerCase()}.webp`,
+	element: (v) => `element_${String(v).toLowerCase()}.webp`,
+	position: (v) => ({
+		Back: "position_backward.webp",
+		Middle: "position_center.webp",
+		Front: "position_forward.webp",
+	}[v] || null),
+};
+const LS_ORDER = {
+	rarity: ["5", "4", "3"],
+	class: ["Archer", "Healer", "Knight", "Wizard"],
+	element: ["Fire", "Frost", "Nature", "Holy", "Chaos", "Radiance", "Shock"],
+	position: ["Front", "Middle", "Back"],
+};
+const LS_LABEL = { rarity: "Rarity", class: "Class", element: "Element", position: "Position" };
+const LS_FIELD = {
+	rarity: "lsRarity", class: "lsClass",
+	element: "lsElement", position: "lsPosition",
+};
+const LS_BROWSE = {
+	rarity: "lsRarity", class: "lsClass",
+	element: "lsElement", position: "lsPosition",
+};
+
+function syncLsFilters() {
+	const box = el.lsFilters;
+	if (!box) return;
+	const show = browse.view === "models" && browse.game === "lostsword";
+	box.hidden = !show;
+	if (!show) return;
+	// Nilai diambil dari SELURUH akar game supaya memilih satu elemen tidak
+	// menghilangkan pilihan elemen lainnya.
+	const roots = libraryIndex(models).rootsByGame.get("lostsword") || [];
+	let any = false;
+	for (const kind of Object.keys(LS_ORDER)) {
+		const row = box.querySelector(`.ls-row[data-kind="${kind}"]`);
+		if (!row) continue;
+		const field = LS_FIELD[kind];
+		const have = [...new Set(roots
+			.map((m) => m[field])
+			.filter((v) => v !== null && v !== undefined && v !== "")
+			.map(String))];
+		const order = LS_ORDER[kind];
+		const vals = [...order.filter((v) => have.includes(v)),
+			...have.filter((v) => !order.includes(v)).sort()];
+		const active = String(browse[LS_BROWSE[kind]] || "");
+		const sig = `${kind}:${vals.join(",")}`;
+		if (row.dataset.sig !== sig) {
+			row.innerHTML = `<span class="ls-label">${LS_LABEL[kind]}</span>`;
+			for (const v of vals) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "ls-chip";
+				b.dataset.kind = kind;
+				b.dataset.value = v;
+				const icon = LS_ICON[kind](v);
+				const n = roots.filter((m) => String(m[field]) === v).length;
+				b.innerHTML = icon
+					? `<img src="${LS_ICON_DIR}${icon}" alt="" />`
+					: `<span class="ls-stars">${"★".repeat(Number(v))}</span>`;
+				b.innerHTML += `<small>${n}</small>`;
+				b.title = `${LS_LABEL[kind]}: ${v} (${n} karakter)`;
+				b.setAttribute("aria-label", b.title);
+				row.appendChild(b);
+			}
+			row.dataset.sig = sig;
+		}
+		for (const b of row.querySelectorAll(".ls-chip")) {
+			const on = b.dataset.value === active;
+			b.classList.toggle("is-on", on);
+			b.setAttribute("aria-pressed", String(on));
+		}
+		if (active) any = true;
+	}
+	if (el.lsReset) el.lsReset.disabled = !any;
+	if (el.lsCount) el.lsCount.textContent = `Menampilkan ${modelsInScope().length} karakter`;
+}
+
+/** Kosongkan filter Lost Sword saat berpindah game. */
+function resetLsFilters() {
+	browse.lsRarity = browse.lsClass = browse.lsElement = browse.lsPosition = "";
+}
+
 function renderModels() {
 	const list = modelsInScope();
 	const perPage = browse.layout === "grid" ? PAGE_SIZE_GRID : PAGE_SIZE;
@@ -7330,6 +7442,7 @@ function renderModels() {
 	renderPager(pages, list.length, start, slice.length);
 	// Jumlah per tab ikut berubah saat pencarian / filter lain berubah.
 	syncCznFilters();
+	syncLsFilters();
 	if (current) setActive(current.id);
 }
 
@@ -7404,8 +7517,26 @@ function galleryCard(m) {
 		? `<img class="gcard-img" src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async" width="160" height="160" />`
 		: `<span class="gcard-img gcard-none" aria-hidden="true">${escapeHtml(initials(m))}</span>`;
 	const newTag = isNewModel(m) ? `<span class="badge-new" title="Baru ditambahkan">NEW</span>` : "";
+	// Kartu ala Prydwen: bintang rarity + ikon elemen/kelas/posisi di atas
+	// potret. Family tanpa metadata Prydwen tetap tampil polos (thumbnail L2D).
+	if (m.game === "lostsword") {
+		btn.classList.add("is-ls");
+		if (m.lsRarity) btn.dataset.lsRarity = String(m.lsRarity);
+	}
+	const lsBadges = (() => {
+		if (m.game !== "lostsword" || !m.lsRarity) return "";
+		const icons = ["element", "class", "position"].map((kind) => {
+			const v = m[LS_FIELD[kind]];
+			const icon = v ? LS_ICON[kind](v) : null;
+			return icon
+				? `<img class="ls-badge-icon" src="${LS_ICON_DIR}${icon}" alt="" title="${escapeHtml(String(v))}" />`
+				: "";
+		}).join("");
+		return `<span class="ls-card-badges"><span class="ls-card-stars">`
+			+ `${"★".repeat(Number(m.lsRarity))}</span>${icons}</span>`;
+	})();
 	btn.innerHTML = `
-		<span class="gcard-art">${art}${newTag}</span>
+		<span class="gcard-art">${art}${lsBadges}${newTag}</span>
 		<span class="gcard-name">${escapeHtml(modelLabel(m))}</span>
 		${variantChip(m)}
 		`;
@@ -7534,6 +7665,7 @@ function syncPanes() {
 	syncChangeLog(inGame ? browse.game : null);
 	// Panel filter CZN ikut hilang saat kembali ke daftar game.
 	syncCznFilters();
+	syncLsFilters();
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -10810,6 +10942,24 @@ el.cznFilters?.addEventListener("click", (e) => {
 });
 el.cznReset?.addEventListener("click", () => {
 	resetCznFilters();
+	resetLsFilters();
+	renderModels();
+});
+
+/* --- Filter Lost Sword: klik chip = toggle, Reset = kosongkan semuanya --- */
+el.lsFilters?.addEventListener("click", (e) => {
+	const chip = e.target.closest?.(".ls-chip");
+	if (!chip) return;
+	const key = LS_BROWSE[chip.dataset.kind];
+	if (!key) return;
+	// Klik chip yang sama lagi = matikan filter itu.
+	browse[key] = browse[key] === chip.dataset.value ? "" : chip.dataset.value;
+	browse.page = 1;
+	renderModels();
+});
+el.lsReset?.addEventListener("click", () => {
+	resetLsFilters();
+	browse.page = 1;
 	renderModels();
 });
 

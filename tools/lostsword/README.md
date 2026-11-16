@@ -57,6 +57,8 @@ tidak pernah menghapus berkas lama di remote.
 ```bash
 # Sinkronkan model, video, nama, family, dan thumbnail dari situs
 python3 tools/lostsword/refresh.py
+# Ambil potret karakter + rarity/class/element/position dari Prydwen
+python3 tools/lostsword/import-prydwen.py
 
 # Kontrak updater untuk tombol "Periksa pembaruan" di UI
 python3 tools/lostsword/update.py --check
@@ -64,6 +66,8 @@ python3 tools/lostsword/update.py --apply
 
 # Verifikasi end-to-end (API + disk + Playwright render Spine, varian & video)
 node tools/check-lostsword.cjs
+# Potret Prydwen + filter bar (API + disk + Playwright klik chip & Reset)
+node tools/check-lostsword-prydwen.cjs
 ```
 
 Backup pohon aset XAPK lama disimpan di luar repo pada `/srv/spine-assets/lostsword/apk-backup-*/` dan state versi disimpan di `/srv/spine-assets/lostsword/state.json`.

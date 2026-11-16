@@ -1449,6 +1449,34 @@ function pairSkeletonAtlas(skels, atlases) {
  * word but no plain folder (`goblin_archer`, `fishman_*`) and lobby-only NPCs
  * stay standalone.
  */
+/**
+ * Lost Sword: metadata Prydwen (rarity / class / element / position) dipakai
+ * filter bar ala https://www.prydwen.gg/lost-sword/characters. Ditulis oleh
+ * tools/lostsword/import-prydwen.py, dikunci oleh id model, dan otomatis ikut
+ * ke indeks lean karena models-payload.js memakai daftar tolak (DENY list).
+ */
+function attachPrydwenMeta(models) {
+	let data;
+	try {
+		data = JSON.parse(fs.readFileSync(
+			path.join(DATA, "lostsword-prydwen.json"), "utf8"));
+	} catch {
+		return models; // belum diimpor — filter tidak aktif
+	}
+	const map = data && data.models;
+	if (!map || typeof map !== "object") return models;
+	for (const m of models) {
+		const info = map[m.id];
+		if (!info) continue;
+		m.lsRarity = info.rarity ?? null;
+		m.lsClass = info.class || null;
+		m.lsElement = info.element || null;
+		m.lsPosition = info.position || null;
+		m.lsCard = info.image || null;
+	}
+	return models;
+}
+
 function attachLostSwordFamilies(models, videos) {
 	const ls = models.filter((m) => (m.game || "") === "lostsword");
 	if (!ls.length) return models;
@@ -1925,6 +1953,8 @@ function scanModels() {
 	const out = attachLostSwordFamilies(
 		applyNikkiNames(attachCharacters(attachNikkiFamilies(attachFamilies(sorted)))),
 		lsVideos);
+	// Prydwen: rarity/kelas/elemen/posisi untuk filter Lost Sword.
+	attachPrydwenMeta(out);
 	// Mitao Utopia: front_<id> jadi kartu root; back/hfront/common/skill/
 	// hspecial_<id> jadi baris varian di picker yang sama. Prefix lain
 	// (monster, loading, ...) sengaja dibiarkan sebagai kartu berdiri sendiri.
@@ -3495,8 +3525,13 @@ function thumbManifest() {
 	// Keys are already fully-qualified model ids, so a flat merge is safe and
 	// adding a new game needs no code change here.
 	const combined = {};
+	// Folder overlay diproses TERAKHIR supaya nilainya menang atas manifest
+	// reguler dengan kunci id model yang sama (tidak bergantung urutan
+	// fs.readdirSync). Dipakai potret karakter Prydwen untuk Lost Sword.
+	const overlays = ["lostsword-prydwen"];
 	try {
 		for (const game of fs.readdirSync(THUMBS)) {
+			if (overlays.includes(game)) continue;
 			const file = path.join(THUMBS, game, "_manifest.json");
 			let st;
 			try {
@@ -3528,6 +3563,18 @@ function thumbManifest() {
 				}
 			}
 			Object.assign(combined, perGame);
+		}
+		for (const game of overlays) {
+			try {
+				const raw = JSON.parse(fs.readFileSync(
+					path.join(THUMBS, game, "_manifest.json"), "utf8"));
+				for (const [k, v] of Object.entries(raw)) {
+					if (typeof v !== "string") continue;
+					combined[k] = v.startsWith(game + "/") ? v : `${game}/${v}`;
+				}
+			} catch {
+				/* overlay belum ada — thumbnail reguler tetap dipakai */
+			}
 		}
 	} catch {
 		return {};

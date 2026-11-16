@@ -96,7 +96,7 @@ const STATIC_ROOTS = {
 	"stellasora-3d": { assets: ["stellasora-3d"] },
 	zonenova: { assets: ["zonenova"] },
 	girlwars: { assets: ["girlwars", "girlwars-l2d"] },
-	lostsword: { assets: ["lostsword"], thumbs: ["lostsword"] },
+	lostsword: { assets: ["lostsword"], thumbs: ["lostsword", "lostsword-prydwen"] },
 	"lostsword-video": { assets: ["lostsword-video"] },
 	eroera: { assets: ["eroera"], thumbs: ["eroera"] },
 	mercenary: { assets: ["mercenary"] },

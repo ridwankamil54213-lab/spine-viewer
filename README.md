@@ -1140,6 +1140,33 @@ pohon lama bila cocok, unduh sisanya), lalu mengarsipkan seluruh pohon lama ke
 1,7 GB) dan `assets/lostsword-video/` cuma `skill-videos/` + `memorial-videos/`
 (159 MB, dari 599 MB). Root GDrive yang bersesuaian juga di-`rclone sync`
 supaya restore tidak mengembalikan model lama.
+
+**Tampilan & filter ala Prydwen.** `tools/lostsword/import-prydwen.py` membaca
+halaman `https://www.prydwen.gg/lost-sword/characters` (71 kartu sudah
+ter-render di HTML) dan mengunduh **71 potret `*_card.webp`** + **14 ikon**
+ke `public/thumbs/lostsword-prydwen/`. Tiap kartu membawa **rarity 3★/4★/5★,
+class (Archer/Healer/Knight/Wizard), element (7 nilai), dan position
+(Front/Middle/Back)**. Nama dicocokkan ke family `_names.json` (69/71 cocok,
+2 alias `Cowqueen Belsey` → `Belsey`, `Rita (Maid)` → `Maid Rita`); 16 family
+NPC tanpa padanan tetap memakai potret L2D viewer.
+
+- Metadata disimpan di `data/lostsword-prydwen.json`, ditempelkan server ke
+  model (`lsRarity`/`lsClass`/`lsElement`/`lsPosition`) sehingga otomatis ikut
+  ke indeks lean.
+- Thumbnail override: `thumbManifest()` menerapkan manifest
+  `lostsword-prydwen` **paling akhir**, jadi potret Prydwen menang atas potret
+  L2D viewer untuk id yang sama tanpa mengubah `refresh.py`.
+- Kartu galeri jadi potret **140:180** dengan border warna rarity, deretan
+  bintang, dan ikon elemen/kelas/posisi — menyamai kartu Prydwen.
+- Baris filter khusus Lost Sword (`#ls-filters`) muncul hanya di game ini:
+  **Rarity / Class / Element / Position** + `Reset` + jumlah karakter. Filter
+  bersifat kumulatif (mis. `5★` + `Fire` → 87 → 52 → 10 kartu).
+- Regresi: `node tools/check-lostsword-prydwen.cjs`. Jalankan ulang importer
+  setelah katalog situs berubah:
+
+```sh
+python3 tools/lostsword/import-prydwen.py
+```
 - `UPDATERS["lostsword"]` & `UPDATERS["lostsword-video"]` (`rescan: true`)
   menjalankan `tools/lostsword/update.py` (`--check` / `--apply`). Regresi:
   `tools/check-lostsword.cjs` (33 assertion API + disk + Playwright). Detail:
@@ -1437,6 +1464,7 @@ node tools/check-mitao.cjs        # Mitao: solver iOS v2, manifest, updater
 node tools/check-mitao-variants.cjs # Mitao: varian front_*, nama JP, thumbnail
 node tools/check-pokerfate.cjs    # Poker Fate: updater XENC, probe HTTP Range
 node tools/check-lostsword.cjs    # Lost Sword: model/video/family dari _names.json
+node tools/check-lostsword-prydwen.cjs # potret Prydwen + filter rarity/class/element/posisi
 node tools/check-eroera.cjs       # 欲洛降临 (EroEra): 174 model, 43 family, Luban, thumb
 node tools/check-mercenary.cjs    # Mercenary: 98 model (89 CDN), 85 ilustrasi, 32 family
 node tools/check-ivntight.cjs     # IV-N-Tight: hash katalog live, 84 model, 0 404, render

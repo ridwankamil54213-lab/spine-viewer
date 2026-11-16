@@ -56,6 +56,12 @@ assert.strictEqual(ccJobs["public/audio/crosscore"], "gdrive:audio/crosscore");
 assert.strictEqual(ccJobs["thumbs/crosscore-render"], "gdrive:thumbs/crosscore-render");
 ok("crosscore: aset, CG, 2 thumbnail, dan klip audio ikut ter-backup");
 
+const lsJobs = Object.fromEntries(buildJobs("lostsword", since).map((j) => [j.label, j.dst]));
+assert.ok(lsJobs["assets/lostsword"] && lsJobs["thumbs/lostsword"] &&
+	lsJobs["thumbs/lostsword-prydwen"],
+	"root lostsword belum lengkap: " + JSON.stringify(Object.keys(lsJobs)));
+ok("lostsword: aset + 2 thumbnail (L2D viewer & Prydwen) ikut ter-backup");
+
 // 3. Deteksi dinamis mengembalikan bentuk yang diharapkan.
 const dyn = changedRoots(since);
 assert.ok(dyn.assets instanceof Set && dyn.thumbs instanceof Set);

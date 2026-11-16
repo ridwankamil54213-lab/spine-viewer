@@ -1,0 +1,3032 @@
+{
+ "characters": 71,
+ "fetchedAt": 1794825681,
+ "matchedFamilies": 69,
+ "models": {
+  "lostsword-video/memorial-videos/Pc_Crassa_01_Memorial": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword-video/memorial-videos/Pc_Eva_02_Memorial": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword-video/memorial-videos/Pc_Galahad_01_Memorial": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword-video/memorial-videos/Pc_Karishara_01_Memorial": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword-video/skill-videos/Pc_Agravaine_01": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "agravaine_card.webp",
+   "name": "Agravaine",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "agravaine"
+  },
+  "lostsword-video/skill-videos/Pc_Anessa_01": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword-video/skill-videos/Pc_Anessa_01_Special": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword-video/skill-videos/Pc_Asuka_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "asuka_card.webp",
+   "name": "Asuka",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "asuka"
+  },
+  "lostsword-video/skill-videos/Pc_Balin_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "baylin_card.webp",
+   "name": "Baylin",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "baylin"
+  },
+  "lostsword-video/skill-videos/Pc_Bedivere_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword-video/skill-videos/Pc_Bedivere_02": {
+   "class": "Archer",
+   "element": "Holy",
+   "image": "neo-bedivere_card.webp",
+   "name": "NEO Bedivere",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "neo-bedivere"
+  },
+  "lostsword-video/skill-videos/Pc_Caira_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword-video/skill-videos/Pc_Claire_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "claire_card.webp",
+   "name": "Claire",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "claire"
+  },
+  "lostsword-video/skill-videos/Pc_Claris_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "clarisse_card.webp",
+   "name": "Clarisse",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "clarisse"
+  },
+  "lostsword-video/skill-videos/Pc_CowQueen_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword-video/skill-videos/Pc_Crassa_01": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword-video/skill-videos/Pc_Crassa_01_Memorial": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword-video/skill-videos/Pc_Cristina_01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword-video/skill-videos/Pc_Diancecht_01": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "dian-cecht_card.webp",
+   "name": "Dian Cecht",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "dian-cecht"
+  },
+  "lostsword-video/skill-videos/Pc_Elaine_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "elaine_card.webp",
+   "name": "Elaine",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "elaine"
+  },
+  "lostsword-video/skill-videos/Pc_Elin_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "elin_card.webp",
+   "name": "Elin",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "elin"
+  },
+  "lostsword-video/skill-videos/Pc_Elizabeth_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword-video/skill-videos/Pc_Elizabeth_01_Special": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword-video/skill-videos/Pc_Enya_01": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "enya_card.webp",
+   "name": "Enya",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "enya"
+  },
+  "lostsword-video/skill-videos/Pc_Erin_01": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword-video/skill-videos/Pc_Esmeralda_01": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "esmeralda_card.webp",
+   "name": "Esmeralda",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "esmeralda"
+  },
+  "lostsword-video/skill-videos/Pc_Estheria_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword-video/skill-videos/Pc_Ethan_01": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "ethan_card.webp",
+   "name": "Ethan",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ethan"
+  },
+  "lostsword-video/skill-videos/Pc_Eva_02": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword-video/skill-videos/Pc_Eva_02_Memorial": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword-video/skill-videos/Pc_Gaheris_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "gaheris_card.webp",
+   "name": "Gaheris",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "gaheris"
+  },
+  "lostsword-video/skill-videos/Pc_Galahad_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword-video/skill-videos/Pc_Galahad_01_Memorial": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword-video/skill-videos/Pc_Galahad_01_Special": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword-video/skill-videos/Pc_Gawain_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "gawain_card.webp",
+   "name": "Gawain",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "gawain"
+  },
+  "lostsword-video/skill-videos/Pc_Guinevere_01": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword-video/skill-videos/Pc_Hikage_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "hikage_card.webp",
+   "name": "Hikage",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "hikage"
+  },
+  "lostsword-video/skill-videos/Pc_Isabel_01": {
+   "class": "Archer",
+   "element": "Frost",
+   "image": "isabel_card.webp",
+   "name": "Isabel",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "isabel"
+  },
+  "lostsword-video/skill-videos/Pc_Isis_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "isis_card.webp",
+   "name": "Isis",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "isis"
+  },
+  "lostsword-video/skill-videos/Pc_Isolde_01": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "isolde_card.webp",
+   "name": "Isolde",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "isolde"
+  },
+  "lostsword-video/skill-videos/Pc_Jan_01": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "joan-of-arc_card.webp",
+   "name": "Joan of Arc",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "joan-of-arc"
+  },
+  "lostsword-video/skill-videos/Pc_Jessi_01": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "jessi_card.webp",
+   "name": "Jessi",
+   "position": "Back",
+   "rarity": 3,
+   "slug": "jessi"
+  },
+  "lostsword-video/skill-videos/Pc_Karishara_01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword-video/skill-videos/Pc_Karishara_01_Memorial": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword-video/skill-videos/Pc_Katrin_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "katrin_card.webp",
+   "name": "Katrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "katrin"
+  },
+  "lostsword-video/skill-videos/Pc_Kirke_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "circe_card.webp",
+   "name": "Circe",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "circe"
+  },
+  "lostsword-video/skill-videos/Pc_Lancelot_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "lancelot_card.webp",
+   "name": "Lancelot",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lancelot"
+  },
+  "lostsword-video/skill-videos/Pc_Lilia_01": {
+   "class": "Healer",
+   "element": "Chaos",
+   "image": "lilia_card.webp",
+   "name": "Lilia",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lilia"
+  },
+  "lostsword-video/skill-videos/Pc_Lilith_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lilith_card.webp",
+   "name": "Lilith",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lilith"
+  },
+  "lostsword-video/skill-videos/Pc_Lisa_01": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "lisa_card.webp",
+   "name": "Lisa",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lisa"
+  },
+  "lostsword-video/skill-videos/Pc_Lohengrin_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword-video/skill-videos/Pc_Lua_01": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword-video/skill-videos/Pc_Lucy_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lucy_card.webp",
+   "name": "Lucy",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lucy"
+  },
+  "lostsword-video/skill-videos/Pc_Lueira_01": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "lueira_card.webp",
+   "name": "Lueira",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lueira"
+  },
+  "lostsword-video/skill-videos/Pc_Lumi_01": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword-video/skill-videos/Pc_Media_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "rowena_card.webp",
+   "name": "Rowena",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "rowena"
+  },
+  "lostsword-video/skill-videos/Pc_Merlin_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword-video/skill-videos/Pc_Merry_01": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "merry_card.webp",
+   "name": "Merry",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "merry"
+  },
+  "lostsword-video/skill-videos/Pc_Merry_02": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "summer-merry_card.webp",
+   "name": "Summer Merry",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "summer-merry"
+  },
+  "lostsword-video/skill-videos/Pc_Mia_01": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "mia_card.webp",
+   "name": "Mia",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "mia"
+  },
+  "lostsword-video/skill-videos/Pc_Morgana_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword-video/skill-videos/Pc_Morganlefay_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword-video/skill-videos/Pc_Morgause_01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "morgause_card.webp",
+   "name": "Morgause",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgause"
+  },
+  "lostsword-video/skill-videos/Pc_Nesha_01": {
+   "class": "Archer",
+   "element": "Radiance",
+   "image": "nesha_card.webp",
+   "name": "Nesha",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "nesha"
+  },
+  "lostsword-video/skill-videos/Pc_Nia_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword-video/skill-videos/Pc_Nimue_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "nymue_card.webp",
+   "name": "Nymue",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "nymue"
+  },
+  "lostsword-video/skill-videos/Pc_Palamedes_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword-video/skill-videos/Pc_Percival_01": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "percival_card.webp",
+   "name": "Percival",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "percival"
+  },
+  "lostsword-video/skill-videos/Pc_Rachel_01": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "rachel_card.webp",
+   "name": "Rachel",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "rachel"
+  },
+  "lostsword-video/skill-videos/Pc_Ran_01": {
+   "class": "Knight",
+   "element": "Holy",
+   "image": "ran_card.webp",
+   "name": "Ran",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "ran"
+  },
+  "lostsword-video/skill-videos/Pc_Rey_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "ray_card.webp",
+   "name": "Ray",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ray"
+  },
+  "lostsword-video/skill-videos/Pc_Ria_01": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "ria_card.webp",
+   "name": "Ria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "ria"
+  },
+  "lostsword-video/skill-videos/Pc_Rita_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "rita_card.webp",
+   "name": "Rita",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "rita"
+  },
+  "lostsword-video/skill-videos/Pc_Rita_02": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "rita-maid_card.webp",
+   "name": "Rita (Maid)",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "rita-maid"
+  },
+  "lostsword-video/skill-videos/Pc_Sarah_01": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "sarah_card.webp",
+   "name": "Sarah",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "sarah"
+  },
+  "lostsword-video/skill-videos/Pc_Tiamat_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword-video/skill-videos/Pc_Tristan_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "tristan_card.webp",
+   "name": "Tristan",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tristan"
+  },
+  "lostsword-video/skill-videos/Pc_Urien_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "urien_card.webp",
+   "name": "Urien",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "urien"
+  },
+  "lostsword-video/skill-videos/Pc_Vivien_01": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "vivien_card.webp",
+   "name": "Vivien",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "vivien"
+  },
+  "lostsword-video/skill-videos/Pc_Yumi_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "yumi_card.webp",
+   "name": "Yumi",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "yumi"
+  },
+  "lostsword/chibi/Agravaine": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "agravaine_card.webp",
+   "name": "Agravaine",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "agravaine"
+  },
+  "lostsword/chibi/Anesa": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword/chibi/Asuka": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "asuka_card.webp",
+   "name": "Asuka",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "asuka"
+  },
+  "lostsword/chibi/Balin": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "baylin_card.webp",
+   "name": "Baylin",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "baylin"
+  },
+  "lostsword/chibi/Bedivere": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword/chibi/Bedivere_Awakening": {
+   "class": "Archer",
+   "element": "Holy",
+   "image": "neo-bedivere_card.webp",
+   "name": "NEO Bedivere",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "neo-bedivere"
+  },
+  "lostsword/chibi/Caira": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword/chibi/Claire": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "claire_card.webp",
+   "name": "Claire",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "claire"
+  },
+  "lostsword/chibi/Claris": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "clarisse_card.webp",
+   "name": "Clarisse",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "clarisse"
+  },
+  "lostsword/chibi/Cowgirl": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword/chibi/Crassa": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/chibi/Cristina": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword/chibi/Dian_Cecht": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "dian-cecht_card.webp",
+   "name": "Dian Cecht",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "dian-cecht"
+  },
+  "lostsword/chibi/Elaine": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "elaine_card.webp",
+   "name": "Elaine",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "elaine"
+  },
+  "lostsword/chibi/Elin": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "elin_card.webp",
+   "name": "Elin",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "elin"
+  },
+  "lostsword/chibi/Elizabeth": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/chibi/Enya": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "enya_card.webp",
+   "name": "Enya",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "enya"
+  },
+  "lostsword/chibi/Erin": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/chibi/Esmeralda": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "esmeralda_card.webp",
+   "name": "Esmeralda",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "esmeralda"
+  },
+  "lostsword/chibi/Estheria": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword/chibi/Ethan": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "ethan_card.webp",
+   "name": "Ethan",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ethan"
+  },
+  "lostsword/chibi/Eva_Awakening": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/chibi/Gaheris": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "gaheris_card.webp",
+   "name": "Gaheris",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "gaheris"
+  },
+  "lostsword/chibi/Galahad_v2": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/chibi/Gawain": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "gawain_card.webp",
+   "name": "Gawain",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "gawain"
+  },
+  "lostsword/chibi/Guinevere": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword/chibi/Hikage": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "hikage_card.webp",
+   "name": "Hikage",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "hikage"
+  },
+  "lostsword/chibi/Isabel": {
+   "class": "Archer",
+   "element": "Frost",
+   "image": "isabel_card.webp",
+   "name": "Isabel",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "isabel"
+  },
+  "lostsword/chibi/Isis": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "isis_card.webp",
+   "name": "Isis",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "isis"
+  },
+  "lostsword/chibi/Isolde": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "isolde_card.webp",
+   "name": "Isolde",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "isolde"
+  },
+  "lostsword/chibi/Jeanne": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "joan-of-arc_card.webp",
+   "name": "Joan of Arc",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "joan-of-arc"
+  },
+  "lostsword/chibi/Karishara": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/chibi/Katrin": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "katrin_card.webp",
+   "name": "Katrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "katrin"
+  },
+  "lostsword/chibi/Kirke": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "circe_card.webp",
+   "name": "Circe",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "circe"
+  },
+  "lostsword/chibi/Lancelot": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "lancelot_card.webp",
+   "name": "Lancelot",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lancelot"
+  },
+  "lostsword/chibi/Lilia": {
+   "class": "Healer",
+   "element": "Chaos",
+   "image": "lilia_card.webp",
+   "name": "Lilia",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lilia"
+  },
+  "lostsword/chibi/Lilith": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lilith_card.webp",
+   "name": "Lilith",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lilith"
+  },
+  "lostsword/chibi/Lisa": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "lisa_card.webp",
+   "name": "Lisa",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lisa"
+  },
+  "lostsword/chibi/Lohengrin": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/chibi/Lohengrin-BlackSwan": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/chibi/Lua": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/chibi/Lucy": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lucy_card.webp",
+   "name": "Lucy",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lucy"
+  },
+  "lostsword/chibi/Lueira": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "lueira_card.webp",
+   "name": "Lueira",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lueira"
+  },
+  "lostsword/chibi/Lumi": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword/chibi/Merlin": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword/chibi/Merry": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "merry_card.webp",
+   "name": "Merry",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "merry"
+  },
+  "lostsword/chibi/Mery_Bikini": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "summer-merry_card.webp",
+   "name": "Summer Merry",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "summer-merry"
+  },
+  "lostsword/chibi/Mia": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "mia_card.webp",
+   "name": "Mia",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "mia"
+  },
+  "lostsword/chibi/Morgana": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/chibi/Morganlefay": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/chibi/Morgause": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "morgause_card.webp",
+   "name": "Morgause",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgause"
+  },
+  "lostsword/chibi/NPC_Ria": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "ria_card.webp",
+   "name": "Ria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "ria"
+  },
+  "lostsword/chibi/Nesha_v2": {
+   "class": "Archer",
+   "element": "Radiance",
+   "image": "nesha_card.webp",
+   "name": "Nesha",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "nesha"
+  },
+  "lostsword/chibi/Nia": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword/chibi/Nimue": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "nymue_card.webp",
+   "name": "Nymue",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "nymue"
+  },
+  "lostsword/chibi/Palamedes": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/chibi/Percival": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "percival_card.webp",
+   "name": "Percival",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "percival"
+  },
+  "lostsword/chibi/Rachel": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "rachel_card.webp",
+   "name": "Rachel",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "rachel"
+  },
+  "lostsword/chibi/Ran": {
+   "class": "Knight",
+   "element": "Holy",
+   "image": "ran_card.webp",
+   "name": "Ran",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "ran"
+  },
+  "lostsword/chibi/Rita": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "rita_card.webp",
+   "name": "Rita",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "rita"
+  },
+  "lostsword/chibi/Rita_Maid": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "rita-maid_card.webp",
+   "name": "Rita (Maid)",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "rita-maid"
+  },
+  "lostsword/chibi/Roenna": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "rowena_card.webp",
+   "name": "Rowena",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "rowena"
+  },
+  "lostsword/chibi/Sarah": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "sarah_card.webp",
+   "name": "Sarah",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "sarah"
+  },
+  "lostsword/chibi/Tiamat": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/chibi/Tiamat_Layman": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "ray_card.webp",
+   "name": "Ray",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ray"
+  },
+  "lostsword/chibi/Tristan": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "tristan_card.webp",
+   "name": "Tristan",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tristan"
+  },
+  "lostsword/chibi/Vivien": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "vivien_card.webp",
+   "name": "Vivien",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "vivien"
+  },
+  "lostsword/chibi/Wulian": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "urien_card.webp",
+   "name": "Urien",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "urien"
+  },
+  "lostsword/chibi/Yumi": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "yumi_card.webp",
+   "name": "Yumi",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "yumi"
+  },
+  "lostsword/pet/Pet_Agravaine_01": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "agravaine_card.webp",
+   "name": "Agravaine",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "agravaine"
+  },
+  "lostsword/pet/Pet_Anesa_01": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword/pet/Pet_Asuka_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "asuka_card.webp",
+   "name": "Asuka",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "asuka"
+  },
+  "lostsword/pet/Pet_Bedivere_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword/pet/Pet_Bedivere_Awakening_01": {
+   "class": "Archer",
+   "element": "Holy",
+   "image": "neo-bedivere_card.webp",
+   "name": "NEO Bedivere",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "neo-bedivere"
+  },
+  "lostsword/pet/Pet_Caira_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword/pet/Pet_Christina_01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword/pet/Pet_Clarice_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "clarisse_card.webp",
+   "name": "Clarisse",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "clarisse"
+  },
+  "lostsword/pet/Pet_CowQueen_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword/pet/Pet_Crassa_01": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/pet/Pet_Diancecht_01": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "dian-cecht_card.webp",
+   "name": "Dian Cecht",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "dian-cecht"
+  },
+  "lostsword/pet/Pet_Elizabeth_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/pet/Pet_Erin_01": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/pet/Pet_Estheria_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword/pet/Pet_Eva_02": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/pet/Pet_Galahad_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/pet/Pet_Gunievere_01": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword/pet/Pet_Hikage_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "hikage_card.webp",
+   "name": "Hikage",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "hikage"
+  },
+  "lostsword/pet/Pet_Isabel_01": {
+   "class": "Archer",
+   "element": "Frost",
+   "image": "isabel_card.webp",
+   "name": "Isabel",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "isabel"
+  },
+  "lostsword/pet/Pet_Jeanne_01": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "joan-of-arc_card.webp",
+   "name": "Joan of Arc",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "joan-of-arc"
+  },
+  "lostsword/pet/Pet_Karishara_01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/pet/Pet_Katrin_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "katrin_card.webp",
+   "name": "Katrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "katrin"
+  },
+  "lostsword/pet/Pet_Kirke_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "circe_card.webp",
+   "name": "Circe",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "circe"
+  },
+  "lostsword/pet/Pet_Lancelot_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "lancelot_card.webp",
+   "name": "Lancelot",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lancelot"
+  },
+  "lostsword/pet/Pet_Lilia_02": {
+   "class": "Healer",
+   "element": "Chaos",
+   "image": "lilia_card.webp",
+   "name": "Lilia",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lilia"
+  },
+  "lostsword/pet/Pet_Lilith_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lilith_card.webp",
+   "name": "Lilith",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lilith"
+  },
+  "lostsword/pet/Pet_Lisa_01": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "lisa_card.webp",
+   "name": "Lisa",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lisa"
+  },
+  "lostsword/pet/Pet_Lohengrin_01": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/pet/Pet_Lua_01": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/pet/Pet_Lueira_01": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "lueira_card.webp",
+   "name": "Lueira",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lueira"
+  },
+  "lostsword/pet/Pet_Lumi_01": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword/pet/Pet_Merlin_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword/pet/Pet_MerryOnTheBeach_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "summer-merry_card.webp",
+   "name": "Summer Merry",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "summer-merry"
+  },
+  "lostsword/pet/Pet_Morgana_01": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/pet/Pet_Morganlefay_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/pet/Pet_Nesha_01": {
+   "class": "Archer",
+   "element": "Radiance",
+   "image": "nesha_card.webp",
+   "name": "Nesha",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "nesha"
+  },
+  "lostsword/pet/Pet_Nia_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword/pet/Pet_Palamedes_01": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/pet/Pet_Ran_01": {
+   "class": "Knight",
+   "element": "Holy",
+   "image": "ran_card.webp",
+   "name": "Ran",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "ran"
+  },
+  "lostsword/pet/Pet_Rita_02": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "rita-maid_card.webp",
+   "name": "Rita (Maid)",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "rita-maid"
+  },
+  "lostsword/pet/Pet_Sumran_Yumi_01": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "yumi_card.webp",
+   "name": "Yumi",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "yumi"
+  },
+  "lostsword/pet/Pet_Tiamat_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/pet/Pet_Tristan_01": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "tristan_card.webp",
+   "name": "Tristan",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tristan"
+  },
+  "lostsword/pet/Pet_Vivien_01": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "vivien_card.webp",
+   "name": "Vivien",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "vivien"
+  },
+  "lostsword/pet/Ps_Galahad_01": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/pet/Ps_Guinevere_01": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword/pet/Ps_Morganlefay_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/pet/Ps_Ria_01": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "ria_card.webp",
+   "name": "Ria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "ria"
+  },
+  "lostsword/pet/Ps_Tiamat_01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/standing/Agravaine": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "agravaine_card.webp",
+   "name": "Agravaine",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "agravaine"
+  },
+  "lostsword/standing/Agravaine_Daily": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "agravaine_card.webp",
+   "name": "Agravaine",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "agravaine"
+  },
+  "lostsword/standing/Anessa": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword/standing/Anessa_Bunny": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "anessa_card.webp",
+   "name": "Anessa",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "anessa"
+  },
+  "lostsword/standing/Asuka": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "asuka_card.webp",
+   "name": "Asuka",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "asuka"
+  },
+  "lostsword/standing/Bedivere": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword/standing/Bedivere_Bunny": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword/standing/Bedivere_Jin": {
+   "class": "Archer",
+   "element": "Holy",
+   "image": "neo-bedivere_card.webp",
+   "name": "NEO Bedivere",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "neo-bedivere"
+  },
+  "lostsword/standing/Bedivere_Jin_Bunny": {
+   "class": "Archer",
+   "element": "Holy",
+   "image": "neo-bedivere_card.webp",
+   "name": "NEO Bedivere",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "neo-bedivere"
+  },
+  "lostsword/standing/Beirin": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "baylin_card.webp",
+   "name": "Baylin",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "baylin"
+  },
+  "lostsword/standing/Caira_v2": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword/standing/Claire": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "claire_card.webp",
+   "name": "Claire",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "claire"
+  },
+  "lostsword/standing/Claris_Bunny": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "clarisse_card.webp",
+   "name": "Clarisse",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "clarisse"
+  },
+  "lostsword/standing/CowQueen": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword/standing/CowQueen_Bunny": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword/standing/Crassa": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/standing/Crassa_Memorial": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/standing/Crassa_Memorial_Room": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/standing/Cristina": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword/standing/Cristina_Bikini": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword/standing/Cristina_Bikini01": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "cristina_card.webp",
+   "name": "Cristina",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "cristina"
+  },
+  "lostsword/standing/Diancecht": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "dian-cecht_card.webp",
+   "name": "Dian Cecht",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "dian-cecht"
+  },
+  "lostsword/standing/Diancecht_Bikini": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "dian-cecht_card.webp",
+   "name": "Dian Cecht",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "dian-cecht"
+  },
+  "lostsword/standing/Elaine": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "elaine_card.webp",
+   "name": "Elaine",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "elaine"
+  },
+  "lostsword/standing/Elin": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "elin_card.webp",
+   "name": "Elin",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "elin"
+  },
+  "lostsword/standing/Elizabeth": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/standing/Elizabeth2": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/standing/Elizabeth_Bunny": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/standing/Enya": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "enya_card.webp",
+   "name": "Enya",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "enya"
+  },
+  "lostsword/standing/Erin": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/standing/Erin_Daily": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/standing/Esmeralda": {
+   "class": "Healer",
+   "element": "Radiance",
+   "image": "esmeralda_card.webp",
+   "name": "Esmeralda",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "esmeralda"
+  },
+  "lostsword/standing/Estheria": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword/standing/Estheria_Lingerie": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword/standing/Ethan": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "ethan_card.webp",
+   "name": "Ethan",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ethan"
+  },
+  "lostsword/standing/Eva_Awakening_Memorial": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/standing/Eva_Jin": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/standing/Eva_Jin_Bunny": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/standing/Eva_Memorial": {
+   "class": "Wizard",
+   "element": "Shock",
+   "image": "eva_card.webp",
+   "name": "Eva",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "eva"
+  },
+  "lostsword/standing/Gaheris": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "gaheris_card.webp",
+   "name": "Gaheris",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "gaheris"
+  },
+  "lostsword/standing/Galahad": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/standing/Galahad_Memorial": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/standing/Galahad_Memorial_Room": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/standing/Galahad_Special": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/standing/Gawain": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "gawain_card.webp",
+   "name": "Gawain",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "gawain"
+  },
+  "lostsword/standing/Guinevere": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword/standing/Guinevere_Bikini": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "guinevere_card.webp",
+   "name": "Guinevere",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "guinevere"
+  },
+  "lostsword/standing/Hikage": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "hikage_card.webp",
+   "name": "Hikage",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "hikage"
+  },
+  "lostsword/standing/Isabel": {
+   "class": "Archer",
+   "element": "Frost",
+   "image": "isabel_card.webp",
+   "name": "Isabel",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "isabel"
+  },
+  "lostsword/standing/Isis": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "isis_card.webp",
+   "name": "Isis",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "isis"
+  },
+  "lostsword/standing/Isolde": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "isolde_card.webp",
+   "name": "Isolde",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "isolde"
+  },
+  "lostsword/standing/Jan": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "joan-of-arc_card.webp",
+   "name": "Joan of Arc",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "joan-of-arc"
+  },
+  "lostsword/standing/Jessi": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "jessi_card.webp",
+   "name": "Jessi",
+   "position": "Back",
+   "rarity": 3,
+   "slug": "jessi"
+  },
+  "lostsword/standing/Karishara": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/standing/Karishara_Memorial": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/standing/Karishara_Memorial_Room": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/standing/Katrin": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "katrin_card.webp",
+   "name": "Katrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "katrin"
+  },
+  "lostsword/standing/Katrin_Daily": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "katrin_card.webp",
+   "name": "Katrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "katrin"
+  },
+  "lostsword/standing/Kirke": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "circe_card.webp",
+   "name": "Circe",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "circe"
+  },
+  "lostsword/standing/Lancelot": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "lancelot_card.webp",
+   "name": "Lancelot",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lancelot"
+  },
+  "lostsword/standing/Lancelot_Bunny": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "lancelot_card.webp",
+   "name": "Lancelot",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lancelot"
+  },
+  "lostsword/standing/Lilith": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lilith_card.webp",
+   "name": "Lilith",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lilith"
+  },
+  "lostsword/standing/Lisa": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "lisa_card.webp",
+   "name": "Lisa",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lisa"
+  },
+  "lostsword/standing/Lobby_Bedivere": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "bedivere_card.webp",
+   "name": "Bedivere",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "bedivere"
+  },
+  "lostsword/standing/Lobby_Caira#Lobby_Caira_B": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword/standing/Lobby_Caira#Lobby_Caira_F": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "caira_card.webp",
+   "name": "Caira",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "caira"
+  },
+  "lostsword/standing/Lobby_CowQueen": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "cowqueen-belsey_card.webp",
+   "name": "Cowqueen Belsey",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "cowqueen-belsey"
+  },
+  "lostsword/standing/Lobby_Crassa": {
+   "class": "Archer",
+   "element": "Shock",
+   "image": "crassa_card.webp",
+   "name": "Crassa",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "crassa"
+  },
+  "lostsword/standing/Lobby_Erin#Lobby_Erin_B": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/standing/Lobby_Erin#Lobby_Erin_F": {
+   "class": "Wizard",
+   "element": "Radiance",
+   "image": "erin_card.webp",
+   "name": "Erin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "erin"
+  },
+  "lostsword/standing/Lobby_Estheria": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "estheria_card.webp",
+   "name": "Estheria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "estheria"
+  },
+  "lostsword/standing/Lobby_Galahad": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "galahad_card.webp",
+   "name": "Galahad",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "galahad"
+  },
+  "lostsword/standing/Lobby_Karishara#Lobby_Karishara_B": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/standing/Lobby_Karishara#Lobby_Karishara_F": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "karishara_card.webp",
+   "name": "Karishara",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "karishara"
+  },
+  "lostsword/standing/Lobby_Lohengrin": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/standing/Lobby_Lua#lobby_Lua_B": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/standing/Lobby_Lua#lobby_Lua_F": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/standing/Lobby_Lumi": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword/standing/Lobby_Made": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "elizabeth_card.webp",
+   "name": "Elizabeth",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "elizabeth"
+  },
+  "lostsword/standing/Lobby_Merlin#Lobby_Merlin_B": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword/standing/Lobby_Merlin#Lobby_Merlin_F": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword/standing/Lobby_MerrySummer": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "summer-merry_card.webp",
+   "name": "Summer Merry",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "summer-merry"
+  },
+  "lostsword/standing/Lobby_Morgana#Lobby_Morgana_B": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/standing/Lobby_Morgana#Lobby_Morgana_F": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/standing/Lobby_Morganlefay#Lobby_Morganlefay_B": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/standing/Lobby_Morganlefay#Lobby_Morganlefay_F": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/standing/Lobby_Nia": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword/standing/Lobby_Palamedes#Lobby_Palamedes_B": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/standing/Lobby_Palamedes#Lobby_Palamedes_F": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/standing/Lobby_Risa": {
+   "class": "Archer",
+   "element": "Chaos",
+   "image": "lisa_card.webp",
+   "name": "Lisa",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "lisa"
+  },
+  "lostsword/standing/Lobby_Tiamat#Lobby_Tiamat_B": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/standing/Lobby_Tiamat#Lobby_Tiamat_F": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/standing/Lohengrin": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/standing/Lohengrin_Bikini": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lohengrin_card.webp",
+   "name": "Lohengrin",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lohengrin"
+  },
+  "lostsword/standing/Lua": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/standing/Lua_Bikini": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lua_card.webp",
+   "name": "Lua",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lua"
+  },
+  "lostsword/standing/Lucy": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "lucy_card.webp",
+   "name": "Lucy",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lucy"
+  },
+  "lostsword/standing/Lueira": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "lueira_card.webp",
+   "name": "Lueira",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lueira"
+  },
+  "lostsword/standing/Lueira_Lingerie": {
+   "class": "Healer",
+   "element": "Frost",
+   "image": "lueira_card.webp",
+   "name": "Lueira",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lueira"
+  },
+  "lostsword/standing/Lumi": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword/standing/Lumi_Daily": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "lumi_card.webp",
+   "name": "Lumi",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "lumi"
+  },
+  "lostsword/standing/Merlin": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "merlin_card.webp",
+   "name": "Merlin",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "merlin"
+  },
+  "lostsword/standing/Merry": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "merry_card.webp",
+   "name": "Merry",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "merry"
+  },
+  "lostsword/standing/Merry_Summer": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "summer-merry_card.webp",
+   "name": "Summer Merry",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "summer-merry"
+  },
+  "lostsword/standing/Mia": {
+   "class": "Knight",
+   "element": "Shock",
+   "image": "mia_card.webp",
+   "name": "Mia",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "mia"
+  },
+  "lostsword/standing/Morgana": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/standing/Morgana_Bunny": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "morgana_card.webp",
+   "name": "Morgana",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgana"
+  },
+  "lostsword/standing/Morganlefay": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/standing/Morganlefay_Lingerie": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/standing/Morganlefay_Lingerie01": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "morgan-le-fay_card.webp",
+   "name": "Morgan le Fay",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "morgan-le-fay"
+  },
+  "lostsword/standing/Morgause": {
+   "class": "Wizard",
+   "element": "Fire",
+   "image": "morgause_card.webp",
+   "name": "Morgause",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "morgause"
+  },
+  "lostsword/standing/Nesha": {
+   "class": "Archer",
+   "element": "Radiance",
+   "image": "nesha_card.webp",
+   "name": "Nesha",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "nesha"
+  },
+  "lostsword/standing/Nesha_Daily": {
+   "class": "Archer",
+   "element": "Radiance",
+   "image": "nesha_card.webp",
+   "name": "Nesha",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "nesha"
+  },
+  "lostsword/standing/Nia": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword/standing/Nia_Daily": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "nia_card.webp",
+   "name": "Nia",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "nia"
+  },
+  "lostsword/standing/Nimue": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "nymue_card.webp",
+   "name": "Nymue",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "nymue"
+  },
+  "lostsword/standing/Palamedes": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/standing/Palamedes_Daily": {
+   "class": "Knight",
+   "element": "Nature",
+   "image": "palamedes_card.webp",
+   "name": "Palamedes",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "palamedes"
+  },
+  "lostsword/standing/Pc_Claris_01": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "clarisse_card.webp",
+   "name": "Clarisse",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "clarisse"
+  },
+  "lostsword/standing/Pc_Lilia_01": {
+   "class": "Healer",
+   "element": "Chaos",
+   "image": "lilia_card.webp",
+   "name": "Lilia",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lilia"
+  },
+  "lostsword/standing/Pc_Lilia_Daily": {
+   "class": "Healer",
+   "element": "Chaos",
+   "image": "lilia_card.webp",
+   "name": "Lilia",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "lilia"
+  },
+  "lostsword/standing/Pc_Rita_Daily": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "rita-maid_card.webp",
+   "name": "Rita (Maid)",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "rita-maid"
+  },
+  "lostsword/standing/Percival": {
+   "class": "Knight",
+   "element": "Frost",
+   "image": "percival_card.webp",
+   "name": "Percival",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "percival"
+  },
+  "lostsword/standing/Rachel": {
+   "class": "Healer",
+   "element": "Nature",
+   "image": "rachel_card.webp",
+   "name": "Rachel",
+   "position": "Middle",
+   "rarity": 3,
+   "slug": "rachel"
+  },
+  "lostsword/standing/Ran": {
+   "class": "Knight",
+   "element": "Holy",
+   "image": "ran_card.webp",
+   "name": "Ran",
+   "position": "Front",
+   "rarity": 5,
+   "slug": "ran"
+  },
+  "lostsword/standing/Rey": {
+   "class": "Knight",
+   "element": "Chaos",
+   "image": "ray_card.webp",
+   "name": "Ray",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "ray"
+  },
+  "lostsword/standing/Ria2": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "ria_card.webp",
+   "name": "Ria",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "ria"
+  },
+  "lostsword/standing/Rita": {
+   "class": "Knight",
+   "element": "Fire",
+   "image": "rita_card.webp",
+   "name": "Rita",
+   "position": "Front",
+   "rarity": 3,
+   "slug": "rita"
+  },
+  "lostsword/standing/Rita02": {
+   "class": "Healer",
+   "element": "Fire",
+   "image": "rita-maid_card.webp",
+   "name": "Rita (Maid)",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "rita-maid"
+  },
+  "lostsword/standing/Roena": {
+   "class": "Wizard",
+   "element": "Chaos",
+   "image": "rowena_card.webp",
+   "name": "Rowena",
+   "position": "Back",
+   "rarity": 4,
+   "slug": "rowena"
+  },
+  "lostsword/standing/Sarah": {
+   "class": "Archer",
+   "element": "Fire",
+   "image": "sarah_card.webp",
+   "name": "Sarah",
+   "position": "Middle",
+   "rarity": 4,
+   "slug": "sarah"
+  },
+  "lostsword/standing/Tiamat": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/standing/Tiamat_Lingerie": {
+   "class": "Wizard",
+   "element": "Holy",
+   "image": "tiamat_card.webp",
+   "name": "Tiamat",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tiamat"
+  },
+  "lostsword/standing/Tristan": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "tristan_card.webp",
+   "name": "Tristan",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tristan"
+  },
+  "lostsword/standing/Tristan_Bunny": {
+   "class": "Archer",
+   "element": "Nature",
+   "image": "tristan_card.webp",
+   "name": "Tristan",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "tristan"
+  },
+  "lostsword/standing/Urien": {
+   "class": "Knight",
+   "element": "Radiance",
+   "image": "urien_card.webp",
+   "name": "Urien",
+   "position": "Front",
+   "rarity": 4,
+   "slug": "urien"
+  },
+  "lostsword/standing/Vivien": {
+   "class": "Wizard",
+   "element": "Nature",
+   "image": "vivien_card.webp",
+   "name": "Vivien",
+   "position": "Middle",
+   "rarity": 5,
+   "slug": "vivien"
+  },
+  "lostsword/standing/Yumi": {
+   "class": "Wizard",
+   "element": "Frost",
+   "image": "yumi_card.webp",
+   "name": "Yumi",
+   "position": "Back",
+   "rarity": 5,
+   "slug": "yumi"
+  }
+ },
+ "source": "https://www.prydwen.gg/lost-sword/characters"
+}

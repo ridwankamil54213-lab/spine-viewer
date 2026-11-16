@@ -125,6 +125,21 @@
 				</div>
 			</div>
 
+			<!-- Filter khusus Lost Sword, meniru baris Rarity/Class/Element/
+			     Position di https://www.prydwen.gg/lost-sword/characters.
+			     Isinya dibangun syncLsFilters() dari metadata model. -->
+			<div id="ls-filters" class="ls-filters" hidden>
+				<div class="ls-row" data-kind="rarity" role="group" aria-label="Filter rarity"></div>
+				<div class="ls-row" data-kind="class" role="group" aria-label="Filter class"></div>
+				<div class="ls-row" data-kind="element" role="group" aria-label="Filter element"></div>
+				<div class="ls-row" data-kind="position" role="group" aria-label="Filter position"></div>
+				<div class="ls-foot">
+					<button id="ls-reset" class="btn btn-sm btn-ghost ls-reset" type="button"
+						title="Hapus semua filter" aria-label="Hapus semua filter">↺ Reset</button>
+					<span id="ls-count" class="ls-count"></span>
+				</div>
+			</div>
+
 			<!-- view 1: games -->
 			<ul id="game-list" class="game-list"></ul>
 

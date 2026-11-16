@@ -3139,3 +3139,83 @@ input:focus-visible {
 	.variant-btn { top: auto; bottom: 68px; transform: none; }
 	.variant-tabs { top: auto; bottom: 68px; }
 }
+
+/* --- Lost Sword: filter & kartu ala Prydwen ------------------------------
+ * Baris Rarity/Class/Element/Position meniru filter button_bar Prydwen, dan
+ * kartu memakai potret 140:180 dengan bintang rarity + ikon atribut.
+ */
+.ls-filters {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	margin: 8px 0 2px;
+	padding: 7px;
+	border: 1px solid var(--line);
+	border-radius: var(--r);
+	background: var(--ink-800);
+}
+.ls-filters[hidden] { display: none; }
+.ls-row { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.ls-label {
+	min-width: 56px;
+	font-size: 10px;
+	letter-spacing: .05em;
+	text-transform: uppercase;
+	color: var(--fg-mute);
+}
+.ls-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 3px 6px;
+	font: inherit;
+	font-size: 11px;
+	color: var(--fg-mute);
+	background: transparent;
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+.ls-chip img { width: 16px; height: 16px; }
+.ls-chip small { font-size: 10px; opacity: .7; }
+.ls-chip:hover { color: var(--fg); background: var(--ink-700); }
+.ls-chip.is-on {
+	color: var(--fg);
+	background: var(--ink-700);
+	border-color: var(--spark-hi);
+	box-shadow: inset 0 -2px 0 var(--spark-hi);
+}
+.ls-foot { display: flex; align-items: center; gap: 8px; }
+.ls-reset { align-self: flex-start; }
+.ls-reset:disabled { opacity: .4; cursor: default; }
+.ls-count { font-size: 11px; color: var(--fg-mute); }
+.ls-stars, .ls-card-stars { color: #ffc93c; letter-spacing: 1px; }
+
+/* Potret kartu lebih tinggi dari kotak galeri bawaan (Prydwen 140x180). */
+.gcard.is-ls .gcard-art { aspect-ratio: 140 / 180; }
+.gcard.is-ls .gcard-img { object-fit: cover; }
+.gcard[data-ls-rarity="5"] .gcard-art {
+	border: 1px solid rgba(232, 182, 76, .85);
+	box-shadow: 0 0 0 1px rgba(232, 182, 76, .25);
+}
+.gcard[data-ls-rarity="4"] .gcard-art {
+	border: 1px solid rgba(166, 120, 216, .8);
+}
+.gcard[data-ls-rarity="3"] .gcard-art {
+	border: 1px solid rgba(91, 155, 213, .8);
+}
+.ls-card-badges {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	padding: 10px 4px 3px;
+	background: linear-gradient(transparent, rgba(0, 0, 0, .82));
+	pointer-events: none;
+}
+.ls-card-stars { margin-right: auto; font-size: 10px; }
+.ls-badge-icon { width: 15px; height: 15px; }
