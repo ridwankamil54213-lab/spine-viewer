@@ -8,7 +8,7 @@
  *   - chip "N varian" di kartu galeri; klik chip langsung buka picker
  *   - <select id="variant-select"> tetap state holder (dataset.id)
  *   - keyboard: 1-9 lompat varian, [ / ] siklus
- *   - CrossCore: 2 pohon aset melebur (899 model -> 583 kartu root)
+ *   - CrossCore: 486 scene crosscore.art melebur jadi 134 kartu karakter
  *
  * Run: node tools/check-variant-picker.cjs   (server on :3000)
  */
@@ -29,10 +29,11 @@ const ok = (label, cond, extra = "") => {
 	ok("CrossCore: 2 pohon melebur jadi kartu root", roots.length < cc.length &&
 		cc.length - roots.length >= 300,
 		`${roots.length} dari ${cc.length}`);
-	ok("CrossCore: >=600 model ber-family", paired.length >= 600, String(paired.length));
-	const fam = (all.find((m) => m.id === "crosscore/10010_skin_Alps03") || {}).family;
-	ok("label family Spine / Interaksi",
-		JSON.stringify(fam?.members?.map((x) => x.label)) === JSON.stringify(["Spine", "Interaksi"]),
+	ok("CrossCore: >=400 model ber-varian", paired.length >= 400, String(paired.length));
+	const fam = (all.find((m) => m.id ===
+		"crosscore/vodkamirror_vodkamirror-03_75010_skin_vodkamirror03_spine") || {}).family;
+	ok("label family Utama + varian",
+		fam?.members?.length >= 2 && fam.members[0].label === "Utama",
 		JSON.stringify(fam?.members?.map((x) => x.label)));
 
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });
@@ -51,7 +52,8 @@ const ok = (label, cond, extra = "") => {
 		{ game: "bd2", id: "bd2-char/Anastasia/Fire_Graffiti", n: 2, label: "BD2", tabs: true },
 		{ game: "epic7", id: "epic7/c1070", n: 5, label: "E7", tabs: false },
 		{ game: "chaoszero", id: "chaoszero/model/1010", n: 7, label: "CZN", tabs: false, viaChip: true },
-		{ game: "crosscore", id: "crosscore/10010_skin_Alps03", n: 2, label: "CrossCore", tabs: true },
+		{ game: "crosscore", n: 2, label: "CrossCore", tabs: true,
+			id: "crosscore/vodkamirror_vodkamirror-03_75010_skin_vodkamirror03_spine" },
 	];
 
 	for (const c of cases) {

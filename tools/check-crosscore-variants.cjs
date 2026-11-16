@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Regresi varian CrossCore: rig Spine dan rig interaksi harus melebur jadi
- * SATU kartu dengan dropdown "Spine / Interaksi".
+ * Regresi varian CrossCore: SEMUA scene satu karakter jadi SATU kartu dengan
+ * dropdown Varian (root = rig Spine utama, label = outfit · sceneLabel).
  *
- * Regresi yang dicegah: attachCrosscoreFamilies() dulu mencocokkan nama folder
- * secara persis, padahal dua pohon aset beda kapital dan pohon interaksi
- * berakhiran `_spine` (10010_skin_Alps03 vs 10010_skin_alps03_spine). Hasilnya
- * cuma 18 dari 899 model yang ber-family. Kuncinya sekarang dinormalisasi.
+ * Sumber crosscore.art punya 486 scene / 134 karakter. Tanpa grouping ini
+ * pustaka menampilkan belasan kartu bernama sama per karakter; grouping lama
+ * "Spine / Interaksi" tidak berlaku lagi karena pohon interaksi sudah
+ * diarsipkan bersama aset ArtHub.
  *
  * Usage: node tools/check-crosscore-variants.cjs
  */
@@ -17,87 +17,87 @@ const BASE = process.env.SPINE_URL || "http://127.0.0.1:3000";
 const ok = (m) => console.log("ok   " + m);
 
 (async () => {
-	const raw = await fetch(`${BASE}/api/models?lean=1`, { cache: "no-store" });
-	assert.ok(raw.ok, `/api/models -> HTTP ${raw.status}`);
-	const d = await raw.json();
+	const d = await fetch(`${BASE}/api/models?lean=1`, { cache: "no-store" }).then((r) => r.json());
 	const all = d.models || (Array.isArray(d) ? d : []);
-	const cc = all.filter((m) => String(m.id).startsWith("crosscore/") ||
-		String(m.id).startsWith("crosscore-interaction/"));
-	assert.ok(cc.length >= 800, `model crosscore terlalu sedikit: ${cc.length}`);
+	const cc = all.filter((m) => m.game === "crosscore");
+	const byId = new Map(all.map((m) => [m.id, m]));
+	assert.strictEqual(cc.length, 486, `model crosscore: ${cc.length}`);
 
-	const fam = cc.filter((m) => (m.family || {}).members?.length);
 	const roots = cc.filter((m) => !m.family || m.family.root === m.id);
+	const fam = cc.filter((m) => (m.family || {}).members?.length);
 	const families = new Map();
 	for (const m of fam) families.set(m.family.root, m.family);
+	assert.strictEqual(roots.length, 134, `kartu root: ${roots.length}`);
+	assert.ok(fam.length >= 450, `model ber-family: ${fam.length}`);
+	assert.ok(families.size >= 100, `family: ${families.size}`);
+	ok(`${cc.length} scene -> ${roots.length} kartu (1 per karakter), ${families.size} family, ${fam.length} ber-varian`);
 
-	assert.ok(fam.length >= 600, `model ber-family: ${fam.length}`);
-	assert.ok(families.size >= 300, `jumlah family: ${families.size}`);
-	assert.ok(roots.length < cc.length - 300, `kartu root: ${roots.length}/${cc.length}`);
-	ok(`${cc.length} model -> ${roots.length} kartu root, ${families.size} family, ${fam.length} model ber-family`);
-
-	let withBoth = 0;
 	for (const [root, f] of families) {
 		const ids = f.members.map((x) => x.id);
-		const spine = ids.filter((id) => id.startsWith("crosscore/"));
-		const inter = ids.filter((id) => id.startsWith("crosscore-interaction/"));
-		assert.ok(spine.length >= 1 && inter.length >= 1,
-			`family ${root} tidak punya pasangan Spine/Interaksi: ${JSON.stringify(ids)}`);
-		assert.ok(spine.includes(root), `root ${root} bukan rig Spine`);
+		assert.ok(ids.includes(root), `root ${root} tidak ada di members`);
+		assert.ok(f.members.length >= 2, `family ${root} cuma 1 anggota`);
+		assert.strictEqual(f.members[0].label, "Utama", `label root ${root}: ${f.members[0].label}`);
 		for (const x of f.members) {
-			assert.ok(/^(Spine|Interaksi)( \d+)?$/.test(x.label),
-				`label varian aneh: ${x.label}`);
+			assert.ok(x.label && byId.has(x.id),
+				`anggota family ${root} tidak valid: ${JSON.stringify(x)}`);
+			assert.strictEqual(byId.get(x.id).family.root, root,
+				`anggota ${x.id} punya root beda`);
 		}
-		withBoth += 1;
 	}
-	ok(`${withBoth} family punya Spine + Interaksi, root Spine, label valid`);
+	ok(`${families.size} family konsisten: root ada di members, label Utama, id valid`);
 
-	const byId = new Map(all.map((m) => [m.id, m]));
-	const a = byId.get("crosscore/10010_skin_Alps03");
-	const b = byId.get("crosscore-interaction/10010_skin_alps03_spine");
-	assert.ok(a?.family && b?.family, "pasangan Alps03 tidak ber-family");
-	assert.strictEqual(a.family.root, b.family.root);
-	assert.deepStrictEqual(a.family.members.map((x) => x.label), ["Spine", "Interaksi"]);
-	ok("pasangan beda kapital + akhiran _spine: 10010_skin_Alps03 nyambung");
+	// Karakter dengan 9 scene: root rig Spine + 8 varian (termasuk ilustrasi).
+	const mach = byId.get("crosscore/machairodus_game-3018002_default");
+	assert.ok(mach?.family && mach.family.members.length >= 5,
+		"family machairodus tidak lengkap");
+	const hasStatic = mach.family.members.some((x) => x.id.startsWith("crosscore-cg/"));
+	ok(`machairodus: ${mach.family.members.length} varian, ada ilustrasi statis = ${hasStatic}`);
 
-	// Kasus 3 anggota: normalisasi 03 vs 3 menyatukan dua rig Spine sekaligus.
-	const three = [...families.values()].find((f) => f.members.length === 3);
-	assert.ok(three, "tidak ada family 3 anggota (normalisasi angka tidak jalan?)");
-	assert.ok(three.members.some((x) => /^Spine 2$/.test(x.label)));
-	ok("normalisasi 03 vs 3: family 3 anggota dengan label Spine 1 / Spine 2");
+	// Karakter berscene-tunggal memang dibiarkan standalone.
+	const standalone = cc.filter((m) => !m.family);
+	assert.ok(standalone.length >= 20 && standalone.length <= 40,
+		`standalone: ${standalone.length}`);
+	ok(`${standalone.length} karakter 1 scene dibiarkan standalone`);
 
-	// Interaksi yang memang tidak punya pasangan harus tetap berdiri sendiri.
-	const orphan = cc.filter((m) => String(m.id).startsWith("crosscore-interaction/") && !m.family);
-	assert.ok(orphan.length > 0 && orphan.length < 30, `interaksi yatim: ${orphan.length}`);
-	ok(`${orphan.length} interaksi tanpa pasangan dibiarkan standalone`);
-
-	// --- UI --------------------------------------------------------------
+	// --- UI: ganti varian lewat #variant-select ---------------------------
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });
 	const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 	const errs = [];
 	page.on("pageerror", (e) => errs.push(e.message));
 	await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 60000 });
-	// Pustaka game besar & di-render bertahap: tunggu daftar game, masuk, lalu
-	// saring lewat #search supaya kartu yang dicari benar-benar ada di DOM.
 	await page.waitForSelector("#game-list .game", { state: "visible", timeout: 90000 });
-	await page.waitForSelector('#game-list .game[data-key="crosscore"]',
-		{ state: "visible", timeout: 90000 });
 	await page.locator('#game-list .game[data-key="crosscore"]').click();
 	await page.waitForSelector("#model-list li > button:not(.model-fav), #model-list .gcard",
 		{ state: "visible", timeout: 90000 });
-	const cardId = "crosscore/10010_skin_Alps03";
-	await page.fill("#search", cardId);
-	await page.locator(`#model-list [data-id="${cardId}"]`).first()
+	const rootId = "crosscore/machairodus_game-3018002_default";
+	const target = "crosscore/machairodus_game-3018005_skin05a";
+	await page.fill("#search", rootId);
+	await page.locator(`#model-list [data-id="${rootId}"]`).first()
 		.waitFor({ state: "visible", timeout: 30000 });
-	await page.locator(`#model-list [data-id="${cardId}"] .variant-chip`).click();
-	await page.waitForFunction(
-		() => document.querySelectorAll("#variant-tabs .variant-tab").length === 2,
-		{ timeout: 30000 });
-	const target = "crosscore-interaction/10010_skin_alps03_spine";
-	await page.locator(`#variant-tabs .variant-tab[data-id="${target}"]`).click();
+	await page.locator(`#model-list [data-id="${rootId}"]`).first().click();
+	await page.waitForFunction(() => !!window.spineStage?.model?.id, null, { timeout: 90000 });
+	const jumped = await page.evaluate((t) => {
+		const sel = document.querySelector("#variant-select");
+		const opt = [...(sel?.options || [])].find((o) => o.dataset.id === t);
+		if (!opt) return false;
+		sel.value = opt.value;
+		sel.dispatchEvent(new Event("change", { bubbles: true }));
+		return true;
+	}, target);
+	assert.ok(jumped, "varian target tidak ada di #variant-select");
 	await page.waitForFunction((id) => window.spineStage?.model?.id === id, target,
-		{ timeout: 60000 });
+		{ timeout: 90000 });
+	await page.waitForTimeout(2500);
+	const st = await page.evaluate(() => ({
+		id: window.spineStage?.model?.id,
+		runtime: window.spineStage?.runtime,
+		canvas: !!document.querySelector("canvas"),
+	}));
+	assert.strictEqual(st.id, target);
+	assert.strictEqual(st.runtime, "4.2");
+	assert.ok(st.canvas);
 	assert.strictEqual(errs.length, 0, "JS error: " + errs.slice(0, 2).join(" | "));
-	ok("UI: chip 2 varian, klik tab Interaksi mengganti model, 0 JS error");
+	ok(`UI: ganti varian -> ${target.slice(0, 50)} (runtime ${st.runtime}), 0 JS error`);
 	await browser.close();
 	console.log("\nCrossCore varian ok");
 })().catch((e) => { console.error("FAIL " + e.message); process.exit(1); });

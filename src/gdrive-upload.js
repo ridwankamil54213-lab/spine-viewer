@@ -71,7 +71,7 @@ const STATIC_ROOTS = {
 	shoujoukaisen: { assets: ["shoujoukaisen"] },
 	pokerfate: { assets: ["pokerfate"] },
 	"mitao-utopia": { assets: ["mitao-utopia"], thumbs: ["mitao-utopia"] },
-	crosscore: { assets: ["crosscore", "crosscore-interaction"] },
+	crosscore: { assets: ["crosscore", "crosscore-cg"], thumbs: ["crosscore"] },
 	catshinobi: { assets: ["catshinobi"] },
 	bd2: { assets: ["bd2", "bd2-char"], thumbs: ["bd2"] },
 	azurlane: { assets: ["azurlane"] },

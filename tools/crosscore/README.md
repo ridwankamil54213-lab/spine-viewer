@@ -1,12 +1,12 @@
 # CrossCore (交错战线) — asset updater
 
-> **Sumber aktif sekarang: https://github.com/Talors1225/arthub-viewer-web.**
-> Yang dipanggil server adalah `tools/crosscore/update.py` (lihat README
-> utama, section CrossCore). Dokumen di bawah ini menjelaskan pipeline
-> **lama** berbasis mirror GitHub + AssetBundle `prefabs_spine_*`; skripnya
-> (`tools/update-crosscore.py`) masih ada sebagai referensi, tetapi tidak
-> dipakai lagi karena indeks ArtHub lebih baru dan aset R2-nya bisa diakses
-> langsung tanpa harus mengekstrak UnityFS/FakeHeader.
+> **Sumber aktif sekarang: https://crosscore.art/.**
+> Yang dipanggil server adalah `tools/crosscore/update.py`, yang menjalankan
+> `tools/crosscore/import-art.py` (lihat README utama, section CrossCore).
+> Dokumen di bawah ini menjelaskan DUA pipeline LAMA: ArtHub / R2
+> (`tools/update-crosscore-*.py`, `refresh-meta.py`) dan mirror komunitas
+> berbasis AssetBundle `prefabs_spine_*` (`tools/update-crosscore.py`).
+> Keduanya sudah diarsipkan dan tidak dipanggil server lagi.
 
 Rangkuman pipeline lama (arsip):
 

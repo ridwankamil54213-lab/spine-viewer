@@ -30,6 +30,8 @@ __pycache__/
 data/updaters-health.json
 data/change-logs.json
 data/change-logs.json.tmp
+# Katalog mentah crosscore.art (cache runtime, ditulis import-art.py).
+data/crosscore-art-catalog.json
 
 # Extracted game assets (assets/<game>/<model>/{skel,atlas,png,moc3,...}).
 #

@@ -1905,13 +1905,12 @@ function scanModels() {
 	// Epic Seven: nama + rarity/elemen/kelas dari katalog e7codex
 	// (assets/epic7/_names.json, ditulis tools/fetch-e7codex-meta.py).
 	applyEpic7Names(models);
-	// CrossCore: nama tampilan dari katalog ArtHub
-	// (assets/crosscore/_names.json, ditulis tools/crosscore/refresh-meta.py).
+	// CrossCore: nama tampilan dari katalog crosscore.art
+	// (assets/crosscore/_names.json, ditulis tools/crosscore/import-art.py).
 	applyCrosscoreNames(models);
-	// CrossCore: satukan rig Spine dan rig interaksi yang berbagi folder jadi
-	// SATU kartu dengan dropdown varian (324 dari 325 folder interaksi punya
-	// pasangan). Tanpa ini 827 model tampil sebagai kartu terpisah, padahal
-	// sebagian besar adalah karakter yang sama.
+	// CrossCore: satukan semua scene (rig Spine + ilustrasi statis) milik satu
+	// karakter jadi SATU kartu dengan dropdown Varian. Tanpa ini 486 scene
+	// tampil sebagai kartu terpisah padahal cuma 134 karakter.
 	attachCrosscoreFamilies(models);
 	// Craving Quest / Lusty Odyssey: nama karakter asli (Tionghoa) dari
 	// data/lustyodyssey-names.json — folder asetnya sengaja ASCII karena
@@ -2221,83 +2220,61 @@ function applyCznNames(models) {
 }
 
 /**
- * CrossCore: gabungkan rig Spine dan rig interaksi jadi SATU family.
+ * CrossCore: satukan SEMUA scene satu karakter jadi satu kartu + dropdown
+ * Varian.
  *
- * Kedua pohon aset (assets/crosscore/ dan assets/crosscore-interaction/)
- * jatuh ke game "crosscore" (resolveGame mencocokkan awalan), sehingga tanpa
- * pengelompokan ratusan model tampil sebagai kartu terpisah.
+ * Sumber barunya https://crosscore.art/ (lihat tools/crosscore/import-art.py):
+ * 486 scene untuk 134 karakter / 421 kostum. Tiap scene bisa berupa rig Spine
+ * (assets/crosscore/) atau ilustrasi statis (assets/crosscore-cg/). Tanpa
+ * pengelompokan, satu karakter bisa memenuhi pustaka dengan belasan kartu
+ * yang namanya sama persis.
  *
- * PENTING: nama folder di dua pohon itu TIDAK identik. Pohon interaksi
- * memakai huruf kecil dan akhiran `_spine`, misalnya
- *   crosscore/10010_skin_Alps03
- *   crosscore-interaction/10010_skin_alps03_spine
- * Ada pula suffix `_pos_main` / `_pos_toushi`, perbedaan `03` vs `3`, dan
- * beberapa rig Spine yang ikut berakhiran `_spine`. Mencocokkan nama folder
- * mentah cuma menyatukan 18 dari 899 model --- itulah regresi yang diperbaiki
- * di sini: kunci grup dinormalisasi dulu lewat crosscoreKey().
+ * Kunci grupnya `crosscoreCharId` yang dipasang applyCrosscoreNames() dari
+ * _names.json, BUKAN potongan nama folder — slug hasil impor memuat
+ * characterId + skinId + sceneId sehingga aman terhadap karakter dengan nama
+ * kembar. Label varian memakai `outfit · sceneLabel` dari katalog.
  *
- * Folder ber-skeleton ganda diberi id "<folder>#<stem>" oleh scanModels();
- * semuanya tetap masuk family yang sama agar tidak ada kartu yatim. Model
- * interaksi tanpa pasangan dibiarkan berdiri sendiri.
- *
- * `label` di family bersifat PER MODEL (nilai yang dipilih di <select>),
- * mengikuti pola attachEpic7CombatFamilies().
+ * Ini menggantikan grouping lama "Spine / Interaksi" yang memasangkan dua
+ * pohon aset ArtHub; pohon `crosscore-interaction` sudah diarsipkan.
  */
-function crosscoreKey(id) {
-	const slash = id.indexOf("/");
-	if (slash < 0) return "";
-	let slug = id.slice(slash + 1).split("#")[0].toLowerCase();
-	slug = slug.replace(/(?:_spine)+$/, "");
-	slug = slug.replace(/_pos_(?:main|toushi).*$/, "");
-	slug = slug.replace(/_+$/, "");
-	// Samakan "03" dengan "3"; id karakter seperti 10010 tidak berubah.
-	slug = slug.replace(/\d+/g, (n) => String(Number(n)));
-	return slug;
-}
-
 function attachCrosscoreFamilies(models) {
-	const byId = new Map(models.map((m) => [m.id, m]));
-	const groups = new Map(); // kunci ternormalisasi -> { spine, interaction }
+	const byChar = new Map();
 	for (const m of models) {
-		const id = String(m.id || "");
-		const kind = id.startsWith("crosscore/") ? "spine"
-			: id.startsWith("crosscore-interaction/") ? "interaction" : null;
-		if (!kind || m.family) continue;
-		const key = crosscoreKey(id);
-		if (!key) continue;
-		let g = groups.get(key);
-		if (!g) {
-			g = { spine: [], interaction: [] };
-			groups.set(key, g);
-		}
-		g[kind].push(id);
+		if (!m.crosscoreCharId || m.family) continue;
+		if (!byChar.has(m.crosscoreCharId)) byChar.set(m.crosscoreCharId, []);
+		byChar.get(m.crosscoreCharId).push(m);
 	}
-	const rank = (id) => (id.includes("#") ? 1 : 0);
-	for (const [, g] of groups) {
-		if (!g.spine.length || !g.interaction.length) continue;
-		g.spine.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
-		g.interaction.sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
-		const root = g.spine[0];
-		const labelled = (ids, base) => ids.map((id, i) => ({
-			id,
-			label: ids.length > 1 ? `${base} ${i + 1}` : base,
-		}));
-		const members = [...labelled(g.spine, "Spine"),
-			...labelled(g.interaction, "Interaksi")];
-		for (const mem of members) {
-			const m = byId.get(mem.id);
-			if (m) m.family = { root, label: mem.label, members };
+	for (const [, members] of byChar) {
+		if (members.length < 2) continue;
+		// Root = rig Spine pertama (ilustrasi statis jadi varian, bukan kartu
+		// utama), lalu urutan id yang stabil supaya dropdown tidak berubah.
+		members.sort((x, y) =>
+			(!!x.crosscoreStatic - !!y.crosscoreStatic) ||
+			String(x.id).localeCompare(String(y.id)));
+		const root = members[0];
+		const used = new Map();
+		const list = members.map((m) => {
+			if (m === root) return { id: m.id, label: "Utama" };
+			const base = m.crosscoreLabel || String(m.id).split("/").pop();
+			const n = (used.get(base) || 0) + 1;
+			used.set(base, n);
+			return { id: m.id, label: n === 1 ? base : `${base} ${n}` };
+		});
+		const labels = new Map(list.map((x) => [x.id, x.label]));
+		for (const m of members) {
+			m.family = { root: root.id, label: labels.get(m.id) || "Utama", members: list };
 		}
+		if (root.character && root.character.name) root.name = root.character.name;
 	}
 }
 
 /**
- * CrossCore: nama tampilan dari katalog ArtHub.
+ * CrossCore: nama tampilan dari katalog crosscore.art.
  *
- * `_names.json` ditulis tools/crosscore/refresh-meta.py dan dikunci oleh id
- * model PENUH ("crosscore/<folder>" / "crosscore-interaction/<folder>"),
- * karena kedua pohon aset jatuh ke game "crosscore" (resolveGame mencocokkan
- * awalan) — memotong prefix per-game akan menabrak keduanya.
+ * `_names.json` ditulis tools/crosscore/import-art.py dan dikunci oleh id
+ * model PENUH ("crosscore/<slug>" / "crosscore-cg/<slug>"). Selain nama,
+ * setiap entri membawa characterId, outfit, sceneLabel, rarity, dan flag
+ * static — dipakai attachCrosscoreFamilies() untuk grouping varian.
  */
 function applyCrosscoreNames(models) {
 	let map;
@@ -2313,16 +2290,21 @@ function applyCrosscoreNames(models) {
 		const rec = map[m.id] || map[baseId];
 		if (!rec || !rec.name) continue;
 		m.name = rec.name;
+		// Dipakai attachCrosscoreFamilies() untuk mengelompokkan SEMUA scene
+		// (rig Spine maupun ilustrasi statis) milik satu karakter.
+		m.crosscoreCharId = rec.characterId || null;
+		m.crosscoreLabel = rec.label || rec.outfit || null;
+		m.crosscoreStatic = !!rec.static;
 		m.character = {
 			name: rec.name,
 			plain: rec.name,
-			source: "arthub-viewer-web",
-			rarity: null,
-			class: rec.category || rec.group || null,
+			source: rec.source || "crosscore.art",
+			rarity: rec.rarity ?? null,
+			class: rec.category || null,
 			element: null,
-			skin: rec.title || null,
+			skin: rec.outfit || null,
 			code: String(m.id).split("/").pop(),
-			rig: rec.game === "crosscore-interaction" ? "interaction" : "spine",
+			rig: rec.static ? "ilustrasi" : "spine",
 		};
 	}
 }
@@ -4270,7 +4252,7 @@ const UPDATERS = {
 		// Pipeline iOS menulis model baru; paksa rescan /api/models setelah apply.
 		rescan: true,
 	},
-	// CrossCore: satu pembaru untuk 2 pohon model ArtHub + nama/thumbnail.
+	// CrossCore: satu pembaru untuk katalog crosscore.art (486 scene).
 	// tools/update-crosscore.py (mirror komunitas kmou424 / R2iCecho) tidak
 	// dipakai lagi: sumbernya sekarang github.com/Talors1225/arthub-viewer-web.
 	crosscore: {

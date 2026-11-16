@@ -716,65 +716,62 @@ dan tidak punya state/rescan — yang dipanggil server adalah updater di atas.
 
 ## CrossCore (交错战线)
 
-Sumber tunggal: **https://github.com/Talors1225/arthub-viewer-web**. Data lama
-dari mirror komunitas (`kmou424/Crosscore_Anti_Hexie_Assets`,
-`R2iCecho/Crosscore_Assets_curr_1`) ditinggalkan — indeks ArtHub lebih baru
-dan asetnya disajikan lewat Cloudflare R2 yang bisa diakses langsung.
+Sumber tunggal sekarang: **https://crosscore.art/** ("Cross Core L2D Viewer",
+134 karakter / 421 kostum / 486 scene). Seluruh aset lama dari ArtHub
+(`github.com/Talors1225/arthub-viewer-web`), mirror komunitas, dan pohon
+`crosscore-interaction/` sudah **diarsipkan** ke
+`/srv/spine-assets/archive-crosscore-<waktu>/`, bukan dihapus.
 
 | Sumber | Isi | Folder |
 | --- | --- | --- |
-| `crosscore/crosscore_chars.json` | 502 entri → 495 folder unik (Spine 4.2.20 / 4.2.38) | `assets/crosscore/` |
-| `crosscore-interaction/catalog/catalog.json` (R2) | 324 prefab → 325 model/layer | `assets/crosscore-interaction/` |
-| `thumbs/index.json` + `thumbs/crosscore/*.webp` | 761 potret WebP 400 px (23 MB) | `public/thumbs/crosscore*/` |
+| `/` → `app.<hash>.js` → `catalog-all.<hash>.js` | 486 scene, `coverage.v2357` | `data/crosscore-art-catalog.json` |
+| `/api/art/...`, `/api/legacy-art/...`, `/game-clips/...` | 408 rig Spine (4.2.20 / 4.2.38 / 3.8.99, PMA) | `assets/crosscore/<slug>/` |
+| `/api/art/<hash>/illustration.webp` | 78 ilustrasi statis | `assets/crosscore-cg/<slug>/` |
+| katalog `roster` + `skins` | nama Tionghoa, outfit, rarity | `assets/crosscore/_names.json` |
+| ilustrasi statis | 79 thumbnail + `_manifest.json` | `public/thumbs/crosscore/` |
 
-Kedua pohon aset jatuh ke game **`crosscore`** (`resolveGame` mencocokkan
-awalan). `attachCrosscoreFamilies()` lalu menggabungkan keduanya jadi satu
-family "Spine / Interaksi": **899 model tetap dikirim ke klien, tapi cuma 583
-kartu root** yang tampil di pustaka (**312 family / 628 model ber-family**).
-Lihat section **Variant picker** di bawah.
+`tools/crosscore/import-art.py` mengunduh semuanya (idempoten, 8 worker,
+skip berkas yang sudah ada). Tiga hal yang mudah menjebak:
 
-Nama folder di dua pohon itu **tidak identik**: pohon interaksi memakai huruf
-kecil dan akhiran `_spine` (`10010_skin_Alps03` lawan
-`10010_skin_alps03_spine`), ada suffix `_pos_main`/`_pos_toushi`, serta beda
-`03` vs `3`. `crosscoreKey()` menormalisasi semua itu sebelum mengelompokkan;
-mencocokkan nama mentah cuma menyatukan 18 dari 899 model. 13 rig interaksi
-yang memang tidak punya pasangan dibiarkan berdiri sendiri. Regresi:
-`node tools/check-crosscore-variants.cjs`.
-`_names.json` dikunci oleh **id model penuh** supaya keduanya tidak tabrak;
-`applyCrosscoreNames()` memetakannya ke `name` + `character`. 55 prefab
-interaksi tidak punya entri di `models[]` katalog, jadi model itu tetap
-memakai nama folder — memang tidak ada nama di sumbernya. Panel interaksi
-sendiri memakai `data/cc-interaction.json` (270 model) lewat
-`/api/interaction/crosscore`.
+- Halaman tekstur **selalu** hidup di direktori yang sama dengan `.atlas`.
+  Katalog punya tiga bentuk URL (`/api/art/<sha256>/`, `/api/legacy-art/<sha1>/<subdir>/`,
+  `/game-clips/<sha256>/`), jadi jangan pernah menebak prefix tetap.
+- Beberapa nama berkas mengandung spasi (`Gondul _character.json`) → path
+  harus di-URL-encode.
+- Baris nama halaman di `.atlas` ditulis ulang ke `<slug>.png` agar cocok
+  dengan konvensi scanner (nama folder = stem).
 
-### Gotcha sumber
+Semua 486 scene jatuh ke game **`crosscore`** (`resolveGame` cocokkan awalan,
+`crosscore-cg` ikut masuk). `applyCrosscoreNames()` memasang nama karakter,
+`characterId`, `outfit`, dan `sceneLabel` dari `_names.json`; lalu
+`attachCrosscoreFamilies()` menyatukan **semua scene satu karakter** jadi satu
+kartu dengan dropdown Varian: **486 scene → 134 kartu** (105 family / 457 model
+ber-varian; 29 karakter yang cuma punya 1 scene dibiarkan standalone). Root
+selalu rig Spine, label varian memakai `outfit · sceneLabel`, root diberi label
+`Utama`. Regresi: `node tools/check-crosscore-variants.cjs`.
 
-- Path prefab menulis `/crosscore-interaction/spine/...`, tapi objeknya ada di
-  `/crosscore/spine/...` (lihat `PATH_REWRITES` di `arthub-cos.js`).
-- Nama kategori non-ASCII (`角色动态`, `剧情CG`) sudah percent-encoded di
-  prefab: harus `unquote` dulu, baru `quote` utuh — kalau di-quote dua kali
-  hasilnya 404.
-- Beberapa atlas memakai kapitalisasi berbeda dari indeks
-  (`60320_skin_Dainslef03.atlas` vs `..._dainslef03...`). Skrip unduh mencoba
-  varian kapital per token, bukan cuma lower/upper.
-- **7 folder berisi beberapa skeleton** → `scanModels()` memberi id
-  `<folder>#<stem>`. Manifest thumbnail di-expand per stem (768 kunci untuk
-  761 berkas) dan `applyCrosscoreNames()` fallback ke id dasar.
-- 236 kunci thumbnail berasal dari katalog lama (555 entri, varian "effect")
-  dan tidak punya model lagi; dilewati.
+Rig efek `front` / `back` di katalog adalah **lapisan overlay** yang situs
+aslinya komposisikan di atas rig utama. Viewer kita merender satu rig sekali,
+jadi keduanya sengaja tidak dijadikan model berdiri sendiri.
+
+`data/cc-interaction.json` (270 prefab sentuh dari ArtHub) masih ada dan
+`/api/interaction/crosscore` tetap menyajikannya, tapi pencocokannya memakai
+nama prefab lama sehingga panel sentuh tidak aktif untuk model crosscore.art.
+Data itu sengaja dibiarkan sebagai arsip, bukan dihapus.
 
 ### Pembaru
 
-`tools/crosscore/update.py` menyatukan tiga langkah: dua skrip unduh
-(`update-crosscore-arthub.py`, `update-crosscore-interaction.py`) lalu
-`refresh-meta.py` (nama + thumbnail + manifest).
+`tools/crosscore/update.py` sekarang memantau katalog crosscore.art, bukan lagi
+tiga katalog ArtHub:
 
-- `--check`: hash `crosscore_chars.json`, `thumbs/index.json`, katalog R2 +
-  jumlah berkas disk terhadap `data/crosscore-update-state.json`, plus tanya
-  kedua skrip unduh berapa model yang belum ada. Check pertama bootstrap.
-- `--apply`: unduh yang belum ada, bangun ulang metadata, simpan state.
-  Kegagalan thumbnail cuma jadi peringatan; yang menggagalkan rescan cuma
-  kegagalan model.
+- `--check`: ambil HTML → `app.<hash>.js` → `catalog-all.<hash>.js`, bandingkan
+  signature + himpunan 486 scene + isi disk terhadap
+  `data/crosscore-art-state.json`. Check pertama bootstrap. `have`/`expected`
+  diisi untuk dashboard (486/486).
+- `--apply`: jalankan `import-art.py` (cuma berkas yang belum ada), tulis ulang
+  `_names.json`, thumbnail, `_manifest.json`, dan state. `rescan: true`
+  memaksa `/api/models` dipindai ulang; apply sukses juga otomatis mengunggah
+  ke GDrive lewat `src/gdrive-upload.js`.
 - `UPDATERS.crosscore` memakai `python3` dan `rescan: true`.
 
 Cek manual:
@@ -785,8 +782,8 @@ curl 'http://127.0.0.1:3000/api/update/crosscore?mode=check'
 curl 'http://127.0.0.1:3000/api/update/crosscore?mode=apply'   # background
 ```
 
-`tools/update-crosscore.py` (mirror lama) masih ada sebagai referensi tapi
-tidak dipanggil server lagi.
+`tools/update-crosscore*.py` dan `tools/crosscore/refresh-meta.py` masih ada
+sebagai referensi pipeline lama, tetapi tidak dipanggil server lagi.
 
 ## Brown Dust 2
 
@@ -1316,13 +1313,12 @@ Rincian:
 
 ### CrossCore ikut rapi
 
-`attachCrosscoreFamilies()` di `src/server.js` mengelompokkan
-`crosscore/<folder>` dan `crosscore-interaction/<folder>` yang berbagi nama
-jadi satu family berlabel `Spine` / `Interaksi` — pola sama seperti
-`attachEpic7CombatFamilies()`. 324 dari 325 folder interaksi punya pasangan,
-jadi **827 model → 502 kartu root**, 649 model ber-family. `family.label`
-diisi per model supaya `<select>` memilih opsi yang benar. Model interaksi
-tanpa pasangan dibiarkan berdiri sendiri.
+`attachCrosscoreFamilies()` di `src/server.js` mengelompokkan **semua scene
+satu karakter** (rig Spine maupun ilustrasi statis) memakai `characterId`
+dari `_names.json` crosscore.art. Hasilnya **486 scene → 134 kartu**, dengan
+label varian `outfit · sceneLabel` dan label `Utama` untuk root. Ini
+menggantikan grouping lama `Spine` / `Interaksi` yang memasangkan dua pohon
+aset ArtHub yang sudah diarsipkan.
 
 `tools/check-variant-picker.cjs` menguji picker di BD2, E7, CZN, dan
 CrossCore (50 assertion): tab vs popup, chip di kartu, `<select>` state holder,
@@ -1342,7 +1338,7 @@ node tools/check-lean-library.cjs # indeks ringan + detail + A/B + shortcut
 node tools/check-czn.cjs         # CZN: roster wiki, thumbnail, render Spine 3.8
 node tools/check-czn-cards.cjs   # CZN: kartu skill, frame, shortcut K
 node tools/check-epic7.cjs       # E7: 4 sumber e7codex, nama, varian, render
-node tools/check-crosscore.cjs   # CrossCore: ArtHub, 827 model, nama, render
+node tools/check-crosscore.cjs   # CrossCore: 486 scene crosscore.art, integritas, render
 node tools/check-bd2.cjs         # BD2: Zormolo, 517 model .skel, family, render
 node tools/check-mad-drama.cjs   # Make Drama: 143 model, metadata, 134 thumb, render
 node tools/check-backdrop-fullscreen.cjs # backdrop on/off + regresi fullscreen blank hitam
@@ -1369,7 +1365,7 @@ node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
 node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
-node tools/check-crosscore-variants.cjs # varian Spine / Interaksi CrossCore
+node tools/check-crosscore-variants.cjs # 486 scene -> 134 kartu karakter
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):
