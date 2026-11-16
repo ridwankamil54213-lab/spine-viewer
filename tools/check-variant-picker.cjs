@@ -31,7 +31,7 @@ const ok = (label, cond, extra = "") => {
 		`${roots.length} dari ${cc.length}`);
 	ok("CrossCore: >=400 model ber-varian", paired.length >= 400, String(paired.length));
 	const fam = (all.find((m) => m.id ===
-		"crosscore/vodkamirror_vodkamirror-03_75010_skin_vodkamirror03_spine") || {}).family;
+		"crosscore/beethorn_game-5002002_game-5002002-beethorn") || {}).family;
 	ok("label family Utama + varian",
 		fam?.members?.length >= 2 && fam.members[0].label === "Utama",
 		JSON.stringify(fam?.members?.map((x) => x.label)));
@@ -53,7 +53,7 @@ const ok = (label, cond, extra = "") => {
 		{ game: "epic7", id: "epic7/c1070", n: 5, label: "E7", tabs: false },
 		{ game: "chaoszero", id: "chaoszero/model/1010", n: 7, label: "CZN", tabs: false, viaChip: true },
 		{ game: "crosscore", n: 2, label: "CrossCore", tabs: true,
-			id: "crosscore/vodkamirror_vodkamirror-03_75010_skin_vodkamirror03_spine" },
+			id: "crosscore/beethorn_game-5002002_game-5002002-beethorn" },
 	];
 
 	for (const c of cases) {

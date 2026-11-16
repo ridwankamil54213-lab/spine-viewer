@@ -29,7 +29,8 @@
  *   GDRIVE_REMOTE=gdrive            nama remote rclone
  *   GDRIVE_ROOT_ID=<id>             folder library di Shared Drive
  *   RCLONE_BIN=/usr/bin/rclone      path absolut (PATH systemd bisa beda)
- *   GDRIVE_UPLOAD_TIMEOUT_MS=<ms>   timeout per root (default 30 menit)
+ *   GDRIVE_UPLOAD_TIMEOUT_MS=<ms>   timeout per root (default 45 menit)
+ *   GDRIVE_UPLOAD_GLOBAL_MS=<ms>    pagar total semua root (default 90 menit)
  *
  * Kredensial TIDAK disimpan di sini: rclone memakai config milik user
  * (~/.config/rclone/rclone.conf, 0600) lewat HOME proses.
@@ -44,7 +45,11 @@ const RCLONE = process.env.RCLONE_BIN || "/usr/bin/rclone";
 const REMOTE = process.env.GDRIVE_REMOTE || "gdrive";
 const ROOT_ID = process.env.GDRIVE_ROOT_ID || "1zRly3eeewcrgdIe3bOUQUmyWUXXIwnzo";
 const ENABLED = process.env.GDRIVE_UPLOAD !== "0";
-const TIMEOUT_MS = Number(process.env.GDRIVE_UPLOAD_TIMEOUT_MS) || 30 * 60 * 1000;
+// Batas per-root. Root berisi ribuan berkas kecil (klip audio) butuh jatah
+// sendiri; dulu satu deadline 30 mnt dipakai bareng sehingga root TERAKHIR
+// selalu kehabisan waktu. Pagar global tetap ada supaya totalnya terikat.
+const TIMEOUT_MS = Number(process.env.GDRIVE_UPLOAD_TIMEOUT_MS) || 45 * 60 * 1000;
+const GLOBAL_MS = Number(process.env.GDRIVE_UPLOAD_GLOBAL_MS) || 90 * 60 * 1000;
 
 const RCLONE_ARGS = [
 	"--fast-list",
@@ -71,7 +76,12 @@ const STATIC_ROOTS = {
 	shoujoukaisen: { assets: ["shoujoukaisen"] },
 	pokerfate: { assets: ["pokerfate"] },
 	"mitao-utopia": { assets: ["mitao-utopia"], thumbs: ["mitao-utopia"] },
-	crosscore: { assets: ["crosscore", "crosscore-cg"], thumbs: ["crosscore"] },
+	crosscore: {
+		assets: ["crosscore", "crosscore-cg"],
+		thumbs: ["crosscore"],
+		// media = folder di bawah public/, tujuannya gdrive:<path> yang sama.
+		media: ["audio/crosscore"],
+	},
 	catshinobi: { assets: ["catshinobi"] },
 	bd2: { assets: ["bd2", "bd2-char"], thumbs: ["bd2"] },
 	azurlane: { assets: ["azurlane"] },
@@ -101,7 +111,11 @@ const STATIC_ROOTS = {
 
 function staticRoots(game) {
 	const r = STATIC_ROOTS[game] || {};
-	return { assets: new Set(r.assets || []), thumbs: new Set(r.thumbs || []) };
+	return {
+		assets: new Set(r.assets || []),
+		thumbs: new Set(r.thumbs || []),
+		media: new Set(r.media || []),
+	};
 }
 
 /** Root dengan berkas yang mtime-nya >= sinceMs (satu proses `find`). */
@@ -146,6 +160,13 @@ function buildJobs(game, sinceMs) {
 		const src = path.join(ROOT, "public", "thumbs", r);
 		if (fs.existsSync(src)) {
 			jobs.push({ src, dst: `${REMOTE}:thumbs/${r}`, label: `thumbs/${r}` });
+		}
+	}
+	// Klip suara / media lain di bawah public/ (bukan assets/).
+	for (const r of [...roots.media].sort()) {
+		const src = path.join(ROOT, "public", r);
+		if (fs.existsSync(src)) {
+			jobs.push({ src, dst: `${REMOTE}:${r}`, label: `public/${r}` });
 		}
 	}
 	return jobs;
@@ -231,9 +252,9 @@ async function uploadAfterApply(game, sinceMs, onLine) {
 		return { ok: true, jobs: [], roots: 0 };
 	}
 	const t0 = Date.now();
-	// SATU deadline untuk seluruh upload, bukan per-root: kalau ada 4 root,
-	// totalnya tetap maksimal GDRIVE_UPLOAD_TIMEOUT_MS.
-	const deadline = Date.now() + TIMEOUT_MS;
+	// Pagar global mencegah total upload melampaui GDRIVE_UPLOAD_GLOBAL_MS,
+	// tapi tiap root tetap dapat jatah TIMEOUT_MS penuh (dipangkas sisa pagar).
+	const deadline = Date.now() + GLOBAL_MS;
 	const results = [];
 	for (const job of jobs) {
 		const remaining = deadline - Date.now();
@@ -244,7 +265,8 @@ async function uploadAfterApply(game, sinceMs, onLine) {
 				timedOut: true, errors: ["batas waktu global habis"], stats: "", seconds: 0 });
 			continue;
 		}
-		const r = await runRclone(job, (l) => onLine("[gdrive]   " + l), remaining);
+		const slice = Math.min(remaining, TIMEOUT_MS);
+		const r = await runRclone(job, (l) => onLine("[gdrive]   " + l), slice);
 		results.push({
 			root: job.label,
 			ok: r.ok,

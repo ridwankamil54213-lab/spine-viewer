@@ -47,6 +47,13 @@ for (const label of ["assets/bd2", "assets/bd2-char", "thumbs/bd2"]) {
 }
 ok("bd2: root multi-folder + thumbnail ikut terpetakan");
 
+const ccJobs = Object.fromEntries(buildJobs("crosscore", since).map((j) => [j.label, j.dst]));
+assert.ok(ccJobs["assets/crosscore"] && ccJobs["assets/crosscore-cg"] &&
+	ccJobs["thumbs/crosscore"] && ccJobs["public/audio/crosscore"],
+	"root crosscore belum lengkap: " + JSON.stringify(Object.keys(ccJobs)));
+assert.strictEqual(ccJobs["public/audio/crosscore"], "gdrive:audio/crosscore");
+ok("crosscore: aset, CG, thumbnail, dan klip audio ikut ter-backup");
+
 // 3. Deteksi dinamis mengembalikan bentuk yang diharapkan.
 const dyn = changedRoots(since);
 assert.ok(dyn.assets instanceof Set && dyn.thumbs instanceof Set);

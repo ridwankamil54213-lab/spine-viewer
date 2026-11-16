@@ -2246,10 +2246,10 @@ function attachCrosscoreFamilies(models) {
 	}
 	for (const [, members] of byChar) {
 		if (members.length < 2) continue;
-		// Root = rig Spine pertama (ilustrasi statis jadi varian, bukan kartu
-		// utama), lalu urutan id yang stabil supaya dropdown tidak berubah.
+		// Root = rig UTAMA (rank 0); efek overlay rank 1 dan ilustrasi statis
+		// rank 2 jadi varian, lalu urutan id stabil supaya dropdown tidak berubah.
 		members.sort((x, y) =>
-			(!!x.crosscoreStatic - !!y.crosscoreStatic) ||
+			((x.crosscoreRank ?? 0) - (y.crosscoreRank ?? 0)) ||
 			String(x.id).localeCompare(String(y.id)));
 		const root = members[0];
 		const used = new Map();
@@ -2283,6 +2283,21 @@ function applyCrosscoreNames(models) {
 	} catch {
 		return; // katalog belum ada — kartu tetap memakai nama folder
 	}
+	// import-extras.py menulis nama model EFEK dan peta AUDIO di berkas
+	// terpisah supaya import-art.py tidak menimpanya saat --apply berikutnya.
+	let extras = {};
+	try {
+		extras = JSON.parse(fs.readFileSync(path.join(ASSETS, "crosscore", "_extras.json"), "utf8"));
+	} catch {
+		/* belum ada efek / suara */
+	}
+	Object.assign(map, extras.names || {});
+	const audioMap = extras.audio || {};
+	const subtitles = extras.subtitles || {};
+	const clipName = (u) => {
+		try { return decodeURIComponent(String(u).split("/").pop()); }
+		catch { return String(u).split("/").pop(); }
+	};
 	for (const m of models) {
 		// Folder dengan beberapa skeleton diberi id "<folder>#<stem>" oleh
 		// scanModels(); katalog dikunci per folder, jadi fallback ke id dasar.
@@ -2291,10 +2306,12 @@ function applyCrosscoreNames(models) {
 		if (!rec || !rec.name) continue;
 		m.name = rec.name;
 		// Dipakai attachCrosscoreFamilies() untuk mengelompokkan SEMUA scene
-		// (rig Spine maupun ilustrasi statis) milik satu karakter.
+		// (rig utama, efek overlay, ilustrasi statis) milik satu karakter.
 		m.crosscoreCharId = rec.characterId || null;
 		m.crosscoreLabel = rec.label || rec.outfit || null;
 		m.crosscoreStatic = !!rec.static;
+		// 0 = rig utama (root), 1 = efek, 2 = ilustrasi statis.
+		m.crosscoreRank = Number.isFinite(rec.rank) ? rec.rank : (rec.static ? 2 : 0);
 		m.character = {
 			name: rec.name,
 			plain: rec.name,
@@ -2304,8 +2321,24 @@ function applyCrosscoreNames(models) {
 			element: null,
 			skin: rec.outfit || null,
 			code: String(m.id).split("/").pop(),
-			rig: rec.static ? "ilustrasi" : "spine",
+			rig: rec.effect ? "efek" : rec.static ? "ilustrasi" : "spine",
 		};
+		// renderAudio() memakai audio.tracks; cciApplyEvent() memakai byIndex.
+		const a = audioMap[m.id] || audioMap[baseId];
+		if (a && Array.isArray(a.tracks) && a.tracks.length) {
+			const sub = {};
+			for (const u of a.tracks) {
+				const n = clipName(u);
+				if (subtitles[n]) sub[n] = subtitles[n];
+			}
+			m.audio = {
+				lang: a.lang || "CN",
+				tracks: a.tracks,
+				byIndex: a.byIndex || {},
+				entrance: a.entrance || null,
+				subtitles: sub,
+			};
+		}
 	}
 }
 

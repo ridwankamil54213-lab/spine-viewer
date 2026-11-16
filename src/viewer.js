@@ -8863,7 +8863,22 @@ const CCI = {
 	// Bounding box model dalam koordinat stage, dipakai untuk memetakan
 	// titik sentuh (koordinat area memakai ruang model, bukan piksel).
 	bounds: null,
+	audio: null,          // model.audio dari crosscore.art (subtitle + tracks)
 };
+
+/** Putar satu klip suara CrossCore. Dipicu klik pengguna, jadi autoplay aman. */
+let cciAudioEl = null;
+function cciPlayClip(name) {
+	if (typeof name !== "string" || !/\.(webm|mp3|ogg|wav)$/i.test(name)) return;
+	const url = name.startsWith("/")
+		? name
+		: `/audio/crosscore/clips/${encodeURIComponent(name)}`;
+	try {
+		if (!cciAudioEl) cciAudioEl = new Audio();
+		cciAudioEl.src = url;
+		cciAudioEl.play().catch(() => { /* autoplay ditolak: abaikan */ });
+	} catch { /* browser tanpa Audio: abaikan */ }
+}
 
 /** Muat katalog interaksi sekali saja (0,36 MB, di-cache browser). */
 async function cciLoadCatalog() {
@@ -8921,6 +8936,7 @@ async function cciAttach(model) {
 	CCI.on = false;
 	CCI.controller = null;
 	CCI.lastEvent = null;
+	CCI.audio = model?.audio || null;
 	try {
 		await cciLoadCatalog();
 	} catch {
@@ -8937,7 +8953,21 @@ async function cciAttach(model) {
 
 /** Terapkan hasil aksi ke viewer (mainkan animasi). */
 function cciApplyEvent(ev) {
-	if (!ev || !spine) return;
+	if (!ev) return;
+	// Aksi sentuh membawa nama klip (bukan id numerik seperti katalog lama).
+	// Pilih satu secara acak kalau ada beberapa variasi voice.
+	if (ev.kind === "action" || ev.kind === "guide") {
+		const ids = ev.audioIds || [];
+		const clips = ids.filter((x) => typeof x === "string" && /\.webm$/i.test(x));
+		if (clips.length) {
+			const clip = clips[Math.floor(Math.random() * clips.length)];
+			cciPlayClip(clip);
+			// 3.638 subtitle crosscore.art: tampilkan teks voice-line saat tap.
+			const line = CCI.audio?.subtitles?.[clip];
+			if (line) toast(line);
+		}
+	}
+	if (!spine) return;
 	if (ev.kind === "action" || ev.kind === "guide" || ev.kind === "idle") {
 		const name = ev.name || ev.kind === "idle" ? ev.name : null;
 		if (!name) return;

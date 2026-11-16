@@ -269,7 +269,11 @@ lagi ingat backup manual (kasus BD2 yang dulu kelewat saat diunduh ulang).
 
 Kredensial tetap di `~/.config/rclone/rclone.conf` (0600), tidak ada di repo.
 Konfigurasi opsional via env: `GDRIVE_UPLOAD=0` (matikan), `GDRIVE_REMOTE`,
-`GDRIVE_ROOT_ID`, `RCLONE_BIN`, `GDRIVE_UPLOAD_TIMEOUT_MS` (default 30 menit).
+`GDRIVE_ROOT_ID`, `RCLONE_BIN`, `GDRIVE_UPLOAD_TIMEOUT_MS` (default 45 menit
+**per root**), `GDRIVE_UPLOAD_GLOBAL_MS` (pagar total, default 90 menit).
+Jatah per-root ini penting: sinkronisasi awal `public/audio/crosscore` berisi
+3.638 berkas kecil, dan satu deadline global 30 menit habis dipakai root lain
+sehingga root terakhir gagal.
 
 Regresi lokal tanpa jaringan: `node tools/check-gdrive-upload.cjs`.
 
@@ -741,23 +745,40 @@ skip berkas yang sudah ada). Tiga hal yang mudah menjebak:
 - Baris nama halaman di `.atlas` ditulis ulang ke `<slug>.png` agar cocok
   dengan konvensi scanner (nama folder = stem).
 
-Semua 486 scene jatuh ke game **`crosscore`** (`resolveGame` cocokkan awalan,
+Semua model jatuh ke game **`crosscore`** (`resolveGame` cocokkan awalan,
 `crosscore-cg` ikut masuk). `applyCrosscoreNames()` memasang nama karakter,
-`characterId`, `outfit`, dan `sceneLabel` dari `_names.json`; lalu
-`attachCrosscoreFamilies()` menyatukan **semua scene satu karakter** jadi satu
-kartu dengan dropdown Varian: **486 scene → 134 kartu** (105 family / 457 model
-ber-varian; 29 karakter yang cuma punya 1 scene dibiarkan standalone). Root
-selalu rig Spine, label varian memakai `outfit · sceneLabel`, root diberi label
+`characterId`, `outfit`, dan `sceneLabel` dari `_names.json` plus `_extras.json`;
+lalu `attachCrosscoreFamilies()` menyatukan **semua scene satu karakter** jadi
+satu kartu dengan dropdown Varian: **713 model → 134 kartu** (130 family / 709
+model ber-varian). Root selalu rig UTAMA (`rank: 0`), efek `rank: 1`, ilustrasi
+statis `rank: 2`; label varian memakai `outfit · sceneLabel`, root diberi label
 `Utama`. Regresi: `node tools/check-crosscore-variants.cjs`.
 
-Rig efek `front` / `back` di katalog adalah **lapisan overlay** yang situs
-aslinya komposisikan di atas rig utama. Viewer kita merender satu rig sekali,
-jadi keduanya sengaja tidak dijadikan model berdiri sendiri.
+### Efek, zona sentuh, dan suara
 
-`data/cc-interaction.json` (270 prefab sentuh dari ArtHub) masih ada dan
-`/api/interaction/crosscore` tetap menyajikannya, tapi pencocokannya memakai
-nama prefab lama sehingga panel sentuh tidak aktif untuk model crosscore.art.
-Data itu sengaja dibiarkan sebagai arsip, bukan dihapus.
+`tools/crosscore/import-extras.py` menambahkan tiga lapisan lagi dari situs
+yang sama:
+
+- **Efek** (`characters[].effects`, 227 rig `front`/`back`): tiap rig jadi model
+  varian `assets/crosscore/<slug>_effF|effB/`. Skeleton-nya punya attachment
+  yang **sama persis** dengan atlas scene induk, jadi atlas dan halaman
+  teksturnya disalin (hardlink untuk hemat disk) dan nama halamannya ditulis
+  ulang. Hasilnya efek bisa dibuka dari dropdown Varian walau viewer kita
+  merender satu rig sekali.
+- **Zona sentuh** (`/official-zones.js` 225 prefab + `/touch-zones.js` 17):
+  `data/cc-interaction.json` dibangun ulang jadi **225 model / 1.554 aksi**
+  dengan `prefab` = slug model, sehingga mesin CCI lama langsung aktif lagi.
+  `areas` memakai format `[cx, cy, w, h, derajat]` yang sama.
+- **Suara** (`/audio/catalog.json`, `entrances.json`, `subtitles.json`):
+  **3.638 klip WebM** (236 MB) ke `public/audio/crosscore/clips/`, disajikan
+  statis di `/audio/crosscore/clips/<nama>`. **188 model** dapat `audio.tracks`
+  (tombol audio bawaan `renderAudio()`), dan aksi sentuh membawa nama klip
+  sehingga `cciApplyEvent()` memutar voice saat area disentuh. 3.638 subtitle
+  tersimpan di `_extras.json`.
+
+`_extras.json` sengaja terpisah dari `_names.json` supaya `import-art.py`
+tidak menimpanya saat apply berikutnya. Regresi:
+`node tools/check-crosscore-extras.cjs`.
 
 ### Pembaru
 
@@ -768,17 +789,21 @@ tiga katalog ArtHub:
   signature + himpunan 486 scene + isi disk terhadap
   `data/crosscore-art-state.json`. Check pertama bootstrap. `have`/`expected`
   diisi untuk dashboard (486/486).
-- `--apply`: jalankan `import-art.py` (cuma berkas yang belum ada), tulis ulang
-  `_names.json`, thumbnail, `_manifest.json`, dan state. `rescan: true`
-  memaksa `/api/models` dipindai ulang; apply sukses juga otomatis mengunggah
-  ke GDrive lewat `src/gdrive-upload.js`.
+- `--apply`: jalankan `import-art.py` lalu `import-extras.py` (keduanya
+  idempoten), tulis ulang `_names.json`, `_extras.json`, thumbnail,
+  `_manifest.json`, `cc-interaction.json`, dan state. Kalau efek/touch/suara
+  belum pernah diimpor, `--check` menawarkan apply walau katalog utama tidak
+  berubah. `rescan: true` memaksa `/api/models` dipindai ulang; apply sukses
+  juga otomatis mengunggah ke GDrive lewat `src/gdrive-upload.js` (termasuk
+  root `public/audio/crosscore`).
 - `UPDATERS.crosscore` memakai `python3` dan `rescan: true`.
 
 Cek manual:
 
 ```bash
 python3 tools/crosscore/update.py --check
-curl 'http://127.0.0.1:3000/api/update/crosscore?mode=check'
+python3 tools/crosscore/import-extras.py --workers 8
+curl 'http://127.0.0.1:3000/api/update/crosscore?mode=check' 
 curl 'http://127.0.0.1:3000/api/update/crosscore?mode=apply'   # background
 ```
 
@@ -1338,7 +1363,7 @@ node tools/check-lean-library.cjs # indeks ringan + detail + A/B + shortcut
 node tools/check-czn.cjs         # CZN: roster wiki, thumbnail, render Spine 3.8
 node tools/check-czn-cards.cjs   # CZN: kartu skill, frame, shortcut K
 node tools/check-epic7.cjs       # E7: 4 sumber e7codex, nama, varian, render
-node tools/check-crosscore.cjs   # CrossCore: 486 scene crosscore.art, integritas, render
+node tools/check-crosscore.cjs   # CrossCore: 713 model crosscore.art, integritas, render
 node tools/check-bd2.cjs         # BD2: Zormolo, 517 model .skel, family, render
 node tools/check-mad-drama.cjs   # Make Drama: 143 model, metadata, 134 thumb, render
 node tools/check-backdrop-fullscreen.cjs # backdrop on/off + regresi fullscreen blank hitam
@@ -1365,7 +1390,8 @@ node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
 node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
-node tools/check-crosscore-variants.cjs # 486 scene -> 134 kartu karakter
+node tools/check-crosscore-variants.cjs # 713 model -> 134 kartu karakter
+node tools/check-crosscore-extras.cjs   # efek, zona sentuh, dan suara crosscore.art
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):

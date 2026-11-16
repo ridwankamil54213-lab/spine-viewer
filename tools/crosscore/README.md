@@ -2,7 +2,47 @@
 
 > **Sumber aktif sekarang: https://crosscore.art/.**
 > Yang dipanggil server adalah `tools/crosscore/update.py`, yang menjalankan
-> `tools/crosscore/import-art.py` (lihat README utama, section CrossCore).
+> `tools/crosscore/import-art.py` LALU `tools/crosscore/import-extras.py`
+> (lihat README utama, section CrossCore).
+
+## Pipeline aktif (crosscore.art)
+
+| Skrip | Tugas | Hasil |
+| --- | --- | --- |
+| `import-art.py` | 134 karakter / 421 outfit / 486 scene | `assets/crosscore/<slug>/`, `assets/crosscore-cg/`, `_names.json`, thumbnail, `_manifest.json` |
+| `import-extras.py` | efek + zona sentuh + suara | `assets/crosscore/<slug>_effF\|effB/`, `_extras.json`, `data/cc-interaction.json`, `public/audio/crosscore/clips/` |
+| `update.py` | pembungkus `--check` / `--apply` untuk server | state + JSON hasil untuk `/api/update/crosscore` |
+
+Keduanya **idempoten** (berkas yang sudah ada dilewati) dan boleh dijalankan
+mandiri:
+
+```sh
+python3 tools/crosscore/import-art.py --workers 8
+python3 tools/crosscore/import-extras.py --workers 8   # ~1 mnt, 236 MB audio
+python3 tools/crosscore/update.py --check
+node tools/check-crosscore-extras.cjs
+```
+
+`import-extras.py` wajib dijalankan **setelah** `import-art.py` karena memakai
+`data/crosscore-art-catalog.json` dan atlas scene induk. Metadata efek/audio
+ditulis ke `_extras.json` (terpisah dari `_names.json`) supaya apply berikutnya
+tidak menimpanya.
+
+Efek `front`/`back` memakai attachment yang sama dengan atlas induk: atlas
+disalin dengan nama halaman ditulis ulang, dan PNG-nya di-**hardlink** supaya
+227 rig efek tidak menggandakan ~1 GB tekstur di disk.
+
+Zona sentuh (`official-zones.js` + `touch-zones.js`) ditulis ke
+`data/cc-interaction.json` dengan `prefab` = slug model, sehingga mesin CCI
+`src/viewer.js` langsung cocok. `audioId` berisi nama klip WebM, diputar
+`cciApplyEvent()` saat area disentuh; `model.audio.tracks` menghidupkan tombol
+audio bawaan `renderAudio()`.
+
+> File di bawah `public/audio/` dan `assets/` hasil unduhan, di-ignore Git.
+> Backupnya lewat auto-upload GDrive (`src/gdrive-upload.js`, root
+> `public/audio/crosscore`).
+
+---
 > Dokumen di bawah ini menjelaskan DUA pipeline LAMA: ArtHub / R2
 > (`tools/update-crosscore-*.py`, `refresh-meta.py`) dan mirror komunitas
 > berbasis AssetBundle `prefabs_spine_*` (`tools/update-crosscore.py`).

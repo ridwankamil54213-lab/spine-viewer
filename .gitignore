@@ -6,6 +6,8 @@ public/dist/
 
 # Cached thumbnails (large, fetched at runtime)
 public/exports/
+# Klip suara crosscore.art (3.638 WebM / 236 MB) hasil unduhan, bukan sumber.
+public/audio/
 
 # Thumbnails are cached at runtime — ignore their CONTENTS but keep descending.
 # Rule: never ignore a directory we need to un-ignore inside; trailing "/*" only

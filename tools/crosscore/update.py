@@ -35,6 +35,8 @@ from pathlib import Path
 VIEW = Path(__file__).resolve().parents[2]
 HERE = VIEW / "tools" / "crosscore"
 STATE = VIEW / "data" / "crosscore-art-state.json"
+EXTRAS_FILE = VIEW / "assets" / "crosscore" / "_extras.json"
+EXTRAS_STATE = VIEW / "data" / "crosscore-extras-state.json"
 CROSS = VIEW / "assets" / "crosscore"
 CG = VIEW / "assets" / "crosscore-cg"
 
@@ -90,8 +92,11 @@ def check() -> dict:
             "expected": len(scenes), "have": have, "bootstrap": True,
             "detail": {"scenes": len(scenes), "disk": have},
         }
+    # Efek / touch / suara ditulis import-extras.py; kalau belum pernah
+    # dijalankan, apply harus ditawarkan walaupun katalog utama tidak berubah.
+    extras_ok = EXTRAS_FILE.is_file() and EXTRAS_STATE.is_file()
     changed = (cat["sig"] != state.get("sig") or bool(missing)
-               or have < len(scenes))
+               or have < len(scenes) or not extras_ok)
     return {
         "ok": True,
         "mode": "check",
@@ -108,37 +113,57 @@ def check() -> dict:
     }
 
 
-def apply_update() -> dict:
-    t0 = time.time()
+def run_json(script: Path, args: list[str]) -> tuple[dict, int]:
+    """Jalankan satu importer; stdout = SATU blok JSON, stderr = progres."""
+    print(f"menjalankan {script.name} …", file=sys.stderr, flush=True)
     r = subprocess.run(
-        [sys.executable, str(HERE / "import-art.py"), "--workers", "8"],
+        [sys.executable, str(script), *args],
         cwd=str(VIEW), stdout=subprocess.PIPE, stderr=sys.stderr,
         text=True, timeout=3600,
     )
     try:
-        res = json.loads(r.stdout)
+        return json.loads(r.stdout), r.returncode
     except Exception:  # noqa: BLE001
-        return {"ok": False, "error": "import-art.py tidak mengembalikan JSON",
-                "rc": r.returncode, "stdout": (r.stdout or "")[-500:]}
+        return {"ok": False, "error": f"{script.name} tidak mengembalikan JSON",
+                "stdout": (r.stdout or "")[-400:]}, r.returncode
+
+
+def apply_update() -> dict:
+    t0 = time.time()
+    art, rc1 = run_json(HERE / "import-art.py", ["--workers", "8"])
+    extras, rc2 = run_json(HERE / "import-extras.py", ["--workers", "8"])
+    ok = (bool(art.get("ok")) and bool(extras.get("ok"))
+          and rc1 == 0 and rc2 == 0)
+    eff = extras.get("effects") or {}
+    snd = extras.get("sound") or {}
+    tch = extras.get("touch") or {}
     out = {
-        "ok": bool(res.get("ok")) and r.returncode == 0,
+        "ok": ok,
         "mode": "apply",
-        "version": version({"coverage": res.get("coverage") or {}}),
-        "new": res.get("downloaded", 0),
+        "version": version({"coverage": art.get("coverage") or {}}),
+        "new": (art.get("downloaded", 0) + eff.get("models", 0)
+                + snd.get("clips", 0)),
         "new_ids": [],
         "new_models": [],
-        "downloaded": res.get("downloaded", 0),
-        "failed": res.get("failed", 0),
-        "errors": res.get("errors", []),
-        "bytes": res.get("bytes", 0),
-        "detail": res.get("coverage"),
-        # Selalu true: metadata (_names.json / thumbnail) ditulis ulang walau
-        # tidak ada berkas model baru, jadi klien harus memanggil refresh().
+        "downloaded": art.get("downloaded", 0),
+        "failed": (art.get("failed", 0) + (eff.get("failed") or 0)
+                   + (snd.get("failed") or 0)),
+        "errors": (art.get("errors") or []) + (extras.get("errors") or []),
+        "detail": {
+            "coverage": art.get("coverage"),
+            "effects": eff.get("models", 0),
+            "touchModels": tch.get("models", 0),
+            "touchActions": tch.get("actions", 0),
+            "audioClips": snd.get("clips", 0),
+            "audioScenes": snd.get("scenes", 0),
+        },
+        # Selalu true: metadata (_names/_extras/touch/thumbnail) ditulis ulang
+        # walau tidak ada berkas baru, jadi klien harus memanggil refresh().
         "extracted": True,
         "seconds": round(time.time() - t0, 1),
     }
-    if not out["ok"]:
-        out["error"] = f"{res.get('failed')} scene gagal diunduh (lihat log)"
+    if not ok:
+        out["error"] = " Sebagian impor gagal (lihat log)".strip()
     return out
 
 

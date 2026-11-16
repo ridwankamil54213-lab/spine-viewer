@@ -30,8 +30,8 @@ const ok = (label, cond, extra = "") => {
 	const cc = all.filter((m) => m.game === "crosscore");
 	const spine = cc.filter((m) => String(m.id).startsWith("crosscore/"));
 	const cg = cc.filter((m) => String(m.id).startsWith("crosscore-cg/"));
-	ok("486 scene crosscore.art terpasang", cc.length === 486, String(cc.length));
-	ok("408 rig Spine", spine.length === 408, String(spine.length));
+	ok("713 model crosscore.art terpasang", cc.length === 713, String(cc.length));
+	ok("635 rig Spine (408 utama + 227 efek)", spine.length === 635, String(spine.length));
 	ok("78 ilustrasi statis", cg.length === 78, String(cg.length));
 	ok("tidak ada sisa crosscore-interaction / ArtHub",
 		!all.some((m) => String(m.id).startsWith("crosscore-interaction/")));
@@ -41,7 +41,12 @@ const ok = (label, cond, extra = "") => {
 	ok("nama memakai aksara Tionghoa", spine.some((m) => /[\u4e00-\u9fff]/.test(m.name || "")));
 
 	const names = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/crosscore/_names.json"), "utf8"));
-	ok("_names.json 486 entri", Object.keys(names).length === 486, String(Object.keys(names).length));
+	const extras = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/crosscore/_extras.json"), "utf8"));
+	ok("_names.json + _extras.json = 713", Object.keys(names).length + Object.keys(extras.names).length === 713,
+		`${Object.keys(names).length} + ${Object.keys(extras.names).length}`);
+	ok("227 model efek & 188 model bersuara",
+		Object.keys(extras.names).length === 227 && Object.keys(extras.audio).length === 188,
+		`${Object.keys(extras.names).length} efek / ${Object.keys(extras.audio).length} audio`);
 
 	// --- integritas berkas -------------------------------------------------
 	let bad = 0;

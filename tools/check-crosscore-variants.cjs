@@ -3,7 +3,7 @@
  * Regresi varian CrossCore: SEMUA scene satu karakter jadi SATU kartu dengan
  * dropdown Varian (root = rig Spine utama, label = outfit · sceneLabel).
  *
- * Sumber crosscore.art punya 486 scene / 134 karakter. Tanpa grouping ini
+ * Sumber crosscore.art punya 486 scene + 227 rig efek / 134 karakter. Tanpa grouping ini
  * pustaka menampilkan belasan kartu bernama sama per karakter; grouping lama
  * "Spine / Interaksi" tidak berlaku lagi karena pohon interaksi sudah
  * diarsipkan bersama aset ArtHub.
@@ -21,15 +21,15 @@ const ok = (m) => console.log("ok   " + m);
 	const all = d.models || (Array.isArray(d) ? d : []);
 	const cc = all.filter((m) => m.game === "crosscore");
 	const byId = new Map(all.map((m) => [m.id, m]));
-	assert.strictEqual(cc.length, 486, `model crosscore: ${cc.length}`);
+	assert.strictEqual(cc.length, 713, `model crosscore: ${cc.length}`);
 
 	const roots = cc.filter((m) => !m.family || m.family.root === m.id);
 	const fam = cc.filter((m) => (m.family || {}).members?.length);
 	const families = new Map();
 	for (const m of fam) families.set(m.family.root, m.family);
 	assert.strictEqual(roots.length, 134, `kartu root: ${roots.length}`);
-	assert.ok(fam.length >= 450, `model ber-family: ${fam.length}`);
-	assert.ok(families.size >= 100, `family: ${families.size}`);
+	assert.ok(fam.length >= 700, `model ber-family: ${fam.length}`);
+	assert.ok(families.size >= 125, `family: ${families.size}`);
 	ok(`${cc.length} scene -> ${roots.length} kartu (1 per karakter), ${families.size} family, ${fam.length} ber-varian`);
 
 	for (const [root, f] of families) {
@@ -55,9 +55,9 @@ const ok = (m) => console.log("ok   " + m);
 
 	// Karakter berscene-tunggal memang dibiarkan standalone.
 	const standalone = cc.filter((m) => !m.family);
-	assert.ok(standalone.length >= 20 && standalone.length <= 40,
+	assert.ok(standalone.length >= 1 && standalone.length <= 10,
 		`standalone: ${standalone.length}`);
-	ok(`${standalone.length} karakter 1 scene dibiarkan standalone`);
+	ok(`${standalone.length} karakter tanpa saudara dibiarkan standalone`);
 
 	// --- UI: ganti varian lewat #variant-select ---------------------------
 	const browser = await chromium.launch({ args: ["--no-sandbox"] });
