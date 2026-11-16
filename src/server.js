@@ -1455,8 +1455,9 @@ function attachLostSwordFamilies(models, videos) {
 
 	// Jalur utama: katalog resmi https://lost-sword-l2d-viewer.pages.dev/
 	// yang ditulis oleh tools/lostsword/refresh.py ke assets/lostsword/_names.json.
-	// Berisi `models` (nama + metadata karakter untuk 287 model Spine & 87 video)
-	// serta `families` (84 family karakter tanpa tabrakan aset maupun label).
+	// Berisi `models` (nama + metadata karakter untuk seluruh model Spine &
+	// video) serta `families` (satu kartu root per karakter). Jumlahnya mengikuti
+	// katalog live, jadi jangan hardcode angka di sini.
 	const namesFile = path.join(ASSETS, "lostsword", "_names.json");
 	try {
 		if (fs.existsSync(namesFile)) {
@@ -4379,7 +4380,8 @@ const UPDATERS = {
 		py: "/srv/venv-spine/bin/python",
 	},
 	// Lost Sword: disinkronkan dari https://lost-sword-l2d-viewer.pages.dev/
-	// (287 model Spine + 87 video + 306 thumbnail WebP + 84 family karakter).
+	// (297 model Spine + 88 video + 87 family karakter per katalog 2026-11-16;
+	// jumlahnya mengikuti situs, lihat assets/lostsword/_names.json).
 	lostsword: {
 		script: path.join(ROOT, "tools", "lostsword", "update.py"),
 		py: "python3",

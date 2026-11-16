@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 /**
  * Verifikasi end-to-end Lost Sword (sumber: https://lost-sword-l2d-viewer.pages.dev/):
- *   1. /api/models?game=lostsword -> 287 model Spine (standing/chibi/pet),
- *      84 kartu root, 0 duplikat kapitalisasi, semua punya metadata character.
- *   2. /api/models?game=lostsword-video -> 87 video, semuanya terhubung ke
+ *   1. /api/models?game=lostsword -> model Spine (standing/chibi/pet),
+ *      kartu root, 0 duplikat kapitalisasi, semua punya metadata character.
+ *   2. /api/models?game=lostsword-video -> video, semuanya terhubung ke
  *      family karakter di lostsword dan disembunyikan dari daftar game utama.
- *   3. /api/thumbnails -> 374/374 item (287 Spine + 87 video) punya thumbnail
- *      WebP valid di disk (char_*, small_*, pet_*).
- *   4. /api/update/lostsword?mode=check -> ok:true, changed:false, have:287.
+ *   3. /api/thumbnails -> semua item (Spine + video) punya thumbnail WebP
+ *      valid di disk (char_*, small_*, pet_*).
+ *   4. /api/update/lostsword?mode=check -> ok:true, changed:false.
+ *
+ * Angka ekspektasi DIHITUNG dari assets/lostsword/_names.json (yang ditulis
+ * refresh.py dari katalog live), bukan hardcode: jumlah entri situs bisa
+ * berubah tiap rilis tanpa membuat regresi ini palsu merah.
+ *
  *   5. Playwright headless:
- *      - Pilih Lost Sword -> 84 kartu root + thumbnail ter-render, dan tile
+ *      - Pilih Lost Sword -> kartu root + thumbnail ter-render, dan tile
  *        Lost Sword — Video disembunyikan.
  *      - Buka popup Varian Agravaine -> 5 baris (Utama, Daily — Silent Shadow,
  *        Battle Mode, Pet Agravaine, Skill Cutscene) + grup Model/Aksi/Varian +
@@ -54,9 +59,21 @@ function getJson(urlPath) {
 }
 
 (async () => {
-	console.log("=== Check Lost Sword (lost-sword-l2d-viewer.pages.dev) ===");
+console.log("=== Check Lost Sword (lost-sword-l2d-viewer.pages.dev) ===");
 
-	const [{ body: lsBody }, { body: vidBody }, { body: thumbBody }, { body: updBody }] =
+// Sumber kebenaran tunggal: metadata yang ditulis refresh.py dari katalog
+// live. Kunci `models` mencakup id Spine DAN id video.
+const namesFile = JSON.parse(fs.readFileSync(
+	path.join(ROOT, "assets", "lostsword", "_names.json"), "utf8"));
+const metaIds = Object.keys(namesFile.models || {});
+const expectedSpine = metaIds.filter((k) => k.startsWith("lostsword/")).length;
+const expectedVideos = metaIds.filter((k) => k.startsWith("lostsword-video/")).length;
+const expectedFamilies = (namesFile.families || []).length;
+console.log(`  ekspektasi dari _names.json: ${expectedSpine} Spine, `
+	+ `${expectedVideos} video, ${expectedFamilies} family, `
+	+ `${namesFile.entries} entri (sig ${namesFile.sig})`);
+
+const [{ body: lsBody }, { body: vidBody }, { body: thumbBody }, { body: updBody }] =
 		await Promise.all([
 			getJson("/api/models?game=lostsword&refresh=1"),
 			getJson("/api/models?game=lostsword-video"),
@@ -68,18 +85,37 @@ function getJson(urlPath) {
 	const videos = vidBody.models || [];
 	const thumbs = thumbBody.thumbs || {};
 
-	ok(models.length >= 287, "jumlah model Spine Lost Sword >= 287", `${models.length}`);
-	ok(videos.length >= 87, "jumlah video Lost Sword >= 87", `${videos.length}`);
+	ok(models.length === expectedSpine, "jumlah model Spine sesuai _names.json",
+		`${models.length}/${expectedSpine}`);
+	ok(videos.length === expectedVideos, "jumlah video sesuai _names.json",
+		`${videos.length}/${expectedVideos}`);
 
 	const roots = models.filter((m) => !m.family || m.family.root === m.id);
 	const inFam = models.filter((m) => m.family && m.family.members.length >= 2);
-	ok(roots.length === 84, "jumlah kartu root = 84 karakter", `roots=${roots.length}`);
-	ok(inFam.length >= 280, "mayoritas model Spine tergabung di family karakter", `inFam=${inFam.length}/${models.length}`);
+	ok(roots.length === expectedFamilies, "jumlah kartu root = family di _names.json",
+		`roots=${roots.length}/${expectedFamilies}`);
+	ok(inFam.length >= expectedSpine - 20,
+		"mayoritas model Spine tergabung di family karakter",
+		`inFam=${inFam.length}/${models.length}`);
 
 	const withChar = models.filter(
 		(m) => m.character && m.character.source === "lost-sword-l2d-viewer.pages.dev" && m.character.name,
 	);
 	ok(withChar.length === models.length, "semua model Spine punya metadata character dari situs", `${withChar.length}/${models.length}`);
+
+	// Tripwire penggantian penuh: folder sisa ekstraksi XAPK lama tidak boleh
+	// kembali (dulu 732 model "hantu" dari unit/ + lobbyunit/ ikut terindeks).
+	const legacyModel = ["unit", "lobbyunit"].filter((d) =>
+		fs.existsSync(path.join(ROOT, "assets", "lostsword", d)));
+	const legacyVideo = ["High", "Low"].filter((d) =>
+		fs.existsSync(path.join(ROOT, "assets", "lostsword-video", d)));
+	ok(legacyModel.length === 0 && legacyVideo.length === 0,
+		"tidak ada sisa pohon XAPK lama (unit/lobbyunit/High/Low)",
+		`model=${legacyModel.join(",") || "-"} video=${legacyVideo.join(",") || "-"}`);
+	const kinds = new Set(models.map((m) => m.id.split("/")[1]));
+	ok([...kinds].every((k) => ["standing", "chibi", "pet"].includes(k)),
+		"semua model berasal dari standing/chibi/pet sesuai katalog situs",
+		[...kinds].join(","));
 
 	// Pastikan tidak ada duplikat kapitalisasi folder di disk
 	const lowerFolders = new Set();
@@ -115,7 +151,7 @@ function getJson(urlPath) {
 	}
 	ok(missingFiles === 0, "semua berkas .skel/.json/.atlas/.png/.mp4 ada di disk", `missing=${missingFiles}`);
 
-	// Thumbnail untuk 287 model Spine + 87 video
+	// Thumbnail untuk seluruh model Spine + video
 	const spineThumbs = models.filter((m) => thumbs[m.id]);
 	const videoThumbs = videos.filter((v) => thumbs[v.id]);
 	let missingThumbDisk = 0;
@@ -134,7 +170,7 @@ function getJson(urlPath) {
 		updBody &&
 			updBody.ok === true &&
 			updBody.changed === false &&
-			updBody.have === models.length &&
+			updBody.have === expectedSpine &&
 			!!updBody.previous &&
 			updBody.previous === updBody.version &&
 			updBody.new === 0,
@@ -179,7 +215,8 @@ function getJson(urlPath) {
 			hasLsVid: !!lsVid,
 		};
 	});
-	ok(gameCheck.hasLs && gameCheck.lsText.includes("84"), "tile game Lost Sword menampilkan 84 kartu root", gameCheck.lsText);
+	ok(gameCheck.hasLs && gameCheck.lsText.includes(String(expectedFamilies)),
+		`tile game Lost Sword menampilkan ${expectedFamilies} kartu root`, gameCheck.lsText);
 	ok(!gameCheck.hasLsVid, "tile Lost Sword — Video disembunyikan dari daftar game utama");
 
 	await page.locator('#game-list .game[data-key="lostsword"]').click();

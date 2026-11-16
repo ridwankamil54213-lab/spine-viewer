@@ -1112,20 +1112,34 @@ video High/Low dobel, dan nol thumbnail. Pohon lama dibackup ke
 `/srv/spine-assets/lostsword/apk-backup-*/`.
 
 - `tools/lostsword/refresh.py` mengunduh HTML utama, me-resolve dinamis
-  `/assets/index-<hash>.js`, lalu mengekstrak katalog `jl=[{...}]` (143 entri:
-  130 `Playable` + 13 `NPC`) dengan tokenizer murni Python.
-- **276 folder Spine / 287 skeleton** di `assets/lostsword/{standing,chibi,pet}/`
-  (147 folder standing termasuk 11 folder `Lobby_*` multi-layer `#_F`/`#_B`,
-  78 folder chibi Battle Mode, 51 folder pet).
-- **87 video cutscene MP4** di `assets/lostsword-video/{skill-videos,memorial-videos}/`
+  `/assets/index-<hash>.js`, lalu mengekstrak katalog `jl=[{...}]` (**147 entri**
+  per 2026-11-16) dengan tokenizer murni Python.
+- **285 folder Spine / 297 skeleton** di `assets/lostsword/{standing,chibi,pet}/`
+  (164 model standing termasuk folder `Lobby_*` multi-layer `#_F`/`#_B`,
+  81 chibi Battle Mode, 52 pet).
+- **88 video cutscene MP4** di `assets/lostsword-video/{skill-videos,memorial-videos}/`
   (`hiddenGame: true`, seluruhnya menempel ke family karakter di `lostsword`).
-- **84 family karakter** di `assets/lostsword/_names.json` (`attachLostSwordFamilies()`
-  di `src/server.js`): 374 item (287 Spine + 87 video) digabung menjadi **84 kartu
+- **87 family karakter** di `assets/lostsword/_names.json` (`attachLostSwordFamilies()`
+  di `src/server.js`): 385 item (297 Spine + 88 video) digabung menjadi **87 kartu
   root** tanpa tabrakan aset maupun label, lengkap dengan pencarian sub-judul
   kostum (`"First Love"`, `"Silent Shadow"`, `"Bunny"`, `"Bikini"`, `"Lingerie"`).
-- **374/374 thumbnail WebP** di `public/thumbs/lostsword/` + `_manifest.json`
-  (`char_*.webp` 256×340 untuk standing/video, `small_*.webp` untuk Battle Mode,
-  dan `pet_*.webp` untuk Pet).
+- **385/385 thumbnail WebP** (277 berkas unik) di `public/thumbs/lostsword/` +
+  `_manifest.json` (`char_*.webp` 256×340 untuk standing/video, `small_*.webp`
+  untuk Battle Mode, dan `pet_*.webp` untuk Pet).
+- Semua angka di atas **mengikuti katalog live** dan tersimpan di
+  `assets/lostsword/_names.json`; `tools/check-lostsword.cjs` membacanya sebagai
+  sumber ekspektasi, jadi rilis situs tidak membuat regresi palsu merah.
+
+**Penggantian penuh (2026-11-16).** Pohon lama ternyata masih menyimpan sisa
+ekstraksi XAPK (`unit/` 411 + `lobbyunit/` 321 model, plus video `High/` & `Low/`)
+sehingga pustaka membaca 1.120 model campuran. `refresh.py --replace` mendeteksi
+layout legacy itu, membangun staging **hanya** dari katalog situs (hardlink dari
+pohon lama bila cocok, unduh sisanya), lalu mengarsipkan seluruh pohon lama ke
+`/srv/spine-assets/lostsword/apk-backup-<waktu>/` sebelum swap. Hasilnya
+`assets/lostsword/` cuma berisi `standing/`, `chibi/`, `pet/` (463 MB, dari
+1,7 GB) dan `assets/lostsword-video/` cuma `skill-videos/` + `memorial-videos/`
+(159 MB, dari 599 MB). Root GDrive yang bersesuaian juga di-`rclone sync`
+supaya restore tidak mengembalikan model lama.
 - `UPDATERS["lostsword"]` & `UPDATERS["lostsword-video"]` (`rescan: true`)
   menjalankan `tools/lostsword/update.py` (`--check` / `--apply`). Regresi:
   `tools/check-lostsword.cjs` (33 assertion API + disk + Playwright). Detail:
@@ -1422,7 +1436,7 @@ node tools/check-nikke.cjs        # Nikke: 2104 model ArtHub, 0 duplikat, render
 node tools/check-mitao.cjs        # Mitao: solver iOS v2, manifest, updater
 node tools/check-mitao-variants.cjs # Mitao: varian front_*, nama JP, thumbnail
 node tools/check-pokerfate.cjs    # Poker Fate: updater XENC, probe HTTP Range
-node tools/check-lostsword.cjs    # Lost Sword: 287 model, 87 video, 84 family, thumb
+node tools/check-lostsword.cjs    # Lost Sword: model/video/family dari _names.json
 node tools/check-eroera.cjs       # 欲洛降临 (EroEra): 174 model, 43 family, Luban, thumb
 node tools/check-mercenary.cjs    # Mercenary: 98 model (89 CDN), 85 ilustrasi, 32 family
 node tools/check-ivntight.cjs     # IV-N-Tight: hash katalog live, 84 model, 0 404, render
