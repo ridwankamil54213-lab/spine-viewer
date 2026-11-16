@@ -7,6 +7,7 @@
  *   - nama dari _names.json (crosscore.art), bukan slug mentah
  *   - integritas .json/.atlas/halaman tekstur untuk tiap rig
  *   - thumbnail manifest + /api/thumbnails + berkasnya tersaji
+ *     (kelengkapan 713 model dicek tools/check-crosscore-thumbs.cjs)
  *   - updater --check memakai katalog crosscore.art
  *   - model Spine ter-render di stage tanpa aset 404 / JS error
  *
@@ -78,7 +79,7 @@ const ok = (label, cond, extra = "") => {
 		Object.values(man).every((f) => fs.existsSync(path.join(tdir, f))));
 	const tmap = (await fetch(`${BASE}/api/thumbnails`).then((r) => r.json())).thumbs;
 	ok("/api/thumbnails memuat crosscore",
-		Object.keys(tmap).filter((k) => k.startsWith("crosscore")).length >= 70,
+		Object.keys(tmap).filter((k) => k.startsWith("crosscore")).length >= 700,
 		String(Object.keys(tmap).filter((k) => k.startsWith("crosscore")).length));
 	const sample = Object.values(man)[0];
 	const tRes = await fetch(`${BASE}/thumbs/crosscore/${sample}`);

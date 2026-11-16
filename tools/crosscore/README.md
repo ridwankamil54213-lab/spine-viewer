@@ -12,6 +12,7 @@
 | `import-art.py` | 134 karakter / 421 outfit / 486 scene | `assets/crosscore/<slug>/`, `assets/crosscore-cg/`, `_names.json`, thumbnail, `_manifest.json` |
 | `import-extras.py` | efek + zona sentuh + suara | `assets/crosscore/<slug>_effF\|effB/`, `_extras.json`, `data/cc-interaction.json`, `public/audio/crosscore/clips/` |
 | `update.py` | pembungkus `--check` / `--apply` untuk server | state + JSON hasil untuk `/api/update/crosscore` |
+| `render-thumbs.cjs` + `normalize-thumbs.py` | screenshot 408 rig utama, crop ke subjek | `public/thumbs/crosscore-render/` (408 WebP + manifest 635 entri) |
 
 Keduanya **idempoten** (berkas yang sudah ada dilewati) dan boleh dijalankan
 mandiri:
@@ -21,6 +22,9 @@ python3 tools/crosscore/import-art.py --workers 8
 python3 tools/crosscore/import-extras.py --workers 8   # ~1 mnt, 236 MB audio
 python3 tools/crosscore/update.py --check
 node tools/check-crosscore-extras.cjs
+# thumbnail (butuh server hidup + Playwright + Pillow)
+node tools/crosscore/render-thumbs.cjs --workers 3
+node tools/check-crosscore-thumbs.cjs
 ```
 
 `import-extras.py` wajib dijalankan **setelah** `import-art.py` karena memakai
@@ -38,9 +42,10 @@ Zona sentuh (`official-zones.js` + `touch-zones.js`) ditulis ke
 `cciApplyEvent()` saat area disentuh; `model.audio.tracks` menghidupkan tombol
 audio bawaan `renderAudio()`.
 
-> File di bawah `public/audio/` dan `assets/` hasil unduhan, di-ignore Git.
-> Backupnya lewat auto-upload GDrive (`src/gdrive-upload.js`, root
-> `public/audio/crosscore`).
+> File di bawah `public/audio/`, `public/thumbs/crosscore-render/`, dan
+> `assets/` hasil unduhan/render, di-ignore Git. Backupnya lewat auto-upload
+> GDrive (`src/gdrive-upload.js`, root `public/audio/crosscore` dan
+> `thumbs/crosscore-render`).
 
 ---
 > Dokumen di bawah ini menjelaskan DUA pipeline LAMA: ArtHub / R2

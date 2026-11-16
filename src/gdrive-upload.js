@@ -78,7 +78,8 @@ const STATIC_ROOTS = {
 	"mitao-utopia": { assets: ["mitao-utopia"], thumbs: ["mitao-utopia"] },
 	crosscore: {
 		assets: ["crosscore", "crosscore-cg"],
-		thumbs: ["crosscore"],
+		// crosscore-render = potret hasil render-tools, bukan unduhan sumber.
+		thumbs: ["crosscore", "crosscore-render"],
 		// media = folder di bawah public/, tujuannya gdrive:<path> yang sama.
 		media: ["audio/crosscore"],
 	},

@@ -780,6 +780,36 @@ yang sama:
 tidak menimpanya saat apply berikutnya. Regresi:
 `node tools/check-crosscore-extras.cjs`.
 
+### Thumbnail
+
+Situsnya cuma menyediakan **79 ilustrasi statis**, jadi 635 rig awalnya tanpa
+gambar. `tools/crosscore/render-thumbs.cjs` membuka tiap rig lewat permalink
+`?v=<base64url {"m":id}>`, menycreenshot canvas WebGL (1200×800 — di bawah
+~1000px layout berubah jadi stack dan clip screenshot gagal), lalu
+`tools/crosscore/normalize-thumbs.py` memotong ke subjek memakai **persentil
+2%/98%** piksel terang (bukan min/max, supaya satu piksel UI di pojok tidak
+membuat crop melar) dan menyimpan WebP ≤256px.
+
+- **408 rig utama** dirender jadi potret ~200×256 (8–18 KB).
+- **227 rig efek** tidak dirender sendiri (isinya cuma lapisan partikel);
+  mereka memakai thumbnail rig induknya.
+- **78 model `crosscore-cg`** tetap memakai 79 ilustrasi WebP lama.
+
+Hasilnya **713/713 model** punya thumbnail. Outputnya sengaja di folder
+`public/thumbs/crosscore-render/` dengan `_manifest.json` sendiri supaya
+`import-art.py` tidak menimpanya saat apply; `thumbManifest()` menggabungkan
+semua folder `public/thumbs/*` sehingga tidak ada kunci yang bentrok. Tool-nya
+**idempoten** (WebP yang sudah ada dilewati), jadi jalankan ulang setelah impor
+scene baru:
+
+```sh
+node tools/crosscore/render-thumbs.cjs --workers 3   # butuh server hidup + Playwright
+node tools/check-crosscore-thumbs.cjs
+```
+
+`normalize-thumbs.py` butuh Pillow; tool mencari interpreter yang memilikinya
+(`THUMB_PYTHON`, venv proyek, `/usr/bin/python3`, lalu `python3`).
+
 ### Pembaru
 
 `tools/crosscore/update.py` sekarang memantau katalog crosscore.art, bukan lagi
@@ -1392,6 +1422,7 @@ node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
 node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
 node tools/check-crosscore-variants.cjs # 713 model -> 134 kartu karakter
 node tools/check-crosscore-extras.cjs   # efek, zona sentuh, dan suara crosscore.art
+node tools/check-crosscore-thumbs.cjs   # 713 model punya thumbnail, <img> ke-load
 ```
 
 Benchmark pustaka (keluaran JSON di baris terakhir, buat diff before/after):
