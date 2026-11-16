@@ -102,9 +102,11 @@ const pageLines = (atlasPath) => {
 	// --- varian aim / cover / skillcut -------------------------------------
 	const withFamily = nikke.filter((m) => (m.family || {}).members?.length);
 	const rootIds = new Set(withFamily.map((m) => m.family.root));
-	ok("391 family karakter", rootIds.size === 391, String(rootIds.size));
-	ok("1406 model jadi varian", withFamily.length === 1406, String(withFamily.length));
-	ok("1089 kartu root di pustaka", nikke.length - withFamily.length + rootIds.size === 1089,
+	// Katalog ArtHub bertambah (2104 -> 2110); yang dijaga adalah tidak ada
+	// yang hilang, bukan angka beku. Baseline lama dipertahankan sebagai lantai.
+	ok(">= 391 family karakter", rootIds.size >= 391, String(rootIds.size));
+	ok(">= 1406 model jadi varian", withFamily.length >= 1406, String(withFamily.length));
+	ok(">= 1089 kartu root di pustaka", nikke.length - withFamily.length + rootIds.size >= 1089,
 		String(nikke.length - withFamily.length + rootIds.size));
 	const root = nikke.find((m) => m.id === "nikke/c010_00");
 	const labels = (root?.family?.members || []).map((x) => x.label);

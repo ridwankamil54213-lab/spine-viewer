@@ -1303,7 +1303,27 @@ manufacturer, squad, burst). Jembatan ke aset kita adalah
 - Baris filter khusus (`#nk-filters`): **Rarity / Class / Element / Weapon /
   Manufacturer / Burst** + `Reset` + counter `N model · M karakter`. Filter
   kumulatif, mis. `2628 → 1160 (SSR) → 159 (SSR + Pilgrim) → 2628`.
-- Regresi: `node tools/check-nikke-prydwen.cjs`.
+`tools/check-nikke-prydwen.cjs`.
+
+**Reset penuh / anti-dobel.** `tools/nikke/replace.py` dipakai kalau
+`assets/nikke/` tercampur sisa pipeline lama (dulu 2.657 folder / 3.666 model,
+padahal katalog cuma 2.110: 553 folder asing `__catalog-...` dan 430 model
+`#`). Script ini **tidak pernah menghapus lebih dulu**: ia mengunduh ke
+staging `/srv/spine-assets/nikke-stage-<stamp>`, memvalidasi tiap folder
+(skel + atlas + semua halaman), baru memindahkan pohon lama ke
+`/srv/spine-assets/nikke-before-replace-<stamp>` dan swap. Entri `bursts/`
+diambil dari `nativeBurst`, dan retry cache-buster menangani objek R2 yang
+kadang kena cached 403. Setelah swap: rescan, regenerasi potret Prydwen, dan
+`update.py --apply` supaya state tetap bersih.
+
+```sh
+python3 tools/nikke/replace.py --dry-run            # unduh + validasi, tanpa swap
+python3 tools/nikke/replace.py --apply --workers 12 # eksekusi penuh
+node tools/check-nikke-clean.cjs                    # regresi anti-dobel
+```
+
+Hasil reset: **2.110 folder / 2.110 model / 0 duplikat `#`**, 0 folder asing,
+4 poster skillcut tidak tersedia di hulu (ditandai, bukan error).
 
 ### Updater berbasis NKAS
 

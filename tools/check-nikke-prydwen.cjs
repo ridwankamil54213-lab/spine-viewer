@@ -24,7 +24,9 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 		{ cache: "no-store" }).then((r) => r.json());
 	const models = idx.models || [];
 	const withMeta = models.filter((m) => m.nkRarity);
-	assert.ok(withMeta.length >= 1500, `metadata Prydwen: ${withMeta.length}`);
+	// Jumlah id menyusut setelah 553 folder duplikat dibersihkan; source of
+	// truth adalah data/nikke-prydwen.json, bukan angka lama hasil dobel.
+	assert.ok(withMeta.length >= 1200, `metadata Prydwen: ${withMeta.length}`);
 	const vals = (f) => [...new Set(withMeta.map((m) => m[f]).filter(Boolean))];
 	assert.deepStrictEqual(vals("nkRarity").sort(), ["R", "SR", "SSR"]);
 	assert.strictEqual(vals("nkClass").length, 3);
@@ -38,7 +40,7 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 	const thumbs = (await fetch(`${BASE}/api/thumbnails`).then((r) => r.json())).thumbs;
 	const overrides = Object.entries(thumbs).filter(([k, v]) =>
 		k.startsWith("nikke") && String(v).startsWith("nikke-prydwen/"));
-	assert.ok(overrides.length >= 1500, `override: ${overrides.length}`);
+	assert.ok(overrides.length >= 1200, `override: ${overrides.length}`);
 	ok(`${overrides.length} id model memakai potret Prydwen`);
 
 	const dir = path.join(ROOT, "public", "thumbs", "nikke-prydwen");
@@ -59,7 +61,7 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 	const data = JSON.parse(fs.readFileSync(
 		path.join(ROOT, "data", "nikke-prydwen.json"), "utf8"));
 	assert.ok(data.characters >= 220 && data.codes >= 190 &&
-		Object.keys(data.models).length >= 1500);
+		Object.keys(data.models).length >= 1200);
 	ok(`${data.characters} karakter Prydwen · ${data.matchedPrydwen} cocok · ${data.codes} kode cNNN`);
 
 	// --- Browser ---------------------------------------------------------

@@ -114,7 +114,23 @@ render 3 model dan 0 aset 404).
 
 ```sh
 python3 tools/nikke/import-prydwen.py
-node tools/check-nikke-prydwen.cjs
+- Regresi: `node tools/check-nikke-prydwen.cjs`.
+
+## Reset penuh saat pohon tercampur
+
+Kalau jumlah model jauh di atas katalog (debug: `find assets/nikke -mindepth 1
+-maxdepth 1 -type d | wc -l`), jangan hapus manual. Pakai:
+
+```sh
+python3 tools/nikke/replace.py --apply --workers 12
+node tools/check-nikke-clean.cjs
+```
+
+`replace.py` mengunduh ke staging, memvalidasi, lalu **memindahkan** pohon lama
+ke `/srv/spine-assets/nikke-before-replace-<stamp>` sebelum swap. Ia juga
+menangani entri `bursts/` lewat `nativeBurst` dan cached 403 R2 dengan
+cache-buster. `--stage /srv/spine-assets/nikke-stage-<stamp>` bisa dipakai
+untuk melanjutkan staging yang gagal di tengah.
 ```
 
 Mengambil 227 karakter dari `https://www.prydwen.gg/nikke/characters` (blob

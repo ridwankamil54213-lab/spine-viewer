@@ -70,12 +70,16 @@ def fetch(url: str, timeout: int = 120, retries: int = 3) -> bytes:
     curl = shutil.which("curl") or "/usr/bin/curl"
     last = None
     for attempt in range(retries):
+        # Beberapa objek R2 kena cached 403 walaupun file-nya ada. Cache-buster
+        # mengubah URL sehingga CDN mengambil ulang dari origin (terbukti 200).
+        fetch_url = url if attempt == 0 else (
+            url + ("&" if "?" in url else "?") + f"_cb={int(time.time() * 1000)}")
         fd, tmp = tempfile.mkstemp(prefix="nikkedl-", suffix=".bin")
         os.close(fd)
         try:
             p = subprocess.run(
                 [curl, "-sSL", "--max-time", str(timeout), "-A", UA,
-                 "-o", tmp, "-w", "%{http_code}", url],
+                 "-o", tmp, "-w", "%{http_code}", fetch_url],
                 capture_output=True, timeout=timeout + 20,
             )
             code = (p.stdout or b"").strip().decode("ascii", "replace")
@@ -123,6 +127,18 @@ def grab(ch: dict, workers_state: dict) -> tuple[str, str, str]:
     atlas_name = cut.get("atlas") or f"{folder}.atlas"
     base = f"{ASSET_ROOT}/nikki/spine_carved/{urllib.parse.quote(folder)}"
     dest = OUT / cid
+    # Entri `bursts/` tidak punya folder spine_carved; aslinya ada di objek
+    # hash yang dirujuk nativeBurst. Pakai itu kalau tersedia.
+    native = cut.get("nativeBurst") or ch.get("nativeBurst")
+    if native and (native.get("skeleton") or native.get("atlas")):
+        skel_url = ASSET_ROOT + "/" + str(native["skeleton"]).lstrip("/")
+        atlas_url = ASSET_ROOT + "/" + str(native["atlas"]).lstrip("/")
+        page_urls = {k: ASSET_ROOT + "/" + str(v).lstrip("/")
+                     for k, v in (native.get("pages") or {}).items()}
+    else:
+        skel_url = f"{base}/{urllib.parse.quote(skel_name)}"
+        atlas_url = f"{base}/{urllib.parse.quote(atlas_name)}"
+        page_urls = None
 
     # Idempoten: cukup cek keberadaan, jangan unduh ulang semua halaman.
     if (dest / f"{cid}.skel").is_file() and (dest / f"{cid}.atlas").is_file():
@@ -131,14 +147,15 @@ def grab(ch: dict, workers_state: dict) -> tuple[str, str, str]:
             return cid, "skip", ""
 
     try:
-        skel = fetch(f"{base}/{urllib.parse.quote(skel_name)}")
-        atlas = fetch(f"{base}/{urllib.parse.quote(atlas_name)}")
+        skel = fetch(skel_url)
+        atlas = fetch(atlas_url)
         pages = atlas_pages(atlas)
         if not pages:
             return cid, "fail", "atlas tanpa halaman gambar"
         blobs = {}
         for p in pages:
-            blobs[p] = fetch(f"{base}/{urllib.parse.quote(p)}")
+            u = page_urls.get(p) if page_urls else None
+            blobs[p] = fetch(u if u else f"{base}/{urllib.parse.quote(p)}")
         dest.mkdir(parents=True, exist_ok=True)
         (dest / f"{cid}.skel").write_bytes(skel)
         (dest / f"{cid}.atlas").write_bytes(atlas)
