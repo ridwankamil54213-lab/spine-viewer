@@ -152,17 +152,18 @@ dimasukkan ke family karakter: tidak ada kartu skillcut mandiri. Regresi
 ```
 
 Mengambil 227 karakter dari `https://www.prydwen.gg/nikke/characters` (blob
-JSON di HTML SSR, bukan API), mengunduh potret `*_card.webp` + ikon ke
-`public/thumbs/nikke-prydwen/`, dan menulis `data/nikke-prydwen.json`
+JSON di HTML SSR, bukan API) untuk **metadata filter**, dan menulis
+`data/nikke-prydwen.json`
 (`byCode` kode `cNNN` → atribut, `models` id model → kode). Pencocokan lewat
 `data/nikke-characters.json`: `slug`/`name` Prydwen → `url`/`name` katalog →
 `img` (`si_c010_00_s`) → `c010`. Idempoten; daftar id model diambil dari
 `/api/models?game=nikke&lean=1` dengan fallback ke `assets/nikke/_names.json`.
 
 Server menempelkan field `nkRarity`/`nkClass`/`nkElement`/`nkWeapon`/
-`nkManufacturer`/`nkBurst` (ikut ke indeks lean), dan `thumbManifest()`
-menerapkan manifest `nikke-prydwen` paling akhir. Filter bar `#nk-filters`
-dan kartu 262:358 ada di `src/viewer.js` / `public/styles.css`.
+`nkManufacturer`/`nkBurst` (ikut ke indeks lean). Potret & ikon filter kini
+diambil dari NKAS (`public/thumbs/nikke-nkas/`, lihat bagian berikut) dan
+manifestnya diterapkan paling akhir. Filter bar `#nk-filters` dan kartu
+256:496 ada di `src/viewer.js` / `public/styles.css`.
 
 ## Arsip
 

@@ -7444,7 +7444,7 @@ function resetLsFilters() {
  * dari https://www.prydwen.gg/nikke/characters. Diimpor oleh
  * tools/nikke/import-prydwen.py, ditempelkan server sebagai field nk*.
  */
-const NK_ICON_DIR = "/thumbs/nikke-prydwen/";
+const NK_ICON_DIR = "/thumbs/nikke-nkas/";
 const NK_ICON = {
 	rarity: () => null,
 	class: (v) => ({

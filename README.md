@@ -1291,19 +1291,33 @@ manufacturer, squad, burst). Jembatan ke aset kita adalah
 
 - **189/227** karakter cocok langsung lewat slug/nama; 10 kode katalog tanpa
   padanan tetap dapat metadata filter (dari katalog) tapi memakai thumbnail lama.
-- Hasil: **1.823 id model** ber-atribut, **1.688 override potret**, 227 kartu
-  + 21 ikon WebP di `public/thumbs/nikke-prydwen/`.
-- Seperti Lost Sword, manifest folder ini diterapkan **paling akhir** di
-  `thumbManifest()`, jadi tidak tertimpa `refresh.py`.
-- Kartu NIKKE jadi potret **262:358** dengan border rarity (SSR emas / SR ungu
+- Metadata Prydwen tetap dipakai untuk filter (**1.414 id model**), tetapi
+  potret & ikon sudah pindah ke NKAS: **1.601 override potret**, WebP
+  256×496 di `public/thumbs/nikke-nkas/`. Folder `nikke-prydwen` lama sudah
+  dihapus dari aplikasi dan GDrive.
+- Manifest NKAS diterapkan **paling akhir** di `thumbManifest()`, jadi tidak
+  tertimpa `refresh.py` maupun metadata Prydwen.
+- Kartu NIKKE jadi potret **256:496** dengan border rarity (SSR emas / SR ungu
   / R biru), label rarity, dan ikon elemen/kelas/senjata/burst.
 - Karena 1.390 dari 2.628 root adalah aset non-karakter (event scene, monster,
   background) yang secara alfabetis mendahului `cNNN`, **kartu karakter
-  diurutkan ke depan** supaya halaman pertama isinya potret Prydwen semua.
+  diurutkan ke depan** supaya halaman pertama isinya potret NKAS semua.
 - Baris filter khusus (`#nk-filters`): **Rarity / Class / Element / Weapon /
   Manufacturer / Burst** + `Reset` + counter `N model · M karakter`. Filter
   kumulatif, mis. `2628 → 1160 (SSR) → 159 (SSR + Pilgrim) → 2628`.
 `tools/check-nikke-prydwen.cjs`.
+
+Regresi `tools/check-czn.cjs` dan `tools/check-czn-cards.cjs` sekarang
+menarget `chaoszero` (bukan `czn-rigs`) dengan jumlah dinamis.
+
+**Bersih-bersih GDrive.** Root yang sudah tidak dipakai dihapus dari remote
+setelah diarsipkan ke `/srv/spine-assets/gdrive-archive/<root>-<stamp>/`:
+`thumbs/nikke-prydwen` (potret lama; ikon sudah pindah ke NKAS),
+`bd2-arthub` (pipeline ArtHub lama), `czn-cutins-cg` dan `czn-rigs` (pustaka
+komunitas yang dipensiunkan), `epic7-v3` (SCSP v3, sudah digabung ke
+`epic7/`), serta `lordmaiden` (0 model dan tanpa GAME_ROOTS/updater).
+Root aktif tetap memakai kriteria: ada di `GAME_ROOTS`, `STATIC_ROOTS`, atau
+punya model di `/api/models`.
 
 **Reset penuh / anti-dobel.** `tools/nikke/replace.py` dipakai kalau
 `assets/nikke/` tercampur sisa pipeline lama (dulu 2.657 folder / 3.666 model,
@@ -1514,7 +1528,8 @@ node tools/check-backdrop-fullscreen.cjs # backdrop on/off + regresi fullscreen 
 node tools/check-aurora-stars.cjs  # Aurora: bintang kedip + bintang jatuh (meteor)
 node tools/check-muvluv-thumbs.cjs # MuvLuv: 1107 thumbnail dari game CG
 node tools/check-nikke.cjs        # Nikke: model ArtHub, 0 duplikat, render
-node tools/check-nikke-prydwen.cjs # potret Prydwen + 6 filter NIKKE
+node tools/check-nikke-prydwen.cjs # metadata Prydwen + 6 filter NIKKE
+node tools/check-nikke-nkas.cjs    # potret NKAS + skillcut sebagai varian
 node tools/check-mitao.cjs        # Mitao: solver iOS v2, manifest, updater
 node tools/check-mitao-variants.cjs # Mitao: varian front_*, nama JP, thumbnail
 node tools/check-pokerfate.cjs    # Poker Fate: updater XENC, probe HTTP Range

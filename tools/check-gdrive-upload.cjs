@@ -64,9 +64,9 @@ ok("lostsword: aset + 2 thumbnail (L2D viewer & Prydwen) ikut ter-backup");
 
 const nkJobs = Object.fromEntries(buildJobs("nikke", since).map((j) => [j.label, j.dst]));
 assert.ok(nkJobs["assets/nikke"] && nkJobs["thumbs/nikke"] &&
-	nkJobs["thumbs/nikke-prydwen"] && nkJobs["thumbs/nikke-nkas"],
+	nkJobs["thumbs/nikke-nkas"] && !nkJobs["thumbs/nikke-prydwen"],
 	"root nikke belum lengkap: " + JSON.stringify(Object.keys(nkJobs)));
-ok("nikke: aset + 3 thumbnail (ArtHub, Prydwen, NKAS) ikut ter-backup");
+ok("nikke: aset + 2 thumbnail aktif (ArtHub & NKAS) ikut ter-backup");
 
 // 3. Deteksi dinamis mengembalikan bentuk yang diharapkan.
 const dyn = changedRoots(since);

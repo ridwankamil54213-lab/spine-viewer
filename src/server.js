@@ -3563,7 +3563,7 @@ function thumbManifest() {
 	// Folder overlay diproses TERAKHIR supaya nilainya menang atas manifest
 	// reguler dengan kunci id model yang sama (tidak bergantung urutan
 	// fs.readdirSync). Dipakai potret karakter Prydwen untuk Lost Sword.
-	const overlays = ["lostsword-prydwen", "nikke-prydwen", "nikke-nkas"];
+	const overlays = ["lostsword-prydwen", "nikke-nkas"];
 	try {
 		for (const game of fs.readdirSync(THUMBS)) {
 			if (overlays.includes(game)) continue;

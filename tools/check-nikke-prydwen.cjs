@@ -46,8 +46,10 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 	assert.ok(overrides.length >= 1200, `override: ${overrides.length}`);
 	ok(`${overrides.length} id model memakai potret Prydwen`);
 
-	const dir = path.join(ROOT, "public", "thumbs", "nikke-prydwen");
-	const cards = fs.readdirSync(dir).filter((f) => f.endsWith("_card.webp"));
+	// Folder Prydwen lama sudah dihapus; metadata tetap dari Prydwen, tetapi
+	// potret & ikon sekarang tinggal di folder NKAS.
+	const dir = path.join(ROOT, "public", "thumbs", "nikke-nkas");
+	const cards = fs.readdirSync(dir).filter((f) => /^c\d{3,4}_\d{2}\.webp$/.test(f));
 	const icons = fs.readdirSync(dir).filter((f) =>
 		/^(element|class|weapon|type)_/.test(f));
 	assert.ok(cards.length >= 220 && icons.length >= 20,
@@ -59,7 +61,7 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 			h.subarray(8, 12).toString() !== "WEBP") broken++;
 	}
 	assert.strictEqual(broken, 0, `non-WebP: ${broken}`);
-	ok(`${cards.length} potret + ${icons.length} ikon WebP valid`);
+	ok(`${cards.length} potret NKAS + ${icons.length} ikon WebP valid`);
 
 	const data = JSON.parse(fs.readFileSync(
 		path.join(ROOT, "data", "nikke-prydwen.json"), "utf8"));
