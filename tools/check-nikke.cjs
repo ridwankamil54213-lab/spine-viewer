@@ -183,6 +183,12 @@ const pageLines = (atlasPath) => {
 	await page.waitForSelector("#model-list li > button:not(.model-fav), #model-list .gcard",
 		{ state: "visible" });
 
+	// Potret NKAS dimuat lazy; tunggu benar-benar decoded sebelum dicek.
+	await page.waitForFunction(() => {
+		const img = document.querySelector(
+			"#model-list li > button:not(.model-fav) img, #model-list .gcard img");
+		return !!img && img.complete && img.naturalWidth > 0;
+	}, null, { timeout: 30000 }).catch(() => {});
 	const cardThumb = await page.evaluate(() => {
 		const img = document.querySelector(
 			"#model-list li > button:not(.model-fav) img, #model-list .gcard img");
