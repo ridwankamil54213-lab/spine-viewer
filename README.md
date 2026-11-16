@@ -241,6 +241,25 @@ diklik** untuk langsung membuka modelnya.
   restore berisi puluhan ribu model tetap ringan. Maksimal 60 entri per game.
 - Entri apply juga mencatat apakah upload GDrive berhasil (`gdrive`).
 
+**Kenapa model di riwayat kadang "tidak ada di list"?** Entri riwayat dibaca
+langsung dari server, tapi daftar pustaka memakai snapshot `/api/models` yang
+dimuat sekali saat tab dibuka. Kalau apply dijalankan dari tab/perangkat lain
+(atau lewat dashboard "Terapkan yang berubah"), tab ini tidak ikut `refresh()` —
+modelnya ada di server dan di disk, tapi tidak ada di `models`, sehingga chip
+riwayat tampil `sudah tidak ada` dan pencarian tidak menemukannya.
+
+Saat panel riwayat dibuka, `ensureFreshModels()` melakukan `HEAD
+/api/models?lean=1` (cuma header, bukan body 12 MB), membandingkan ETag dengan
+indeks lokal, dan memanggil `refresh()` kalau berbeda. Jadi sumber data riwayat
+dan pustaka selalu sama. Selain itu, klik chip kini menjalankan
+`revealModelInLibrary()`: pindah ke game model, bersihkan filter pencarian/
+favorit, lompat ke halaman yang memuat kartunya, dan sorot kartu itu.
+Perhitungan halaman diulang **setelah** `loadModel()` karena `markSeen()`
+membuang badge NEW dan model turun dari urutan "baru dulu" ke posisi
+alfabetisnya (bisa beda halaman). Regresi:
+`node tools/check-change-log-stale.cjs` (mensuntik indeks basi lewat route
+Playwright, tidak bergantung isi `data/change-logs.json`).
+
 Path bisa di-override lewat `CHANGE_LOG_FILE` / `NEW_MODELS_FILE` (dipakai
 regresi `tools/check-change-log.cjs` supaya data produksi aman).
 
@@ -1419,7 +1438,8 @@ node tools/check-model3d.cjs    # 3D glTF: 59 model, render, clip, balik ke 2D
 node tools/check-variant-picker.cjs # picker bersama: 4 game, thumbnail, switch
 node tools/check-update-log.cjs     # log pembaruan tidak hilang sebelum selesai
 node tools/check-gdrive-upload.cjs   # peta root backup GDrive, tanpa jaringan
-node tools/check-change-log.cjs       # riwayat per game: tanggal + model baru
+node tools/check-change-log.cjs        # riwayat per game: tanggal + model baru
+node tools/check-change-log-stale.cjs  # riwayat vs indeks pustaka basi
 node tools/check-crosscore-variants.cjs # 713 model -> 134 kartu karakter
 node tools/check-crosscore-extras.cjs   # efek, zona sentuh, dan suara crosscore.art
 node tools/check-crosscore-thumbs.cjs   # 713 model punya thumbnail, <img> ke-load

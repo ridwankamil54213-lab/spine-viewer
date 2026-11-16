@@ -6925,6 +6925,9 @@ window.addEventListener("resize", () => {
  * Model list
  * ------------------------------------------------------------------ */
 let models = [];
+// ETag /api/models terakhir yang dipakai `models`. Dipakai untuk mendeteksi
+// tab yang indeksnya basi setelah apply dijalankan dari tab/perangkat lain.
+let modelsEtag = null;
 /** model id -> thumbnail path relative to /thumbs (e.g. "nikke/xxx.png") */
 let thumbs = {};
 /** game key -> icon URL under /thumbs/_game/ */
@@ -7748,6 +7751,56 @@ function clModelName(id) {
 	return m ? (m.name || id) : String(id).split("/").pop();
 }
 
+/**
+ * Indeks pustaka bisa basi kalau apply dijalankan dari tab/perangkat lain:
+ * /api/change-logs selalu dibaca langsung dari server, sedangkan `models`
+ * masih snapshot lama. Akibatnya chip riwayat tampil "sudah tidak ada" dan
+ * modelnya memang tidak ada di daftar. HEAD + ETag cukup murah (tanpa body
+ * 12 MB) untuk tahu kapan refresh() perlu dipanggil.
+ */
+async function ensureFreshModels() {
+	try {
+		const r = await fetch("/api/models?lean=1",
+			{ method: "HEAD", cache: "no-store" });
+		const etag = r.headers.get("etag");
+		if (!etag || (modelsEtag && etag === modelsEtag)) return;
+		await refresh();
+	} catch {
+		/* offline — pakai indeks yang ada */
+	}
+}
+
+/**
+ * Bawa pustaka ke kartu model ini: pindah game, hapus filter pencarian/
+ * favorit, lompat ke halaman yang memuatnya, lalu sorot kartunya.
+ * `loadModel()` hanya mengisi stage — tanpa ini model yang diklik dari
+ * riwayat tetap "tidak ada di list".
+ */
+function revealModelInLibrary(id) {
+	const m = models.find((x) => x.id === id);
+	if (!m) return;
+	browse.view = "models";
+	browse.game = m.game || "lainnya";
+	browse.favOnly = false;
+	el.favFilter?.classList.remove("is-on");
+	if (el.search) el.search.value = "";
+	// Model ber-badge NEW diapungkan ke atas; begitu dibuka badge hilang dan
+	// urutannya berubah, jadi posisi SELALU dihitung ulang dari keadaan kini.
+	let target = id;
+	const list = modelsInScope();
+	let i = list.findIndex((x) => x.id === target);
+	if (i < 0 && m.family?.root) {
+		target = m.family.root;
+		i = list.findIndex((x) => x.id === target);
+	}
+	const perPage = browse.layout === "grid" ? PAGE_SIZE_GRID : PAGE_SIZE;
+	browse.page = i < 0 ? 1 : Math.floor(i / perPage) + 1;
+	renderLibrary();
+	setActive(target);
+	const card = el.list?.querySelector(`[data-id="${CSS.escape(target)}"]`);
+	card?.scrollIntoView?.({ block: "nearest" });
+}
+
 function clRenderModels(box, ids, total) {
 	if (!ids.length) return;
 	const wrap = clText("div", "cl-models");
@@ -7763,7 +7816,11 @@ function clRenderModels(box, ids, total) {
 		} else {
 			chip.addEventListener("click", () => {
 				closeChangeLog();
-				loadModel(m);
+				// Segera arahkan pustaka, lalu ulangi setelah loadModel():
+				// markSeen() membuang badge NEW dan mengurut ulang daftar,
+				// sehingga halaman yang benar bisa berubah.
+				revealModelInLibrary(id);
+				loadModel(m).finally(() => revealModelInLibrary(id));
 			});
 		}
 		wrap.appendChild(chip);
@@ -7813,6 +7870,8 @@ async function openChangeLog(gameOverride) {
 	if (!el.changeLogModal) return;
 	if (typeof gameOverride === "string") changeLogGame = gameOverride;
 	el.changeLogModal.hidden = false;
+	// Riwayat diambil dari server, jadi samakan dulu indeks pustakanya.
+	await ensureFreshModels();
 	el.changeLogGame.textContent = changeLogGame
 		? (gameBuckets().find((g) => g.key === changeLogGame)?.label || changeLogGame)
 		: "Semua game";
@@ -8418,6 +8477,8 @@ async function refresh() {
 		// Index ringan: field yang cuma dipakai saat model dibuka diambil
 		// terpisah lewat ensureModelDetail(). Lihat src/models-payload.js.
 		const res = await fetch("/api/models?lean=1");
+		const etag = res.headers.get("etag");
+		if (etag) modelsEtag = etag;
 		// /api/models memakai ETag + Cache-Control: no-cache. Kalau tidak ada
 		// perubahan, server menjawab 304 tanpa body; res.json() saat itu
 		// melempar "Unexpected end of JSON input" dan seluruh refresh gagal
