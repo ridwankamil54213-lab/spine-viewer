@@ -1310,6 +1310,14 @@ manufacturer, squad, burst). Jembatan ke aset kita adalah
 Regresi `tools/check-czn.cjs` dan `tools/check-czn-cards.cjs` sekarang
 menarget `chaoszero` (bukan `czn-rigs`) dengan jumlah dinamis.
 
+**Replace penuh Epic Seven.** `tools/replace-epic7.py` membersihkan campuran
+folder lama (`assets/epic7/` dulu 2.018 folder, padahal katalog e7codex.com
+cuma 856 unit, termasuk 104 folder `epic7-v3` yang sudah pensiun). Alurnya
+sama dengan NIKKE: staging → validasi → arsip → swap → rescan → updater.
+Root yang tersisa persis **856 lobby / 467 combat / 427 skill / 24 wallpaper**
+dengan 528 thumbnail dari e7codex. Regresi `check-epic7.cjs` kini dinamis dan
+menolak keberadaan `epic7-v3`.
+
 **Bersih-bersih GDrive.** Root yang sudah tidak dipakai dihapus dari remote
 setelah diarsipkan ke `/srv/spine-assets/gdrive-archive/<root>-<stamp>/`:
 `thumbs/nikke-prydwen` (potret lama; ikon sudah pindah ke NKAS),

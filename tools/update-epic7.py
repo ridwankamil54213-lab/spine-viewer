@@ -55,12 +55,12 @@ LOBBY_ANIMS_URL = f"{BASE}/data/lobby_anims.json"
 THUMB_WIDTH = 300
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-A_LOBBY = os.path.join(ROOT, "assets", "epic7")
-A_COMBAT = os.path.join(ROOT, "assets", "epic7-combat")
-A_SKILL = os.path.join(ROOT, "assets", "epic7-skill")
-A_WALL = os.path.join(ROOT, "assets", "epic7-wallpaper")
-THUMBS = os.path.join(ROOT, "public", "thumbs", "epic7")
-STATE = os.path.join(ROOT, "data", "epic7-update-state.json")
+A_LOBBY = os.environ.get("E7_LOBBY", os.path.join(ROOT, "assets", "epic7"))
+A_COMBAT = os.environ.get("E7_COMBAT", os.path.join(ROOT, "assets", "epic7-combat"))
+A_SKILL = os.environ.get("E7_SKILL", os.path.join(ROOT, "assets", "epic7-skill"))
+A_WALL = os.environ.get("E7_WALL", os.path.join(ROOT, "assets", "epic7-wallpaper"))
+THUMBS = os.environ.get("E7_THUMBS", os.path.join(ROOT, "public", "thumbs", "epic7"))
+STATE = os.environ.get("E7_STATE", os.path.join(ROOT, "data", "epic7-update-state.json"))
 
 HEADERS = {
     "User-Agent": (

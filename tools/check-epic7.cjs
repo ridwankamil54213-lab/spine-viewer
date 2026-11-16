@@ -31,12 +31,20 @@ const ok = (label, cond, extra = "") => {
 	const skill = byGame("epic7-skill");
 	const wall = byGame("epic7-wallpaper");
 	const names = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/epic7/_names.json"), "utf8"));
+	ok("tidak ada root legacy epic7-v3",
+		!fs.existsSync(path.join(ROOT, "assets", "epic7-v3")) &&
+		!all.some((m) => String(m.id).startsWith("epic7-v3/")));
+	ok("folder lobby = katalog nama",
+		fs.readdirSync(path.join(ROOT, "assets", "epic7"), { withFileTypes: true })
+			.filter((d) => d.isDirectory()).length === Object.keys(names).length);
 
-	ok("855 rig lobby terpasang", lobby.length === Object.keys(names).length,
+	// Katalog e7codex bisa bertambah; yang dijaga adalah keselarasan API dan
+	// _names.json, bukan angka beku 855.
+	ok("rig lobby terpasang sesuai katalog", lobby.length === Object.keys(names).length,
 		`${lobby.length} vs ${Object.keys(names).length}`);
 	ok("rig combat terpasang", combat.length > 400, String(combat.length));
 	ok("animasi skill terpasang", skill.length > 400, String(skill.length));
-	ok("24 wallpaper terpasang", wall.length === 24, String(wall.length));
+	ok("wallpaper terpasang", wall.length >= 24, String(wall.length));
 
 	ok("semua model punya nama katalog", lobby.every((m) => m.name && m.character?.name));
 	ok("metadata rarity/elemen/kelas dari e7codex",
@@ -45,7 +53,7 @@ const ok = (label, cond, extra = "") => {
 		lobby.some((m) => ["Knight", "Ranger", "Mage", "Assassin", "Warrior", "Manauser"]
 			.includes(m.character?.class)));
 	ok("sumber metadata tercatat e7codex.com",
-		lobby.every((m) => m.character?.source === "e7codex.com"));
+		lobby.filter((m) => m.character).every((m) => m.character.source === "e7codex.com"));
 
 	const withCombat = lobby.filter((m) => m.family?.members?.some((x) => x.id.startsWith("epic7-combat/")));
 	ok("combat jadi varian, bukan entri terpisah", withCombat.length > 400,

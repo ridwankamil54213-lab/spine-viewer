@@ -78,14 +78,21 @@ const PAGE_EXT = /\.(png|webp|jpe?g)$/i;
 
 	const chk = await fetch(`${BASE}/api/update/nikke?mode=check`,
 		{ cache: "no-store" }).then((r) => r.json());
-	assert.strictEqual(chk.changed, false, JSON.stringify(chk.alasan));
+	// Katalog ArtHub/NKAS bisa sah bertambah. Yang dilarang adalah folder
+	// asing/# di disk — sudah dicek di atas — bukan updater yang melaporkan
+	// model baru dari hulu.
+	assert.strictEqual(chk.ok, true, JSON.stringify(chk.alasan));
+	if (chk.changed) {
+		assert.ok((chk.alasan || []).some((a) => /katalog ArtHub nikki berubah/.test(a)) &&
+			(chk.new || 0) > 0, JSON.stringify(chk.alasan));
+	}
 	assert.strictEqual(chk.disk.folders, canonical.size);
 	assert.strictEqual(chk.disk.thumbManifest,
 		canonical.size - tanpaPoster.length,
 		`thumbManifest ${chk.disk.thumbManifest} vs ${canonical.size}`);
 	assert.ok(chk.disk.thumbs >= canonical.size - tanpaPoster.length,
 		`thumb ${chk.disk.thumbs} vs ${canonical.size}`);
-	ok(`updater bersih (expected ${chk.expected}, disk ${chk.disk.folders})`);
+	ok(`updater ${chk.changed ? "ada katalog baru" : "bersih"} (expected ${chk.expected}, disk ${chk.disk.folders})`);
 
 	console.log("\nPohon NIKKE bersih — 0 duplikat");
 })().catch((e) => { console.error("FAIL " + e.message); process.exit(1); });
