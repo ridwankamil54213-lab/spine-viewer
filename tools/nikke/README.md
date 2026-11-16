@@ -131,6 +131,24 @@ ke `/srv/spine-assets/nikke-before-replace-<stamp>` sebelum swap. Ia juga
 menangani entri `bursts/` lewat `nativeBurst` dan cached 403 R2 dengan
 cache-buster. `--stage /srv/spine-assets/nikke-stage-<stamp>` bisa dipakai
 untuk melanjutkan staging yang gagal di tengah.
+
+## Potret NKAS
+
+```sh
+python3 tools/nikke/import-nkas-thumbs.py
+node tools/check-nikke-nkas.cjs
+```
+
+Daftar kode dari `https://nkas-l2d.pages.dev/characters.json` (571 entri,
+termasuk NPC `c9000_*`), potret dari `https://nkas.pages.dev/characters/
+mi_<kode>_s.png`. Server NKAS menolak request tanpa UA browser; importer
+memakai `Mozilla/5.0` + retry cache-buster untuk 403 sesekali. Potret
+disimpan sebagai WebP 256×496 dan dipasang sebagai overlay manifest paling
+akhir, jadi menimpa Prydwen tanpa mengubah metadata filter.
+
+Semua varian `skillcut` kini dinormalisasi di `nikkiVariantOf()` dan
+dimasukkan ke family karakter: tidak ada kartu skillcut mandiri. Regresi
+`check-nikke-nkas.cjs` memastikan 0 skillcut tampil di grid.
 ```
 
 Mengambil 227 karakter dari `https://www.prydwen.gg/nikke/characters` (blob

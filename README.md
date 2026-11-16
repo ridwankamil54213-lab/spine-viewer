@@ -1325,6 +1325,17 @@ node tools/check-nikke-clean.cjs                    # regresi anti-dobel
 Hasil reset: **2.110 folder / 2.110 model / 0 duplikat `#`**, 0 folder asing,
 4 poster skillcut tidak tersedia di hulu (ditandai, bukan error).
 
+**Potret NKAS & skillcut sebagai varian.** `tools/nikke/import-nkas-thumbs.py`
+mengambil 571 entri dari `https://nkas-l2d.pages.dev/characters.json` lalu
+mengunduh `https://nkas.pages.dev/characters/mi_<kode>_s.png` (butuh UA
+browser). Hasilnya WebP 256×496 di `public/thumbs/nikke-nkas/` dan manifest
+overlay yang diproses paling akhir, jadi potret NKAS menimpa Prydwen/ArtHub.
+Filter & metadata Prydwen tetap dipakai. Semua `*_skillcut` — termasuk typo
+`slillcut`, suffix `--core-N`, dan `cNNN_skillcut_00` — dinormalisasi
+`nikkiVariantOf()` menjadi anggota family; `c019_*_skillcut` (Marian: Queen,
+tanpa rig utama) digabung ke `c013_00`. Tidak ada kartu skillcut berdiri
+sendiri. Regresi: `node tools/check-nikke-nkas.cjs`.
+
 ### Updater berbasis NKAS
 
 `tools/nikke/update.py` memantau **NKAS sebagai sumber kanonik**; ArtHub cuma

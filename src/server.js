@@ -3563,7 +3563,7 @@ function thumbManifest() {
 	// Folder overlay diproses TERAKHIR supaya nilainya menang atas manifest
 	// reguler dengan kunci id model yang sama (tidak bergantung urutan
 	// fs.readdirSync). Dipakai potret karakter Prydwen untuk Lost Sword.
-	const overlays = ["lostsword-prydwen", "nikke-prydwen"];
+	const overlays = ["lostsword-prydwen", "nikke-prydwen", "nikke-nkas"];
 	try {
 		for (const game of fs.readdirSync(THUMBS)) {
 			if (overlays.includes(game)) continue;
@@ -3854,9 +3854,12 @@ function applyNikkiNames(models) {
  * sendiri, padahal mereka satu karakter. Hanya grup yang root-nya benar-benar
  * ada yang dibuat family; sisanya tetap berdiri sendiri.
  */
-function nikkiVariantOf(slug) {
+function nikkiVariantOf(slug, byId) {
 	const cat = slug.startsWith("catalog-");
-	const s = cat ? slug.slice("catalog-".length) : slug;
+	// Beberapa entri katalog punya typo `slillcut` atau suffix `acji--core-N`;
+	// normalkan dulu supaya semua skillcut jadi anggota varian, bukan kartu.
+	let s = cat ? slug.slice("catalog-".length) : slug;
+	s = s.replace(/--core-\d+$/i, "").replace(/slillcut/gi, "skillcut");
 	let m;
 	if ((m = /^(c\d{3})_(\d{2})$/.exec(s)))
 		return { root: s, order: 0, base: "Utama", cat };
@@ -3864,23 +3867,53 @@ function nikkiVariantOf(slug) {
 		return { root: `${m[1]}_${m[2]}`, order: 1, base: `Aim ${m[2]}`, cat };
 	if ((m = /^(c\d{3})_cover_(\d{2})$/.exec(s)))
 		return { root: `${m[1]}_${m[2]}`, order: 2, base: `Cover ${m[2]}`, cat };
-	if ((m = /^(c\d{3})_(\d{2})_skillcut$/.exec(s)))
-		return { root: `${m[1]}_${m[2]}`, order: 3, base: "Skill Cut", cat };
+	let root = null;
+	let base = "Skill Cut";
+	if ((m = /^(c\d{3})_(\d{2})_skillcut(?:_\d+)?$/i.exec(s))) {
+		root = `${m[1]}_${m[2]}`;
+	} else if ((m = /^(c\d{3})_skillcut_(\d{2})$/i.exec(s))) {
+		root = `${m[1]}_${m[2]}`;
+		base = `Skill Cut ${m[2]}`;
+	} else if ((m = /^(c\d{3})_skillcut$/i.exec(s))) {
+		root = `${m[1]}_00`;
+	} else if ((m = /^(c\d{3})_(\d{2})_skillcut_(\d{2})$/i.exec(s))) {
+		root = `${m[1]}_${m[2]}`;
+	}
+	if (!root) return null;
+	// `c019_*_skillcut` punya nama Marian: Queen, tapi rig utamanya tidak
+	// diunduh ArtHub. Gabungkan ke Marian (c013_00) supaya tidak jadi kartu
+	// skillcut berdiri sendiri.
+	const alias = { c019: "c013_00" };
+	const code = root.slice(0, 4);
+	const candidates = [root, alias[code], `${code}_00`].filter(Boolean);
+	for (const cand of candidates) {
+		if (byId && byId.has(`nikke/${cand}`)) {
+			// Label khusus hanya untuk Marian: Queen yang memang tidak punya rig
+			// utama; skillcut lain memakai label generik.
+			if (code === "c019" && cand !== root) {
+				const num = /_(\d{2})_skillcut/.exec(s)?.[1];
+				if (num === "01") base = "Last Affection · Skill Cut";
+				else if (num === "00") base = "Queen · Skill Cut";
+			}
+			return { root: cand, order: 3, base, cat };
+		}
+	}
 	return null;
 }
 
 function attachNikkiFamilies(models) {
 	const groups = new Map();
+	const byId = new Map(models.map((m) => [m.id, m]));
+	// Hitung grup dengan tahu id mana yang benar-benar ada; dipakai untuk
+	// mengalihkan skillcut tanpa rig utama (c019) ke family yang tersedia.
 	for (const m of models) {
 		if ((m.game || "") !== "nikke" || m.family) continue;
-		const slug = String(m.id).slice("nikke/".length);
-		const v = nikkiVariantOf(slug);
+		const v = nikkiVariantOf(String(m.id).slice("nikke/".length), byId);
 		if (!v) continue;
 		const g = groups.get(v.root) || [];
 		g.push({ id: m.id, order: v.order, base: v.base, cat: v.cat });
 		groups.set(v.root, g);
 	}
-	const byId = new Map(models.map((m) => [m.id, m]));
 	for (const [rootSlug, raw] of groups) {
 		const rootId = `nikke/${rootSlug}`;
 		if (!byId.has(rootId) || raw.length < 2) continue;

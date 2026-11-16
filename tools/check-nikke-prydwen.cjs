@@ -38,8 +38,11 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 		`3 rarity · 3 class · 5 elemen · 6 senjata · 5 manufacturer · 3 burst`);
 
 	const thumbs = (await fetch(`${BASE}/api/thumbnails`).then((r) => r.json())).thumbs;
+	// NKAS dipasang sebagai overlay paling akhir, jadi boleh menimpa path
+	// Prydwen di /api/thumbnails; metadata filter tetap dari Prydwen.
 	const overrides = Object.entries(thumbs).filter(([k, v]) =>
-		k.startsWith("nikke") && String(v).startsWith("nikke-prydwen/"));
+		k.startsWith("nikke") &&
+		/^nikke-(prydwen|nkas)\//.test(String(v)));
 	assert.ok(overrides.length >= 1200, `override: ${overrides.length}`);
 	ok(`${overrides.length} id model memakai potret Prydwen`);
 
@@ -103,8 +106,8 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 		const g = [...document.querySelectorAll("#model-list .gcard")];
 		return {
 			n: g.length,
-			portraits: g.filter((x) => x.querySelector("img.gcard-img")?.getAttribute("src")
-				?.startsWith("/thumbs/nikke-prydwen/")).length,
+			portraits: g.filter((x) => /^\/thumbs\/nikke-(prydwen|nkas)\//
+				.test(x.querySelector("img.gcard-img")?.getAttribute("src") || "")).length,
 			badges: g.filter((x) => x.querySelector(".ls-card-badges")).length,
 			ssr: g.filter((x) => x.dataset.nkRarity === "SSR").length,
 		};

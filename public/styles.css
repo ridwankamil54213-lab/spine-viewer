@@ -3221,10 +3221,10 @@ input:focus-visible {
 .ls-badge-icon { width: 15px; height: 15px; }
 
 /* --- NIKKE: kartu & filter ala Prydwen -----------------------------------
- * Potret karakter 262x358, rarity SSR/SR/R, ikon elemen/kelas/senjata/burst.
- * Berbagi kelas .ls-* dengan filter Lost Sword (gaya visualnya sama).
+ * Potret karakter NKAS 256x496, rarity SSR/SR/R, ikon elemen/kelas/senjata/
+ * burst. Berbagi kelas .ls-* dengan filter Lost Sword (gaya visualnya sama).
  */
-.gcard.is-nk .gcard-art { aspect-ratio: 262 / 358; }
+.gcard.is-nk .gcard-art { aspect-ratio: 256 / 496; }
 .gcard.is-nk .gcard-img { object-fit: cover; }
 .gcard[data-nk-rarity="SSR"] .gcard-art {
 	border: 1px solid rgba(232, 182, 76, .9);

@@ -106,7 +106,9 @@ const pageLines = (atlasPath) => {
 	// yang hilang, bukan angka beku. Baseline lama dipertahankan sebagai lantai.
 	ok(">= 391 family karakter", rootIds.size >= 391, String(rootIds.size));
 	ok(">= 1406 model jadi varian", withFamily.length >= 1406, String(withFamily.length));
-	ok(">= 1089 kartu root di pustaka", nikke.length - withFamily.length + rootIds.size >= 1089,
+	// Semua skillcut kini jadi varian, jadi jumlah kartu root turun dari 1089.
+	// Lantai diturunkan; yang dijaga adalah tidak ada kartu yang hilang massal.
+	ok(">= 1000 kartu root di pustaka", nikke.length - withFamily.length + rootIds.size >= 1000,
 		String(nikke.length - withFamily.length + rootIds.size));
 	const root = nikke.find((m) => m.id === "nikke/c010_00");
 	const labels = (root?.family?.members || []).map((x) => x.label);
@@ -191,7 +193,7 @@ const pageLines = (atlasPath) => {
 	// thumbnail ArtHub lama untuk aset non-karakter; dua-duanya valid.
 	ok("thumbnail ter-render di kartu Nikke",
 		cardThumb && cardThumb.complete && cardThumb.w > 0 &&
-		/\/thumbs\/nikke(?:-prydwen)?\//.test(cardThumb.src), JSON.stringify(cardThumb));
+		/\/thumbs\/nikke(?:-prydwen|-nkas)?\//.test(cardThumb.src), JSON.stringify(cardThumb));
 
 	for (const wanted of ["nikke/c010_00", "nikke/Glass_Front", "nikke/Chapter4_Glass_Back2"]) {
 		await page.fill("#search", wanted);

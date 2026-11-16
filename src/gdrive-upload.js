@@ -87,7 +87,7 @@ const STATIC_ROOTS = {
 	bd2: { assets: ["bd2", "bd2-char"], thumbs: ["bd2"] },
 	azurlane: { assets: ["azurlane"] },
 	"azurlane-l2d": { assets: ["azurlane-l2d"] },
-	nikke: { assets: ["nikke"], thumbs: ["nikke", "nikke-prydwen"] },
+	nikke: { assets: ["nikke"], thumbs: ["nikke", "nikke-prydwen", "nikke-nkas"] },
 	alliancesages: { assets: ["alliancesages", "alliancesages-cg"] },
 	mcs18: { assets: ["mcs18"] },
 	ivntight: { assets: ["ivntight"] },
