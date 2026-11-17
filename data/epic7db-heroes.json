@@ -1,0 +1,6066 @@
+{
+ "byModel": {
+  "c1001": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "dual-attack",
+    "increase-defense",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Ras",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c1002": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "dispel",
+    "decrease-attack",
+    "barrier",
+    "debuff-immunity",
+    "provoke"
+   ],
+   "element": "Fire",
+   "name": "Cecilia",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1002_s01": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "dispel",
+    "decrease-attack",
+    "barrier",
+    "debuff-immunity",
+    "provoke"
+   ],
+   "element": "Fire",
+   "name": "Cecilia",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1003": {
+   "class": "Knight",
+   "effects": [
+    "increase-defense",
+    "provoke",
+    "barrier",
+    "cleanse",
+    "increase-attack",
+    "increase-defense",
+    "increase-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Rose",
+   "stars": 4,
+   "zodiac": "Libra"
+  },
+  "c1003_s01": {
+   "class": "Knight",
+   "effects": [
+    "increase-defense",
+    "provoke",
+    "barrier",
+    "cleanse",
+    "increase-attack",
+    "increase-defense",
+    "increase-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Rose",
+   "stars": 4,
+   "zodiac": "Libra"
+  },
+  "c1004": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "increase-combat-readiness",
+    "cleanse",
+    "increase-speed-greater",
+    "decrease-speed"
+   ],
+   "element": "Earth",
+   "name": "Silk",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c1005": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "dispel",
+    "increase-attack"
+   ],
+   "element": "Fire",
+   "name": "Mercedes",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c1005_s01": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "dispel",
+    "increase-attack"
+   ],
+   "element": "Fire",
+   "name": "Mercedes",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c1006": {
+   "class": "Thief",
+   "effects": [
+    "penetrate",
+    "increase-combat-readiness",
+    "barrier",
+    "stealth",
+    "increase-skill-cooldown"
+   ],
+   "element": "Ice",
+   "name": "Kise",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1007": {
+   "class": "Thief",
+   "effects": [
+    "increase-attack",
+    "increase-combat-readiness"
+   ],
+   "element": "Earth",
+   "name": "Vildred",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1007_s01": {
+   "class": "Thief",
+   "effects": [
+    "increase-attack",
+    "increase-combat-readiness"
+   ],
+   "element": "Earth",
+   "name": "Vildred",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1008": {
+   "class": "Knight",
+   "effects": [
+    "stun",
+    "increase-defense",
+    "barrier",
+    "cleanse"
+   ],
+   "element": "Earth",
+   "name": "Armin",
+   "stars": 4,
+   "zodiac": "Capricorn"
+  },
+  "c1009": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-attack",
+    "increase-attack",
+    "increase-defense",
+    "unhealable"
+   ],
+   "element": "Fire",
+   "name": "Charlotte",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1010": {
+   "class": "Mage",
+   "effects": [
+    "decrease-speed",
+    "increase-combat-readiness",
+    "stun"
+   ],
+   "element": "Ice",
+   "name": "Zerato",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c1011": {
+   "class": "Thief",
+   "effects": [
+    "decrease-skill-cooldown",
+    "extra-turn",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Karin",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1011_s01": {
+   "class": "Thief",
+   "effects": [
+    "decrease-skill-cooldown",
+    "extra-turn",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Karin",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1012": {
+   "class": "Warrior",
+   "effects": [
+    "transfer",
+    "stun",
+    "stun",
+    "decrease-combat-readiness",
+    "extra-turn",
+    "healing",
+    "fury"
+   ],
+   "element": "Fire",
+   "name": "Corvus",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1013": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "increase-combat-readiness",
+    "increase-defense",
+    "healing",
+    "decrease-attack"
+   ],
+   "element": "Earth",
+   "name": "Cartuja",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1014": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "debuff-immunity",
+    "evasion",
+    "increase-critical-hit-damage",
+    "increase-speed-greater",
+    "effectiveness",
+    "extra-turn"
+   ],
+   "element": "Earth",
+   "name": "Cidd",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c1014_s01": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "debuff-immunity",
+    "evasion",
+    "increase-critical-hit-damage",
+    "increase-speed-greater",
+    "effectiveness",
+    "extra-turn"
+   ],
+   "element": "Earth",
+   "name": "Cidd",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c1015": {
+   "class": "Mage",
+   "effects": [
+    "poison",
+    "decrease-defense",
+    "decrease-speed",
+    "unhealable"
+   ],
+   "element": "Fire",
+   "name": "Baal & Sezan",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1016": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "increase-defense",
+    "dispel",
+    "silence",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "penetrate"
+   ],
+   "element": "Earth",
+   "name": "Yufine",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1016_s01": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "increase-defense",
+    "dispel",
+    "silence",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "penetrate"
+   ],
+   "element": "Earth",
+   "name": "Yufine",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1016_s02": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "increase-defense",
+    "dispel",
+    "silence",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "penetrate"
+   ],
+   "element": "Earth",
+   "name": "Yufine",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1017": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-attack",
+    "invincible",
+    "decrease-skill-cooldown",
+    "healing",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Achates",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c1017_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-attack",
+    "invincible",
+    "decrease-skill-cooldown",
+    "healing",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Achates",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c1018": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-speed",
+    "increase-combat-readiness",
+    "cleanse",
+    "healing",
+    "barrier",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Aither",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c1018_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-speed",
+    "increase-combat-readiness",
+    "cleanse",
+    "healing",
+    "barrier",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Aither",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c1019": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "stun",
+    "increase-combat-readiness",
+    "penetrate",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Ravi",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1019_s01": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "stun",
+    "increase-combat-readiness",
+    "penetrate",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Ravi",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1020": {
+   "class": "Ranger",
+   "effects": [
+    "poison",
+    "increase-combat-readiness",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Schuri",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1021": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "healing",
+    "burn",
+    "extra-turn",
+    "decrease-skill-cooldown",
+    "increase-critical-hit-chance",
+    "cleanse"
+   ],
+   "element": "Fire",
+   "name": "Dingo",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c1022": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "healing",
+    "invincible",
+    "cleanse",
+    "healing",
+    "resurrect"
+   ],
+   "element": "Light",
+   "name": "Ruele of Light",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1022_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "healing",
+    "invincible",
+    "cleanse",
+    "healing",
+    "resurrect"
+   ],
+   "element": "Light",
+   "name": "Ruele of Light",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1023": {
+   "class": "Thief",
+   "effects": [
+    "decrease-hit-chance",
+    "immortal",
+    "evasion",
+    "increase-attack",
+    "buff-extension"
+   ],
+   "element": "Fire",
+   "name": "Kayron",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1023_s01": {
+   "class": "Thief",
+   "effects": [
+    "decrease-hit-chance",
+    "immortal",
+    "evasion",
+    "increase-attack",
+    "buff-extension"
+   ],
+   "element": "Fire",
+   "name": "Kayron",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1024": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extra-turn",
+    "decrease-skill-cooldown",
+    "dispel",
+    "decrease-defense",
+    "cannot-buff"
+   ],
+   "element": "Earth",
+   "name": "Iseria",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1024_s01": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extra-turn",
+    "decrease-skill-cooldown",
+    "dispel",
+    "decrease-defense",
+    "cannot-buff"
+   ],
+   "element": "Earth",
+   "name": "Iseria",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1027": {
+   "class": "Knight",
+   "effects": [
+    "decrease-attack",
+    "dispel",
+    "increase-attack",
+    "increase-defense"
+   ],
+   "element": "Earth",
+   "name": "Charles",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1027_s01": {
+   "class": "Knight",
+   "effects": [
+    "decrease-attack",
+    "dispel",
+    "increase-attack",
+    "increase-defense"
+   ],
+   "element": "Earth",
+   "name": "Charles",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1028": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "fury",
+    "decrease-defense",
+    "bleed"
+   ],
+   "element": "Ice",
+   "name": "Clarissa",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1029": {
+   "class": "Ranger",
+   "effects": [
+    "stun",
+    "decrease-defense",
+    "decrease-speed",
+    "stun"
+   ],
+   "element": "Earth",
+   "name": "Leo",
+   "stars": 4,
+   "zodiac": "Capricorn"
+  },
+  "c1030": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-speed-greater",
+    "extra-turn"
+   ],
+   "element": "Ice",
+   "name": "Yuna",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1030_s01": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-speed-greater",
+    "extra-turn"
+   ],
+   "element": "Ice",
+   "name": "Yuna",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1031": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-attack",
+    "increase-combat-readiness",
+    "healing",
+    "increase-combat-readiness",
+    "continuous-heal",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Lots",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c1032": {
+   "class": "Knight",
+   "effects": [
+    "stun",
+    "stun",
+    "decrease-combat-readiness",
+    "increase-defense",
+    "decrease-attack",
+    "provoke"
+   ],
+   "element": "Fire",
+   "name": "Maya",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c1033": {
+   "class": "Thief",
+   "effects": [
+    "buff-stealing",
+    "stealth",
+    "detonate",
+    "increase-combat-readiness",
+    "bleed",
+    "bomb"
+   ],
+   "element": "Ice",
+   "name": "Coli",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c1034": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "dispel",
+    "invincible",
+    "penetrate"
+   ],
+   "element": "Dark",
+   "name": "Straze",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1035": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "stun",
+    "stun"
+   ],
+   "element": "Earth",
+   "name": "Purrgis",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c1036": {
+   "class": "Knight",
+   "effects": [
+    "decrease-attack",
+    "increase-defense",
+    "barrier",
+    "decrease-combat-readiness",
+    "provoke"
+   ],
+   "element": "Ice",
+   "name": "Crozet",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1037": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "barrier",
+    "reflect",
+    "increase-speed-greater",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Dominiel",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c1038": {
+   "class": "Thief",
+   "effects": [
+    "unhealable",
+    "stealth",
+    "extinction"
+   ],
+   "element": "Ice",
+   "name": "Sez",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1038_s01": {
+   "class": "Thief",
+   "effects": [
+    "unhealable",
+    "stealth",
+    "extinction"
+   ],
+   "element": "Ice",
+   "name": "Sez",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1039": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "unhealable",
+    "bleed",
+    "vampiric-touch",
+    "dispel",
+    "decrease-defense",
+    "bleed"
+   ],
+   "element": "Fire",
+   "name": "Haste",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1040": {
+   "class": "Mage",
+   "effects": [
+    "decrease-defense",
+    "healing",
+    "decrease-attack",
+    "burn"
+   ],
+   "element": "Fire",
+   "name": "Serila",
+   "stars": 4,
+   "zodiac": "Aquarius"
+  },
+  "c1042": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "barrier",
+    "debuff-immunity",
+    "cleanse",
+    "increase-defense",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Tywin",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1043": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-combat-readiness",
+    "decrease-combat-readiness",
+    "increase-combat-readiness",
+    "dispel",
+    "poison"
+   ],
+   "element": "Ice",
+   "name": "Romann",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c1044": {
+   "class": "Warrior",
+   "effects": [
+    "random-debuff",
+    "stun",
+    "bleed",
+    "increase-attack",
+    "increase-combat-readiness",
+    "dispel"
+   ],
+   "element": "Earth",
+   "name": "Mui",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1046": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "dispel",
+    "unhealable",
+    "decrease-hit-chance",
+    "skill-nullifier",
+    "decrease-speed",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Lidica",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1046_s01": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "dispel",
+    "unhealable",
+    "decrease-hit-chance",
+    "skill-nullifier",
+    "decrease-speed",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Lidica",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1046_s02_1": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "dispel",
+    "unhealable",
+    "decrease-hit-chance",
+    "skill-nullifier",
+    "decrease-speed",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Lidica",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1047": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "burn",
+    "increase-speed-greater",
+    "decrease-defense",
+    "vigor",
+    "decrease-attack",
+    "stun"
+   ],
+   "element": "Fire",
+   "name": "Ken",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1048": {
+   "class": "Mage",
+   "effects": [
+    "detonate",
+    "burn",
+    "increase-attack",
+    "increase-combat-readiness",
+    "dispel",
+    "unhealable",
+    "barrier",
+    "stun",
+    "burn"
+   ],
+   "element": "Fire",
+   "name": "Aramintha",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1049": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "magic-nail",
+    "stun"
+   ],
+   "element": "Ice",
+   "name": "Chloe",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1050": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "sleep",
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "restrict",
+    "increase-attack",
+    "decrease-defense",
+    "sleep"
+   ],
+   "element": "Fire",
+   "name": "Tenebria",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1050_s01": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "sleep",
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "restrict",
+    "increase-attack",
+    "decrease-defense",
+    "sleep"
+   ],
+   "element": "Fire",
+   "name": "Tenebria",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1053": {
+   "class": "Mage",
+   "effects": [
+    "transfer",
+    "random-debuff",
+    "decrease-attack",
+    "decrease-hit-chance",
+    "dispel",
+    "cannot-buff",
+    "decrease-combat-readiness"
+   ],
+   "element": "Earth",
+   "name": "Basar",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1053_s01": {
+   "class": "Mage",
+   "effects": [
+    "transfer",
+    "random-debuff",
+    "decrease-attack",
+    "decrease-hit-chance",
+    "dispel",
+    "cannot-buff",
+    "decrease-combat-readiness"
+   ],
+   "element": "Earth",
+   "name": "Basar",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1054": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "dispel",
+    "decrease-defense",
+    "barrier",
+    "random-buff"
+   ],
+   "element": "Earth",
+   "name": "Rin",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c1055": {
+   "class": "Thief",
+   "effects": [
+    "increase-attack",
+    "increase-attack-greater",
+    "increase-combat-readiness",
+    "immortal",
+    "rage",
+    "penetrate"
+   ],
+   "element": "Fire",
+   "name": "Jenua",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1060": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Earth",
+   "name": "Schniel",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1062": {
+   "class": "Soul Weaver",
+   "effects": [
+    "stun",
+    "healing",
+    "barrier",
+    "debuff-immunity",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Angelica",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1062_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "stun",
+    "healing",
+    "barrier",
+    "debuff-immunity",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Angelica",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1065": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "decrease-attack",
+    "bleed",
+    "debuff-extension"
+   ],
+   "element": "Fire",
+   "name": "Surin",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c1066": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-skill-cooldown",
+    "penetrate",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Luna",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1066_s01": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-skill-cooldown",
+    "penetrate",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Luna",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1067": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dual-attack",
+    "dispel",
+    "healing",
+    "increase-attack",
+    "increase-combat-readiness",
+    "healing",
+    "extra-turn",
+    "idol",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Tamarinne",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1067_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dual-attack",
+    "dispel",
+    "healing",
+    "increase-attack",
+    "increase-combat-readiness",
+    "healing",
+    "extra-turn",
+    "idol",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Tamarinne",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1067_s02": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dual-attack",
+    "dispel",
+    "healing",
+    "increase-attack",
+    "increase-combat-readiness",
+    "healing",
+    "extra-turn",
+    "idol",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Tamarinne",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1069": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "dispel",
+    "buff-stealing",
+    "invincible",
+    "increase-combat-readiness",
+    "stun",
+    "penetrate",
+    "buff-extension"
+   ],
+   "element": "Earth",
+   "name": "Ludwig",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1070": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-defense",
+    "decrease-combat-readiness",
+    "barrier",
+    "penetrate"
+   ],
+   "element": "Ice",
+   "name": "Krau",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1071": {
+   "class": "Ranger",
+   "effects": [
+    "debuff-immunity",
+    "decrease-defense"
+   ],
+   "element": "Earth",
+   "name": "Bellona",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1072": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "unhealable",
+    "bleed",
+    "penetrate",
+    "extinction"
+   ],
+   "element": "Ice",
+   "name": "Sigret",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1073": {
+   "class": "Mage",
+   "effects": [
+    "silence",
+    "dispel",
+    "stealth",
+    "increase-speed-greater",
+    "increase-skill-cooldown",
+    "penetrate",
+    "silence"
+   ],
+   "element": "Fire",
+   "name": "Kawerik",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1074": {
+   "class": "Thief",
+   "effects": [
+    "decrease-attack",
+    "extra-turn",
+    "cleanse",
+    "healing",
+    "perception",
+    "decrease-skill-cooldown"
+   ],
+   "element": "Earth",
+   "name": "Violet",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1074_s01": {
+   "class": "Thief",
+   "effects": [
+    "decrease-attack",
+    "extra-turn",
+    "cleanse",
+    "healing",
+    "perception",
+    "decrease-skill-cooldown"
+   ],
+   "element": "Earth",
+   "name": "Violet",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1076": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "increase-attack",
+    "increase-combat-readiness",
+    "increase-critical-hit-resistance"
+   ],
+   "element": "Ice",
+   "name": "Diene",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1076_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "increase-attack",
+    "increase-combat-readiness",
+    "increase-critical-hit-resistance"
+   ],
+   "element": "Ice",
+   "name": "Diene",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1078": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "dual-attack",
+    "increase-defense",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Ras",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c1079": {
+   "class": "Warrior",
+   "effects": [
+    "unhealable",
+    "extra-turn",
+    "increase-attack-greater",
+    "penetrate"
+   ],
+   "element": "Fire",
+   "name": "Cermia",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1079_s01": {
+   "class": "Warrior",
+   "effects": [
+    "unhealable",
+    "extra-turn",
+    "increase-attack-greater",
+    "penetrate"
+   ],
+   "element": "Fire",
+   "name": "Cermia",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1080": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-attack"
+   ],
+   "element": "Earth",
+   "name": "Pavel",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1081": {
+   "class": "Ranger",
+   "effects": [
+    "dual-attack",
+    "increase-combat-readiness",
+    "increase-combat-readiness",
+    "stun",
+    "cannot-buff",
+    "invincible",
+    "decrease-speed",
+    "restrict"
+   ],
+   "element": "Ice",
+   "name": "Cerise",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1081_s01": {
+   "class": "Ranger",
+   "effects": [
+    "dual-attack",
+    "increase-combat-readiness",
+    "increase-combat-readiness",
+    "stun",
+    "cannot-buff",
+    "invincible",
+    "decrease-speed",
+    "restrict"
+   ],
+   "element": "Ice",
+   "name": "Cerise",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1082": {
+   "class": "Mage",
+   "effects": [
+    "decrease-defense",
+    "increase-defense",
+    "barrier",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Luluca",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1082_s01": {
+   "class": "Mage",
+   "effects": [
+    "decrease-defense",
+    "increase-defense",
+    "barrier",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Luluca",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c1083": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "silence",
+    "bleed"
+   ],
+   "element": "Ice",
+   "name": "Zeno",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1085": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-defense",
+    "increase-attack",
+    "cleanse",
+    "decrease-defense",
+    "unhealable"
+   ],
+   "element": "Fire",
+   "name": "Khawazu",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c1086": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "increase-attack",
+    "skill-nullifier",
+    "increase-combat-readiness",
+    "dispel",
+    "stun"
+   ],
+   "element": "Fire",
+   "name": "Khawana",
+   "stars": 4,
+   "zodiac": "Pisces"
+  },
+  "c1087": {
+   "class": "Ranger",
+   "effects": [
+    "burn",
+    "extra-turn",
+    "increase-critical-hit-chance",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Furious",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1088": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "debuff-immunity",
+    "increase-attack-greater"
+   ],
+   "element": "Earth",
+   "name": "Vivian",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1088_s01": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "debuff-immunity",
+    "increase-attack-greater"
+   ],
+   "element": "Earth",
+   "name": "Vivian",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1089": {
+   "class": "Knight",
+   "effects": [
+    "dual-attack",
+    "barrier",
+    "cleanse",
+    "provoke",
+    "increase-combat-readiness",
+    "cleanse",
+    "decrease-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Lilias",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1090": {
+   "class": "Soul Weaver",
+   "effects": [
+    "cleanse",
+    "barrier",
+    "healing",
+    "debuff-immunity",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Ray",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1091": {
+   "class": "Soul Weaver",
+   "effects": [
+    "cleanse",
+    "healing",
+    "invincible",
+    "effect-resistance"
+   ],
+   "element": "Ice",
+   "name": "Elena",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1091_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "cleanse",
+    "healing",
+    "invincible",
+    "effect-resistance"
+   ],
+   "element": "Ice",
+   "name": "Elena",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1092": {
+   "class": "Warrior",
+   "effects": [
+    "extra-turn",
+    "buff-extension",
+    "increase-combat-readiness",
+    "silence",
+    "dispel",
+    "cannot-buff"
+   ],
+   "element": "Fire",
+   "name": "Sol",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1093": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "extra-turn",
+    "bleed",
+    "increase-combat-readiness",
+    "detonate"
+   ],
+   "element": "Earth",
+   "name": "Baiken",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1094": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "decrease-combat-readiness",
+    "debuff-extension",
+    "decrease-speed",
+    "decrease-attack",
+    "decrease-hit-chance"
+   ],
+   "element": "Ice",
+   "name": "Dizzy",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1095": {
+   "class": "Warrior",
+   "effects": [
+    "cannot-buff",
+    "increase-combat-readiness",
+    "bleed",
+    "decrease-skill-cooldown",
+    "skill-nullifier",
+    "extinction"
+   ],
+   "element": "Earth",
+   "name": "Lilibet",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1096": {
+   "class": "Mage",
+   "effects": [
+    "unhealable",
+    "immortal",
+    "decrease-skill-cooldown",
+    "debuff-immunity",
+    "extra-turn",
+    "dispel",
+    "curse"
+   ],
+   "element": "Fire",
+   "name": "Melissa",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1097": {
+   "class": "Ranger",
+   "effects": [
+    "increase-attack",
+    "dispel",
+    "increase-speed-greater"
+   ],
+   "element": "Fire",
+   "name": "Bomb Model Kanna",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1097_s01": {
+   "class": "Ranger",
+   "effects": [
+    "increase-attack",
+    "dispel",
+    "increase-speed-greater"
+   ],
+   "element": "Fire",
+   "name": "Bomb Model Kanna",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1099": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "dual-attack",
+    "decrease-skill-cooldown",
+    "target",
+    "debuff-immunity",
+    "decrease-speed",
+    "sleep"
+   ],
+   "element": "Earth",
+   "name": "Command Model Laika",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1100": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "minds-eye",
+    "increase-defense",
+    "increase-combat-readiness",
+    "dispel"
+   ],
+   "element": "Earth",
+   "name": "Alencia",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1100_s01": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "minds-eye",
+    "increase-defense",
+    "increase-combat-readiness",
+    "dispel"
+   ],
+   "element": "Earth",
+   "name": "Alencia",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1101": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "healing",
+    "increase-critical-hit-resistance",
+    "debuff-immunity"
+   ],
+   "element": "Ice",
+   "name": "Choux",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1101_s01": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "healing",
+    "increase-critical-hit-resistance",
+    "debuff-immunity"
+   ],
+   "element": "Ice",
+   "name": "Choux",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1102": {
+   "class": "Soul Weaver",
+   "effects": [
+    "barrier",
+    "increase-combat-readiness",
+    "healing",
+    "barrier",
+    "revive",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Roana",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1103": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "barrier",
+    "evasion",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Celine",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1103_s01": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "barrier",
+    "evasion",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Celine",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1104": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "increase-critical-hit-resistance",
+    "increase-speed-greater",
+    "healing",
+    "fury"
+   ],
+   "element": "Earth",
+   "name": "Mort",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1105": {
+   "class": "Ranger",
+   "effects": [
+    "cannot-buff",
+    "increase-attack",
+    "decrease-defense",
+    "extra-turn",
+    "dispel",
+    "decrease-defense",
+    "sleep"
+   ],
+   "element": "Fire",
+   "name": "Elphelt",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1106": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "barrier",
+    "increase-speed-greater",
+    "counterattack",
+    "provoke",
+    "decrease-hit-chance"
+   ],
+   "element": "Earth",
+   "name": "Senya",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1106_s01": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "barrier",
+    "increase-speed-greater",
+    "counterattack",
+    "provoke",
+    "decrease-hit-chance"
+   ],
+   "element": "Earth",
+   "name": "Senya",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1107": {
+   "class": "Soul Weaver",
+   "effects": [
+    "cleanse",
+    "healing",
+    "increase-attack",
+    "barrier",
+    "increase-speed-greater"
+   ],
+   "element": "Fire",
+   "name": "Kizuna AI",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c1108": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "extra-turn",
+    "barrier",
+    "counterattack"
+   ],
+   "element": "Earth",
+   "name": "Ervalen",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1109": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-combat-readiness",
+    "penetrate",
+    "increase-speed-greater"
+   ],
+   "element": "Earth",
+   "name": "Landy",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1110": {
+   "class": "Ranger",
+   "effects": [
+    "dispel",
+    "increase-attack",
+    "increase-combat-readiness",
+    "increase-critical-hit-damage",
+    "decrease-defense",
+    "unhealable",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Flan",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1111": {
+   "class": "Mage",
+   "effects": [
+    "decrease-defense",
+    "dispel",
+    "skill-nullifier",
+    "decrease-combat-readiness",
+    "increase-combat-readiness",
+    "stun"
+   ],
+   "element": "Ice",
+   "name": "Eda",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1112": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "cannot-buff",
+    "decrease-hit-chance"
+   ],
+   "element": "Fire",
+   "name": "Politis",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1112_s01": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "cannot-buff",
+    "decrease-hit-chance"
+   ],
+   "element": "Fire",
+   "name": "Politis",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1113": {
+   "class": "Knight",
+   "effects": [
+    "increase-defense",
+    "debuff-immunity",
+    "increase-critical-hit-damage"
+   ],
+   "element": "Fire",
+   "name": "Ilynav",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1114": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "demon-mode",
+    "unhealable",
+    "increase-attack",
+    "increase-combat-readiness",
+    "decrease-hit-chance"
+   ],
+   "element": "Ice",
+   "name": "Rem",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1115": {
+   "class": "Mage",
+   "effects": [
+    "decrease-attack",
+    "increase-attack-greater",
+    "decrease-defense"
+   ],
+   "element": "Earth",
+   "name": "Ram",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1116": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "increase-attack",
+    "increase-combat-readiness",
+    "cleanse",
+    "barrier",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Emilia",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1117": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "decrease-speed",
+    "decrease-hit-chance",
+    "continuous-heal",
+    "increase-critical-hit-chance",
+    "effectiveness",
+    "increase-defense",
+    "decrease-combat-readiness",
+    "provoke"
+   ],
+   "element": "Light",
+   "name": "Belian",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1117_s01": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "decrease-speed",
+    "decrease-hit-chance",
+    "continuous-heal",
+    "increase-critical-hit-chance",
+    "effectiveness",
+    "increase-defense",
+    "decrease-combat-readiness",
+    "provoke"
+   ],
+   "element": "Light",
+   "name": "Belian",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1118": {
+   "class": "Thief",
+   "effects": [
+    "penetrate",
+    "increase-attack",
+    "extra-turn",
+    "debuff-immunity",
+    "dispel",
+    "skill-nullifier",
+    "decrease-defense",
+    "stigma"
+   ],
+   "element": "Ice",
+   "name": "Ran",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1118_s01": {
+   "class": "Thief",
+   "effects": [
+    "penetrate",
+    "increase-attack",
+    "extra-turn",
+    "debuff-immunity",
+    "dispel",
+    "skill-nullifier",
+    "decrease-defense",
+    "stigma"
+   ],
+   "element": "Ice",
+   "name": "Ran",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1119": {
+   "class": "Warrior",
+   "effects": [
+    "extra-turn",
+    "increase-combat-readiness",
+    "cleanse",
+    "invincible"
+   ],
+   "element": "Earth",
+   "name": "Zahhak",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1121": {
+   "class": "Warrior",
+   "effects": [
+    "increase-attack",
+    "increase-critical-hit-resistance",
+    "debuff-immunity",
+    "effect-resistance",
+    "increase-combat-readiness",
+    "decrease-defense"
+   ],
+   "element": "Earth",
+   "name": "Rimuru",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1122": {
+   "class": "Mage",
+   "effects": [
+    "increase-attack",
+    "healing",
+    "dispel",
+    "dragon-eye-milim-eye",
+    "evasion",
+    "extinction"
+   ],
+   "element": "Fire",
+   "name": "Milim",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1123": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "barrier",
+    "cleanse",
+    "dispel",
+    "decrease-attack",
+    "sleep"
+   ],
+   "element": "Fire",
+   "name": "Shuna",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c1124": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "increase-combat-readiness",
+    "penetrate",
+    "extinction"
+   ],
+   "element": "Earth",
+   "name": "Arunka",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1125": {
+   "class": "Thief",
+   "effects": [
+    "stun",
+    "extra-turn",
+    "dispel",
+    "cannot-buff",
+    "restrict",
+    "increase-attack",
+    "barrier",
+    "stealth",
+    "escort"
+   ],
+   "element": "Ice",
+   "name": "Peira",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1125_s01": {
+   "class": "Thief",
+   "effects": [
+    "stun",
+    "extra-turn",
+    "dispel",
+    "cannot-buff",
+    "restrict",
+    "increase-attack",
+    "barrier",
+    "stealth",
+    "escort"
+   ],
+   "element": "Ice",
+   "name": "Peira",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1126": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extra-turn",
+    "dispel",
+    "sleep",
+    "dispel",
+    "increase-speed-greater",
+    "increase-skill-cooldown",
+    "beguile"
+   ],
+   "element": "Ice",
+   "name": "Lua",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1126_s01_1": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extra-turn",
+    "dispel",
+    "sleep",
+    "dispel",
+    "increase-speed-greater",
+    "increase-skill-cooldown",
+    "beguile"
+   ],
+   "element": "Ice",
+   "name": "Lua",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1127": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "skill-nullifier",
+    "fury",
+    "increase-attack",
+    "dispel",
+    "increase-skill-cooldown"
+   ],
+   "element": "Ice",
+   "name": "Taeyou",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1128": {
+   "class": "Warrior",
+   "effects": [
+    "barrier",
+    "penetrate",
+    "debuff-immunity",
+    "cleanse"
+   ],
+   "element": "Fire",
+   "name": "Hwayoung",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1129": {
+   "class": "Mage",
+   "effects": [
+    "decrease-hit-chance",
+    "dispel",
+    "decrease-combat-readiness",
+    "increase-defense",
+    "barrier",
+    "counterattack",
+    "stealth"
+   ],
+   "element": "Ice",
+   "name": "Aria",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1130": {
+   "class": "Warrior",
+   "effects": [
+    "stealth",
+    "stun",
+    "increase-combat-readiness",
+    "chain-of-chiron",
+    "increase-attack",
+    "extra-turn",
+    "increase-combat-readiness",
+    "penetrate"
+   ],
+   "element": "Fire",
+   "name": "Jack-O'",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1131": {
+   "class": "Knight",
+   "effects": [
+    "redirected-provoke",
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "penetrate",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Yulha",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1132": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-skill-cooldown",
+    "venom",
+    "increase-attack",
+    "immortal",
+    "barrier",
+    "increase-critical-hit-damage",
+    "increase-speed-greater",
+    "increase-combat-readiness",
+    "decrease-speed",
+    "venom"
+   ],
+   "element": "Earth",
+   "name": "Sharun",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1133": {
+   "class": "Mage",
+   "effects": [
+    "increase-attack",
+    "penetrate",
+    "increase-combat-readiness",
+    "dispel",
+    "penetrate",
+    "decrease-combat-readiness",
+    "silence"
+   ],
+   "element": "Dark",
+   "name": "Zio",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1134": {
+   "class": "Warrior",
+   "effects": [
+    "barrier",
+    "increase-combat-readiness",
+    "dispel",
+    "cleanse",
+    "random-debuff",
+    "increase-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Edward Elric",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1135": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "penetrate",
+    "increase-attack"
+   ],
+   "element": "Fire",
+   "name": "Roy Mustang",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1136": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "target",
+    "cleanse",
+    "dispel",
+    "debuff-immunity",
+    "exploiting-weak-points",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Riza Hawkeye",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1137": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "increase-defense",
+    "increase-combat-readiness",
+    "barrier",
+    "increase-speed-greater",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "ae-KARINA",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1138": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "increase-attack",
+    "extra-turn"
+   ],
+   "element": "Earth",
+   "name": "ae-GISELLE",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1139": {
+   "class": "Thief",
+   "effects": [
+    "stun",
+    "stealth",
+    "debuff-immunity",
+    "cleanse",
+    "increase-combat-readiness",
+    "stun"
+   ],
+   "element": "Fire",
+   "name": "ae-WINTER",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1140": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "stun",
+    "increase-attack",
+    "increase-combat-readiness",
+    "decrease-combat-readiness",
+    "increase-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "ae-NINGNING",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1141": {
+   "class": "Ranger",
+   "effects": [
+    "detonate",
+    "burn",
+    "increase-combat-readiness",
+    "dispel",
+    "cannot-buff"
+   ],
+   "element": "Fire",
+   "name": "Beehoo",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1142": {
+   "class": "Ranger",
+   "effects": [
+    "dual-attack",
+    "perception",
+    "dispel",
+    "decrease-defense",
+    "decrease-combat-readiness",
+    "target"
+   ],
+   "element": "Fire",
+   "name": "Eligos",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c1143": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "extra-turn",
+    "increase-combat-readiness",
+    "skill-nullifier",
+    "increase-attack",
+    "cleanse"
+   ],
+   "element": "Ice",
+   "name": "Amid",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1144": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "immortal",
+    "curse",
+    "dispel"
+   ],
+   "element": "Fire",
+   "name": "Abigail",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1145": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "extra-turn",
+    "barrier",
+    "perception",
+    "dispel",
+    "decrease-defense",
+    "decrease-speed"
+   ],
+   "element": "Ice",
+   "name": "Brieg",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1146": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "cleanse",
+    "increase-combat-readiness",
+    "decrease-defense"
+   ],
+   "element": "Fire",
+   "name": "Benimaru",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1147": {
+   "class": "Mage",
+   "effects": [
+    "decrease-attack",
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "decrease-buff-duration"
+   ],
+   "element": "Ice",
+   "name": "Fumyr",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1148": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Ice",
+   "name": "Elvira",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1150": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "detonate",
+    "increase-combat-readiness",
+    "extra-turn",
+    "decrease-defense",
+    "bomb"
+   ],
+   "element": "Fire",
+   "name": "Veronica",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c1151": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "silence",
+    "increase-speed-greater",
+    "extra-turn",
+    "dispel",
+    "increase-skill-cooldown"
+   ],
+   "element": "Fire",
+   "name": "Nahkwol",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1152": {
+   "class": "Warrior",
+   "effects": [
+    "cleanse",
+    "bleed",
+    "immortal",
+    "decrease-skill-cooldown",
+    "fury",
+    "vampiric-touch",
+    "increase-attack-greater"
+   ],
+   "element": "Fire",
+   "name": "Kane",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1153": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Harsetti",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1153_s01": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Harsetti",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1154": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "silence",
+    "increase-combat-readiness",
+    "healing",
+    "decrease-defense",
+    "decrease-buff-duration",
+    "barrier",
+    "decrease-hit-chance",
+    "decrease-buff-duration"
+   ],
+   "element": "Ice",
+   "name": "Byblis",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1155": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Ainz Ooal Gown",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1156": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Earth",
+   "name": "Albedo",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1157": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Fire",
+   "name": "Shalltear",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1158": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Earth",
+   "name": "Fenris",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1159": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Earth",
+   "name": "Laia",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c1160": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Ice",
+   "name": "Birgitta",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1161": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Earth",
+   "name": "Immortal Wukong",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1162": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Earth",
+   "name": "Young Senya",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1163": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Ice",
+   "name": "Frida",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1166": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Fire",
+   "name": "Victorika",
+   "stars": 4,
+   "zodiac": "Leo"
+  },
+  "c1168": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Earth",
+   "name": "Rinak",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1169": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Fire",
+   "name": "Robin",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1170": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Ice",
+   "name": "Fenne",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c1171": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Fire",
+   "name": "Tori",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1172": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Earth",
+   "name": "Frieren",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c1173": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Ice",
+   "name": "Fern",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1174": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Fire",
+   "name": "Stark",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1176": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Fire",
+   "name": "Setsuka",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c1177": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Earth",
+   "name": "Saria",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1178": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Earth",
+   "name": "Hecate",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c1179": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Fire",
+   "name": "Aki",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1180_1": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Fire",
+   "name": "Ruiza",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c1182": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Fire",
+   "name": "Ivana",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c1183_1": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Earth",
+   "name": "Estelle",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c1191_1": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Fire",
+   "name": "Mei Lin",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c1192": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Ice",
+   "name": "Haru",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c2001": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Genesis Ras",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2002": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "barrier",
+    "skill-nullifier"
+   ],
+   "element": "Dark",
+   "name": "Fallen Cecilia",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2002_s01": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "barrier",
+    "skill-nullifier"
+   ],
+   "element": "Dark",
+   "name": "Fallen Cecilia",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2003": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "unhealable",
+    "dispel",
+    "decrease-defense",
+    "increase-combat-readiness",
+    "effectiveness",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Shadow Rose",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c2004": {
+   "class": "Ranger",
+   "effects": [
+    "target",
+    "dual-attack",
+    "dispel",
+    "barrier",
+    "decrease-attack",
+    "decrease-combat-readiness",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Wanderer Silk",
+   "stars": 4,
+   "zodiac": "Capricorn"
+  },
+  "c2005": {
+   "class": "Mage",
+   "effects": [
+    "unhealable",
+    "increase-attack",
+    "increase-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Celestial Mercedes",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2006": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "decrease-hit-chance",
+    "dispel",
+    "skill-nullifier",
+    "increase-skill-cooldown"
+   ],
+   "element": "Light",
+   "name": "Judge Kise",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c2006_s01": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "decrease-hit-chance",
+    "dispel",
+    "skill-nullifier",
+    "increase-skill-cooldown"
+   ],
+   "element": "Light",
+   "name": "Judge Kise",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c2007": {
+   "class": "Thief",
+   "effects": [
+    "decrease-combat-readiness",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "decrease-hit-chance"
+   ],
+   "element": "Dark",
+   "name": "Arbiter Vildred",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2007_s01": {
+   "class": "Thief",
+   "effects": [
+    "decrease-combat-readiness",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "decrease-hit-chance"
+   ],
+   "element": "Dark",
+   "name": "Arbiter Vildred",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2008": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "invincible",
+    "debuff-immunity"
+   ],
+   "element": "Light",
+   "name": "Crimson Armin",
+   "stars": 4,
+   "zodiac": "Libra"
+  },
+  "c2009": {
+   "class": "Warrior",
+   "effects": [
+    "debuff-immunity",
+    "increase-combat-readiness",
+    "penetrate",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Little Queen Charlotte",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2009_s01": {
+   "class": "Warrior",
+   "effects": [
+    "debuff-immunity",
+    "increase-combat-readiness",
+    "penetrate",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Little Queen Charlotte",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2010": {
+   "class": "Mage",
+   "effects": [
+    "transfer",
+    "healing",
+    "counterattack",
+    "increase-defense",
+    "decrease-defense",
+    "decrease-attack"
+   ],
+   "element": "Dark",
+   "name": "Champion Zerato",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c2011": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "healing",
+    "immortal",
+    "increase-attack",
+    "extra-turn"
+   ],
+   "element": "Dark",
+   "name": "Blood Blade Karin",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2012": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "provoke",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "healing",
+    "extinction"
+   ],
+   "element": "Dark",
+   "name": "Dark Corvus",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c2013": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "increase-combat-readiness",
+    "evasion",
+    "decrease-defense",
+    "stun"
+   ],
+   "element": "Dark",
+   "name": "Assassin Cartuja",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2014": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "increase-combat-readiness",
+    "evasion",
+    "decrease-combat-readiness",
+    "silence"
+   ],
+   "element": "Dark",
+   "name": "Assassin Cidd",
+   "stars": 4,
+   "zodiac": "Aquarius"
+  },
+  "c2015": {
+   "class": "Mage",
+   "effects": [
+    "sleep",
+    "dispel",
+    "sleep",
+    "penetrate",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Sage Baal & Sezan",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c2016": {
+   "class": "Knight",
+   "effects": [
+    "penetrate",
+    "decrease-attack",
+    "counterattack",
+    "cleanse",
+    "dispel",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Abyssal Yufine",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c2017": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-hit-chance",
+    "immortal",
+    "random-buff",
+    "resurrect",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Dark",
+   "name": "Shooting Star Achates",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c2018": {
+   "class": "Mage",
+   "effects": [
+    "decrease-speed",
+    "barrier",
+    "increase-attack",
+    "increase-combat-readiness",
+    "dispel"
+   ],
+   "element": "Light",
+   "name": "Guider Aither",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c2019": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "healing",
+    "skill-nullifier",
+    "resurrect"
+   ],
+   "element": "Dark",
+   "name": "Apocalypse Ravi",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2019_s01": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "healing",
+    "skill-nullifier",
+    "resurrect"
+   ],
+   "element": "Dark",
+   "name": "Apocalypse Ravi",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2020": {
+   "class": "Ranger",
+   "effects": [
+    "target",
+    "increase-speed-greater",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Watcher Schuri",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2021": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "healing",
+    "decrease-defense",
+    "increase-attack",
+    "invincible",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Blaze Dingo",
+   "stars": 4,
+   "zodiac": "Sagittarius"
+  },
+  "c2022": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "cleanse",
+    "healing",
+    "revive",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Destina",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2022_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "cleanse",
+    "healing",
+    "revive",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Destina",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2023": {
+   "class": "Thief",
+   "effects": [
+    "barrier",
+    "increase-combat-readiness",
+    "counterattack"
+   ],
+   "element": "Light",
+   "name": "Twisted Eidolon Kayron",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2024": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "immortal",
+    "dispel",
+    "decrease-defense",
+    "cannot-buff"
+   ],
+   "element": "Dark",
+   "name": "Briar Witch Iseria",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2024_s01": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "immortal",
+    "dispel",
+    "decrease-defense",
+    "cannot-buff"
+   ],
+   "element": "Dark",
+   "name": "Briar Witch Iseria",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2027": {
+   "class": "Thief",
+   "effects": [
+    "decrease-skill-cooldown",
+    "increase-combat-readiness",
+    "perception",
+    "increase-attack",
+    "increase-combat-readiness",
+    "evasion"
+   ],
+   "element": "Dark",
+   "name": "Closer Charles",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2028": {
+   "class": "Warrior",
+   "effects": [
+    "dual-attack",
+    "unhealable",
+    "extra-turn",
+    "debuff-immunity",
+    "loveliness"
+   ],
+   "element": "Dark",
+   "name": "Kitty Clarissa",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c2029": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-attack",
+    "decrease-skill-cooldown",
+    "decrease-defense",
+    "skill-nullifier",
+    "decrease-speed",
+    "bomb"
+   ],
+   "element": "Dark",
+   "name": "Roaming Warrior Leo",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c2031": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-combat-readiness",
+    "silence"
+   ],
+   "element": "Dark",
+   "name": "Auxiliary Lots",
+   "stars": 4,
+   "zodiac": "Pisces"
+  },
+  "c2032": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-defense",
+    "cleanse",
+    "extra-turn"
+   ],
+   "element": "Light",
+   "name": "Fighter Maya",
+   "stars": 4,
+   "zodiac": "Libra"
+  },
+  "c2033": {
+   "class": "Thief",
+   "effects": [
+    "increase-speed-greater",
+    "increase-attack",
+    "stealth",
+    "stun",
+    "silence"
+   ],
+   "element": "Dark",
+   "name": "Assassin Coli",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2035": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "increase-combat-readiness",
+    "increase-attack",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "General Purrgis",
+   "stars": 4,
+   "zodiac": "Cancer"
+  },
+  "c2036": {
+   "class": "Knight",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "increase-defense",
+    "barrier",
+    "increase-critical-hit-resistance",
+    "cleanse"
+   ],
+   "element": "Dark",
+   "name": "Troublemaker Crozet",
+   "stars": 4,
+   "zodiac": "Pisces"
+  },
+  "c2037": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "extra-turn",
+    "increase-combat-readiness",
+    "increase-critical-hit-chance"
+   ],
+   "element": "Dark",
+   "name": "Challenger Dominiel",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2038": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "stun",
+    "increase-combat-readiness",
+    "stun",
+    "counterattack",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "extinction"
+   ],
+   "element": "Light",
+   "name": "Specimen Sez",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2039": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dispel",
+    "barrier",
+    "debuff-immunity",
+    "penetrate",
+    "healing"
+   ],
+   "element": "Dark",
+   "name": "Blood Moon Haste",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2042": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "cleanse",
+    "fury",
+    "decrease-defense",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "Ambitious Tywin",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2043": {
+   "class": "Mage",
+   "effects": [
+    "decrease-combat-readiness",
+    "dispel",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Benevolent Romann",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2046": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-combat-readiness",
+    "dispel",
+    "increase-combat-readiness",
+    "skill-nullifier",
+    "increase-skill-cooldown"
+   ],
+   "element": "Light",
+   "name": "Faithless Lidica",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2046_s01": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-combat-readiness",
+    "dispel",
+    "increase-combat-readiness",
+    "skill-nullifier",
+    "increase-skill-cooldown"
+   ],
+   "element": "Light",
+   "name": "Faithless Lidica",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2047": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "counterattack",
+    "penetrate",
+    "vigor",
+    "increase-attack",
+    "decrease-defense"
+   ],
+   "element": "Dark",
+   "name": "Martial Artist Ken",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2048": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "burn",
+    "increase-combat-readiness",
+    "stun",
+    "burn",
+    "decrease-combat-readiness"
+   ],
+   "element": "Light",
+   "name": "Silver Blade Aramintha",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2049": {
+   "class": "Soul Weaver",
+   "effects": [
+    "stun",
+    "healing",
+    "increase-attack",
+    "revive",
+    "cleanse",
+    "resurrect"
+   ],
+   "element": "Light",
+   "name": "Maid Chloe",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c2049_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "stun",
+    "healing",
+    "increase-attack",
+    "revive",
+    "cleanse",
+    "resurrect"
+   ],
+   "element": "Light",
+   "name": "Maid Chloe",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c2050": {
+   "class": "Mage",
+   "effects": [
+    "poison",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Specter Tenebria",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2050_s01": {
+   "class": "Mage",
+   "effects": [
+    "poison",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Specter Tenebria",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2053": {
+   "class": "Soul Weaver",
+   "effects": [
+    "healing",
+    "stun",
+    "extra-turn",
+    "decrease-hit-chance",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "cleanse"
+   ],
+   "element": "Light",
+   "name": "Desert Jewel Basar",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2054": {
+   "class": "Thief",
+   "effects": [
+    "random-buff",
+    "decrease-skill-cooldown",
+    "buff-stealing",
+    "stun",
+    "extra-turn",
+    "dispel",
+    "increase-critical-hit-damage"
+   ],
+   "element": "Dark",
+   "name": "Crescent Moon Rin",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2062": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dual-attack",
+    "decrease-attack",
+    "healing",
+    "increase-attack",
+    "immortal",
+    "cleanse",
+    "increase-speed-greater"
+   ],
+   "element": "Dark",
+   "name": "Sinful Angelica",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2062_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "dual-attack",
+    "decrease-attack",
+    "healing",
+    "increase-attack",
+    "immortal",
+    "cleanse",
+    "increase-speed-greater"
+   ],
+   "element": "Dark",
+   "name": "Sinful Angelica",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2065": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "increase-combat-readiness",
+    "stealth",
+    "cleanse",
+    "cannot-buff",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Tempest Surin",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c2065_s01": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "increase-combat-readiness",
+    "stealth",
+    "cleanse",
+    "cannot-buff",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Tempest Surin",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c2066": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Light",
+   "name": "New Moon Luna",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2066_s01_1": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Light",
+   "name": "New Moon Luna",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2069": {
+   "class": "Mage",
+   "effects": [
+    "increase-attack",
+    "skill-nullifier"
+   ],
+   "element": "Dark",
+   "name": "Eternal Wanderer Ludwig",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2070": {
+   "class": "Knight",
+   "effects": [
+    "increase-speed-greater",
+    "barrier",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "debuff-immunity"
+   ],
+   "element": "Light",
+   "name": "Last Rider Krau",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2070_s01": {
+   "class": "Knight",
+   "effects": [
+    "increase-speed-greater",
+    "barrier",
+    "decrease-skill-cooldown",
+    "penetrate",
+    "debuff-immunity"
+   ],
+   "element": "Light",
+   "name": "Last Rider Krau",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2071": {
+   "class": "Warrior",
+   "effects": [
+    "debuff-immunity",
+    "increase-combat-readiness",
+    "vigor"
+   ],
+   "element": "Dark",
+   "name": "Lone Crescent Bellona",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2071_s01_1": {
+   "class": "Warrior",
+   "effects": [
+    "debuff-immunity",
+    "increase-combat-readiness",
+    "vigor"
+   ],
+   "element": "Dark",
+   "name": "Lone Crescent Bellona",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2072": {
+   "class": "Ranger",
+   "effects": [
+    "healing",
+    "extra-turn",
+    "penetrate",
+    "increase-attack",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Operator Sigret",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2073": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "barrier",
+    "dispel",
+    "decrease-attack",
+    "increase-attack",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "cleanse"
+   ],
+   "element": "Dark",
+   "name": "Mediator Kawerik",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c2073_s01": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "barrier",
+    "dispel",
+    "decrease-attack",
+    "increase-attack",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "cleanse"
+   ],
+   "element": "Dark",
+   "name": "Mediator Kawerik",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c2074": {
+   "class": "Thief",
+   "effects": [
+    "decrease-hit-chance",
+    "evasion",
+    "increase-attack",
+    "penetrate"
+   ],
+   "element": "Dark",
+   "name": "Remnant Violet",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2076_1": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Shepherd of the Dark Diene",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2079": {
+   "class": "Warrior",
+   "effects": [
+    "increase-speed-greater",
+    "increase-defense",
+    "increase-combat-readiness",
+    "cleanse",
+    "effect-resistance",
+    "extra-turn",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Lionheart Cermia",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2079_s01": {
+   "class": "Warrior",
+   "effects": [
+    "increase-speed-greater",
+    "increase-defense",
+    "increase-combat-readiness",
+    "cleanse",
+    "effect-resistance",
+    "extra-turn",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Lionheart Cermia",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2080": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-attack",
+    "increase-attack",
+    "increase-combat-readiness",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Commander Pavel",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c2082": {
+   "class": "Mage",
+   "effects": [
+    "increase-attack",
+    "extra-turn",
+    "increase-combat-readiness",
+    "increase-attack",
+    "decrease-skill-cooldown",
+    "stealth",
+    "extinction"
+   ],
+   "element": "Dark",
+   "name": "Top Model Luluca",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2085": {
+   "class": "Warrior",
+   "effects": [
+    "burn",
+    "increase-combat-readiness",
+    "vigor",
+    "cleanse",
+    "healing",
+    "dispel",
+    "detonate",
+    "burn"
+   ],
+   "element": "Dark",
+   "name": "Inferno Khawazu",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2086": {
+   "class": "Warrior",
+   "effects": [
+    "restrict",
+    "extra-turn",
+    "barrier",
+    "cleanse",
+    "increase-speed-greater"
+   ],
+   "element": "Dark",
+   "name": "Great Chief Khawana",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c2087": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "extra-turn",
+    "increase-speed-greater",
+    "fury",
+    "penetrate",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Peacemaker Furious",
+   "stars": 4,
+   "zodiac": "Scorpio"
+  },
+  "c2088": {
+   "class": "Mage",
+   "effects": [
+    "increase-speed-greater",
+    "decrease-skill-cooldown",
+    "increase-attack",
+    "increase-critical-hit-damage",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Sylvan Sage Vivian",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2088_s01": {
+   "class": "Mage",
+   "effects": [
+    "increase-speed-greater",
+    "decrease-skill-cooldown",
+    "increase-attack",
+    "increase-critical-hit-damage",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Sylvan Sage Vivian",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2089": {
+   "class": "Warrior",
+   "effects": [
+    "dual-attack",
+    "barrier",
+    "decrease-combat-readiness",
+    "redirected-provoke",
+    "extra-turn",
+    "vigor",
+    "decrease-attack"
+   ],
+   "element": "Light",
+   "name": "Conqueror Lilias",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c2090": {
+   "class": "Soul Weaver",
+   "effects": [
+    "detonate",
+    "sleep",
+    "increase-combat-readiness",
+    "effectiveness",
+    "extra-turn",
+    "sleep"
+   ],
+   "element": "Dark",
+   "name": "Death Dealer Ray",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2091": {
+   "class": "Ranger",
+   "effects": [
+    "increase-combat-readiness",
+    "cannot-counterattack",
+    "unhealable",
+    "restrict"
+   ],
+   "element": "Light",
+   "name": "Astromancer Elena",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2095": {
+   "class": "Warrior",
+   "effects": [
+    "silence",
+    "increase-defense",
+    "increase-combat-readiness",
+    "cleanse",
+    "increase-combat-readiness",
+    "increase-skill-cooldown"
+   ],
+   "element": "Dark",
+   "name": "Designer Lilibet",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2099": {
+   "class": "Mage",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-combat-readiness",
+    "dispel",
+    "debuff-immunity",
+    "target",
+    "increase-attack",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Architect Laika",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c2101": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "increase-speed-greater",
+    "healing"
+   ],
+   "element": "Dark",
+   "name": "Urban Shadow Choux",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c2102": {
+   "class": "Mage",
+   "effects": [
+    "decrease-defense",
+    "increase-combat-readiness",
+    "penetrate",
+    "decrease-combat-readiness",
+    "increase-skill-cooldown"
+   ],
+   "element": "Dark",
+   "name": "Requiem Roana",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c2103": {
+   "class": "Thief",
+   "effects": [
+    "penetrate",
+    "cleanse",
+    "decrease-skill-cooldown",
+    "immortal",
+    "revive",
+    "cleanse",
+    "possession"
+   ],
+   "element": "Light",
+   "name": "Spirit Eye Celine",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2103_s01": {
+   "class": "Thief",
+   "effects": [
+    "penetrate",
+    "cleanse",
+    "decrease-skill-cooldown",
+    "immortal",
+    "revive",
+    "cleanse",
+    "possession"
+   ],
+   "element": "Light",
+   "name": "Spirit Eye Celine",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2106": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Dragon Bride Senya",
+   "stars": 5,
+   "zodiac": "Sagittarius"
+  },
+  "c2109": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "healing",
+    "increase-critical-hit-resistance",
+    "increase-attack",
+    "penetrate",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "Navy Captain Landy",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c2110": {
+   "class": "Ranger",
+   "effects": [
+    "detonate",
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-combat-readiness",
+    "burn",
+    "decrease-combat-readiness",
+    "bomb"
+   ],
+   "element": "Dark",
+   "name": "Pirate Captain Flan",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2110_s01": {
+   "class": "Ranger",
+   "effects": [
+    "detonate",
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-combat-readiness",
+    "burn",
+    "decrease-combat-readiness",
+    "bomb"
+   ],
+   "element": "Dark",
+   "name": "Pirate Captain Flan",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c2111": {
+   "class": "Mage",
+   "effects": [
+    "dispel",
+    "stun",
+    "stealth",
+    "daydream",
+    "barrier",
+    "stun",
+    "decrease-combat-readiness"
+   ],
+   "element": "Light",
+   "name": "Solitaria of the Snow",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c2112": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Dark",
+   "name": "Sea Phantom Politis",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2112_s01_1": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Dark",
+   "name": "Sea Phantom Politis",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2113": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Empyrean Ilynav",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2113_s01_1": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Empyrean Ilynav",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2124": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Boss Arunka",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c2125": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Dark",
+   "name": "Lone Wolf Peira",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c2126": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Dark",
+   "name": "Hellion Lua",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2127": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Light",
+   "name": "Successor Taeyou",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c2128": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Dark",
+   "name": "Bystander Hwayoung",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2129": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Dark",
+   "name": "Disciplinary Prefect Aria",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c2131": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Dark",
+   "name": "School Nurse Yulha",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2132": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Light",
+   "name": "Dragon King Sharun",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c2148_1": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Tidal Rift Elvira",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c2165": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Dark",
+   "name": "New Kid Adin",
+   "stars": 4,
+   "zodiac": "Sagittarius"
+  },
+  "c2181_1": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Notos",
+   "stars": 5,
+   "zodiac": "Cancer"
+  },
+  "c2184_1": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Dark",
+   "name": "Salome",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c2185_1": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Dark",
+   "name": "Rhianna and Luciella",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c3001": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Butcher Corps Inquisitor",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3002": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "reflect",
+    "dispel",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Taranor Royal Guard",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3003": {
+   "class": "Knight",
+   "effects": [
+    "healing",
+    "decrease-defense",
+    "provoke"
+   ],
+   "element": "Earth",
+   "name": "Kluri",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c3004": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "increase-combat-readiness",
+    "escort",
+    "barrier",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "Arowell",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3005": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-defense",
+    "barrier",
+    "provoke"
+   ],
+   "element": "Dark",
+   "name": "Pyllis",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c3006": {
+   "class": "Knight",
+   "effects": [
+    "decrease-attack",
+    "dispel",
+    "barrier",
+    "debuff-immunity"
+   ],
+   "element": "Ice",
+   "name": "Bask",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3011": {
+   "class": "Thief",
+   "effects": [
+    "stun",
+    "stealth",
+    "increase-combat-readiness",
+    "stealth"
+   ],
+   "element": "Fire",
+   "name": "Judith",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3012": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "poison"
+   ],
+   "element": "Ice",
+   "name": "Alexa",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3013": {
+   "class": "Thief",
+   "effects": [
+    "decrease-speed",
+    "decrease-attack",
+    "increase-speed-greater"
+   ],
+   "element": "Earth",
+   "name": "Roozid",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c3014": {
+   "class": "Thief",
+   "effects": [
+    "decrease-speed",
+    "decrease-skill-cooldown",
+    "increase-speed-greater",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Mirsa",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3015": {
+   "class": "Thief",
+   "effects": [
+    "increase-attack",
+    "immortal"
+   ],
+   "element": "Dark",
+   "name": "Sven",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3021": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-combat-readiness"
+   ],
+   "element": "Fire",
+   "name": "Tieria",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c3022": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "decrease-defense",
+    "cannot-buff",
+    "increase-attack",
+    "increase-combat-readiness",
+    "increase-critical-hit-chance"
+   ],
+   "element": "Ice",
+   "name": "Enott",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3023": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "buff-extension",
+    "decrease-defense",
+    "increase-attack",
+    "increase-combat-readiness"
+   ],
+   "element": "Earth",
+   "name": "Helga",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3024": {
+   "class": "Warrior",
+   "effects": [
+    "bleed",
+    "decrease-defense",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "Gunther",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3025": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "debuff-immunity",
+    "provoke",
+    "decrease-defense"
+   ],
+   "element": "Dark",
+   "name": "Church of Ilryos Axe",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3026": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-attack",
+    "decrease-skill-cooldown",
+    "healing",
+    "debuff-immunity",
+    "decrease-defense"
+   ],
+   "element": "Light",
+   "name": "Free Spirit Tieria",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c3026_s01": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-attack",
+    "decrease-skill-cooldown",
+    "healing",
+    "debuff-immunity",
+    "decrease-defense"
+   ],
+   "element": "Light",
+   "name": "Free Spirit Tieria",
+   "stars": 4,
+   "zodiac": "Virgo"
+  },
+  "c3031": {
+   "class": "Warrior",
+   "effects": [
+    "healing",
+    "unhealable",
+    "provoke",
+    "decrease-defense",
+    "decrease-speed"
+   ],
+   "element": "Fire",
+   "name": "Azalea",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3032": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "dual-attack",
+    "increase-combat-readiness",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Taranor Guard",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3033": {
+   "class": "Warrior",
+   "effects": [
+    "increase-speed-greater",
+    "decrease-defense"
+   ],
+   "element": "Earth",
+   "name": "Mucacha",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3034": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "decrease-skill-cooldown",
+    "increase-speed-greater",
+    "dispel"
+   ],
+   "element": "Light",
+   "name": "Rikoris",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3035": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Lorina",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3041": {
+   "class": "Soul Weaver",
+   "effects": [
+    "unhealable",
+    "increase-combat-readiness",
+    "healing",
+    "increase-attack",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Hazel",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c3042": {
+   "class": "Soul Weaver",
+   "effects": [
+    "sleep",
+    "cleanse",
+    "healing",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Montmorancy",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3043": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "dispel",
+    "increase-skill-cooldown"
+   ],
+   "element": "Earth",
+   "name": "Adlay",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3044": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-defense",
+    "continuous-heal",
+    "healing",
+    "increase-combat-readiness",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Doris",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c3045": {
+   "class": "Mage",
+   "effects": [
+    "unhealable",
+    "cannot-buff",
+    "decrease-combat-readiness",
+    "silence"
+   ],
+   "element": "Dark",
+   "name": "Otillie",
+   "stars": 3,
+   "zodiac": "Taurus"
+  },
+  "c3051": {
+   "class": "Mage",
+   "effects": [
+    "detonate",
+    "decrease-speed",
+    "barrier",
+    "burn",
+    "dispel",
+    "burn"
+   ],
+   "element": "Fire",
+   "name": "Carrot",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3052": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "debuff-immunity",
+    "decrease-defense",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Jena",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c3053": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-hit-chance",
+    "cleanse",
+    "continuous-heal",
+    "increase-speed-greater"
+   ],
+   "element": "Earth",
+   "name": "Jecht",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3054": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-attack",
+    "healing",
+    "increase-attack",
+    "increase-defense",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Elson",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3055": {
+   "class": "Mage",
+   "effects": [
+    "silence",
+    "increase-combat-readiness",
+    "dispel",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Hurado",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3061": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "decrease-hit-chance",
+    "increase-attack",
+    "cleanse"
+   ],
+   "element": "Fire",
+   "name": "Nemunas",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3062": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-skill-cooldown",
+    "sleep",
+    "decrease-skill-cooldown"
+   ],
+   "element": "Ice",
+   "name": "Rima",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c3063": {
+   "class": "Ranger",
+   "effects": [
+    "poison",
+    "debuff-extension",
+    "extra-turn",
+    "poison"
+   ],
+   "element": "Earth",
+   "name": "Kiris ",
+   "stars": 3,
+   "zodiac": "Capricorn"
+  },
+  "c3064": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-hit-chance",
+    "decrease-combat-readiness",
+    "increase-attack",
+    "extra-turn"
+   ],
+   "element": "Light",
+   "name": "Celeste",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3065": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "target",
+    "stun"
+   ],
+   "element": "Dark",
+   "name": "Wanda",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c3071": {
+   "class": "Mage",
+   "effects": [
+    "healing",
+    "increase-speed-greater",
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "increase-attack",
+    "increase-defense",
+    "dispel"
+   ],
+   "element": "Fire",
+   "name": "Carmainerose",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c3072": {
+   "class": "Mage",
+   "effects": [
+    "healing",
+    "decrease-attack",
+    "unhealable",
+    "revive",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Mistychain",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3073": {
+   "class": "Mage",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-combat-readiness",
+    "sleep",
+    "stun",
+    "sleep"
+   ],
+   "element": "Earth",
+   "name": "Pearlhorizon",
+   "stars": 3,
+   "zodiac": "Taurus"
+  },
+  "c3074": {
+   "class": "Mage",
+   "effects": [
+    "extra-turn",
+    "transfer"
+   ],
+   "element": "Light",
+   "name": "Gloomyrain",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c3075": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-attack",
+    "increase-combat-readiness",
+    "healing",
+    "increase-combat-readiness",
+    "decrease-defense"
+   ],
+   "element": "Dark",
+   "name": "Requiemroar",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3084": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "counterattack",
+    "decrease-hit-chance"
+   ],
+   "element": "Light",
+   "name": "Kikirat v2",
+   "stars": 3,
+   "zodiac": "Capricorn"
+  },
+  "c3091": {
+   "class": "Thief",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-attack",
+    "increase-speed-greater"
+   ],
+   "element": "Fire",
+   "name": "Hataan",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3092": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-attack",
+    "decrease-skill-cooldown",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Lena",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3093": {
+   "class": "Warrior",
+   "effects": [
+    "stun"
+   ],
+   "element": "Earth",
+   "name": "Ains",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3094": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "barrier",
+    "debuff-immunity",
+    "cleanse"
+   ],
+   "element": "Light",
+   "name": "Eaton",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c3095": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-attack",
+    "decrease-defense"
+   ],
+   "element": "Dark",
+   "name": "Batisse",
+   "stars": 3,
+   "zodiac": "Taurus"
+  },
+  "c3101": {
+   "class": "Ranger",
+   "effects": [
+    "target",
+    "decrease-attack",
+    "decrease-hit-chance",
+    "increase-speed-greater",
+    "effectiveness"
+   ],
+   "element": "Fire",
+   "name": "Godmother",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c3102": {
+   "class": "Ranger",
+   "effects": [
+    "dispel",
+    "increase-attack",
+    "extra-turn",
+    "dispel",
+    "skill-nullifier",
+    "decrease-hit-chance"
+   ],
+   "element": "Ice",
+   "name": "Ian",
+   "stars": 3,
+   "zodiac": "Virgo"
+  },
+  "c3103": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extinction",
+    "extra-turn",
+    "increase-attack-greater"
+   ],
+   "element": "Earth",
+   "name": "Glenn",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3104": {
+   "class": "Soul Weaver",
+   "effects": [
+    "barrier",
+    "cleanse",
+    "healing",
+    "debuff-immunity",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Sonia",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c3105": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-defense",
+    "increase-combat-readiness",
+    "increase-attack",
+    "increase-speed-greater",
+    "healing"
+   ],
+   "element": "Dark",
+   "name": "Ainos",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3113": {
+   "class": "Soul Weaver",
+   "effects": [
+    "restrict",
+    "decrease-speed",
+    "restrict",
+    "barrier",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Lucy",
+   "stars": 3,
+   "zodiac": "Virgo"
+  },
+  "c3121": {
+   "class": "Warrior",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "decrease-speed",
+    "stigma"
+   ],
+   "element": "Fire",
+   "name": "Melany",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c3122": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-defense",
+    "healing",
+    "barrier",
+    "counterattack",
+    "decrease-skill-cooldown",
+    "increase-speed-greater"
+   ],
+   "element": "Ice",
+   "name": "Helen",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c3123": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-attack",
+    "increase-defense",
+    "healing"
+   ],
+   "element": "Earth",
+   "name": "Christy",
+   "stars": 3,
+   "zodiac": "Capricorn"
+  },
+  "c3124": {
+   "class": "Warrior",
+   "effects": [
+    "dual-attack",
+    "decrease-defense",
+    "increase-attack",
+    "extra-turn",
+    "skill-nullifier",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Camilla",
+   "stars": 3,
+   "zodiac": "Virgo"
+  },
+  "c3125": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "extra-turn",
+    "barrier",
+    "stealth",
+    "decrease-attack",
+    "stun"
+   ],
+   "element": "Dark",
+   "name": "Penelope",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3131": {
+   "class": "Warrior",
+   "effects": [
+    "increase-speed-greater",
+    "fury",
+    "increase-attack",
+    "decrease-speed"
+   ],
+   "element": "Fire",
+   "name": "Januta",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3132": {
+   "class": "Thief",
+   "effects": [
+    "bleed",
+    "increase-combat-readiness",
+    "counterattack",
+    "decrease-attack",
+    "increase-attack",
+    "decrease-defense"
+   ],
+   "element": "Ice",
+   "name": "Muwi",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3133": {
+   "class": "Thief",
+   "effects": [
+    "increase-attack",
+    "perception",
+    "penetrate"
+   ],
+   "element": "Earth",
+   "name": "Orte",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c3134": {
+   "class": "Knight",
+   "effects": [
+    "decrease-defense",
+    "restrict",
+    "increase-combat-readiness",
+    "barrier",
+    "increase-attack",
+    "debuff-immunity"
+   ],
+   "element": "Light",
+   "name": "Yoonryoung",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c3135": {
+   "class": "Knight",
+   "effects": [
+    "healing",
+    "increase-combat-readiness",
+    "increase-defense",
+    "decrease-skill-cooldown"
+   ],
+   "element": "Dark",
+   "name": "Hasol",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3143": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "cannot-buff",
+    "increase-attack",
+    "weakness-shared"
+   ],
+   "element": "Earth",
+   "name": "Adin",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3151": {
+   "class": "Warrior",
+   "effects": [
+    "perception",
+    "decrease-defense",
+    "cannot-buff"
+   ],
+   "element": "Fire",
+   "name": "Juni",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c3152": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "increase-combat-readiness",
+    "decrease-skill-cooldown",
+    "increase-defense"
+   ],
+   "element": "Ice",
+   "name": "Talaz",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3153": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "increase-attack",
+    "increase-combat-readiness",
+    "increase-speed-greater",
+    "decrease-speed",
+    "decrease-attack"
+   ],
+   "element": "Earth",
+   "name": "Lilka",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c3154": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "barrier",
+    "debuff-immunity",
+    "dispel",
+    "cannot-buff"
+   ],
+   "element": "Light",
+   "name": "Talia",
+   "stars": 3,
+   "zodiac": "Capricorn"
+  },
+  "c3155": {
+   "class": "Mage",
+   "effects": [
+    "burn",
+    "unhealable",
+    "burn"
+   ],
+   "element": "Dark",
+   "name": "Suthan",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c3156": {
+   "class": "Knight",
+   "effects": [
+    "decrease-hit-chance",
+    "barrier",
+    "decrease-attack",
+    "debuff-immunity",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Claudia",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c3157": {
+   "class": "Thief",
+   "effects": [
+    "decrease-attack",
+    "increase-combat-readiness",
+    "unhealable",
+    "decrease-hit-chance",
+    "restrict"
+   ],
+   "element": "Earth",
+   "name": "Ezra",
+   "stars": 3,
+   "zodiac": "Virgo"
+  },
+  "c3158": {
+   "class": "Warrior",
+   "effects": [
+    "extra-turn",
+    "penetrate",
+    "provoke",
+    "increase-attack",
+    "immortal",
+    "penetrate"
+   ],
+   "element": "Ice",
+   "name": "Amiki",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3160": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Dark",
+   "name": "Revna",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c3162": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Earth",
+   "name": "Bernard",
+   "stars": 3,
+   "zodiac": "Taurus"
+  },
+  "c3163": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "silence",
+    "decrease-buff-duration",
+    "increase-attack",
+    "extra-turn",
+    "increase-critical-hit-damage"
+   ],
+   "element": "Earth",
+   "name": "Leah",
+   "stars": 3,
+   "zodiac": "Virgo"
+  },
+  "c3164": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Ice",
+   "name": "Ragnvald",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c3165": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Dark",
+   "name": "Pernilla",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4001": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Chaos Inquisitor",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4003": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "healing",
+    "dispel",
+    "decrease-defense",
+    "provoke"
+   ],
+   "element": "Earth",
+   "name": "Falconer Kluri",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c4004": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "increase-combat-readiness",
+    "escort",
+    "barrier",
+    "dispel",
+    "stun"
+   ],
+   "element": "Light",
+   "name": "Unbound Knight Arowell",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c4005": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-defense",
+    "barrier",
+    "cleanse",
+    "provoke"
+   ],
+   "element": "Dark",
+   "name": "Shadow Knight Pyllis",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c4012": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "poison",
+    "increase-attack"
+   ],
+   "element": "Ice",
+   "name": "Summer's Disciple Alexa",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4013": {
+   "class": "Thief",
+   "effects": [
+    "decrease-speed",
+    "decrease-attack",
+    "increase-combat-readiness",
+    "continuous-heal",
+    "increase-speed-greater"
+   ],
+   "element": "Earth",
+   "name": "Righteous Thief Roozid",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c4023": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "buff-extension",
+    "decrease-defense",
+    "increase-attack",
+    "effectiveness"
+   ],
+   "element": "Earth",
+   "name": "Mercenary Helga",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c4025": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "debuff-immunity",
+    "provoke",
+    "extra-turn",
+    "healing",
+    "decrease-defense"
+   ],
+   "element": "Dark",
+   "name": "Chaos Sect Axe",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4034": {
+   "class": "Warrior",
+   "effects": [
+    "decrease-defense",
+    "decrease-skill-cooldown",
+    "increase-speed-greater",
+    "cleanse",
+    "decrease-speed",
+    "restrict"
+   ],
+   "element": "Light",
+   "name": "Captain Rikoris",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c4035": {
+   "class": "Warrior",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-combat-readiness"
+   ],
+   "element": "Dark",
+   "name": "Commander Lorina",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4041": {
+   "class": "Soul Weaver",
+   "effects": [
+    "unhealable",
+    "increase-combat-readiness",
+    "healing",
+    "increase-attack",
+    "continuous-heal",
+    "cleanse",
+    "increase-attack-greater",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Mascot Hazel",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c4042": {
+   "class": "Soul Weaver",
+   "effects": [
+    "sleep",
+    "cleanse",
+    "healing",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Angelic Montmorancy",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c4042_s01": {
+   "class": "Soul Weaver",
+   "effects": [
+    "sleep",
+    "cleanse",
+    "healing",
+    "increase-combat-readiness",
+    "debuff-immunity",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Ice",
+   "name": "Angelic Montmorancy",
+   "stars": 3,
+   "zodiac": "Pisces"
+  },
+  "c4044": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-defense",
+    "continuous-heal",
+    "healing",
+    "increase-combat-readiness",
+    "cleanse",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Magic Scholar Doris",
+   "stars": 3,
+   "zodiac": "Cancer"
+  },
+  "c4051": {
+   "class": "Mage",
+   "effects": [
+    "detonate",
+    "decrease-speed",
+    "barrier",
+    "burn",
+    "dispel",
+    "burn"
+   ],
+   "element": "Fire",
+   "name": "Researcher Carrot",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c4052": {
+   "class": "Mage",
+   "effects": [
+    "stun",
+    "debuff-immunity",
+    "decrease-defense",
+    "decrease-combat-readiness"
+   ],
+   "element": "Ice",
+   "name": "Shepherd Jena",
+   "stars": 3,
+   "zodiac": "Aries"
+  },
+  "c4062": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-skill-cooldown",
+    "sleep",
+    "increase-attack",
+    "decrease-skill-cooldown"
+   ],
+   "element": "Ice",
+   "name": "Muse Rima",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c4065": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-combat-readiness",
+    "target",
+    "decrease-speed",
+    "stun"
+   ],
+   "element": "Dark",
+   "name": "All-Rounder Wanda",
+   "stars": 3,
+   "zodiac": "Gemini"
+  },
+  "c4071": {
+   "class": "Mage",
+   "effects": [
+    "healing",
+    "increase-speed-greater",
+    "decrease-speed",
+    "decrease-combat-readiness",
+    "increase-attack",
+    "increase-defense",
+    "dispel",
+    "cannot-buff"
+   ],
+   "element": "Fire",
+   "name": "Zealot Carmainerose",
+   "stars": 3,
+   "zodiac": "Aquarius"
+  },
+  "c4073": {
+   "class": "Mage",
+   "effects": [
+    "decrease-hit-chance",
+    "increase-combat-readiness",
+    "sleep",
+    "decrease-defense",
+    "stun"
+   ],
+   "element": "Earth",
+   "name": "Doll Maker Pearlhorizon",
+   "stars": 3,
+   "zodiac": "Taurus"
+  },
+  "c4103": {
+   "class": "Ranger",
+   "effects": [
+    "decrease-defense",
+    "extinction",
+    "extra-turn",
+    "increase-critical-hit-chance",
+    "increase-attack-greater"
+   ],
+   "element": "Earth",
+   "name": "Vigilante Leader Glenn",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c4105": {
+   "class": "Soul Weaver",
+   "effects": [
+    "decrease-defense",
+    "increase-combat-readiness",
+    "dispel",
+    "increase-attack",
+    "increase-speed",
+    "healing"
+   ],
+   "element": "Dark",
+   "name": "Ainos 2.0",
+   "stars": 3,
+   "zodiac": "Sagittarius"
+  },
+  "c4123": {
+   "class": "Knight",
+   "effects": [
+    "provoke",
+    "increase-combat-readiness",
+    "effect-resistance",
+    "increase-attack",
+    "increase-defense",
+    "healing",
+    "effectiveness"
+   ],
+   "element": "Earth",
+   "name": "Silvertide Christy",
+   "stars": 3,
+   "zodiac": "Capricorn"
+  },
+  "c4141": {
+   "class": "Thief",
+   "effects": [
+    "healing",
+    "increase-speed-greater",
+    "willful-flame",
+    "decrease-defense",
+    "decrease-speed"
+   ],
+   "element": "Fire",
+   "name": "Holy Flame Adin",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4142": {
+   "class": "Thief",
+   "effects": [
+    "decrease-defense",
+    "decrease-defense",
+    "increase-speed-greater",
+    "decrease-speed"
+   ],
+   "element": "Ice",
+   "name": "Serene Purity Adin",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4143": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "cannot-buff",
+    "increase-attack",
+    "healing",
+    "weakness-shared"
+   ],
+   "element": "Earth",
+   "name": "Verdant Adin",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4144": {
+   "class": "Thief",
+   "effects": [
+    "cannot-buff",
+    "dispel",
+    "invincible",
+    "penetrate"
+   ],
+   "element": "Light",
+   "name": "Savior Adin",
+   "stars": 3,
+   "zodiac": "Leo"
+  },
+  "c4158": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Ice",
+   "name": "Inheritor Amiki",
+   "stars": 3,
+   "zodiac": "Scorpio"
+  },
+  "c5001": {
+   "class": "Knight",
+   "effects": [
+    "dispel",
+    "dual-attack",
+    "decrease-defense",
+    "increase-defense",
+    "healing"
+   ],
+   "element": "Fire",
+   "name": "Adventurer Ras",
+   "stars": 3,
+   "zodiac": "Libra"
+  },
+  "c5009": {
+   "class": "Knight",
+   "effects": [
+    "increase-combat-readiness",
+    "decrease-defense",
+    "enhanced-dual-attack",
+    "cleanse",
+    "decrease-defense",
+    "stun"
+   ],
+   "element": "Ice",
+   "name": "Summer Break Charlotte",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c5016": {
+   "class": "Warrior",
+   "effects": [
+    "burn",
+    "evasion",
+    "increase-attack",
+    "increase-combat-readiness",
+    "cleanse"
+   ],
+   "element": "Fire",
+   "name": "Holiday Yufine",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c5024": {
+   "class": "Ranger",
+   "effects": [
+    "dispel",
+    "increase-combat-readiness",
+    "bomb",
+    "detonate",
+    "increase-speed-greater",
+    "decrease-attack"
+   ],
+   "element": "Fire",
+   "name": "Summertime Iseria",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c5033": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Ice",
+   "name": "Tactical Archetype Coli",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c5046": {
+   "class": "Thief",
+   "effects": [
+    "stun",
+    "cannot-buff",
+    "penetrate",
+    "skill-nullifier"
+   ],
+   "element": "Earth",
+   "name": "Blooming Lidica",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c5050": {
+   "class": "Mage",
+   "effects": [
+    "redirected-provoke",
+    "decrease-defense",
+    "decrease-speed",
+    "silence",
+    "dispel",
+    "cannot-buff",
+    "redirected-provoke"
+   ],
+   "element": "Ice",
+   "name": "Fairytale Tenebria",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c5069_1": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Ice",
+   "name": "Aubade Ludwig",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c5070": {
+   "class": "Warrior",
+   "effects": [],
+   "element": "Fire",
+   "name": "Guard Captain Krau",
+   "stars": 5,
+   "zodiac": "Aries"
+  },
+  "c5071": {
+   "class": "Ranger",
+   "effects": [
+    "target",
+    "decrease-defense",
+    "unhealable",
+    "cannot-buff"
+   ],
+   "element": "Ice",
+   "name": "Seaside Bellona",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c5072": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Fire",
+   "name": "Swift Flagbearer Sigret",
+   "stars": 5,
+   "zodiac": "Capricorn"
+  },
+  "c5082": {
+   "class": "Soul Weaver",
+   "effects": [
+    "increase-combat-readiness",
+    "increase-combat-readiness",
+    "dispel",
+    "silence",
+    "increase-defense",
+    "cleanse"
+   ],
+   "element": "Earth",
+   "name": "Ocean Breeze Luluca",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c5089": {
+   "class": "Thief",
+   "effects": [
+    "healing",
+    "increase-attack",
+    "increase-combat-readiness",
+    "penetrate"
+   ],
+   "element": "Earth",
+   "name": "Midnight Gala Lilias",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c5110": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Fire",
+   "name": "Afternoon Soak Flan",
+   "stars": 5,
+   "zodiac": "Gemini"
+  },
+  "c5111": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Fire",
+   "name": "Festive Eda",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c5112_1": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Ice",
+   "name": "Uncharted Pioneer Politis",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c5128": {
+   "class": "Thief",
+   "effects": [],
+   "element": "Ice",
+   "name": "Argent Waves Hwayoung",
+   "stars": 5,
+   "zodiac": "Leo"
+  },
+  "c5147_1": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Earth",
+   "name": "Eye of the Abyss Fumyr",
+   "stars": 5,
+   "zodiac": "Libra"
+  },
+  "c5149": {
+   "class": "Warrior",
+   "effects": [
+    "penetrate",
+    "increase-speed-greater",
+    "healing",
+    "extinction",
+    "restrict"
+   ],
+   "element": "Ice",
+   "name": "Lethe",
+   "stars": 5,
+   "zodiac": "Aquarius"
+  },
+  "c5154": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Fire",
+   "name": "Perfumer Byblis",
+   "stars": 5,
+   "zodiac": "Virgo"
+  },
+  "c5175": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Fire",
+   "name": "Aram",
+   "stars": 5,
+   "zodiac": "Scorpio"
+  },
+  "c5190_1": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Ice",
+   "name": "Aube",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c6003": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Light",
+   "name": "Wretched Rose",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c6005": {
+   "class": "Soul Weaver",
+   "effects": [],
+   "element": "Light",
+   "name": "Lady of the Scales",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c6008": {
+   "class": "Warrior",
+   "effects": [
+    "provoke",
+    "increase-critical-hit-damage",
+    "increase-defense",
+    "barrier",
+    "provoke"
+   ],
+   "element": "Dark",
+   "name": "Bad Cat Armin",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c6011": {
+   "class": "Thief",
+   "effects": [
+    "increase-combat-readiness",
+    "barrier",
+    "stealth",
+    "extra-turn",
+    "cleanse"
+   ],
+   "element": "Light",
+   "name": "Last Piece Karin",
+   "stars": 4,
+   "zodiac": "Aries"
+  },
+  "c6014": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Light",
+   "name": "Wandering Prince Cidd",
+   "stars": 4,
+   "zodiac": "Pisces"
+  },
+  "c6017": {
+   "class": "Soul Weaver",
+   "effects": [
+    "stun",
+    "increase-combat-readiness",
+    "barrier",
+    "cleanse",
+    "increase-combat-readiness",
+    "dispel",
+    "random-buff",
+    "healing"
+   ],
+   "element": "Light",
+   "name": "Infinite Horizon Achates",
+   "stars": 4,
+   "zodiac": "Pisces"
+  },
+  "c6020": {
+   "class": "Ranger",
+   "effects": [],
+   "element": "Dark",
+   "name": "Westwind Executioner Schuri",
+   "stars": 4,
+   "zodiac": "Gemini"
+  },
+  "c6024_1": {
+   "class": "Knight",
+   "effects": [],
+   "element": "Light",
+   "name": "Monarch of the Sword Iseria",
+   "stars": 5,
+   "zodiac": "Taurus"
+  },
+  "c6037": {
+   "class": "Soul Weaver",
+   "effects": [
+    "sleep",
+    "debuff-immunity",
+    "cleanse",
+    "skill-nullifier",
+    "increase-attack",
+    "increase-combat-readiness",
+    "barrier"
+   ],
+   "element": "Light",
+   "name": "Moon Bunny Dominiel",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c6050": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Light",
+   "name": "Witch of the Mere Tenebria",
+   "stars": 5,
+   "zodiac": "Pisces"
+  },
+  "c6062": {
+   "class": "Mage",
+   "effects": [
+    "decrease-combat-readiness",
+    "silence",
+    "increase-combat-readiness",
+    "cleanse",
+    "skill-nullifier",
+    "dispel",
+    "cannot-buff",
+    "silence"
+   ],
+   "element": "Light",
+   "name": "Angel of Light Angelica",
+   "stars": 4,
+   "zodiac": "Taurus"
+  },
+  "c6065": {
+   "class": "Mage",
+   "effects": [],
+   "element": "Dark",
+   "name": "Sealed Eye Surin",
+   "stars": 4,
+   "zodiac": "Aquarius"
+  }
+ },
+ "fetchedAt": 1794873343,
+ "heroes": 387,
+ "models": 454,
+ "source": "https://epic7db.com/heroes",
+ "unmatched": [
+  "af0401",
+  "c0002",
+  "c1098",
+  "c1193_1",
+  "c2186_1",
+  "c2187_1",
+  "c5002",
+  "c7016_1",
+  "d1001",
+  "d1005",
+  "d1030",
+  "d3006",
+  "d3143",
+  "m1264",
+  "m1265",
+  "m1275",
+  "m1281",
+  "m1283",
+  "m1284",
+  "m1291",
+  "m1293",
+  "m1295",
+  "m1301",
+  "m1302",
+  "m1304",
+  "m1305",
+  "m1311",
+  "m1312",
+  "m1314",
+  "m1315",
+  "m1324",
+  "m1325",
+  "m1334",
+  "m1335",
+  "m1336",
+  "m1337",
+  "m9181",
+  "m9182",
+  "m9183",
+  "m9184",
+  "m9185",
+  "m9193",
+  "m9194",
+  "m9202",
+  "m9208",
+  "m9209",
+  "m9241",
+  "m9242",
+  "m9243",
+  "m9244"
+ ]
+}

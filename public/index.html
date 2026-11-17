@@ -157,6 +157,21 @@
 				</div>
 			</div>
 
+			<!-- Filter khusus Epic Seven, meniru https://epic7db.com/heroes:
+			     bintang / elemen / class / zodiac / status effect. -->
+			<div id="e7-filters" class="ls-filters" hidden>
+				<div class="ls-row" data-kind="stars" role="group" aria-label="Filter bintang"></div>
+				<div class="ls-row" data-kind="element" role="group" aria-label="Filter elemen"></div>
+				<div class="ls-row" data-kind="class" role="group" aria-label="Filter class"></div>
+				<div class="ls-row" data-kind="zodiac" role="group" aria-label="Filter zodiac"></div>
+				<div class="ls-row" data-kind="effect" role="group" aria-label="Filter status effect"></div>
+				<div class="ls-foot">
+					<button id="e7-reset" class="btn btn-sm btn-ghost ls-reset" type="button"
+						title="Hapus semua filter" aria-label="Hapus semua filter">↺ Reset</button>
+					<span id="e7-count" class="ls-count"></span>
+				</div>
+			</div>
+
 			<!-- view 1: games -->
 			<ul id="game-list" class="game-list"></ul>
 

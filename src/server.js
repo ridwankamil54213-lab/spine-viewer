@@ -2424,12 +2424,30 @@ function applyCrosscoreNames(models) {
 function applyEpic7Names(models) {
 	const e7 = models.filter((m) => (m.game || "") === "epic7");
 	if (!e7.length) return;
+	// Metadata tambahan dari Epic7DB (zodiac & status effect), tidak ada di
+	// katalog e7codex. Dipakai filter khusus Epic7 di viewer.
+	let e7db = {};
+	try {
+		e7db = JSON.parse(fs.readFileSync(path.join(DATA, "epic7db-heroes.json"), "utf8"))
+			.byModel || {};
+	} catch { /* opsional */ }
 	let map;
 	try {
 		map = JSON.parse(fs.readFileSync(path.join(ASSETS, "epic7", "_names.json"), "utf8"));
 	} catch {
 		return; // katalog belum dibuat — kartu tetap memakai id
 	}
+	// Epic7DB memakai "Thief"/"Soul Weaver"; e7codex memakai "assassin"/
+	// "manauser". Samakan di sini supaya chip filter memakai label wiki.
+	const e7Class = (v) => ({
+		assassin: "Thief", manauser: "Soul Weaver",
+	}[String(v || "").toLowerCase()] || v || null);
+	const e7Element = (v) => {
+		const s = String(v || "").toLowerCase();
+		// Epic7DB menyebut "Earth", e7codex menyebut "Wind".
+		if (s === "wind") return "Earth";
+		return s ? s.charAt(0).toUpperCase() + s.slice(1) : null;
+	};
 	const kindSuffix = (kind) => {
 		if (!kind || kind === "unit") return "";
 		return kind === "npc" ? " (NPC)" : kind === "monster" ? " (Monster)" : ` (${kind})`;
@@ -2452,6 +2470,15 @@ function applyEpic7Names(models) {
 			skin: rec.hero && rec.hero !== rec.name ? rec.hero : null,
 			code: key,
 		};
+		m.e7Class = e7Class(rec.class);
+		m.e7Element = e7Element(rec.element);
+		m.e7Stars = Number(String(rec.rarity || "").replace(/\D/g, "")) || null;
+		const extra = e7db[key];
+		if (extra) {
+			m.e7Zodiac = extra.zodiac || null;
+			m.e7Effects = extra.effects || [];
+			m.e7Stars = extra.stars || m.e7Stars;
+		}
 		if (rec.slug) m.slug = rec.slug;
 		if (rec.released) m.released = rec.released;
 		m.kind = rec.kind || "unit";
@@ -2476,6 +2503,15 @@ function applyEpic7Names(models) {
 			code: key,
 			rig: "combat",
 		};
+		m.e7Class = e7Class(rec.class);
+		m.e7Element = e7Element(rec.element);
+		m.e7Stars = Number(String(rec.rarity || "").replace(/\D/g, "")) || null;
+		const extra = e7db[key];
+		if (extra) {
+			m.e7Zodiac = extra.zodiac || null;
+			m.e7Effects = extra.effects || [];
+			m.e7Stars = extra.stars || m.e7Stars;
+		}
 		m.kind = rec.kind || "unit";
 	}
 

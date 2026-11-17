@@ -515,6 +515,15 @@ def main() -> int:
     named = rebuild_names(units)
     print("memeriksa thumbnail…", file=sys.stderr, flush=True)
     thumbs = fetch_thumbs(units, a.workers)
+    # Metadata filter (zodiac/status effect) berasal dari Epic7DB, bukan dari
+    # e7codex. Segarkan juga supaya hero baru tetap bisa difilter.
+    print("mengambil metadata Epic7DB…", file=sys.stderr, flush=True)
+    e7db = subprocess.run(
+        [sys.executable, os.path.join(ROOT, "tools", "import-epic7db-heroes.py")],
+        capture_output=True, text=True, timeout=180,
+    )
+    if e7db.returncode != 0:
+        print((e7db.stderr or "")[-500:], file=sys.stderr, flush=True)
     save_state(sig)
 
     res = {
@@ -526,9 +535,11 @@ def main() -> int:
         "detail": {k: len(v) for k, v in p.items()},
         "names": named,
         "thumbs": thumbs,
+        "epic7db": e7db.returncode == 0,
         "errors": [f"{r['src']}/{r['id']}: {r.get('err','')}" for r in critical[:15]],
-        "warnings": [f"{r['src']}/{r['id']}: {r.get('err','')}"
-                     for r in bad if r["src"] != "lobby"][:15],
+        "warnings": ([f"{r['src']}/{r['id']}: {r.get('err','')}"
+                      for r in bad if r["src"] != "lobby"] +
+                     ([] if e7db.returncode == 0 else ["metadata Epic7DB gagal disegarkan"]))[:15],
         "seconds": round(time.time() - t0, 1),
         "catatan": "server memindai ulang /api/models otomatis (cfg.rescan)",
     }

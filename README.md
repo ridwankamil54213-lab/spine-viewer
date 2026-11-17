@@ -1310,6 +1310,13 @@ manufacturer, squad, burst). Jembatan ke aset kita adalah
 Regresi `tools/check-czn.cjs` dan `tools/check-czn-cards.cjs` sekarang
 menarget `chaoszero` (bukan `czn-rigs`) dengan jumlah dinamis.
 
+**Filter Epic Seven (epic7db.com/heroes).** `tools/import-epic7db-heroes.py`
+menarik 387 hero beserta zodiac dan status effect, lalu memetakannya ke 454
+model e7codex. Filter bar `#e7-filters` menyediakan Bintang (3/4/5), Elemen,
+Class, Zodiac, dan Status Effect (multi-select AND); field `e7*` ikut ke
+payload `lean=1` dan ikut disegarkan oleh `tools/update-epic7.py --apply`.
+Regresi: `node tools/check-epic7-filters.cjs`.
+
 **Replace penuh Epic Seven.** `tools/replace-epic7.py` membersihkan campuran
 folder lama (`assets/epic7/` dulu 2.018 folder, padahal katalog e7codex.com
 cuma 856 unit, termasuk 104 folder `epic7-v3` yang sudah pensiun). Alurnya

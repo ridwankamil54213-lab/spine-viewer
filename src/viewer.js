@@ -325,6 +325,10 @@ const el = {
 	nkFilters: $("#nk-filters"),
 	nkReset: $("#nk-reset"),
 	nkCount: $("#nk-count"),
+	// Filter Epic Seven (epic7db.com)
+	e7Filters: $("#e7-filters"),
+	e7Reset: $("#e7-reset"),
+	e7Count: $("#e7-count"),
 	favCount: $("#fav-count"),
 
 	animSelect: $("#anim-select"),
@@ -6962,6 +6966,8 @@ const browse = {
 	// Filter khusus NIKKE: atribut Prydwen (nilai kosong = semua).
 	nkRarity: "", nkClass: "", nkElement: "",
 	nkWeapon: "", nkManufacturer: "", nkBurst: "",
+	// Filter khusus Epic Seven: efek bisa dipilih beberapa sekaligus (AND).
+	e7Stars: "", e7Element: "", e7Class: "", e7Zodiac: "", e7Effects: [],
 };
 
 /**
@@ -7134,6 +7140,7 @@ function openGame(key) {
 	resetCznFilters();
 	resetLsFilters();
 	resetNkFilters();
+	resetE7Filters();
 	// Must go through syncPanes: renderModels fills the grid, but the pane it
 	// lives in starts `hidden`, so calling renderModels directly renders into
 	// a container nobody can see.
@@ -7148,6 +7155,7 @@ function backToGames() {
 	resetCznFilters();
 	resetLsFilters();
 	resetNkFilters();
+	resetE7Filters();
 	// Leaving a game must stop any playing video: a <video> keeps downloading
 	// and decoding off-screen, which stalls the library render.
 	if (videoStageActive()) {
@@ -7220,6 +7228,21 @@ function modelsInScope(group = browse.cznGroup) {
 			["lsPosition", browse.lsPosition],
 		]) {
 			if (want) out = out.filter((m) => String(m[field] ?? "") === String(want));
+		}
+	}
+	// Filter Epic Seven (epic7db.com): bintang/elemen/class/zodiac + status
+	// effect. Efek bersifat AND: model harus punya semua efek yang dipilih.
+	if (browse.game === "epic7") {
+		for (const [field, want] of [
+			["e7Stars", browse.e7Stars],
+			["e7Element", browse.e7Element],
+			["e7Class", browse.e7Class],
+			["e7Zodiac", browse.e7Zodiac],
+		]) {
+			if (want) out = out.filter((m) => String(m[field] ?? "") === String(want));
+		}
+		for (const fx of browse.e7Effects) {
+			out = out.filter((m) => (m.e7Effects || []).includes(fx));
 		}
 	}
 	// Filter NIKKE (Prydwen): 6 dimensi, diterapkan pada kartu ROOT. Model
@@ -7538,6 +7561,95 @@ function resetNkFilters() {
 	browse.nkWeapon = browse.nkManufacturer = browse.nkBurst = "";
 }
 
+/* --- Filter Epic Seven (epic7db.com/heroes) ---------------------------- */
+const E7_EFFECT_LABEL = {
+	"increase-attack": "+ATK", "increase-speed": "+SPD", "increase-defense": "+DEF",
+	"dual-attack": "Dual Attack", "invincible": "Invincible", "extra-turn": "Extra Turn",
+	"increase-combat-readiness": "+CR", "immortal": "Immortal", "barrier": "Barrier",
+	"increase-critical-hit-resistance": "+RES", "decrease-attack": "-ATK",
+	"decrease-defense": "-DEF", "decrease-speed": "-SPD", "decrease-combat-readiness": "-CR",
+	"cannot-buff": "Cannot Buff", "unhealable": "Unhealable", "stun": "Stun",
+	"sleep": "Sleep", "poison": "Poison", "burn": "Burn", "provoke": "Provoke",
+	"counterattack": "Counter", "cleanse": "Cleanse", "healing": "Heal",
+	"dispel": "Dispel", "penetrate": "Penetrate", "debuff-immunity": "Immune",
+};
+const E7_DEFS = [
+	["stars", "e7Stars", "Bintang", ["5", "4", "3"], (v) => `${v}★`],
+	["element", "e7Element", "Elemen", ["Fire", "Ice", "Earth", "Light", "Dark"], (v) => String(v)],
+	["class", "e7Class", "Class",
+		["Knight", "Thief", "Ranger", "Mage", "Soul Weaver", "Warrior", "Assassin", "Manauser"],
+		(v) => ({ Manauser: "Soul Weaver", Assassin: "Thief" }[v] || String(v))],
+	["zodiac", "e7Zodiac", "Zodiac",
+		["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio",
+			"Sagittarius", "Capricorn", "Aquarius", "Pisces"], (v) => String(v)],
+	["effect", "e7Effects", "Status Effect", [],
+		(v) => E7_EFFECT_LABEL[v] || String(v).replace(/-/g, " ")],
+];
+
+function syncE7Filters() {
+	const box = el.e7Filters;
+	if (!box) return;
+	const show = browse.view === "models" && browse.game === "epic7";
+	box.hidden = !show;
+	if (!show) return;
+	const roots = libraryIndex(models).rootsByGame.get("epic7") || [];
+	for (const [kind, field, label, order, text] of E7_DEFS) {
+		const row = box.querySelector(`.ls-row[data-kind="${kind}"]`);
+		if (!row) continue;
+		let have;
+		if (kind === "effect") {
+			have = [...new Set(roots.flatMap((m) => m.e7Effects || []))].sort();
+		} else {
+			have = [...new Set(roots.map((m) => m[field]).filter((v) =>
+				v !== null && v !== undefined && v !== "").map(String))];
+		}
+		const vals = kind === "effect" ? have : [
+			...order.filter((v) => have.includes(v)),
+			...have.filter((v) => !order.includes(v)).sort(),
+		];
+		const active = kind === "effect" ? "" : String(browse[field] || "");
+		const sig = `${kind}:${vals.join(",")}:${kind === "effect" ? browse.e7Effects.join(",") : ""}`;
+		if (row.dataset.sig !== sig) {
+			row.innerHTML = `<span class="ls-label">${label}</span>`;
+			for (const v of vals) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "ls-chip";
+				b.dataset.kind = kind;
+				b.dataset.value = v;
+				const n = kind === "effect"
+					? roots.filter((m) => (m.e7Effects || []).includes(v)).length
+					: roots.filter((m) => String(m[field]) === v).length;
+				b.innerHTML = `<span class="ls-chip-text">${text(v)}</span><small>${n}</small>`;
+				b.title = `${label}: ${text(v)} (${n} karakter)`;
+				b.setAttribute("aria-label", b.title);
+				row.appendChild(b);
+			}
+			row.dataset.sig = sig;
+		}
+		for (const b of row.querySelectorAll(".ls-chip")) {
+			const on = kind === "effect"
+				? browse.e7Effects.includes(b.dataset.value)
+				: b.dataset.value === active;
+			b.classList.toggle("is-on", on);
+			b.setAttribute("aria-pressed", String(on));
+		}
+	}
+	const any = !!(browse.e7Stars || browse.e7Element || browse.e7Class ||
+		browse.e7Zodiac || browse.e7Effects.length);
+	if (el.e7Reset) el.e7Reset.disabled = !any;
+	if (el.e7Count) {
+		const shown = modelsInScope();
+		const chars = shown.filter((m) => m.e7Stars).length;
+		el.e7Count.textContent = `Menampilkan ${shown.length} model · ${chars} hero`;
+	}
+}
+
+function resetE7Filters() {
+	browse.e7Stars = browse.e7Element = browse.e7Class = browse.e7Zodiac = "";
+	browse.e7Effects = [];
+}
+
 function renderModels() {
 	const list = modelsInScope();
 	const perPage = browse.layout === "grid" ? PAGE_SIZE_GRID : PAGE_SIZE;
@@ -7574,6 +7686,7 @@ function renderModels() {
 	syncCznFilters();
 	syncLsFilters();
 	syncNkFilters();
+	syncE7Filters();
 	if (current) setActive(current.id);
 }
 
@@ -7817,6 +7930,7 @@ function syncPanes() {
 	syncCznFilters();
 	syncLsFilters();
 	syncNkFilters();
+	syncE7Filters();
 }
 
 /* --- Asset updater ----------------------------------------------------
@@ -11092,10 +11206,11 @@ el.cznFilters?.addEventListener("click", (e) => {
 	renderModels();
 });
 el.cznReset?.addEventListener("click", () => {
-	resetCznFilters();
-	resetLsFilters();
-	resetNkFilters();
-	renderModels();
+resetCznFilters();
+resetLsFilters();
+resetNkFilters();
+resetE7Filters();
+renderModels();
 });
 
 /* --- Filter Lost Sword: klik chip = toggle, Reset = kosongkan semuanya --- */
@@ -11127,9 +11242,33 @@ el.nkFilters?.addEventListener("click", (e) => {
 	renderModels();
 });
 el.nkReset?.addEventListener("click", () => {
-	resetNkFilters();
-	browse.page = 1;
-	renderModels();
+resetNkFilters();
+browse.page = 1;
+renderModels();
+});
+
+/* --- Filter Epic Seven: chip toggle (efek = multi-select AND) ---------- */
+el.e7Filters?.addEventListener("click", (e) => {
+const chip = e.target.closest?.(".ls-chip");
+if (!chip) return;
+const kind = chip.dataset.kind;
+if (kind === "effect") {
+	const v = chip.dataset.value;
+	browse.e7Effects = browse.e7Effects.includes(v)
+		? browse.e7Effects.filter((x) => x !== v)
+		: [...browse.e7Effects, v];
+} else {
+	const key = E7_DEFS.find((d) => d[0] === kind)?.[1];
+	if (!key) return;
+	browse[key] = browse[key] === chip.dataset.value ? "" : chip.dataset.value;
+}
+browse.page = 1;
+renderModels();
+});
+el.e7Reset?.addEventListener("click", () => {
+resetE7Filters();
+browse.page = 1;
+renderModels();
 });
 
 /** Tutup dialog yang sedang terbuka. true = ada yang ditutup. */
