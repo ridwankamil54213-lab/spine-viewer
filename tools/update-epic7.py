@@ -60,6 +60,7 @@ A_COMBAT = os.environ.get("E7_COMBAT", os.path.join(ROOT, "assets", "epic7-comba
 A_SKILL = os.environ.get("E7_SKILL", os.path.join(ROOT, "assets", "epic7-skill"))
 A_WALL = os.environ.get("E7_WALL", os.path.join(ROOT, "assets", "epic7-wallpaper"))
 THUMBS = os.environ.get("E7_THUMBS", os.path.join(ROOT, "public", "thumbs", "epic7"))
+ICONS = os.environ.get("E7_ICONS", os.path.join(ROOT, "public", "thumbs", "epic7-filters"))
 STATE = os.environ.get("E7_STATE", os.path.join(ROOT, "data", "epic7-update-state.json"))
 
 HEADERS = {
@@ -154,7 +155,8 @@ def disk_counts() -> dict:
         "skill": n(A_SKILL, (".webp",)),
         "wall": n(A_WALL, (".webm",)),
         "thumbs": n(THUMBS, (".png",)),
-    }
+        "icons": n(ICONS, (".png", ".webp", ".svg", ".json")),
+        }
 
 
 def load_state() -> dict | None:
@@ -524,6 +526,25 @@ def main() -> int:
     )
     if e7db.returncode != 0:
         print((e7db.stderr or "")[-500:], file=sys.stderr, flush=True)
+    # Ikon filter juga berasal dari Epic7DB. Cosmetic: kegagalan jangan
+    # membatalkan model inti, tapi harus terlihat jelas di log + warnings.
+    print("mengunduh ikon filter Epic7DB…", file=sys.stderr, flush=True)
+    icons = subprocess.run(
+        [sys.executable, os.path.join(ROOT, "tools", "import-epic7db-icons.py")],
+        capture_output=True, text=True, timeout=240,
+    )
+    icons_ok = icons.returncode == 0
+    try:
+        icons_info = json.loads(icons.stdout or "{}")
+    except Exception:  # noqa: BLE001
+        icons_info = {}
+    print("ikon filter Epic7DB: "
+          + f"{icons_info.get('icons', '?')} ikon, "
+          + f"{icons_info.get('missingEffects', '?')} fallback, "
+          + f"rc={icons.returncode}", file=sys.stderr, flush=True)
+    if not icons_ok:
+        detail = (icons.stderr or icons.stdout or "").strip().replace("\n", " ")[-500:]
+        print("peringatan ikon Epic7DB: " + detail, file=sys.stderr, flush=True)
     save_state(sig)
 
     res = {
@@ -535,11 +556,14 @@ def main() -> int:
         "detail": {k: len(v) for k, v in p.items()},
         "names": named,
         "thumbs": thumbs,
+        "icons": icons_info.get("icons", 0),
         "epic7db": e7db.returncode == 0,
+        "epic7dbIcons": icons_ok,
         "errors": [f"{r['src']}/{r['id']}: {r.get('err','')}" for r in critical[:15]],
         "warnings": ([f"{r['src']}/{r['id']}: {r.get('err','')}"
                       for r in bad if r["src"] != "lobby"] +
-                     ([] if e7db.returncode == 0 else ["metadata Epic7DB gagal disegarkan"]))[:15],
+                     ([] if e7db.returncode == 0 else ["metadata Epic7DB gagal disegarkan"]) +
+                     ([] if icons_ok else ["ikon filter Epic7DB gagal disegarkan"]))[:15],
         "seconds": round(time.time() - t0, 1),
         "catatan": "server memindai ulang /api/models otomatis (cfg.rescan)",
     }

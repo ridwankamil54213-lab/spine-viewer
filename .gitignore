@@ -19,6 +19,10 @@ public/thumbs/*
 !public/thumbs/_game/
 !public/thumbs/_game/**
 
+# Ikon filter Epic7DB juga aset UI kecil yang dikurasi, bukan cache runtime.
+!public/thumbs/epic7-filters/
+!public/thumbs/epic7-filters/**
+
 # Python bytecode
 __pycache__/
 *.py[cod]

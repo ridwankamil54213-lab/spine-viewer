@@ -98,9 +98,11 @@ async function getRaw(url, headers = {}) {
         /updaterBase|\/api\/update\/|\/api\/updaters\//.test(l) && /\.json\(\)/.test(l));
     ok("tidak ada r.json() tersisa di jalur updater", stale.length === 0,
         stale.slice(0, 2).join(" | "));
+    // Hitung CALL SITE, bukan deklarasi fungsinya. Delapan jalur ini mencakup
+    // status, check, apply, dan polling di dashboard + tombol per-game.
+    const updaterCalls = (view.match(/await fetchUpdateJSON\(/g) || []).length;
     ok("semua jalur updater memakai fetchUpdateJSON",
-        (view.match(/fetchUpdateJSON\(/g) || []).length >= 10,
-        String((view.match(/fetchUpdateJSON\(/g) || []).length));
+        updaterCalls >= 8, String(updaterCalls));
 
     ok("Python punya cache hasil scan",
         /SCAN_CACHE\s*=/.test(py) && /def load_scan_cache/.test(py) &&

@@ -103,7 +103,10 @@ const STATIC_ROOTS = {
 	dragontravelers: { assets: ["dragontravelers"] },
 	"mad-drama": { assets: ["mad-drama"] },
 	muvluv: { assets: ["muvluv"] },
-	epic7: { assets: ["epic7", "epic7-combat", "epic7-skill", "epic7-wallpaper"] },
+	epic7: {
+		assets: ["epic7", "epic7-combat", "epic7-skill", "epic7-wallpaper"],
+		thumbs: ["epic7", "epic7-filters"],
+	},
 	chaoszero: {
 		assets: ["chaoszero", "czn-cards"],
 		thumbs: ["chaoszero", "czn-ui"],

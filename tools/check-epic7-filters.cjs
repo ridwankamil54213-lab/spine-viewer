@@ -11,6 +11,7 @@ const { chromium } = require("playwright-core");
 
 const BASE = process.env.SPINE_URL || "http://127.0.0.1:3000";
 const ROOT = path.resolve(__dirname, "..");
+const ICON_DIR = path.join(ROOT, "public", "thumbs", "epic7-filters");
 const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 
 (async () => {
@@ -24,6 +25,41 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 	assert.ok(zodiac.size >= 12 && effects.size >= 50,
 		`zodiac=${zodiac.size} effects=${effects.size}`);
 	ok(`${db.heroes} hero Epic7DB · ${entries.length} model · ${zodiac.size} zodiac · ${effects.size} efek`);
+
+	const iconManifest = JSON.parse(fs.readFileSync(
+		path.join(ICON_DIR, "_manifest.json"), "utf8"));
+	const iconData = JSON.parse(fs.readFileSync(
+		path.join(ROOT, "data", "epic7db-icons.json"), "utf8"));
+	const iconRels = new Set(Object.values(iconManifest.icons || {})
+		.flatMap((group) => Object.values(group)));
+	assert.ok(iconManifest.counts.element === 5 && iconManifest.counts.class === 6 &&
+		iconManifest.counts.zodiac === 12 && iconManifest.counts.star === 1 &&
+		iconManifest.counts.effect >= 80 && iconRels.size >= 100,
+		"manifest ikon tidak lengkap: " + JSON.stringify(iconManifest.counts));
+	assert.strictEqual(iconManifest.missingEffects.length, 0);
+	assert.strictEqual(iconData.missingEffects.length, 0);
+	for (const rel of iconRels) {
+		const p = path.join(ICON_DIR, rel);
+		assert.ok(fs.existsSync(p) && fs.statSync(p).size > 0, `ikon hilang: ${rel}`);
+	}
+	assert.ok(fs.existsSync(path.join(ICON_DIR, "effects", "_neutral.svg")));
+	ok(`${iconRels.size} ikon Epic7DB · ${iconManifest.counts.effect} efek · 0 fallback`);
+	const manifestRes = await fetch(`${BASE}/thumbs/epic7-filters/_manifest.json`,
+		{ cache: "no-store" });
+	assert.strictEqual(manifestRes.status, 200);
+	for (const rel of [
+		iconManifest.icons.element.Fire,
+		iconManifest.icons.class["Soul Weaver"],
+		iconManifest.icons.zodiac.Leo,
+		iconManifest.icons.stars["5"],
+		iconManifest.icons.effect.dispel,
+	]) {
+		const r = await fetch(`${BASE}/thumbs/epic7-filters/${encodeURI(rel)}`,
+			{ cache: "no-store" });
+		assert.strictEqual(r.status, 200, `ikon HTTP ${r.status}: ${rel}`);
+		assert.match(r.headers.get("content-type") || "", /image\//);
+	}
+	ok("manifest + sampel ikon elemen/class/zodiac/star/effect HTTP 200");
 
 	const models = (await fetch(`${BASE}/api/models?game=epic7&lean=1`,
 		{ cache: "no-store" }).then((r) => r.json())).models || [];
@@ -47,6 +83,39 @@ const ok = (m, x = "") => console.log("ok   " + m + (x ? " — " + x : ""));
 	await page.locator('#game-list .game[data-key="epic7"]').click();
 	await page.waitForSelector("#model-list .gcard", { state: "visible", timeout: 90000 });
 	await page.waitForTimeout(1600);
+	await page.waitForFunction(() => {
+		const box = document.querySelector("#e7-filters");
+		const imgs = [...box.querySelectorAll("img.e7-chip-icon")];
+		return box.dataset.icons === "ready" && imgs.length >= 100 &&
+			imgs.every((img) => img.complete && img.naturalWidth > 0);
+	}, null, { timeout: 30000 });
+
+	const iconUi = await page.evaluate(() => {
+		const box = document.querySelector("#e7-filters");
+		const chips = [...box.querySelectorAll(".ls-chip")];
+		const imgs = [...box.querySelectorAll("img.e7-chip-icon")];
+		return {
+			ready: box.dataset.icons,
+			chips: chips.length,
+			withIcon: chips.filter((c) => c.querySelector("img.e7-chip-icon")).length,
+			imgs: imgs.length,
+			broken: imgs.filter((i) => !i.complete || i.naturalWidth === 0).length,
+			foreign: imgs.filter((i) => !i.src.includes("/thumbs/epic7-filters/")).length,
+			invisible: imgs.filter((i) => {
+				const cs = getComputedStyle(i);
+				const box = i.getBoundingClientRect();
+				return cs.display === "none" || cs.visibility === "hidden" ||
+					Number(cs.opacity) === 0 || box.width < 8 || box.height < 8;
+			}).length,
+		};
+	});
+	assert.strictEqual(iconUi.ready, "ready");
+	assert.strictEqual(iconUi.withIcon, iconUi.chips);
+	assert.strictEqual(iconUi.broken, 0);
+	assert.strictEqual(iconUi.foreign, 0);
+	assert.strictEqual(iconUi.invisible, 0);
+	assert.ok(iconUi.imgs >= 100);
+	ok(`semua ${iconUi.chips} chip punya ikon · ${iconUi.imgs} gambar decode & terlihat · 0 rusak`);
 
 	const ui = await page.evaluate(() => {
 		const box = document.querySelector("#e7-filters");

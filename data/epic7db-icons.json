@@ -1,0 +1,15 @@
+{
+ "buffs": 54,
+ "counts": {
+  "class": 6,
+  "effect": 87,
+  "element": 5,
+  "star": 1,
+  "zodiac": 12
+ },
+ "debuffs": 32,
+ "effects": 87,
+ "missingEffects": [],
+ "otherEffects": 1,
+ "source": "https://epic7db.com/heroes"
+}

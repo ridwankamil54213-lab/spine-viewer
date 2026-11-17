@@ -68,6 +68,14 @@ assert.ok(nkJobs["assets/nikke"] && nkJobs["thumbs/nikke"] &&
 	"root nikke belum lengkap: " + JSON.stringify(Object.keys(nkJobs)));
 ok("nikke: aset + 2 thumbnail aktif (ArtHub & NKAS) ikut ter-backup");
 
+const e7Jobs = Object.fromEntries(buildJobs("epic7", since).map((j) => [j.label, j.dst]));
+assert.ok(e7Jobs["assets/epic7"] && e7Jobs["assets/epic7-combat"] &&
+	e7Jobs["assets/epic7-skill"] && e7Jobs["assets/epic7-wallpaper"] &&
+	e7Jobs["thumbs/epic7"] && e7Jobs["thumbs/epic7-filters"],
+	"root epic7 belum lengkap: " + JSON.stringify(Object.keys(e7Jobs)));
+assert.strictEqual(e7Jobs["thumbs/epic7-filters"], "gdrive:thumbs/epic7-filters");
+ok("epic7: 4 aset + thumbnail model + ikon filter ikut ter-backup");
+
 // 3. Deteksi dinamis mengembalikan bentuk yang diharapkan.
 const dyn = changedRoots(since);
 assert.ok(dyn.assets instanceof Set && dyn.thumbs instanceof Set);

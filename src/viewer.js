@@ -7573,6 +7573,43 @@ const E7_EFFECT_LABEL = {
 	"counterattack": "Counter", "cleanse": "Cleanse", "healing": "Heal",
 	"dispel": "Dispel", "penetrate": "Penetrate", "debuff-immunity": "Immune",
 };
+/* Ikon resmi Epic7DB (diunduh tools/import-epic7db-icons.py). Manifest
+   dibaca runtime supaya ikon baru tidak butuh rebuild bundle. */
+const E7_ICON_DIR = "/thumbs/epic7-filters/";
+let E7_ICON_MANIFEST = null;
+const E7_ICON_ALIAS = { class: { Assassin: "Thief", Manauser: "Soul Weaver" } };
+
+function e7IconRels(kind, value) {
+	const raw = String(value);
+	const key = E7_ICON_ALIAS[kind]?.[raw] || raw;
+	const rel = E7_ICON_MANIFEST?.icons?.[kind]?.[key];
+	if (rel) return [rel];
+	if (kind === "stars") {
+		const n = Math.max(1, Math.min(5, Number(raw) || 1));
+		return Array.from({ length: n }, () => "stars/star.png");
+	}
+	const slug = key.toLowerCase().replace(/[^a-z0-9]+/g, "");
+	if (kind === "element") return [`elements/${key.toLowerCase()}.png`];
+	if (kind === "class") return [`classes/${slug}.png`];
+	if (kind === "zodiac") return [`zodiacs/${key.toLowerCase()}.webp`];
+	if (kind === "effect")
+		return [E7_ICON_MANIFEST ? "effects/_neutral.svg" : `effects/${raw}.png`];
+	return [];
+}
+
+async function loadE7Icons() {
+	let loaded = false;
+	try {
+		const r = await fetch(`${E7_ICON_DIR}_manifest.json`, { cache: "no-store" });
+		if (r.ok) {
+			E7_ICON_MANIFEST = await r.json();
+			loaded = !!E7_ICON_MANIFEST?.icons;
+		}
+	} catch { /* fallback path deterministic tetap dipakai */ }
+	if (el.e7Filters) el.e7Filters.dataset.icons = loaded ? "ready" : "fallback";
+	if (browse.game === "epic7") syncE7Filters();
+}
+
 const E7_DEFS = [
 	["stars", "e7Stars", "Bintang", ["5", "4", "3"], (v) => `${v}★`],
 	["element", "e7Element", "Elemen", ["Fire", "Ice", "Earth", "Light", "Dark"], (v) => String(v)],
@@ -7608,7 +7645,8 @@ function syncE7Filters() {
 			...have.filter((v) => !order.includes(v)).sort(),
 		];
 		const active = kind === "effect" ? "" : String(browse[field] || "");
-		const sig = `${kind}:${vals.join(",")}:${kind === "effect" ? browse.e7Effects.join(",") : ""}`;
+		const iconSig = E7_ICON_MANIFEST ? "manifest" : "fallback";
+		const sig = `${kind}:${vals.join(",")}:${kind === "effect" ? browse.e7Effects.join(",") : ""}:${iconSig}`;
 		if (row.dataset.sig !== sig) {
 			row.innerHTML = `<span class="ls-label">${label}</span>`;
 			for (const v of vals) {
@@ -7620,7 +7658,31 @@ function syncE7Filters() {
 				const n = kind === "effect"
 					? roots.filter((m) => (m.e7Effects || []).includes(v)).length
 					: roots.filter((m) => String(m[field]) === v).length;
-				b.innerHTML = `<span class="ls-chip-text">${text(v)}</span><small>${n}</small>`;
+				const iconVersion = E7_ICON_MANIFEST?.fetchedAt
+					? `?v=${E7_ICON_MANIFEST.fetchedAt}` : "";
+				for (const rel of e7IconRels(kind, v)) {
+					const img = document.createElement("img");
+					img.className = "e7-chip-icon";
+					img.src = E7_ICON_DIR + encodeURI(rel) + iconVersion;
+					img.alt = "";
+					img.setAttribute("aria-hidden", "true");
+					img.decoding = "async";
+					img.addEventListener("error", () => {
+						if (img.dataset.fallback) return;
+						img.dataset.fallback = "1";
+						img.src = `${E7_ICON_DIR}effects/_neutral.svg${iconVersion}`;
+					}, { once: true });
+					b.appendChild(img);
+				}
+				b.classList.add("has-e7-icon");
+				if (kind === "effect")
+					b.dataset.effectType = E7_ICON_MANIFEST?.effectTypes?.[v] || "other";
+				const chipLabel = document.createElement("span");
+				chipLabel.className = "ls-chip-text";
+				chipLabel.textContent = text(v);
+				const chipCount = document.createElement("small");
+				chipCount.textContent = String(n);
+				b.append(chipLabel, chipCount);
 				b.title = `${label}: ${text(v)} (${n} karakter)`;
 				b.setAttribute("aria-label", b.title);
 				row.appendChild(b);
@@ -12258,6 +12320,9 @@ app.renderer.resize(el.canvasWrap.clientWidth, el.canvasWrap.clientHeight);
 // shared ?v= link describes. Async IIFE, not top-level await: the bundle is an
 // IIFE and top-level await is not supported in that output format.
 (async () => {
+	const iconsReady = loadE7Icons();
 	await refresh();
 	await bootPermalink();
+	await iconsReady;
+	if (browse.game === "epic7") syncE7Filters();
 })();

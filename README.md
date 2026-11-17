@@ -1315,6 +1315,10 @@ menarik 387 hero beserta zodiac dan status effect, lalu memetakannya ke 454
 model e7codex. Filter bar `#e7-filters` menyediakan Bintang (3/4/5), Elemen,
 Class, Zodiac, dan Status Effect (multi-select AND); field `e7*` ikut ke
 payload `lean=1` dan ikut disegarkan oleh `tools/update-epic7.py --apply`.
+Ikon resmi Elemen / Class / Zodiac / Bintang / Status Effect dari Epic7DB
+diunduh `tools/import-epic7db-icons.py` ke `public/thumbs/epic7-filters/`,
+lengkap dengan `_manifest.json` dan fallback netral. Ikon ikut dibackup ke
+`gdrive:thumbs/epic7-filters` dan disegarkan oleh `update-epic7.py --apply`.
 Regresi: `node tools/check-epic7-filters.cjs`.
 
 **Replace penuh Epic Seven.** `tools/replace-epic7.py` membersihkan campuran

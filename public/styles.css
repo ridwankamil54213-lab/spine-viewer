@@ -3248,3 +3248,20 @@ input:focus-visible {
 	align-content: flex-start;
 }
 .ls-row[data-kind="stars"] .ls-chip.is-on { color: #ffc93c; }
+/* Ikon filter Epic7DB: ikon + teks + jumlah, bukan teks polos. */
+#e7-filters .ls-chip.has-e7-icon { gap: 4px; padding-inline: 6px; }
+.e7-chip-icon {
+	width: 18px;
+	height: 18px;
+	object-fit: contain;
+	flex: 0 0 auto;
+}
+#e7-filters .ls-row[data-kind="stars"] .e7-chip-icon { width: 12px; height: 12px; }
+#e7-filters .ls-row[data-kind="element"] .e7-chip-icon,
+#e7-filters .ls-row[data-kind="class"] .e7-chip-icon { width: 20px; height: 20px; }
+#e7-filters .ls-row[data-kind="effect"] .e7-chip-icon { width: 16px; height: 16px; }
+#e7-filters .ls-chip.is-on .e7-chip-icon {
+	filter: drop-shadow(0 0 3px var(--spark-hi));
+}
+#e7-filters .ls-chip[data-effect-type="buff"] .e7-chip-icon { filter: hue-rotate(18deg); }
+#e7-filters .ls-chip[data-effect-type="debuff"] .e7-chip-icon { filter: hue-rotate(-22deg); }
