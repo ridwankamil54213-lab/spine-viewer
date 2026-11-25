@@ -1,0 +1,2432 @@
+{
+ "img_cg_dynamic_a001_01_cg_spine": {
+  "name": "Milian — Shield Defense · CG 01",
+  "character": "Milian",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a001_03_cg_spine": {
+  "name": "Gretel · CG 03",
+  "character": "Gretel",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a002_01_cg_spine": {
+  "name": "Camilla — Self Damage Reduction · CG 01",
+  "character": "Camilla",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a002_02_cg_spine": {
+  "name": "Aladdin · CG 02",
+  "character": "Aladdin",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a003_01_cg_spine": {
+  "name": "Noctis — DMG BLK · CG 01",
+  "character": "Noctis",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a003_02_cg_spine": {
+  "name": "Sun · CG 02",
+  "character": "Sun",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a004_03_cg_spine": {
+  "name": "Don Quixote · CG 03",
+  "character": "Don Quixote",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a005_03_cg_spine": {
+  "name": "Alice — Shield, Damage Reduction, Stun Damage · CG 03",
+  "character": "Alice",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a006_03_cg_spine": {
+  "name": "Mother Goat — Teamwide Heal, Judgment Chance · CG 03",
+  "character": "Mother Goat",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a007_03_cg_spine": {
+  "name": "Yuki · CG 03",
+  "character": "Yuki",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a007_04_cg_spine": {
+  "name": "Sukuna — Massive Burns, Additional Attack · CG 04",
+  "character": "Sukuna",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a009_03_cg_spine": {
+  "name": "Belle — Judgment Sanction, On-hit Speed Up · CG 03",
+  "character": "Belle",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_a010_01_cg_spine": {
+  "name": "Mysterious Figure — For Story Use · CG 01",
+  "character": "Mysterious Figure",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b001_01_nightshot_cg_spine": {
+  "name": "Tin Soldier — Attack Speed Up, Detonate Pursuit · CG 01",
+  "character": "Tin Soldier",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b001_03_cg_spine": {
+  "name": "Tin Soldier — Attack Speed Up, Detonate Pursuit · CG 03",
+  "character": "Tin Soldier",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b002_02_cg_spine": {
+  "name": "Kinreiko — Enemy Weaken, Shatter Pursuit · CG 02",
+  "character": "Kinreiko",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b003_02_cg_spine": {
+  "name": "Urashima Tatsuko — Single Target Stun, Bleed Stacking · CG 02",
+  "character": "Urashima Tatsuko",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b003_04_cg_spine": {
+  "name": "Milnes · CG 04",
+  "character": "Milnes",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b004_01_cg_spine": {
+  "name": "March Hare — Teamwide Knockdown, Light Type Buffs · CG 01",
+  "character": "March Hare",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b005_03_cg_spine": {
+  "name": "Aunt Tigress — Shatter Pursuit, Buff Dispel · CG 03",
+  "character": "Aunt Tigress",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b006_03_cg_spine": {
+  "name": "Hansel — Cast Interrupt, Silence, Life Steal, Damage Reduction · CG 03",
+  "character": "Hansel",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b007_01_cg_spine": {
+  "name": "Erika — Inflict Bleed · CG 01",
+  "character": "Erika",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b007_03_cg_spine": {
+  "name": "Erika — Inflict Bleed · CG 03",
+  "character": "Erika",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b008_01_cg_spine": {
+  "name": "Myrna — DEF Down · CG 01",
+  "character": "Myrna",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b008_02_cg_spine": {
+  "name": "Drizella · CG 02",
+  "character": "Drizella",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b009_03_cg_spine": {
+  "name": "Shuten-douji · CG 03",
+  "character": "Shuten-douji",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b009_04_cg_spine": {
+  "name": "Inkiiing — ACC Down, Knockdown Chance · CG 04",
+  "character": "Inkiiing",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_b010_03_cg_spine": {
+  "name": "Dracula · CG 03",
+  "character": "Dracula",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c001_01_cg_spine": {
+  "name": "Lupin — Random Attack, Burn Detonate · CG 01",
+  "character": "Lupin",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c001_03_cg_spine": {
+  "name": "Lupin — Random Attack, Burn Detonate · CG 03",
+  "character": "Lupin",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c002_01_cg_spine": {
+  "name": "Sivia — Teamwide Crit · CG 01",
+  "character": "Sivia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c002_03_cg_spine": {
+  "name": "North Wind · CG 03",
+  "character": "North Wind",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c003_01_cg_spine": {
+  "name": "Gabriel — Self Buff, Formidable Enemy Attack · CG 01",
+  "character": "Gabriel",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c004_03_cg_spine": {
+  "name": "Ugly Duckling · CG 03",
+  "character": "Ugly Duckling",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c004_04_cg_spine": {
+  "name": "Tinker Bell · CG 04",
+  "character": "Tinker Bell",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c004_04_fas_cg_spine": {
+  "name": "Tinker Bell · CG 04",
+  "character": "Tinker Bell",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c004_05_cg_spine": {
+  "name": "Houyi — Precise Killer, Non-Elemental Pursuit · CG 05",
+  "character": "Houyi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c005_03_cg_spine": {
+  "name": "Amaterasu — Counter Stun, ACC Down · CG 03",
+  "character": "Amaterasu",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c007_01_cg_spine": {
+  "name": "Marianly — Reduce Defense · CG 01",
+  "character": "Marianly",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c007_03_cg_spine": {
+  "name": "Captain Hook · CG 03",
+  "character": "Captain Hook",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_c007_03_fas_cg_spine": {
+  "name": "Captain Hook · CG 03",
+  "character": "Captain Hook",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_cq03_01_cg_spine": {
+  "name": "Aphrodite · CG 01",
+  "character": "Aphrodite",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_cq10_01_cg_spine": {
+  "name": "Loki · CG 01",
+  "character": "Loki",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct001_cg_spine": {
+  "name": "Arthur — Self Buffs, Judgment Sanction · CG",
+  "character": "Arthur",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct002_cg_spine": {
+  "name": "Lancelot — Knockdown, Bleed, Non-Elemental Pursuit · CG",
+  "character": "Lancelot",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct003_cg_spine": {
+  "name": "Guinevere — Multi-hit Attacks, Weaken Defenses · CG",
+  "character": "Guinevere",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct004_cg_spine": {
+  "name": "Shao Ling — Healing Disruption, Self Buff · CG",
+  "character": "Shao Ling",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct005_cg_spine": {
+  "name": "Pan Jinlian — High Single Damage, Pierce Block · CG",
+  "character": "Pan Jinlian",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct006_cg_spine": {
+  "name": "Pang Chunmei — Lower Enemy Damage, Pursuit Mana Down · CG",
+  "character": "Pang Chunmei",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct007_cg_spine": {
+  "name": "Li Ping'er — Freeze Chance, Freeze Pursuit · CG",
+  "character": "Li Ping'er",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct008_cg_spine": {
+  "name": "Mamiya Marika · CG",
+  "character": "Mamiya Marika",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct008_fas_cg_spine": {
+  "name": "Mamiya Marika · CG",
+  "character": "Mamiya Marika",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct009_cg_spine": {
+  "name": "Jade Rabbit — Multiple Buffs, Teamwide Revival · CG",
+  "character": "Jade Rabbit",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct010_cg_spine": {
+  "name": "Urd · CG",
+  "character": "Urd",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct011_cg_spine": {
+  "name": "Verthandi — Bleed Silence, Non-Elemental Pursuit · CG",
+  "character": "Verthandi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct012_cg_spine": {
+  "name": "Skuld — Teamwide SPD Buff, Pursuit Buffs · CG",
+  "character": "Skuld",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct013_cg_spine": {
+  "name": "Izanagi — Shield, Heal, Mana Recover, Sanction · CG",
+  "character": "Izanagi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct014_cg_spine": {
+  "name": "Susanoo — Continuous Freeze, Ice Break, Mana Down · CG",
+  "character": "Susanoo",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct015_cg_spine": {
+  "name": "Izanami — Burn, Defense Down, Heal Down · CG",
+  "character": "Izanami",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct016_cg_spine": {
+  "name": "Minamoto no Hiromasa · CG",
+  "character": "Minamoto no Hiromasa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct017_cg_spine": {
+  "name": "Zhinu · CG",
+  "character": "Zhinu",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct018_cg_spine": {
+  "name": "Kaguya · CG",
+  "character": "Kaguya",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct019_cg_spine": {
+  "name": "Mamiya Marie · CG",
+  "character": "Mamiya Marie",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct020_cg_spine": {
+  "name": "Ashiya Doma · CG",
+  "character": "Ashiya Doma",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct021_cg_spine": {
+  "name": "Hamlet — Teamwide DMG RED, Judgment Sanction · CG",
+  "character": "Hamlet",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct022_cg_spine": {
+  "name": "Gertrude — Continuous Healing, Shield, Burn · CG",
+  "character": "Gertrude",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct023_cg_spine": {
+  "name": "Claudius — Defense Down, Bleed, Non-Elemental Pursuit · CG",
+  "character": "Claudius",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct024_cg_spine": {
+  "name": "Mier · CG",
+  "character": "Mier",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct025_cg_spine": {
+  "name": "Tsukuyomi — Magic Reflection, Ultimate Blocking · CG",
+  "character": "Tsukuyomi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct026_cg_spine": {
+  "name": "Apathy — Multiple Debuffs, Relentless Pursuits · CG",
+  "character": "Apathy",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct027_cg_spine": {
+  "name": "Lucia — Teamwide Comatose, ACC Down · CG",
+  "character": "Lucia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct028_cg_spine": {
+  "name": "Rafael — Teamwide SPD Buff, Crit DMG RES · CG",
+  "character": "Rafael",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct029_cg_spine": {
+  "name": "Shima Itsuki — Teamwide Shield, Teamwide Stun · CG",
+  "character": "Shima Itsuki",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct030_cg_spine": {
+  "name": "Ayaka Yoshino — Damage Down, Bleed, Heal · CG",
+  "character": "Ayaka Yoshino",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct031_cg_spine": {
+  "name": "Kiriko Hitomi — Mark Nemesis, Silence Pursuit · CG",
+  "character": "Kiriko Hitomi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct032_cg_spine": {
+  "name": "Mamiya Marisa · CG",
+  "character": "Mamiya Marisa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct033_cg_spine": {
+  "name": "Shelley · CG",
+  "character": "Shelley",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct034_cg_spine": {
+  "name": "Da Vinci · CG",
+  "character": "Da Vinci",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct035_cg_spine": {
+  "name": "Salome · CG",
+  "character": "Salome",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct036_cg_spine": {
+  "name": "Pygmalion · CG",
+  "character": "Pygmalion",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct037_cg_spine": {
+  "name": "Gulliver · CG",
+  "character": "Gulliver",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct038_cg_spine": {
+  "name": "Demeter · CG",
+  "character": "Demeter",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct039_cg_spine": {
+  "name": "青龍 · CG",
+  "character": "青龍",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct040_cg_spine": {
+  "name": "白虎 · CG",
+  "character": "白虎",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct041_cg_spine": {
+  "name": "Diao Chan · CG",
+  "character": "Diao Chan",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct042_cg_spine": {
+  "name": "Merlin · CG",
+  "character": "Merlin",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct043_2_cg_spine": {
+  "name": "Six-Eared Macaque — For Story Use · CG 2",
+  "character": "Six-Eared Macaque",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct043_cg_spine": {
+  "name": "Six-Eared Macaque — For Story Use · CG",
+  "character": "Six-Eared Macaque",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct044_cg_spine": {
+  "name": "玄武 · CG",
+  "character": "玄武",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct045_cg_spine": {
+  "name": "Uriel · CG",
+  "character": "Uriel",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct046_cg_spine": {
+  "name": "甄姬 · CG",
+  "character": "甄姬",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct047_cg_spine": {
+  "name": "Cai Wenji · CG",
+  "character": "Cai Wenji",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct048_cg_spine": {
+  "name": "麒麟 · CG",
+  "character": "麒麟",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct049_cg_spine": {
+  "name": "Mammon — AOE Stun, Judgment, Sanction · CG",
+  "character": "Mammon",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct050_cg_spine": {
+  "name": "Sweetie Fox — Mana Absorption, Fire Pursuit · CG",
+  "character": "Sweetie Fox",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct051_cg_spine": {
+  "name": "黑夜女神 · CG",
+  "character": "黑夜女神",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct052_cg_spine": {
+  "name": "曙光女神 · CG",
+  "character": "曙光女神",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct053_cg_spine": {
+  "name": "Sun Shangxiang — Block Down, Bleed Pursuit · CG",
+  "character": "Sun Shangxiang",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct054_cg_spine": {
+  "name": "Odin — Pierce Block, Freeze Pursuit · CG",
+  "character": "Odin",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct055_cg_spine": {
+  "name": "Freya — Continuous Healing, Poison Pursuit · CG",
+  "character": "Freya",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct056_cg_spine": {
+  "name": "Brynhildr — Stun Chance, Detonate Pursuit · CG",
+  "character": "Brynhildr",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct057_cg_spine": {
+  "name": "Rakshasi — AOE Knockdown, Wind Pursuit · CG",
+  "character": "Rakshasi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct058_cg_spine": {
+  "name": "Yu Ning — Low Health Execute, Anti-Heal · CG",
+  "character": "Yu Ning",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct059_cg_spine": {
+  "name": "Zhiying — Poison, Paralysis, Non-Elemental Pursuit · CG",
+  "character": "Zhiying",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct060_cg_spine": {
+  "name": "Miyamoto Musashi — Self Buff, Dark Pursuit · CG",
+  "character": "Miyamoto Musashi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct061_cg_spine": {
+  "name": "Sasaki Kojiro — Weaken DEF, Burn Detonate · CG",
+  "character": "Sasaki Kojiro",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct062_cg_spine": {
+  "name": "Yagyu Jubei — Increase Self Speed, Judgment Sanction · CG",
+  "character": "Yagyu Jubei",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct062_fas_cg_spine": {
+  "name": "Yagyu Jubei — Increase Self Speed, Judgment Sanction · CG",
+  "character": "Yagyu Jubei",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct063_cg_spine": {
+  "name": "Athena — Defense Buff, Pursuit DMG RED · CG",
+  "character": "Athena",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct064_cg_spine": {
+  "name": "Minerva — Shield Break, Shatter Pursuit · CG",
+  "character": "Minerva",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct065_cg_spine": {
+  "name": "Pandora — AOE Cast Interrupt, Ebon Pursuit · CG",
+  "character": "Pandora",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct066_cg_spine": {
+  "name": "Raphael — Team Buff, Wind Pursuit · CG",
+  "character": "Raphael",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct066_fas_cg_spine": {
+  "name": "Raphael — Team Buff, Wind Pursuit · CG",
+  "character": "Raphael",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct067_cg_spine": {
+  "name": "Rudy · CG",
+  "character": "Rudy",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct068_cg_spine": {
+  "name": "Aoi Hinamori — HP Absorption, Dark Pursuit · CG",
+  "character": "Aoi Hinamori",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct069_cg_spine": {
+  "name": "Tachibana — Teamwide Buffs, Water Pursuit · CG",
+  "character": "Tachibana",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct070_cg_spine": {
+  "name": "Tendo Mia — Defense Down, Paralysis, Ebon Pursuit · CG",
+  "character": "Tendo Mia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct071_cg_spine": {
+  "name": "Amamiya — Self Buff, Burn Detonate · CG",
+  "character": "Amamiya",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct072_cg_spine": {
+  "name": "Marco Polo — Pierce Block, Earth Pursuit · CG",
+  "character": "Marco Polo",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct072_fas_cg_spine": {
+  "name": "Marco Polo — Pierce Block, Earth Pursuit · CG",
+  "character": "Marco Polo",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct073_cg_spine": {
+  "name": "Wu Song — Self Buff, Dark Pursuit · CG",
+  "character": "Wu Song",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct074_cg_spine": {
+  "name": "Lu Zhishen — Lower Enemy Damage, Defense Buff · CG",
+  "character": "Lu Zhishen",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct075_cg_spine": {
+  "name": "Sun Erniang — AOE Heal, Sanction Pursuit · CG",
+  "character": "Sun Erniang",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct076_cg_spine": {
+  "name": "Akaoni — AOE Heal, Water Pursuit · CG",
+  "character": "Akaoni",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct077_cg_spine": {
+  "name": "Aramis · CG",
+  "character": "Aramis",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct078_cg_spine": {
+  "name": "Athos · CG",
+  "character": "Athos",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct079_cg_spine": {
+  "name": "Porthos · CG",
+  "character": "Porthos",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct080_cg_spine": {
+  "name": "Zheng Xiyue · CG",
+  "character": "Zheng Xiyue",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct081_cg_spine": {
+  "name": "D'Artagnan · CG",
+  "character": "D'Artagnan",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct082_cg_spine": {
+  "name": "Abe no Seimei · CG",
+  "character": "Abe no Seimei",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct083_cg_spine": {
+  "name": "Ashiya Doma · CG",
+  "character": "Ashiya Doma",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct084_cg_spine": {
+  "name": "Minamoto no Hiromasa · CG",
+  "character": "Minamoto no Hiromasa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct085_cg_spine": {
+  "name": "Zhinu · CG",
+  "character": "Zhinu",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct086_cg_spine": {
+  "name": "Kaguya · CG",
+  "character": "Kaguya",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct087_cg_spine": {
+  "name": "Mamiya Marie · CG",
+  "character": "Mamiya Marie",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct088_cg_spine": {
+  "name": "Mamiya Marika · CG",
+  "character": "Mamiya Marika",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct089_cg_spine": {
+  "name": "Mamiya Marisa · CG",
+  "character": "Mamiya Marisa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct090_cg_spine": {
+  "name": "Shelley · CG",
+  "character": "Shelley",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct091_cg_spine": {
+  "name": "Da Vinci · CG",
+  "character": "Da Vinci",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct092_cg_spine": {
+  "name": "Salome · CG",
+  "character": "Salome",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct093_cg_spine": {
+  "name": "Pygmalion · CG",
+  "character": "Pygmalion",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct094_cg_spine": {
+  "name": "Gulliver · CG",
+  "character": "Gulliver",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct095_cg_spine": {
+  "name": "Demeter · CG",
+  "character": "Demeter",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct102_cg_spine": {
+  "name": "Cupid — Random Charm, Non-Elemental Pursuit · CG",
+  "character": "Cupid",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct103_cg_spine": {
+  "name": "Saturn — For Story Use · CG",
+  "character": "Saturn",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct104_cg_spine": {
+  "name": "Daphne — For Story Use · CG",
+  "character": "Daphne",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct105_cg_spine": {
+  "name": "Cecilia — For Story Use · CG",
+  "character": "Cecilia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct106_cg_spine": {
+  "name": "Fannina — Dodge UP, Fire Pursuit · CG",
+  "character": "Fannina",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct107_cg_spine": {
+  "name": "Seiryu · CG",
+  "character": "Seiryu",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ct109_cg_spine": {
+  "name": "Suzaku · CG",
+  "character": "Suzaku",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d001_03_cg_spine": {
+  "name": "Jafar · CG 03",
+  "character": "Jafar",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d001_04_cg_spine": {
+  "name": "Thor · CG 04",
+  "character": "Thor",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d002_01_cg_spine": {
+  "name": "Sabrina — Teamwide Freeze · CG 01",
+  "character": "Sabrina",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d002_03_cg_spine": {
+  "name": "Starella · CG 03",
+  "character": "Starella",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d002_04_cg_spine": {
+  "name": "Medusa · CG 04",
+  "character": "Medusa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d003_03_cg_spine": {
+  "name": "Zhuge Liang — Bleed Removal, MAG DMG Up · CG 03",
+  "character": "Zhuge Liang",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d005_03_cg_spine": {
+  "name": "Himiko — Heal, Damage Reduction, Detonate Pursuit · CG 03",
+  "character": "Himiko",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d007_02_cg_spine": {
+  "name": "Beth — AOE Damage, Intense Bleeding · CG 02",
+  "character": "Beth",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d008_03_cg_spine": {
+  "name": "Dorothy — Freeze on Hit Chance, Ice Shatter Pursuit · CG 03",
+  "character": "Dorothy",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d009_03_cg_spine": {
+  "name": "Naphissa — Continuous Recovery, Dark Damage Buff · CG 03",
+  "character": "Naphissa",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_d010_02_cg_spine": {
+  "name": "Anubis — Ebon Abyss, Silence Pursuit · CG 02",
+  "character": "Anubis",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_da03_01_cg_spine": {
+  "name": "Melody · CG 01",
+  "character": "Melody",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_da04_01_cg_spine": {
+  "name": "Orochi · CG 01",
+  "character": "Orochi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_da04_02_cg_spine": {
+  "name": "Orochi · CG 02",
+  "character": "Orochi",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_da05_01_cg_spine": {
+  "name": "Hela · CG 01",
+  "character": "Hela",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_da06_01_cg_spine": {
+  "name": "Yama · CG 01",
+  "character": "Yama",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e001_01_cg_spine": {
+  "name": "Cinderella · CG 01",
+  "character": "Cinderella",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e001_04_cg_spine": {
+  "name": "Michael — ACC Up, Teamwide Judgment · CG 04",
+  "character": "Michael",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e002_03_cg_spine": {
+  "name": "Rapunzel · CG 03",
+  "character": "Rapunzel",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e002_04_cg_spine": {
+  "name": "Jizo · CG 04",
+  "character": "Jizo",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e003_03_cg_spine": {
+  "name": "Oz — Siphoning Shield, Teamwide DMG RED · CG 03",
+  "character": "Oz",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e004_01_cg_spine": {
+  "name": "Fanny — Defense Healing · CG 01",
+  "character": "Fanny",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e004_02_cg_spine": {
+  "name": "Sylv · CG 02",
+  "character": "Sylv",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e004_02_teaching_cg_spine": {
+  "name": "Sylv · CG 02",
+  "character": "Sylv",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e004_04_cg_spine": {
+  "name": "Annin Miru · CG 04",
+  "character": "Annin Miru",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e005_03_cg_spine": {
+  "name": "Quasimodo — Teamwide Heal, Teamwide Petrify · CG 03",
+  "character": "Quasimodo",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e006_03_cg_spine": {
+  "name": "Tutankhamun — ACC Down, Earth Pursuit · CG 03",
+  "character": "Tutankhamun",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e007_02_cg_spine": {
+  "name": "Snow White · CG 02",
+  "character": "Snow White",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e007_04_cg_spine": {
+  "name": "Nie Xiaoqian — Dodge UP, Non-Elemental Pursuit · CG 04",
+  "character": "Nie Xiaoqian",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e008_03_cg_spine": {
+  "name": "Otohime — Continuous Ice Break, AOE CC · CG 03",
+  "character": "Otohime",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_e009_01_cg_spine": {
+  "name": "Cortés · CG 01",
+  "character": "Cortés",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ea01_01_cg_spine": {
+  "name": "Pinocchio · CG 01",
+  "character": "Pinocchio",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ea03_01_cg_spine": {
+  "name": "Lanmei · CG 01",
+  "character": "Lanmei",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_ea05_01_cg_spine": {
+  "name": "Cheung-san · CG 01",
+  "character": "Cheung-san",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f001_03_cg_spine": {
+  "name": "Lupiz — Bleed Crit, STM Up on Hit · CG 03",
+  "character": "Lupiz",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f002_01_cg_spine": {
+  "name": "Joyce — Intercept magic · CG 01",
+  "character": "Joyce",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f002_03_cg_spine": {
+  "name": "Peter Pan · CG 03",
+  "character": "Peter Pan",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f002_03_fas_cg_spine": {
+  "name": "Peter Pan · CG 03",
+  "character": "Peter Pan",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f002_04_cg_spine": {
+  "name": "Prometheus · CG 04",
+  "character": "Prometheus",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f003_03_cg_spine": {
+  "name": "Ursuna · CG 03",
+  "character": "Ursuna",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f003_04_cg_spine": {
+  "name": "Lilith — Multi-hit Combo, Petrify Shatter · CG 04",
+  "character": "Lilith",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f004_03_cg_spine": {
+  "name": "Bluebeard · CG 03",
+  "character": "Bluebeard",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f005_01_cg_spine": {
+  "name": "Georgia · CG 01",
+  "character": "Georgia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f005_02_cg_spine": {
+  "name": "Ginger Britney · CG 02",
+  "character": "Ginger Britney",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f006_01_cg_spine": {
+  "name": "Mandy — Mana Steal · CG 01",
+  "character": "Mandy",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f006_03_cg_spine": {
+  "name": "Aurora · CG 03",
+  "character": "Aurora",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f007_02_cg_spine": {
+  "name": "Mad Hatter — PHY PEN Down, Electrocute, Poison · CG 02",
+  "character": "Mad Hatter",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_f008_02_cg_spine": {
+  "name": "Anastasia — Continuous Mana Down, Burn Detonate · CG 02",
+  "character": "Anastasia",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_fi04_01_cg_spine": {
+  "name": "Wu Zetian · CG 01",
+  "character": "Wu Zetian",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_fi05_01_cg_spine": {
+  "name": "Sakiko · CG 01",
+  "character": "Sakiko",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_fi10_01_cg_spine": {
+  "name": "Hephaestus · CG 01",
+  "character": "Hephaestus",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_g025_01_cg_spine": {
+  "name": "Red · CG 01",
+  "character": "Red",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_g025_03_cg_spine": {
+  "name": "Yule · CG 03",
+  "character": "Yule",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_li01_01_cg_spine": {
+  "name": "Elizabeth I · CG 01",
+  "character": "Elizabeth I",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_li02_01_cg_spine": {
+  "name": "Lucifer · CG 01",
+  "character": "Lucifer",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_mb05_1_cg_spine": {
+  "name": "Lanho · CG 1",
+  "character": "Lanho",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wa02_01_cg_spine": {
+  "name": "Poseidon · CG 01",
+  "character": "Poseidon",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wa04_01_cg_spine": {
+  "name": "Chang'e · CG 01",
+  "character": "Chang'e",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wa05_01_cg_spine": {
+  "name": "Thetis · CG 01",
+  "character": "Thetis",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wa06_01_cg_spine": {
+  "name": "Ping · CG 01",
+  "character": "Ping",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wa08_01_cg_spine": {
+  "name": "Cleopatra · CG 01",
+  "character": "Cleopatra",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wi01_01_cg_spine": {
+  "name": "Rinko · CG 01",
+  "character": "Rinko",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wi03_01_cg_spine": {
+  "name": "Martha · CG 01",
+  "character": "Martha",
+  "kind": "CG"
+ },
+ "img_cg_dynamic_wi04_01_cg_spine": {
+  "name": "Tengu · CG 01",
+  "character": "Tengu",
+  "kind": "CG"
+ },
+ "img_hcg_dynamic_2.5nd_anniversary_hcg1_1_spine": {
+  "name": "2.5nd Anniversary Hcg1 1",
+  "character": "2.5nd Anniversary Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_2nd_anniversary_hcg1_1_spine": {
+  "name": "2nd Anniversary Hcg1 1",
+  "character": "2nd Anniversary Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_3rd_anniversary_hcg1_1_spine": {
+  "name": "3rd Anniversary Hcg1 1",
+  "character": "3rd Anniversary Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a001_01_hcg1_1_spine": {
+  "name": "Milian — Shield Defense · HCG 1",
+  "character": "Milian",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a001_03_hcg1_1_spine": {
+  "name": "Gretel · HCG 1",
+  "character": "Gretel",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a002_01_hcg1_1_spine": {
+  "name": "Camilla — Self Damage Reduction · HCG 1",
+  "character": "Camilla",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a002_02_hcg1_1_spine": {
+  "name": "Aladdin · HCG 1",
+  "character": "Aladdin",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a003_01_hcg1_1_spine": {
+  "name": "Noctis — DMG BLK · HCG 1",
+  "character": "Noctis",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a003_02_hcg1_1_spine": {
+  "name": "Sun · HCG 1",
+  "character": "Sun",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a004_03_hcg1_1_spine": {
+  "name": "Don Quixote · HCG 1",
+  "character": "Don Quixote",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a005_03_hcg1_1_spine": {
+  "name": "Alice — Shield, Damage Reduction, Stun Damage · HCG 1",
+  "character": "Alice",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a006_03_hcg1_1_spine": {
+  "name": "Mother Goat — Teamwide Heal, Judgment Chance · HCG 1",
+  "character": "Mother Goat",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a007_03_hcg1_1_spine": {
+  "name": "Yuki · HCG 1",
+  "character": "Yuki",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a007_04_hcg1_1_spine": {
+  "name": "Sukuna — Massive Burns, Additional Attack · HCG 1",
+  "character": "Sukuna",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_a009_03_hcg1_1_spine": {
+  "name": "Belle — Judgment Sanction, On-hit Speed Up · HCG 1",
+  "character": "Belle",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b001_03_hcg1_1_spine": {
+  "name": "Tin Soldier — Attack Speed Up, Detonate Pursuit · HCG 1",
+  "character": "Tin Soldier",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b002_02_hcg1_1_spine": {
+  "name": "Kinreiko — Enemy Weaken, Shatter Pursuit · HCG 1",
+  "character": "Kinreiko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b003_02_hcg1_1_spine": {
+  "name": "Urashima Tatsuko — Single Target Stun, Bleed Stacking · HCG 1",
+  "character": "Urashima Tatsuko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b003_04_hcg1_1_spine": {
+  "name": "Milnes · HCG 1",
+  "character": "Milnes",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b004_01_hcg1_1_spine": {
+  "name": "March Hare — Teamwide Knockdown, Light Type Buffs · HCG 1",
+  "character": "March Hare",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b005_03_hcg1_1_spine": {
+  "name": "Aunt Tigress — Shatter Pursuit, Buff Dispel · HCG 1",
+  "character": "Aunt Tigress",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b006_03_hcg1_1_spine": {
+  "name": "Hansel — Cast Interrupt, Silence, Life Steal, Damage Reduction · HCG 1",
+  "character": "Hansel",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b007_01_hcg1_1_spine": {
+  "name": "Erika — Inflict Bleed · HCG 1",
+  "character": "Erika",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b007_03_hcg1_1_spine": {
+  "name": "Erika — Inflict Bleed · HCG 1",
+  "character": "Erika",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b008_01_hcg1_1_spine": {
+  "name": "Myrna — DEF Down · HCG 1",
+  "character": "Myrna",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b008_02_hcg1_1_spine": {
+  "name": "Drizella · HCG 1",
+  "character": "Drizella",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b009_03_hcg1_1_spine": {
+  "name": "Shuten-douji · HCG 1",
+  "character": "Shuten-douji",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b009_04_hcg1_1_spine": {
+  "name": "Inkiiing — ACC Down, Knockdown Chance · HCG 1",
+  "character": "Inkiiing",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b009_04_hcg1_2_spine": {
+  "name": "Inkiiing — ACC Down, Knockdown Chance · HCG 2",
+  "character": "Inkiiing",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_b010_03_hcg1_1_spine": {
+  "name": "Dracula · HCG 1",
+  "character": "Dracula",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c001_01_hcg1_1_spine": {
+  "name": "Lupin — Random Attack, Burn Detonate · HCG 1",
+  "character": "Lupin",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c001_03_hcg1_1_spine": {
+  "name": "Lupin — Random Attack, Burn Detonate · HCG 1",
+  "character": "Lupin",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c002_01_hcg1_1_spine": {
+  "name": "Sivia — Teamwide Crit · HCG 1",
+  "character": "Sivia",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c002_03_hcg1_1_spine": {
+  "name": "North Wind · HCG 1",
+  "character": "North Wind",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c003_01_hcg1_1_spine": {
+  "name": "Gabriel — Self Buff, Formidable Enemy Attack · HCG 1",
+  "character": "Gabriel",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c004_03_hcg1_1_spine": {
+  "name": "Ugly Duckling · HCG 1",
+  "character": "Ugly Duckling",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c004_04_hcg1_1_spine": {
+  "name": "Tinker Bell · HCG 1",
+  "character": "Tinker Bell",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c004_05_hcg1_1_spine": {
+  "name": "Houyi — Precise Killer, Non-Elemental Pursuit · HCG 1",
+  "character": "Houyi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c005_03_hcg1_1_spine": {
+  "name": "Amaterasu — Counter Stun, ACC Down · HCG 1",
+  "character": "Amaterasu",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c007_01_hcg1_1_spine": {
+  "name": "Marianly — Reduce Defense · HCG 1",
+  "character": "Marianly",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_c007_03_hcg1_1_spine": {
+  "name": "Captain Hook · HCG 1",
+  "character": "Captain Hook",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq03_01_hcg1_1_spine": {
+  "name": "Aphrodite · HCG 1",
+  "character": "Aphrodite",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq10_01_hcg1_1_spine": {
+  "name": "Loki · HCG 1",
+  "character": "Loki",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq17cq18cq19_hcg1_1_spine": {
+  "name": "Cq17cq18cq19 Hcg1 1",
+  "character": "Cq17cq18cq19 Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq17cq18cq19_hcg1_2_spine": {
+  "name": "Cq17cq18cq19 Hcg1 2",
+  "character": "Cq17cq18cq19 Hcg1 2",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq25cq26cq27_hcg1_1_spine": {
+  "name": "Cq25cq26cq27 Hcg1 1",
+  "character": "Cq25cq26cq27 Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq29cq30cq31_hcg1_1_spine": {
+  "name": "Cq29cq30cq31 Hcg1 1",
+  "character": "Cq29cq30cq31 Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_cq29cq30cq31_hcg1_2_spine": {
+  "name": "Cq29cq30cq31 Hcg1 2",
+  "character": "Cq29cq30cq31 Hcg1 2",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct001_hcg1_1_spine": {
+  "name": "Arthur — Self Buffs, Judgment Sanction · HCG 1",
+  "character": "Arthur",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct002_hcg1_1_spine": {
+  "name": "Lancelot — Knockdown, Bleed, Non-Elemental Pursuit · HCG 1",
+  "character": "Lancelot",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct003_hcg1_1_spine": {
+  "name": "Guinevere — Multi-hit Attacks, Weaken Defenses · HCG 1",
+  "character": "Guinevere",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct004_hcg1_1_spine": {
+  "name": "Shao Ling — Healing Disruption, Self Buff · HCG 1",
+  "character": "Shao Ling",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct005_hcg1_1_spine": {
+  "name": "Pan Jinlian — High Single Damage, Pierce Block · HCG 1",
+  "character": "Pan Jinlian",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct006_hcg1_1_spine": {
+  "name": "Pang Chunmei — Lower Enemy Damage, Pursuit Mana Down · HCG 1",
+  "character": "Pang Chunmei",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct007_hcg1_1_spine": {
+  "name": "Li Ping'er — Freeze Chance, Freeze Pursuit · HCG 1",
+  "character": "Li Ping'er",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct008_hcg1_1_spine": {
+  "name": "Mamiya Marika · HCG 1",
+  "character": "Mamiya Marika",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct009_hcg1_1_spine": {
+  "name": "Jade Rabbit — Multiple Buffs, Teamwide Revival · HCG 1",
+  "character": "Jade Rabbit",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct010_hcg1_1_spine": {
+  "name": "Urd · HCG 1",
+  "character": "Urd",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct011_hcg1_1_spine": {
+  "name": "Verthandi — Bleed Silence, Non-Elemental Pursuit · HCG 1",
+  "character": "Verthandi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct012_hcg1_1_spine": {
+  "name": "Skuld — Teamwide SPD Buff, Pursuit Buffs · HCG 1",
+  "character": "Skuld",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct013_hcg1_1_spine": {
+  "name": "Izanagi — Shield, Heal, Mana Recover, Sanction · HCG 1",
+  "character": "Izanagi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct014_hcg1_1_spine": {
+  "name": "Susanoo — Continuous Freeze, Ice Break, Mana Down · HCG 1",
+  "character": "Susanoo",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct015_hcg1_1_spine": {
+  "name": "Izanami — Burn, Defense Down, Heal Down · HCG 1",
+  "character": "Izanami",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct016_hcg1_1_spine": {
+  "name": "Minamoto no Hiromasa · HCG 1",
+  "character": "Minamoto no Hiromasa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct017_hcg1_1_spine": {
+  "name": "Zhinu · HCG 1",
+  "character": "Zhinu",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct018_hcg1_1_spine": {
+  "name": "Kaguya · HCG 1",
+  "character": "Kaguya",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct019_hcg1_1_spine": {
+  "name": "Mamiya Marie · HCG 1",
+  "character": "Mamiya Marie",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct020_hcg1_1_spine": {
+  "name": "Ashiya Doma · HCG 1",
+  "character": "Ashiya Doma",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct021_hcg1_1_spine": {
+  "name": "Hamlet — Teamwide DMG RED, Judgment Sanction · HCG 1",
+  "character": "Hamlet",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct022_hcg1_1_spine": {
+  "name": "Gertrude — Continuous Healing, Shield, Burn · HCG 1",
+  "character": "Gertrude",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct023_hcg1_1_spine": {
+  "name": "Claudius — Defense Down, Bleed, Non-Elemental Pursuit · HCG 1",
+  "character": "Claudius",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct024_hcg1_1_spine": {
+  "name": "Mier · HCG 1",
+  "character": "Mier",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct025_hcg1_1_spine": {
+  "name": "Tsukuyomi — Magic Reflection, Ultimate Blocking · HCG 1",
+  "character": "Tsukuyomi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct026_hcg1_1_spine": {
+  "name": "Apathy — Multiple Debuffs, Relentless Pursuits · HCG 1",
+  "character": "Apathy",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct027_hcg1_1_spine": {
+  "name": "Lucia — Teamwide Comatose, ACC Down · HCG 1",
+  "character": "Lucia",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct028_hcg1_1_spine": {
+  "name": "Rafael — Teamwide SPD Buff, Crit DMG RES · HCG 1",
+  "character": "Rafael",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct029_hcg1_1_spine": {
+  "name": "Shima Itsuki — Teamwide Shield, Teamwide Stun · HCG 1",
+  "character": "Shima Itsuki",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct030_hcg1_1_spine": {
+  "name": "Ayaka Yoshino — Damage Down, Bleed, Heal · HCG 1",
+  "character": "Ayaka Yoshino",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct031_hcg1_1_spine": {
+  "name": "Kiriko Hitomi — Mark Nemesis, Silence Pursuit · HCG 1",
+  "character": "Kiriko Hitomi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct032_hcg1_1_spine": {
+  "name": "Mamiya Marisa · HCG 1",
+  "character": "Mamiya Marisa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct033_hcg1_1_spine": {
+  "name": "Shelley · HCG 1",
+  "character": "Shelley",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct034_hcg1_1_spine": {
+  "name": "Da Vinci · HCG 1",
+  "character": "Da Vinci",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct035_hcg1_1_spine": {
+  "name": "Salome · HCG 1",
+  "character": "Salome",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct036_hcg1_1_spine": {
+  "name": "Pygmalion · HCG 1",
+  "character": "Pygmalion",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct037_hcg1_1_spine": {
+  "name": "Gulliver · HCG 1",
+  "character": "Gulliver",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct038_hcg1_1_spine": {
+  "name": "Demeter · HCG 1",
+  "character": "Demeter",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct039_hcg1_1_spine": {
+  "name": "青龍 · HCG 1",
+  "character": "青龍",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct040_hcg1_1_spine": {
+  "name": "白虎 · HCG 1",
+  "character": "白虎",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct041_hcg1_1_spine": {
+  "name": "Diao Chan · HCG 1",
+  "character": "Diao Chan",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct042_hcg1_1_spine": {
+  "name": "Merlin · HCG 1",
+  "character": "Merlin",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct043_hcg1_1_spine": {
+  "name": "Six-Eared Macaque — For Story Use · HCG 1",
+  "character": "Six-Eared Macaque",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct044_hcg1_1_spine": {
+  "name": "玄武 · HCG 1",
+  "character": "玄武",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct045_hcg1_1_spine": {
+  "name": "Uriel · HCG 1",
+  "character": "Uriel",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct046_hcg1_1_spine": {
+  "name": "甄姬 · HCG 1",
+  "character": "甄姬",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct047_hcg1_1_spine": {
+  "name": "Cai Wenji · HCG 1",
+  "character": "Cai Wenji",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct048_hcg1_1_spine": {
+  "name": "麒麟 · HCG 1",
+  "character": "麒麟",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct049_hcg1_1_spine": {
+  "name": "Mammon — AOE Stun, Judgment, Sanction · HCG 1",
+  "character": "Mammon",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct050_hcg1_1_spine": {
+  "name": "Sweetie Fox — Mana Absorption, Fire Pursuit · HCG 1",
+  "character": "Sweetie Fox",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct050_hcg1_2_spine": {
+  "name": "Sweetie Fox — Mana Absorption, Fire Pursuit · HCG 2",
+  "character": "Sweetie Fox",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct051_hcg1_1_spine": {
+  "name": "黑夜女神 · HCG 1",
+  "character": "黑夜女神",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct052_hcg1_1_spine": {
+  "name": "曙光女神 · HCG 1",
+  "character": "曙光女神",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct053_hcg1_1_spine": {
+  "name": "Sun Shangxiang — Block Down, Bleed Pursuit · HCG 1",
+  "character": "Sun Shangxiang",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct054_hcg1_1_spine": {
+  "name": "Odin — Pierce Block, Freeze Pursuit · HCG 1",
+  "character": "Odin",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct055_hcg1_1_spine": {
+  "name": "Freya — Continuous Healing, Poison Pursuit · HCG 1",
+  "character": "Freya",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct056_hcg1_1_spine": {
+  "name": "Brynhildr — Stun Chance, Detonate Pursuit · HCG 1",
+  "character": "Brynhildr",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct057_hcg1_1_spine": {
+  "name": "Rakshasi — AOE Knockdown, Wind Pursuit · HCG 1",
+  "character": "Rakshasi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct058_hcg1_1_spine": {
+  "name": "Yu Ning — Low Health Execute, Anti-Heal · HCG 1",
+  "character": "Yu Ning",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct059_hcg1_1_spine": {
+  "name": "Zhiying — Poison, Paralysis, Non-Elemental Pursuit · HCG 1",
+  "character": "Zhiying",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct060_hcg1_1_spine": {
+  "name": "Miyamoto Musashi — Self Buff, Dark Pursuit · HCG 1",
+  "character": "Miyamoto Musashi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct061_hcg1_1_spine": {
+  "name": "Sasaki Kojiro — Weaken DEF, Burn Detonate · HCG 1",
+  "character": "Sasaki Kojiro",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct062_hcg1_1_spine": {
+  "name": "Yagyu Jubei — Increase Self Speed, Judgment Sanction · HCG 1",
+  "character": "Yagyu Jubei",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct063_hcg1_1_spine": {
+  "name": "Athena — Defense Buff, Pursuit DMG RED · HCG 1",
+  "character": "Athena",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct064_hcg1_1_spine": {
+  "name": "Minerva — Shield Break, Shatter Pursuit · HCG 1",
+  "character": "Minerva",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct065_hcg1_1_spine": {
+  "name": "Pandora — AOE Cast Interrupt, Ebon Pursuit · HCG 1",
+  "character": "Pandora",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct066_hcg1_1_spine": {
+  "name": "Raphael — Team Buff, Wind Pursuit · HCG 1",
+  "character": "Raphael",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct067_hcg1_1_spine": {
+  "name": "Rudy · HCG 1",
+  "character": "Rudy",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct067_hcg1_2_spine": {
+  "name": "Rudy · HCG 2",
+  "character": "Rudy",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct068_hcg1_1_spine": {
+  "name": "Aoi Hinamori — HP Absorption, Dark Pursuit · HCG 1",
+  "character": "Aoi Hinamori",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct068_hcg1_2_spine": {
+  "name": "Aoi Hinamori — HP Absorption, Dark Pursuit · HCG 2",
+  "character": "Aoi Hinamori",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct069_hcg1_1_spine": {
+  "name": "Tachibana — Teamwide Buffs, Water Pursuit · HCG 1",
+  "character": "Tachibana",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct070_hcg1_1_spine": {
+  "name": "Tendo Mia — Defense Down, Paralysis, Ebon Pursuit · HCG 1",
+  "character": "Tendo Mia",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct071_hcg1_1_spine": {
+  "name": "Amamiya — Self Buff, Burn Detonate · HCG 1",
+  "character": "Amamiya",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct072_hcg1_1_spine": {
+  "name": "Marco Polo — Pierce Block, Earth Pursuit · HCG 1",
+  "character": "Marco Polo",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct073_hcg1_1_spine": {
+  "name": "Wu Song — Self Buff, Dark Pursuit · HCG 1",
+  "character": "Wu Song",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct074_hcg1_1_spine": {
+  "name": "Lu Zhishen — Lower Enemy Damage, Defense Buff · HCG 1",
+  "character": "Lu Zhishen",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct075_hcg1_1_spine": {
+  "name": "Sun Erniang — AOE Heal, Sanction Pursuit · HCG 1",
+  "character": "Sun Erniang",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct076_hcg1_1_spine": {
+  "name": "Akaoni — AOE Heal, Water Pursuit · HCG 1",
+  "character": "Akaoni",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct076_hcg1_2_spine": {
+  "name": "Akaoni — AOE Heal, Water Pursuit · HCG 2",
+  "character": "Akaoni",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct076_hcg1_3_spine": {
+  "name": "Akaoni — AOE Heal, Water Pursuit · HCG 3",
+  "character": "Akaoni",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct077_hcg1_1_spine": {
+  "name": "Aramis · HCG 1",
+  "character": "Aramis",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct078_hcg1_1_spine": {
+  "name": "Athos · HCG 1",
+  "character": "Athos",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct079_hcg1_1_spine": {
+  "name": "Porthos · HCG 1",
+  "character": "Porthos",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct080_hcg1_1_spine": {
+  "name": "Zheng Xiyue · HCG 1",
+  "character": "Zheng Xiyue",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct081_hcg1_1_spine": {
+  "name": "D'Artagnan · HCG 1",
+  "character": "D'Artagnan",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct082_hcg1_1_spine": {
+  "name": "Abe no Seimei · HCG 1",
+  "character": "Abe no Seimei",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct083_hcg1_1_spine": {
+  "name": "Ashiya Doma · HCG 1",
+  "character": "Ashiya Doma",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct084_hcg1_1_spine": {
+  "name": "Minamoto no Hiromasa · HCG 1",
+  "character": "Minamoto no Hiromasa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct085_hcg1_1_spine": {
+  "name": "Zhinu · HCG 1",
+  "character": "Zhinu",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct086_hcg1_1_spine": {
+  "name": "Kaguya · HCG 1",
+  "character": "Kaguya",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct087_hcg1_1_spine": {
+  "name": "Mamiya Marie · HCG 1",
+  "character": "Mamiya Marie",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct088_hcg1_1_spine": {
+  "name": "Mamiya Marika · HCG 1",
+  "character": "Mamiya Marika",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct089_hcg1_1_spine": {
+  "name": "Mamiya Marisa · HCG 1",
+  "character": "Mamiya Marisa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct090_hcg1_1_spine": {
+  "name": "Shelley · HCG 1",
+  "character": "Shelley",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct091_hcg1_1_spine": {
+  "name": "Da Vinci · HCG 1",
+  "character": "Da Vinci",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct092_hcg1_1_spine": {
+  "name": "Salome · HCG 1",
+  "character": "Salome",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct093_hcg1_1_spine": {
+  "name": "Pygmalion · HCG 1",
+  "character": "Pygmalion",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct094_hcg1_1_spine": {
+  "name": "Gulliver · HCG 1",
+  "character": "Gulliver",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct095_hcg1_1_spine": {
+  "name": "Demeter · HCG 1",
+  "character": "Demeter",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct098_hcg1_1_spine": {
+  "name": "Diaochan · HCG 1",
+  "character": "Diaochan",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct102_hcg1_1_spine": {
+  "name": "Cupid — Random Charm, Non-Elemental Pursuit · HCG 1",
+  "character": "Cupid",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct106_hcg1_1_spine": {
+  "name": "Fannina — Dodge UP, Fire Pursuit · HCG 1",
+  "character": "Fannina",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct108_hcg1_1_spine": {
+  "name": "Byakko · HCG 1",
+  "character": "Byakko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct69ct70ct71_hcg1_1_spine": {
+  "name": "Ct69ct70ct71 Hcg1 1",
+  "character": "Ct69ct70ct71 Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct69ct70ct71_hcg1_2_spine": {
+  "name": "Ct69ct70ct71 Hcg1 2",
+  "character": "Ct69ct70ct71 Hcg1 2",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct87ct88ct89_hcg1_1_spine": {
+  "name": "Ct87ct88ct89 Hcg1 1",
+  "character": "Ct87ct88ct89 Hcg1 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ct87ct88ct89_hcg1_2_spine": {
+  "name": "Ct87ct88ct89 Hcg1 2",
+  "character": "Ct87ct88ct89 Hcg1 2",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d001_03_hcg1_1_spine": {
+  "name": "Jafar · HCG 1",
+  "character": "Jafar",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d001_04_hcg1_1_spine": {
+  "name": "Thor · HCG 1",
+  "character": "Thor",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d002_01_hcg1_1_spine": {
+  "name": "Sabrina — Teamwide Freeze · HCG 1",
+  "character": "Sabrina",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d002_03_hcg1_1_spine": {
+  "name": "Starella · HCG 1",
+  "character": "Starella",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d002_04_hcg1_1_spine": {
+  "name": "Medusa · HCG 1",
+  "character": "Medusa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d003_03_hcg1_1_spine": {
+  "name": "Zhuge Liang — Bleed Removal, MAG DMG Up · HCG 1",
+  "character": "Zhuge Liang",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d005_03_hcg1_1_spine": {
+  "name": "Himiko — Heal, Damage Reduction, Detonate Pursuit · HCG 1",
+  "character": "Himiko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d007_02_hcg1_1_spine": {
+  "name": "Beth — AOE Damage, Intense Bleeding · HCG 1",
+  "character": "Beth",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d008_03_hcg1_1_spine": {
+  "name": "Dorothy — Freeze on Hit Chance, Ice Shatter Pursuit · HCG 1",
+  "character": "Dorothy",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d009_03_hcg1_1_spine": {
+  "name": "Naphissa — Continuous Recovery, Dark Damage Buff · HCG 1",
+  "character": "Naphissa",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_d010_02_hcg1_1_spine": {
+  "name": "Anubis — Ebon Abyss, Silence Pursuit · HCG 1",
+  "character": "Anubis",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_da03_0_hcg1_2_spine": {
+  "name": "Melody · HCG 2",
+  "character": "Melody",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_da03_01_hcg1_1_spine": {
+  "name": "Melody · HCG 1",
+  "character": "Melody",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_da04_01_hcg1_1_spine": {
+  "name": "Orochi · HCG 1",
+  "character": "Orochi",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_da05_01_hcg1_1_spine": {
+  "name": "Hela · HCG 1",
+  "character": "Hela",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_da06_01_hcg1_1_spine": {
+  "name": "Yama · HCG 1",
+  "character": "Yama",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e001_01_hcg1_1_spine": {
+  "name": "Cinderella · HCG 1",
+  "character": "Cinderella",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e001_04_hcg1_1_spine": {
+  "name": "Michael — ACC Up, Teamwide Judgment · HCG 1",
+  "character": "Michael",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e002_03_hcg1_1_spine": {
+  "name": "Rapunzel · HCG 1",
+  "character": "Rapunzel",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e002_04_hcg1_1_spine": {
+  "name": "Jizo · HCG 1",
+  "character": "Jizo",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e003_03_hcg1_1_spine": {
+  "name": "Oz — Siphoning Shield, Teamwide DMG RED · HCG 1",
+  "character": "Oz",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e004_01_hcg1_1_spine": {
+  "name": "Fanny — Defense Healing · HCG 1",
+  "character": "Fanny",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e004_02_hcg1_1_spine": {
+  "name": "Sylv · HCG 1",
+  "character": "Sylv",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e004_04_hcg1_1_spine": {
+  "name": "Annin Miru · HCG 1",
+  "character": "Annin Miru",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e004_04_hcg1_2_spine": {
+  "name": "Annin Miru · HCG 2",
+  "character": "Annin Miru",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e005_03_hcg1_1_spine": {
+  "name": "Quasimodo — Teamwide Heal, Teamwide Petrify · HCG 1",
+  "character": "Quasimodo",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e006_03_hcg1_1_spine": {
+  "name": "Tutankhamun — ACC Down, Earth Pursuit · HCG 1",
+  "character": "Tutankhamun",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e007_02_hcg1_1_spine": {
+  "name": "Snow White · HCG 1",
+  "character": "Snow White",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e007_04_hcg1_1_spine": {
+  "name": "Nie Xiaoqian — Dodge UP, Non-Elemental Pursuit · HCG 1",
+  "character": "Nie Xiaoqian",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e008_03_hcg1_1_spine": {
+  "name": "Otohime — Continuous Ice Break, AOE CC · HCG 1",
+  "character": "Otohime",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_e009_01_hcg1_1_spine": {
+  "name": "Cortés · HCG 1",
+  "character": "Cortés",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ea01_01_hcg1_1_spine": {
+  "name": "Pinocchio · HCG 1",
+  "character": "Pinocchio",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ea03_01_hcg1_1_spine": {
+  "name": "Lanmei · HCG 1",
+  "character": "Lanmei",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ea03_01_hcg1_2_spine": {
+  "name": "Lanmei · HCG 2",
+  "character": "Lanmei",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_ea05_01_hcg1_1_spine": {
+  "name": "Cheung-san · HCG 1",
+  "character": "Cheung-san",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f001_03_hcg1_1_spine": {
+  "name": "Lupiz — Bleed Crit, STM Up on Hit · HCG 1",
+  "character": "Lupiz",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f002_01_hcg1_1_spine": {
+  "name": "Joyce — Intercept magic · HCG 1",
+  "character": "Joyce",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f002_03_hcg1_1_spine": {
+  "name": "Peter Pan · HCG 1",
+  "character": "Peter Pan",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f002_04_hcg1_1_spine": {
+  "name": "Prometheus · HCG 1",
+  "character": "Prometheus",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f003_03_hcg1_1_spine": {
+  "name": "Ursuna · HCG 1",
+  "character": "Ursuna",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f003_04_hcg1_1_spine": {
+  "name": "Lilith — Multi-hit Combo, Petrify Shatter · HCG 1",
+  "character": "Lilith",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f004_03_hcg1_1_spine": {
+  "name": "Bluebeard · HCG 1",
+  "character": "Bluebeard",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f005_01_hcg1_1_spine": {
+  "name": "Georgia · HCG 1",
+  "character": "Georgia",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f005_02_hcg1_1_spine": {
+  "name": "Ginger Britney · HCG 1",
+  "character": "Ginger Britney",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f006_01_hcg1_1_spine": {
+  "name": "Mandy — Mana Steal · HCG 1",
+  "character": "Mandy",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f006_03_hcg1_1_spine": {
+  "name": "Aurora · HCG 1",
+  "character": "Aurora",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f007_02_hcg1_1_spine": {
+  "name": "Mad Hatter — PHY PEN Down, Electrocute, Poison · HCG 1",
+  "character": "Mad Hatter",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_f008_02_hcg1_1_spine": {
+  "name": "Anastasia — Continuous Mana Down, Burn Detonate · HCG 1",
+  "character": "Anastasia",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_fi04_01_hcg1_1_spine": {
+  "name": "Wu Zetian · HCG 1",
+  "character": "Wu Zetian",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_fi05_01_hcg1_1_spine": {
+  "name": "Sakiko · HCG 1",
+  "character": "Sakiko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_fi10_01_hcg1_1_spine": {
+  "name": "Hephaestus · HCG 1",
+  "character": "Hephaestus",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_g025_01_hcg1_1_spine": {
+  "name": "Red · HCG 1",
+  "character": "Red",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_g025_03_hcg1_1_spine": {
+  "name": "Yule · HCG 1",
+  "character": "Yule",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_li01_01_hcg1_1_spine": {
+  "name": "Elizabeth I · HCG 1",
+  "character": "Elizabeth I",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_li02_01_hcg1_1_spine": {
+  "name": "Lucifer · HCG 1",
+  "character": "Lucifer",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_mb05_1_hcg1_2_spine": {
+  "name": "Lanho · HCG 2",
+  "character": "Lanho",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_free_hcg01_1_spine": {
+  "name": "Story Free Hcg01 1",
+  "character": "Story Free Hcg01 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_free_hcg02_1_spine": {
+  "name": "Story Free Hcg02 1",
+  "character": "Story Free Hcg02 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_free_hcg03_1_spine": {
+  "name": "Story Free Hcg03 1",
+  "character": "Story Free Hcg03 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg01_1_spine": {
+  "name": "Story Hcg01 1",
+  "character": "Story Hcg01 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg02_1_spine": {
+  "name": "Story Hcg02 1",
+  "character": "Story Hcg02 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg03_1_spine": {
+  "name": "Story Hcg03 1",
+  "character": "Story Hcg03 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg04_1_spine": {
+  "name": "Story Hcg04 1",
+  "character": "Story Hcg04 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg05_1_spine": {
+  "name": "Story Hcg05 1",
+  "character": "Story Hcg05 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg07_1_spine": {
+  "name": "Story Hcg07 1",
+  "character": "Story Hcg07 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg08_1_spine": {
+  "name": "Story Hcg08 1",
+  "character": "Story Hcg08 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg09_1_spine": {
+  "name": "Story Hcg09 1",
+  "character": "Story Hcg09 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg10_1_spine": {
+  "name": "Story Hcg10 1",
+  "character": "Story Hcg10 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg11_1_spine": {
+  "name": "Story Hcg11 1",
+  "character": "Story Hcg11 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg12_1_spine": {
+  "name": "Story Hcg12 1",
+  "character": "Story Hcg12 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg13_1_spine": {
+  "name": "Story Hcg13 1",
+  "character": "Story Hcg13 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg14_1_spine": {
+  "name": "Story Hcg14 1",
+  "character": "Story Hcg14 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg15_1_spine": {
+  "name": "Story Hcg15 1",
+  "character": "Story Hcg15 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg16_1_spine": {
+  "name": "Story Hcg16 1",
+  "character": "Story Hcg16 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg17_1_spine": {
+  "name": "Story Hcg17 1",
+  "character": "Story Hcg17 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg18_1_spine": {
+  "name": "Story Hcg18 1",
+  "character": "Story Hcg18 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg19_1_spine": {
+  "name": "Story Hcg19 1",
+  "character": "Story Hcg19 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg20_1_spine": {
+  "name": "Story Hcg20 1",
+  "character": "Story Hcg20 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg21_1_spine": {
+  "name": "Story Hcg21 1",
+  "character": "Story Hcg21 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg22_1_spine": {
+  "name": "Story Hcg22 1",
+  "character": "Story Hcg22 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg23_1_spine": {
+  "name": "Story Hcg23 1",
+  "character": "Story Hcg23 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg24_1_spine": {
+  "name": "Story Hcg24 1",
+  "character": "Story Hcg24 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg25_1_spine": {
+  "name": "Story Hcg25 1",
+  "character": "Story Hcg25 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg26_1_spine": {
+  "name": "Story Hcg26 1",
+  "character": "Story Hcg26 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg27_1_spine": {
+  "name": "Story Hcg27 1",
+  "character": "Story Hcg27 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg28_1_spine": {
+  "name": "Story Hcg28 1",
+  "character": "Story Hcg28 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg29_1_spine": {
+  "name": "Story Hcg29 1",
+  "character": "Story Hcg29 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg30_1_spine": {
+  "name": "Story Hcg30 1",
+  "character": "Story Hcg30 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg31_1_spine": {
+  "name": "Story Hcg31 1",
+  "character": "Story Hcg31 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg32_1_spine": {
+  "name": "Story Hcg32 1",
+  "character": "Story Hcg32 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg33_1_spine": {
+  "name": "Story Hcg33 1",
+  "character": "Story Hcg33 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg34_1_spine": {
+  "name": "Story Hcg34 1",
+  "character": "Story Hcg34 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg35_1_spine": {
+  "name": "Story Hcg35 1",
+  "character": "Story Hcg35 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg36_1_spine": {
+  "name": "Story Hcg36 1",
+  "character": "Story Hcg36 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg37_1_spine": {
+  "name": "Story Hcg37 1",
+  "character": "Story Hcg37 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg38_1_spine": {
+  "name": "Story Hcg38 1",
+  "character": "Story Hcg38 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg39_1_spine": {
+  "name": "Story Hcg39 1",
+  "character": "Story Hcg39 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg40_1_spine": {
+  "name": "Story Hcg40 1",
+  "character": "Story Hcg40 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg41_1_spine": {
+  "name": "Story Hcg41 1",
+  "character": "Story Hcg41 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg42_1_spine": {
+  "name": "Story Hcg42 1",
+  "character": "Story Hcg42 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg43_1_spine": {
+  "name": "Story Hcg43 1",
+  "character": "Story Hcg43 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg44_1_spine": {
+  "name": "Story Hcg44 1",
+  "character": "Story Hcg44 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_story_hcg45_1_spine": {
+  "name": "Story Hcg45 1",
+  "character": "Story Hcg45 1",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_teaching_hcg01_spine": {
+  "name": "Teaching Hcg01",
+  "character": "Teaching Hcg01",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_teaching_hcg02_spine": {
+  "name": "Teaching Hcg02",
+  "character": "Teaching Hcg02",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wa02_01_hcg1_1_spine": {
+  "name": "Poseidon · HCG 1",
+  "character": "Poseidon",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wa04_01_hcg1_1_spine": {
+  "name": "Chang'e · HCG 1",
+  "character": "Chang'e",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wa05_01_hcg1_1_spine": {
+  "name": "Thetis · HCG 1",
+  "character": "Thetis",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wa06_01_hcg1_1_spine": {
+  "name": "Ping · HCG 1",
+  "character": "Ping",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wa08_01_hcg1_1_spine": {
+  "name": "Cleopatra · HCG 1",
+  "character": "Cleopatra",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wi01_01_hcg1_1_spine": {
+  "name": "Rinko · HCG 1",
+  "character": "Rinko",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wi03_01_hcg1_1_spine": {
+  "name": "Martha · HCG 1",
+  "character": "Martha",
+  "kind": "HCG"
+ },
+ "img_hcg_dynamic_wi04_01_hcg1_1_spine": {
+  "name": "Tengu · HCG 1",
+  "character": "Tengu",
+  "kind": "HCG"
+ },
+ "mainui_alliance_bg_c003_01_guild_spine": {
+  "name": "Mainui Alliance Bg C003 01 Guild",
+  "character": "Mainui Alliance Bg C003 01 Guild",
+  "kind": "CG"
+ },
+ "mainui_alliance_bg_e001_01_guild_spine": {
+  "name": "Mainui Alliance Bg E001 01 Guild",
+  "character": "Mainui Alliance Bg E001 01 Guild",
+  "kind": "CG"
+ },
+ "slot_slot_spine": {
+  "name": "Slot Slot",
+  "character": "Slot Slot",
+  "kind": "CG"
+ }
+}

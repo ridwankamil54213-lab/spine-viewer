@@ -1978,6 +1978,11 @@ function scanModels() {
 	// data/lustyodyssey-names.json — folder asetnya sengaja ASCII karena
 	// klien memakai id yang sudah disanitasi sebagai path aset.
 	applyLustyNames(models);
+	// CherryTale: nama karakter/kostum EN + label CG/HCG dari dump repo
+	// CherryTale_Standalone, supaya 480 rig tidak tampil sebagai nama berkas.
+	applyCherrytaleNames(models);
+	// CherryTale: timeline adegan (durasi + voice) dari bundle storyshow.
+	applyCherrytaleScenes(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -2737,8 +2742,62 @@ function attachEpic7CombatFamilies(models) {
  * folder full Tionghoa runtuh jadi "-A-D" — id duplikat, dan permintaan
  * atlasnya 404. Jadi CJK-nya dipulihkan di sini, bukan di disk.
  */
-function applyLustyNames(models) {
+/**
+ * CherryTale: nama karakter + kostum dari dump CherryTale_Standalone
+ * (data/cherrytale-names.json, ditulis dengan mencocokkan id
+ * img_*_dynamic_<model>_spine terhadap characters_index.json repo itu).
+ * Thumbnail-nya lewat public/thumbs/cherrytale/_manifest.json.
+ */
+function applyCherrytaleNames(models) {
 	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "cherrytale-names.json"), "utf8"));
+	} catch {
+		return;
+	}
+	for (const m of models) {
+		if (m.game !== "cherrytale") continue;
+		const slug = String(m.id || "").replace(/^cherrytale\//, "");
+		const rec = map[slug];
+		if (rec && rec.name) {
+			m.name = rec.name;
+			if (rec.kind) m.group = rec.kind;
+		}
+	}
+}
+
+/**
+ * CherryTale: timeline fase H-scene + voice JP.
+ *
+ * Data ditulis tools/build-cherrytale-scenes.py dari bundle storyshow asli
+ * (durasi tiap gerakan) dan voice yang diekstrak
+ * tools/extract-cherrytale-voices.py. Viewer memakainya untuk dock timeline
+ * yang memutar adegan berurutan, bukan sekadar tombol lompat fase.
+ */
+function applyCherrytaleScenes(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "cherrytale-scenes.json"), "utf8"));
+	} catch {
+		return;
+	}
+	let hits = 0;
+	for (const m of models) {
+		if (m.game !== "cherrytale") continue;
+		const scene = map[m.id];
+		if (!scene || !Array.isArray(scene.phases) || !scene.phases.length) continue;
+		m.ctScene = {
+			phases: scene.phases,
+			bgm: scene.bgm || null,
+			touch: Array.isArray(scene.touch) ? scene.touch : [],
+		};
+		if (scene.audio?.tracks?.length) m.audio = scene.audio;
+		hits++;
+	}
+	if (hits) console.log(`  ct scene  : ${hits} model punya timeline fase`);
+}
+
+function applyLustyNames(models) {	let map;
 	try {
 		map = JSON.parse(fs.readFileSync(path.join(DATA, "lustyodyssey-names.json"), "utf8"));
 	} catch {
@@ -3006,6 +3065,10 @@ function scanImageGalleries(models) {
 const app = express();
 app.disable("x-powered-by");
 
+// password + cookie gate. Dipasang sebelum semua route, tapi setelah body parser
+// supaya POST /login bisa baca form. Lihat src/auth.js.
+const auth = require("./auth");
+
 // --- security headers (viewer loads only same-origin assets) ---
 app.use((req, res, next) => {
 	res.setHeader("X-Content-Type-Options", "nosniff");
@@ -3023,6 +3086,8 @@ app.use((req, res, next) => {
 app.use(compression());
 
 app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: false }));
+auth.mount(app);
 
 /* The app has no accounts, so anyone who can reach the port can ask it to
  * spawn ffmpeg or a downloader. A tiny in-process rate limit keeps a public
@@ -3282,6 +3347,12 @@ function getModels({ force = false } = {}) {
 			dirBytesCache.clear();
 			for (const [k, v] of sizes) dirBytesCache.set(k, v);
 			cache = { models: persisted.models, mtime: persisted.mtime, signature: sig };
+			// Cache ditulis dari hasil pindai yang SUDAH dilampiri, tapi
+			// lampiran CherryTale dibaca dari data/ + folder audio — keduanya
+			// tidak mengubah signature pohon aset. Tanpa melampirkan ulang di
+			// sini, data scene yang baru dibangun tidak pernah muncul sampai
+			// cache dihapus.
+			applyCherrytaleScenes(cache.models);
 			console.log(`[cache] memakai cache ${persisted.models.length} model`);
 			return cache.models;
 		}
@@ -5577,6 +5648,16 @@ app.use(
 app.use(
 	"/orisries-audio",
 	express.static(OR_AUDIO_DIR, { fallthrough: false, maxAge: "7d", immutable: true })
+);
+// CherryTale H-scene voice lines (opus, di dalam folder model). Prefix sendiri
+// supaya folder yang belum punya voice tidak menutupi /assets.
+app.use(
+	"/cherrytale-audio",
+	express.static(path.join(ASSETS, "cherrytale"), {
+		fallthrough: false,
+		maxAge: "7d",
+		immutable: true,
+	})
 );
 // Lost Sword cutscene videos (skill / summon / quest .mp4|.m4v). Served under
 // its own prefix so a missing folder can never shadow /assets.

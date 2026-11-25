@@ -204,6 +204,14 @@
 				<div id="ab-pane-b" class="ab-pane"><span class="ab-tag">B</span></div>
 			</div>
 			<div id="stage-bg" class="stage-bg" data-bg="dark" aria-hidden="true"></div>
+			<!-- Vignette + tepi gelap untuk efek lensa (toggle #lens-btn / M). -->
+			<div id="stage-lens" class="stage-lens" aria-hidden="true" hidden></div>
+			<!-- Subtitle adegan: teks EN + (opsional) teks asli ZH. -->
+			<div id="ct-sub" class="ct-sub" aria-live="polite" hidden>
+				<span id="ct-sub-spk" class="ct-sub-spk" hidden></span>
+				<p id="ct-sub-en" class="ct-sub-text"></p>
+				<p id="ct-sub-zh" class="ct-sub-zh" hidden></p>
+			</div>
 			<!-- Gambar latar (backdrop) opsional. Di atas warna latar, di bawah
 			     grid veil dan kanvas (z-index 0 vs kanvas 1). Di-toggle lewat
 			     #backdrop-btn / Shift+L; scene dipilih lewat #backdrop-select. -->
@@ -331,6 +339,24 @@
 
 		<!-- transport -->
 		<div class="transport">
+			<!-- Timeline adegan H-scene CherryTale; hanya untuk model beradegan. -->
+			<div id="ct-timeline" class="ct-timeline" hidden>
+				<div class="ct-tl-head">
+					<button id="ct-play" class="btn btn-icon ct-tl-play" aria-label="Putar adegan"
+						title="Putar adegan berurutan">
+						<svg viewBox="0 0 24 24" class="icon"></svg>
+					</button>
+					<span id="ct-title" class="ct-tl-title">Adegan</span>
+					<span class="ct-tl-hint">Tap kanvas: lanjut</span>
+					<button id="ct-censor" class="btn btn-toggle" data-on="true"
+						title="Tampilkan/sembunyikan sensor, mark, dan kabut">Sensor</button>
+					<button id="ct-zh" class="btn btn-toggle" data-on="false"
+						title="Tampilkan teks asli (ZH) di bawah subtitle">ZH</button>
+					<button id="ct-loop" class="btn btn-toggle" data-on="true"
+						title="Ulangi adegan dari awal setelah selesai">Ulang</button>
+				</div>
+				<div id="ct-track" class="ct-tl-track" role="group" aria-label="Fase adegan"></div>
+			</div>
 			<div class="transport-row">
 				<div class="tgroup tgroup-play">
 					<button id="prev-btn" class="btn btn-icon" aria-label="Animasi sebelumnya" title="Animasi sebelumnya (←)">
@@ -703,6 +729,9 @@
 					</div>
 					<!-- Kartu tetap terlihat: ini fitur tontonan, bukan alat diagnostik. -->
 					<button id="cards-btn" class="btn" type="button" title="Lihat kartu skill karakter ini (K)" hidden>Kartu</button>
+					<!-- Efek lensa sinematik (tiruan LensAberrations CherryTale). -->
+					<button id="lens-btn" class="btn btn-toggle" data-on="false"
+						title="Nyalakan/matikan efek lensa sinematik (M)" hidden>Lensa</button>
 
 					<!-- Alat lanjutan: dikumpulkan di satu menu supaya baris kontrol
 					     tidak lagi berisi 15 tombol kecil. Elemennya TIDAK dihapus,
@@ -976,6 +1005,23 @@
 		</div>
 	</div>
 </div>
+
+<!-- Filter lensa: chromatic split per kanal RGB, digabung mode screen. Kanal
+     hijau tidak digeser supaya identitas warna terjaga. -->
+<svg class="ct-lens-defs" width="0" height="0" aria-hidden="true" focusable="false">
+	<filter id="ct-lens" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB">
+		<feColorMatrix in="SourceGraphic" type="matrix" result="ct-r"
+			values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+		<feOffset in="ct-r" dx="-1.7" dy="0" result="ct-ro" />
+		<feColorMatrix in="SourceGraphic" type="matrix" result="ct-g"
+			values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" />
+		<feColorMatrix in="SourceGraphic" type="matrix" result="ct-b"
+			values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+		<feOffset in="ct-b" dx="1.7" dy="0" result="ct-bo" />
+		<feBlend in="ct-ro" in2="ct-g" mode="screen" result="ct-rg" />
+		<feBlend in="ct-rg" in2="ct-bo" mode="screen" />
+	</filter>
+</svg>
 
 <!-- Cubism 4 core runtime. Must load BEFORE the viewer bundle: pixi-live2d-display
      resolves `Live2DCubismCore` from the global scope and its startUpWithRetry()

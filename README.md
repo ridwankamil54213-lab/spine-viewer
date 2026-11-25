@@ -110,6 +110,9 @@ langsung dimuat dan diputar.
 | `G` | Toggle grid |
 | `L` | Ganti warna latar (Gelap → Abu → Terang → Papan catur → …) |
 | `Shift+L` | On/off gambar latar (backdrop) |
+| `M` | On/off efek lensa sinematik (model beradegan CherryTale) |
+| `S` | On/off sensor (adegan CherryTale) |
+| `Z` | On/off teks asli ZH pada subtitle |
 | `F` | Fullscreen |
 | `E` | Buka dialog export |
 | `T` | Toggle timeline |
@@ -168,6 +171,37 @@ memangkasnya jadi satu tingkat:
 
 > Bundle `_gacha_` dan `rtcamera_` tidak memuat TextAsset (spine-nya
 > dirujuk dari bundle lain), jadi memang dilewati — bukan gagal.
+
+### Timeline adegan + voice + efek lensa
+
+Urutan, voice, BGM, dan teks adegan HCG diambil dari skrip asli
+`StoryHData.txt` — kolom `spineAnimName`, `charSound`, `music`, `text` — dengan
+terjemahan EN dari `dump/hscene_en/storyhdata_EN_full.txt` yang dipasangkan per
+indeks baris. Durasi fase dari AnimationClip storyshow; skin + animasi lapisan
+dari tabel `SecretHCGClickGameScenesData` (kolom default/click/fever).
+
+```bash
+/srv/venv-spine/bin/python tools/extract-cherrytale-voices.py --all        # voice per model
+/srv/venv-spine/bin/python tools/extract-cherrytale-touch.py --all         # voice sentuhan
+/srv/venv-spine/bin/python tools/extract-cherrytale-bgm.py                 # BGM global
+/srv/venv-spine/bin/python tools/build-cherrytale-scenes.py                # data adegan
+```
+
+`build-cherrytale-scenes.py` menulis `data/cherrytale-scenes.json` (dibaca
+`applyCherrytaleScenes()` dan ditempel ke model saat pindai). Tiap fase membawa
+baris dialognya sendiri: teks EN/ZH, speaker, dan voice. Slot `BG_Light`
+dibuang dan slot `censor|mark|mosaic|fog|light` bisa disembunyikan lewat tombol
+Sensor. Model CG/UI tanpa skrip memakai daftar animasinya sendiri (animasi
+`_mark` sebagai lapisan, tanpa voice/subtitle). Skrip-skrip ini menghapus
+`data/models-cache.json` supaya server tidak menyajikan cache lama — atau
+restart server setelahnya.
+
+Di UI: segmen timeline selebar durasinya, Play memutar adegan berurutan sambil
+menampilkan subtitle dan memutar voice/BGM. Klik (tap) di kanvas memajukan satu
+baris dan memutar voice sentuhan bila baris tujuan tidak punya voice; seret
+untuk pan tidak dihitung sebagai tap. Tombol **Sensor** (`S`) dan **ZH** (`Z`)
+untuk teks asli, plus **Lensa** (`M`) yang menyalakan tiruan `LensAberrations` —
+chromatic split + vignette.
 
 ### Upload manual
 

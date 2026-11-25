@@ -38,6 +38,8 @@ const DETAIL_FIELDS = new Set([
 	"animations", "skins", "bones", "slots", "size", "motionFiles", "expressions",
 	"spine", "runtime", "spineRuntime", "needsLegacyViewer", "needsProbe",
 	"pmaDefault", "bytes", "group", "subgroup",
+	// CherryTale: timeline fase + voice hanya dipakai setelah model dibuka.
+	"ctScene", "audio",
 ]);
 
 /** Compact copy of one model for the library index. */

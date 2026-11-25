@@ -393,6 +393,15 @@ const el = {
 	flipBtn: $("#flip-btn"),
 	loopBtn: $("#loop-btn"),
 	audioBtn: $("#audio-btn"),
+	lensBtn: $("#lens-btn"),
+	stageLens: $("#stage-lens"),
+	ctTimeline: $("#ct-timeline"),
+	ctSub: $("#ct-sub"),
+	ctSubEn: $("#ct-sub-en"),
+	ctSubZh: $("#ct-sub-zh"),
+	ctSubSpk: $("#ct-sub-spk"),
+	ctCensor: $("#ct-censor"),
+	ctZh: $("#ct-zh"),
 	audioAutoBtn: $("#audio-auto-btn"),
 
 	scrub: $("#scrub"),
@@ -3704,6 +3713,7 @@ async function loadLive2DModel(model) {
 
 	renderVariants(model);
 	renderAudio(model);
+	renderCtTimeline(model);
 
 	tl.anim = null;
 	if (!el.timeline.hidden) renderTimeline();
@@ -3755,6 +3765,7 @@ async function loadVideoModel(model) {
 	vid.addEventListener("pause", syncPlayBtn);
 	renderVariants(model);
 	renderAudio(model);
+	renderCtTimeline(model);
 
 	vid.addEventListener("error", () => {
 		showError(new Error("Gagal memutar video (kode " + (vid.error?.code ?? "?") + ")."));
@@ -3811,6 +3822,7 @@ async function loadImageModel(model) {
 	if (el.scrub) el.scrub.value = "0";
 	renderVariants(model);
 	renderAudio(model);
+	renderCtTimeline(model);
 	el.empty.hidden = true;
 	setActive(model.id);
 	renderHud();
@@ -4235,6 +4247,7 @@ async function load3DModel(model) {
 	};
 	renderVariants(model);
 	renderAudio(model);
+	renderCtTimeline(model);
 	el.empty.hidden = true;
 	setActive(model.id);
 	renderHud();
@@ -4380,7 +4393,8 @@ async function loadModelBody(model) {
 		fillSelect(el.skinSelect, ["default", ...skins.filter((s) => s !== "default")], "default");
 
 		renderVariants(model);
-		renderAudio(model);
+		renderAudio(model, { auto: !model?.ctScene });
+		renderCtTimeline(model);
 
 		// Rebuild the timeline for the new skeleton. It may already be visible
 		// from a previous model (or opened before anything was loaded), in
@@ -4802,7 +4816,7 @@ function setVoiceAutoplay(on) {
 
 let voiceUnlocked = false;
 
-function renderAudio(model) {
+function renderAudio(model, { auto = true } = {}) {
 	const tracks = model?.audio?.tracks || [];
 	stopVoice();
 	voiceQueue = tracks;
@@ -4819,7 +4833,9 @@ function renderAudio(model) {
 
 	// Autoplay on load — if the browser lets us. The very first page load is
 	// almost always blocked until the user interacts; see voiceUnlock().
-	if (tracks.length && voiceAutoplay) playVoice({ auto: true });
+	// Model beraudio adegan menyerahkan voice pertama ke tombol Play timeline,
+	// supaya tidak dobel dengan autoplay di sini.
+	if (auto && tracks.length && voiceAutoplay) playVoice({ auto: true });
 }
 
 function stopVoice() {
@@ -4828,6 +4844,46 @@ function stopVoice() {
 		voiceEl.currentTime = 0;
 	}
 	el.audioBtn.dataset.playing = "false";
+}
+
+function ensureVoiceEl() {
+	if (!voiceEl) {
+		voiceEl = new Audio();
+		// Status tombol mengikuti ELEMEN, bukan tulisan manual di tiap pemanggil:
+		// dua permintaan play() beruntun (voiceUnlock lalu timeline) membuat
+		// promise yang pertama ditolak "interrupted by a new load", dan tulisan
+		// manual akan menandai tombol mati padahal track barunya berbunyi.
+		voiceEl.addEventListener("playing", () => {
+			el.audioBtn.dataset.playing = "true";
+			if (CT.bgm) CT.bgm.volume = 0.12;
+		});
+		["pause", "ended", "error"].forEach((ev) =>
+			voiceEl.addEventListener(ev, () => {
+				el.audioBtn.dataset.playing = "false";
+				if (CT.bgm) CT.bgm.volume = 0.32;
+			})
+		);
+	}
+	return voiceEl;
+}
+
+/**
+ * Putar satu track voice tertentu (dipakai timeline adegan).
+ *
+ * Berbeda dari playVoice(): track yang sedang berbunyi DIGANTI, bukan
+ * dihentikan, karena tiap fase adegan punya barisnya sendiri. `idx` di-modulo
+ * panjang antrean supaya fase yang lebih banyak dari jumlah voice tetap
+ * mendapat baris.
+ */
+function playVoiceAt(idx, { auto = false } = {}) {
+	if (!voiceQueue.length || (auto && !voiceAutoplay)) return;
+	const elv = ensureVoiceEl();
+	voiceIndex = ((idx % voiceQueue.length) + voiceQueue.length) % voiceQueue.length;
+	elv.src = voiceQueue[voiceIndex];
+	voiceIndex = (voiceIndex + 1) % voiceQueue.length;
+	elv.play().catch(() => {
+		if (!auto && elv.paused) toast("Browser memblokir audio — klik lagi untuk memutar.");
+	});
 }
 
 /**
@@ -4839,28 +4895,17 @@ function stopVoice() {
  */
 function playVoice({ auto = false } = {}) {
 	if (!voiceQueue.length || (auto && !voiceAutoplay)) return;
-	if (!voiceEl) {
-		voiceEl = new Audio();
-		voiceEl.addEventListener("ended", () => {
-			el.audioBtn.dataset.playing = "false";
-		});
-		voiceEl.addEventListener("error", () => {
-			el.audioBtn.dataset.playing = "false";
-			if (!auto) toast("Suara gagal diputar.");
-		});
-	}
+	const elv = ensureVoiceEl();
 	// Already playing? stop — the button doubles as a stop control.
-	if (!auto && !voiceEl.paused) {
+	if (!auto && !elv.paused) {
 		stopVoice();
 		return;
 	}
-	voiceEl.src = voiceQueue[voiceIndex % voiceQueue.length];
+	elv.src = voiceQueue[voiceIndex % voiceQueue.length];
 	voiceIndex = (voiceIndex + 1) % voiceQueue.length;
-	el.audioBtn.dataset.playing = "true";
-	voiceEl.play().catch(() => {
+	elv.play().catch(() => {
 		// Almost always the autoplay policy rather than a broken file.
-		el.audioBtn.dataset.playing = "false";
-		if (!auto) toast("Browser memblokir audio — klik lagi untuk memutar.");
+		if (!auto && elv.paused) toast("Browser memblokir audio — klik lagi untuk memutar.");
 	});
 }
 
@@ -4889,6 +4934,503 @@ function voiceUnlock() {
 ["pointerdown", "keydown"].forEach((ev) =>
 	window.addEventListener(ev, voiceUnlock, { capture: true })
 );
+
+/* ------------------------------------------------------------------ *
+ * Timeline adegan (CherryTale)
+ *
+ * Urutan fase + durasinya datang dari data/cherrytale-scenes.json (lihat
+ * tools/build-cherrytale-scenes.py): durasi asli tiap AnimationClip di bundle
+ * storyshow. Dock-nya menggantikan tombol fase lama: segmen selebar durasi,
+ * bisa diklik untuk lompat, dan "Play" memutar seluruh adegan berurutan —
+ * tiap fase memicu animasi Spine senama plus baris voice-nya.
+ * ------------------------------------------------------------------ */
+const CT = {
+	phases: [],
+	idx: -1,
+	line: 0,
+	playing: false,
+	raf: 0,
+	last: 0,
+	elapsed: 0,
+	loop: true,
+	censored: true,
+	zh: false,
+	lineTimer: 0,
+	bgm: null,
+	bgmUrl: null,
+	touch: [],
+	touchIdx: 0,
+};
+
+const CT_CENSOR_RE = /censor|mark|mosaic|fog|light/i;
+
+function ctUi() {
+	return {
+		root: $("#ct-timeline"),
+		track: $("#ct-track"),
+		play: $("#ct-play"),
+		loop: $("#ct-loop"),
+		title: $("#ct-title"),
+		censor: el.ctCensor,
+		zh: el.ctZh,
+		sub: el.ctSub,
+	};
+}
+
+function ctFmt(seconds) {
+	const s = Math.max(0, seconds || 0);
+	return `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+}
+
+function ctPaint() {
+	const { track, title } = ctUi();
+	if (!track) return;
+	const total = CT.phases.reduce((n, p) => n + (p.seconds || 0), 0);
+	if (title) title.textContent = `Adegan · ${CT.phases.length} fase · ${ctFmt(total)}`;
+	for (const [i, seg] of [...track.children].entries()) {
+		const on = i === CT.idx;
+		seg.classList.toggle("is-active", on);
+		seg.setAttribute("aria-current", on ? "step" : "false");
+		const fill = seg.firstElementChild;
+		if (!fill) continue;
+		if (!on) fill.style.width = i < CT.idx ? "100%" : "0%";
+	}
+}
+
+/**
+ * Sensor: slot censor/mark/mosaic/fog/light disembunyikan lewat alpha.
+ * Trik yang sama dipakai viewer referensi; BG_Light tetap dibuang terpisah.
+ */
+function ctApplyCensor() {
+	const slots = spine?.skeleton?.slots;
+	if (!slots) return;
+	for (const slot of slots) {
+		if (!CT_CENSOR_RE.test(slot.data?.name || "")) continue;
+		slot.color.a = CT.censored ? 0 : 1;
+		const att = slot.getAttachment?.();
+		if (att) att.alpha = CT.censored ? 0 : 1;
+	}
+}
+
+/** Hentikan semua media fase: timer baris, SFX loop, voice, subtitle. */
+function ctStopMedia() {
+	if (CT.lineTimer) clearTimeout(CT.lineTimer);
+	CT.lineTimer = 0;
+	ctStopVoice();
+	const { sub, subEn, subZh, subSpk } = ctSubEls();
+	if (sub) sub.hidden = true;
+	if (subEn) subEn.textContent = "";
+	if (subZh) subZh.textContent = "";
+	if (subSpk) subSpk.hidden = true;
+}
+
+/** Putar voice dari URL langsung (dipakai baris dialog adegan). */
+function playVoiceUrl(url, { auto = false } = {}) {
+	if (!url) return;
+	const elv = ensureVoiceEl();
+	elv.src = url;
+	elv.play().catch(() => {
+		if (!auto) toast("Browser memblokir audio — klik lagi untuk memutar.");
+	});
+}
+
+function ctStopVoice() {
+	stopVoice();
+}
+
+function ctSubEls() {
+	return { sub: el.ctSub, subEn: el.ctSubEn, subZh: el.ctSubZh, subSpk: el.ctSubSpk };
+}
+
+/** Tampilkan satu baris subtitle (EN utama, ZH opsional). */
+function ctSubtitle(line) {
+	const { sub, subEn, subZh, subSpk } = ctSubEls();
+	if (!sub) return;
+	if (!line || (!line.text && !line.textZh)) {
+		sub.hidden = true;
+		return;
+	}
+	sub.hidden = false;
+	const spk = (line.speaker || "").replace(/\$\{playername\}/g, "Kamu");
+	if (subSpk) {
+		subSpk.hidden = !spk;
+		subSpk.textContent = spk;
+	}
+	if (subEn) subEn.textContent = (line.text || "").replace(/\$\{playername\}/g, "Kamu");
+	if (subZh) {
+		subZh.hidden = !CT.zh || !line.textZh;
+		subZh.textContent = CT.zh ? line.textZh || "" : "";
+	}
+}
+
+/** BGM adegan: satu elemen, loop, volume rendah. */
+function ctBgmStart(url) {
+	if (!url) return;
+	if (!CT.bgm) {
+		CT.bgm = new Audio();
+		CT.bgm.loop = true;
+		CT.bgm.volume = 0.32;
+	}
+	if (CT.bgm.src.endsWith(url)) {
+		if (CT.bgm.paused) CT.bgm.play().catch(() => {});
+		return;
+	}
+	CT.bgm.src = url;
+	CT.bgm.play().catch(() => {});
+}
+
+function ctBgmStop() {
+	if (!CT.bgm) return;
+	CT.bgm.pause();
+}
+
+/**
+ * Jalankan satu baris dialog pada fase aktif, lalu jadwalkan baris
+ * berikutnya. Ujung baris ditentukan durasi voice-nya (atau tempo baca).
+ */
+function ctRunLine(phase, index) {
+	const line = phase?.lines?.[index];
+	if (!line) return;
+	CT.line = index;
+	CT.currentLine = line;
+	ctSubtitle(line);
+	if (line.voice) playVoiceUrl(line.voice, { auto: true });
+	const delay = Math.max(1.2, line.seconds || 2.2) * 1000;
+	CT.lineTimer = setTimeout(() => {
+		if (!CT.playing || CT.phases[CT.idx] !== phase) return;
+		ctRunLine(phase, index + 1);
+	}, delay);
+}
+
+function ctPause() {
+	CT.playing = false;
+	CT.elapsed = 0;
+	if (CT.raf) cancelAnimationFrame(CT.raf);
+	CT.raf = 0;
+	ctStopMedia();
+	ctBgmStop();
+	const { play } = ctUi();
+	if (play) {
+		play.dataset.playing = "false";
+		play.setAttribute("aria-label", "Putar adegan");
+		play.querySelector(".icon").innerHTML = ICON.play;
+	}
+}
+
+/** Pasang timer untuk fase aktif; satu frame hanya mengurus satu fase. */
+function ctArm(i) {
+	if (CT.raf) cancelAnimationFrame(CT.raf);
+	CT.last = performance.now();
+	const phase = CT.phases[i];
+	const dur = Math.max(0.2, phase?.seconds || 2) * 1000;
+	const seg = ctUi().track?.children[i];
+	const fill = seg?.firstElementChild;
+	const step = (ts) => {
+		if (!CT.playing || CT.idx !== i) return;
+		const dt = Math.min(250, ts - CT.last);
+		CT.last = ts;
+		CT.elapsed += dt;
+		if (fill) fill.style.width = `${Math.min(100, (CT.elapsed / dur) * 100)}%`;
+		if (CT.elapsed >= dur) {
+			if (i < CT.phases.length - 1) return void ctSelect(i + 1);
+			if (CT.loop) return void ctSelect(0);
+			return void ctPause();
+		}
+		CT.raf = requestAnimationFrame(step);
+	};
+	CT.raf = requestAnimationFrame(step);
+}
+
+/**
+ * Pasang skin gabungan untuk satu fase.
+ *
+ * Tabel adegan menyebut skin per fase sebagai daftar (mis.
+ * `Blush_02$Eye_03$Liquid_01$Mouth_02`). Spine hanya punya satu slot skin,
+ * jadi semuanya digabung jadi satu Skin baru — sama seperti CombinedSkin di
+ * editor; `setSlotsToSetupPose()` menegakkan hasilnya. Kalau satu nama pun
+ * tidak ada di skeleton, skin yang sedang dipakai dibiarkan.
+ */
+function ctApplySkins(names) {
+	const sk = spine?.skeleton;
+	const data = spine?.spineData || sk?.data;
+	if (!sk || !data) return;
+	const found = (names || []).map((n) => data.findSkin?.(n)).filter(Boolean);
+	if (!found.length) {
+		// Fase tanpa skin (scene yang tidak ada di tabel): lepas skin fase
+		// sebelumnya supaya blush/liquid tidak menempel ke fase lain.
+		if (sk.skin) {
+			try {
+				sk.setSkin(null);
+				sk.setSlotsToSetupPose();
+				ctApplyCensor();
+			} catch {
+				/* biarkan */
+			}
+		}
+		return;
+	}
+	try {
+		if (found.length === 1) {
+			sk.setSkin(found[0]);
+		} else {
+			const Ctor = found[0].constructor;
+			const combo = new Ctor("ct-phase");
+			for (const skn of found) combo.addSkin(skn);
+			sk.setSkin(combo);
+		}
+		sk.setSlotsToSetupPose();
+		// Slot BG_Light hanya dipakai UI gim lain; di sini menutupi CG.
+		sk.findSlot?.("BG_Light")?.setAttachment?.(null);
+		ctApplyCensor();
+	} catch (err) {
+		console.warn("skin fase", err);
+	}
+	if (names?.length && el.skinSelect?.querySelector(`option[value="${CSS.escape(names[0])}"]`)) {
+		el.skinSelect.value = names[0];
+	}
+}
+
+/** Track lapisan (animasi mix seperti penis/air) milik fase yang sedang jalan. */
+const CT_LAYERS = [];
+
+function ctClearLayers() {
+	for (const track of CT_LAYERS) {
+		try {
+			spine?.state?.clearTrack(track);
+		} catch {
+			/* skeleton sudah berganti */
+		}
+	}
+	CT_LAYERS.length = 0;
+}
+
+/**
+ * Animasi lapisan fase: tabel punya kolom FacialMix (mis. `Penis_01$Water_01`)
+ * untuk digerakkan BERSAMAAN dengan animasi utama, di track terpisah.
+ */
+function ctApplyMix(names) {
+	ctClearLayers();
+	if (!spine?.state || !names?.length) return;
+	let track = 1;
+	for (const anim of names) {
+		if (!spine.spineData?.findAnimation?.(anim)) continue;
+		try {
+			spine.state.setAnimation(track, anim, true);
+			CT_LAYERS.push(track);
+			track++;
+		} catch (err) {
+			console.warn("mix fase", err);
+		}
+	}
+}
+
+/** Pilih fase ke-i: media lama mati, skin+lapisan+animasi baru, voice baris. */
+function ctSelect(i, { user = false, play = CT.playing } = {}) {
+	if (!CT.phases.length) return;
+	CT.idx = Math.max(0, Math.min(CT.phases.length - 1, i));
+	CT.elapsed = 0;
+	CT.line = 0;
+	ctStopMedia();
+	const phase = CT.phases[CT.idx];
+	if (phase) {
+		ctApplySkins(phase.skins);
+		ctApplyMix(phase.mix);
+	}
+	if (phase?.anim) {
+		setAnimation(phase.anim, true);
+		// Dropdown animasi harus ikut: kalau tidak, kontrol di transport
+		// menampilkan animasi lama dan memilih ulang dari dropdown terasa
+		// seperti lompat liar.
+		if (el.animSelect?.querySelector(`option[value="${CSS.escape(phase.anim)}"]`)) {
+			el.animSelect.value = phase.anim;
+		}
+	}
+	if (user && phase?.lines?.length) ctRunLine(phase, 0);
+	else if (user && phase) ctRunLine(phase, 0);
+	ctPaint();
+	if (play) ctArm(CT.idx);
+}
+
+/**
+ * Tap kanvas = maju satu baris (atau fase berikutnya).
+ *
+ * Saat belum main, tap memulai pemutaran. Kalau baris tujuan tidak punya
+ * voice, voice sentuhan model diputar bergiliran supaya tap tetap terasa
+ * merespons. Timer baris otomatis yang sedang jalan dibatalkan dulu.
+ */
+function ctTap() {
+	if (!CT.phases.length || !CT.playing && !CT.phases.length) return;
+	if (!CT.playing) {
+		ctPlay();
+		return;
+	}
+	const phase = CT.phases[CT.idx];
+	if (!phase) return;
+	if (CT.lineTimer) {
+		clearTimeout(CT.lineTimer);
+		CT.lineTimer = 0;
+	}
+	ctStopVoice();
+	if (CT.touch.length && (!phase.lines?.[CT.line]?.voice || CT.line >= (phase.lines?.length || 0))) {
+		const url = CT.touch[CT.touchIdx % CT.touch.length];
+		CT.touchIdx++;
+		if (url) playVoiceUrl(url, { auto: true });
+	}
+	if (CT.line + 1 < (phase.lines?.length || 0)) {
+		ctRunLine(phase, CT.line + 1);
+	} else if (CT.idx < CT.phases.length - 1) {
+		ctSelect(CT.idx + 1, { user: true });
+	} else if (CT.loop) {
+		ctSelect(0, { user: true });
+	} else {
+		ctPause();
+	}
+	ctFlashSub();
+}
+
+/** Kilat halus di subtitle sebagai umpan balik tap. */
+function ctFlashSub() {
+	const sub = el.ctSub;
+	if (!sub) return;
+	sub.classList.remove("is-tap");
+	void sub.offsetWidth;
+	sub.classList.add("is-tap");
+}
+
+function ctPlay() {
+	if (!CT.phases.length) return;
+	CT.playing = true;
+	const { play } = ctUi();
+	if (play) {
+		play.dataset.playing = "true";
+		play.setAttribute("aria-label", "Jeda adegan");
+		play.querySelector(".icon").innerHTML = ICON.pause;
+	}
+	ctBgmStart(CT.bgmUrl);
+	// Mulai dari awal kalau sebelumnya sudah di ujung & tidak mengulang.
+	if (!CT.loop && CT.idx >= CT.phases.length - 1) return void ctSelect(0, { user: true });
+	ctSelect(CT.idx < 0 ? 0 : CT.idx, { user: true });
+}
+
+function ctToggle() {
+	if (CT.playing) ctPause();
+	else ctPlay();
+}
+
+/** Bangun dock untuk model ini, atau sembunyikan kalau tak punya data adegan. */
+function renderCtTimeline(model) {
+	ctPause();
+	const ui = ctUi();
+	if (!ui.root || !ui.track) return;
+	const phases = (model?.ctScene?.phases || []).filter((p) => p && p.anim);
+	CT.phases = phases;
+	CT.idx = -1;
+	CT.line = 0;
+	CT.bgmUrl = model?.ctScene?.bgm || null;
+	CT.touch = Array.isArray(model?.ctScene?.touch) ? model.ctScene.touch : [];
+	CT.touchIdx = 0;
+	ui.track.innerHTML = "";
+	if (!phases.length) {
+		ui.root.hidden = true;
+		setLens(false, { save: false });
+		el.lensBtn.hidden = true;
+		return;
+	}
+	ui.root.hidden = false;
+	el.lensBtn.hidden = false;
+	ui.loop.dataset.on = String(CT.loop);
+	ui.censor.dataset.on = String(CT.censored);
+	ui.zh.dataset.on = String(CT.zh);
+	for (const [i, phase] of phases.entries()) {
+		const seg = document.createElement("button");
+		seg.type = "button";
+		seg.className = "ct-tl-seg";
+		// Lebar proporsional durasi, tapi dijaga supaya fase 0,2 detik pun tetap
+		// bisa diklik (min-width di CSS).
+		seg.style.flex = `${Math.max(0.2, phase.seconds || 2)} 1 0`;
+		const fill = document.createElement("span");
+		fill.className = "ct-tl-fill";
+		const label = document.createElement("span");
+		label.className = "ct-tl-label";
+		label.textContent = phase.label || phase.anim;
+		seg.title = `${phase.label || phase.anim} · ${(phase.seconds || 0).toFixed(1)}s`;
+		seg.append(fill, label);
+		seg.addEventListener("click", () => {
+			if (!CT.playing) return void ctSelect(i, { user: true, play: false });
+			ctSelect(i, { user: true });
+		});
+		ui.track.appendChild(seg);
+	}
+	ui.play.querySelector(".icon").innerHTML = ICON.play;
+	ui.play.dataset.playing = "false";
+	ui.play.onclick = ctToggle;
+	ui.loop.onclick = () => {
+		CT.loop = !CT.loop;
+		ui.loop.dataset.on = String(CT.loop);
+	};
+	ui.censor.onclick = () => {
+		CT.censored = !CT.censored;
+		ui.censor.dataset.on = String(CT.censored);
+		ctApplyCensor();
+	};
+	ui.zh.onclick = () => {
+		CT.zh = !CT.zh;
+		ui.zh.dataset.on = String(CT.zh);
+		// Baris yang sedang tampil ikut diperbarui, bukan hanya baris berikutnya.
+		ctSubtitle(CT.currentLine);
+	};
+	// Tampilkan fase pertama sebagai pilihan awal (tanpa memutar voice).
+	ctSelect(0, { play: false });
+}
+
+/* --- efek lensa ---------------------------------------------------- */
+const LENS_KEY = "spine-lens";
+
+function setLens(on, { save = true } = {}) {
+	document.body.classList.toggle("ct-lens", !!on);
+	if (el.lensBtn) el.lensBtn.dataset.on = String(!!on);
+	if (el.stageLens) el.stageLens.hidden = !on;
+	if (save) {
+		try {
+			localStorage.setItem(LENS_KEY, on ? "1" : "0");
+		} catch {
+			/* mode privat */
+		}
+	}
+}
+
+function toggleLens() {
+	if (el.lensBtn?.hidden) return;
+	setLens(!document.body.classList.contains("ct-lens"));
+}
+
+try {
+	if (localStorage.getItem(LENS_KEY) === "1") setLens(true, { save: false });
+} catch {
+	/* mode privat */
+}
+el.lensBtn?.addEventListener("click", toggleLens);
+
+/* Tap kanvas untuk maju satu baris adegan. Hanya hitungan klik pendek tanpa
+ * geser, dan tidak saat mode edit (bone/vertex/bounds) atau A/B menyala —
+ * di mode-mode itu klik tetap milik alat edit. */
+let ctTapDown = null;
+el.canvasWrap.addEventListener("pointerdown", (e) => {
+	ctTapDown = { x: e.clientX, y: e.clientY, t: performance.now() };
+});
+el.canvasWrap.addEventListener("pointercancel", () => {
+	ctTapDown = null;
+});
+el.canvasWrap.addEventListener("pointerup", (e) => {
+	const down = ctTapDown;
+	ctTapDown = null;
+	if (!down || !CT.phases.length) return;
+	if (BONES.on || VTX.on || BOUNDS.on || AB.on) return;
+	const dist = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+	if (dist > 8 || performance.now() - down.t > 400) return;
+	ctTap();
+});
+
 
 /**
  * Switch to a sibling variant without going back to the library.
@@ -11457,12 +11999,15 @@ window.addEventListener("keydown", (e) => {
 			break;
 		case "z":
 		case "Z":
-			// Undo/redo pose tulang. Hanya saat editor tulang menyala, supaya
-			// tidak merebut Ctrl+Z browser di tempat lain.
+			// Ctrl+Z = undo/redo pose tulang (hanya saat editor tulang menyala).
+			// Tanpa Ctrl, Z = teks asli ZH pada subtitle adegan.
 			if ((e.ctrlKey || e.metaKey) && BONES.on) {
 				e.preventDefault();
 				if (e.shiftKey) boneRedo();
 				else boneUndo();
+			} else if (!el.ctTimeline?.hidden) {
+				e.preventDefault();
+				el.ctZh?.click();
 			}
 			break;
 		case "v":
@@ -11502,6 +12047,17 @@ window.addEventListener("keydown", (e) => {
 			// (model bukan CZN / belum punya kartu).
 			e.preventDefault();
 			if (el.cardsBtn && !el.cardsBtn.hidden) el.cardsBtn.click();
+			break;
+		case "m":
+		case "M":
+			e.preventDefault();
+			toggleLens();
+			break;
+		case "s":
+		case "S":
+			if (el.ctTimeline?.hidden) break;
+			e.preventDefault();
+			el.ctCensor?.click();
 			break;
 		case "p":
 		case "P":
@@ -12097,6 +12653,18 @@ window.__spineStage = {
 	get state() { return state; },
 	get clock() { return clock; },
 	get fps() { return fps; },
+	get voiceQueue() { return voiceQueue; },
+	get voiceEl() { return voiceEl; },
+	get skin() { return spine?.skeleton?.skin?.name || ""; },
+	get ctLine() { return CT.line; },
+	get ctBgm() {
+		return CT.bgm ? { src: CT.bgm.src, paused: CT.bgm.paused, volume: CT.bgm.volume } : null;
+	},
+	get tracks() {
+		return (spine?.state?.tracks || [])
+			.map((t) => t?.animation?.name)
+			.filter(Boolean);
+	},
 	get parts() { return parts; },
 	sourcePixelScale: () => (spine ? sourcePixelScale(spine) : 0),
 	get ik() { return IK; },
