@@ -121,3 +121,7 @@ data/crosscore-interaction-catalog.json
 # Kunci dekripsi aset hasil capture (data/mlbb-crypto.json). Kunci tidak
 # pernah ikut repo; extractor membacanya dari disk kalau ada.
 data/mlbb-crypto.json
+
+# Rahasia auth (hash password + HMAC cookie). Jangan pernah ikut repo.
+data/auth-password
+data/auth-secret

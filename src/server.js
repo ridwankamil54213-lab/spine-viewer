@@ -1983,6 +1983,7 @@ function scanModels() {
 	applyCherrytaleNames(models);
 	// CherryTale: timeline adegan (durasi + voice) dari bundle storyshow.
 	applyCherrytaleScenes(models);
+	applyArkrecodeScenes(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -2797,6 +2798,33 @@ function applyCherrytaleScenes(models) {
 	if (hits) console.log(`  ct scene  : ${hits} model punya timeline fase`);
 }
 
+/**
+ * Ark Re:Code: timeline adegan Hxxx_S dari animasi Spine + voice SexStory.
+ * Data ditulis tools/build-arkrecode-scenes.py.
+ */
+function applyArkrecodeScenes(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "arkrecode-scenes.json"), "utf8"));
+	} catch {
+		return;
+	}
+	let hits = 0;
+	for (const m of models) {
+		if (m.game !== "arkrecode") continue;
+		const scene = map[m.id];
+		if (!scene?.phases?.length) continue;
+		m.ctScene = {
+			phases: scene.phases,
+			bgm: scene.bgm || null,
+			touch: Array.isArray(scene.touch) ? scene.touch : [],
+		};
+		if (scene.audio?.tracks?.length) m.audio = scene.audio;
+		hits++;
+	}
+	if (hits) console.log(`  ark scene  : ${hits} model punya timeline suara`);
+}
+
 function applyLustyNames(models) {	let map;
 	try {
 		map = JSON.parse(fs.readFileSync(path.join(DATA, "lustyodyssey-names.json"), "utf8"));
@@ -3353,6 +3381,7 @@ function getModels({ force = false } = {}) {
 			// sini, data scene yang baru dibangun tidak pernah muncul sampai
 			// cache dihapus.
 			applyCherrytaleScenes(cache.models);
+			applyArkrecodeScenes(cache.models);
 			console.log(`[cache] memakai cache ${persisted.models.length} model`);
 			return cache.models;
 		}
@@ -5654,6 +5683,15 @@ app.use(
 app.use(
 	"/cherrytale-audio",
 	express.static(path.join(ASSETS, "cherrytale"), {
+		fallthrough: false,
+		maxAge: "7d",
+		immutable: true,
+	})
+);
+// Ark Re:Code H-scene voice lines (opus per model).
+app.use(
+	"/arkrecode-audio",
+	express.static(path.join(ASSETS, "arkrecode"), {
 		fallthrough: false,
 		maxAge: "7d",
 		immutable: true,

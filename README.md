@@ -494,6 +494,22 @@ Hasil sekarang: **268 model · 250 terpasang · 18 bukan Spine · 0 baru**,
 idempoten. Regresi `node tools/check-arkrecode.cjs` (36 assertion) mencakup
 unit signature, state, dashboard, 0 aset 404, dan render `M_001_1`.
 
+### H-scene: timeline adegan + voice
+
+Model `Hxxx_S` (H001–H007 dst.) punya animasi Spine per fase dan voice
+`SexStory_##` / `Sex_##` di bundle hero. Data adegan dibangun dua tool:
+
+```bash
+/srv/venv-spine/bin/python tools/extract-arkrecode-story-voices.py --all  # voice -> opus
+/srv/venv-spine/bin/python tools/build-arkrecode-scenes.py                # data/arkrecode-scenes.json
+```
+
+`build-arkrecode-scenes.py` memetakan voice berurutan ke fase animasi (tidak
+ada tabel dialog di katalog/CDN), lalu viewer memakai ulang jalur CherryTale:
+dock timeline, tap kanvas, sensor `S`, lensa `M`. Subtitle kosong karena teks
+aslinya tidak ada di aset. Voice dilayani dari `/arkrecode-audio` (di-gate
+auth seperti `/assets`).
+
 ## Deteksi runtime
 
 Bukan cuma `.skel` vs `.json`. `src/spine-version.cjs` membaca bytes header
@@ -1596,6 +1612,7 @@ node tools/check-zonenova.cjs     # Zone Nova: 188 Spine 4.1 CDN, katalog XOR, i
 node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilustrasi, render
 node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
 node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
+node tools/check-arkrecode-scene.cjs # Ark Re:Code: timeline H-scene + voice opus
 node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
 node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilustrasi, render
 node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa reload
