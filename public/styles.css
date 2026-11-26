@@ -3277,6 +3277,22 @@ input:focus-visible {
 	padding-bottom: 2px;
 }
 .ct-timeline[hidden] { display: none; }
+/* Kamera LoveTalk: satu baris tombol, gaya sama dengan dock CherryTale. */
+.lt-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	padding-bottom: 2px;
+}
+.lt-bar[hidden] { display: none; }
+.lt-title {
+	font: 500 11px/1.3 var(--font-body, system-ui);
+	letter-spacing: 0.02em;
+	color: var(--fg-mute);
+}
+.lt-list { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: thin; }
+.lt-btn { flex: none; }
 .ct-tl-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .ct-tl-play[data-playing="true"] { border-color: var(--spark); color: var(--spark-hi); }
 .ct-tl-title {

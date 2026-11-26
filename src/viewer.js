@@ -396,6 +396,8 @@ const el = {
 	lensBtn: $("#lens-btn"),
 	stageLens: $("#stage-lens"),
 	ctTimeline: $("#ct-timeline"),
+	ltBar: $("#lt-bar"),
+	ltList: $("#lt-list"),
 	ctSub: $("#ct-sub"),
 	ctSubEn: $("#ct-sub-en"),
 	ctSubZh: $("#ct-sub-zh"),
@@ -3023,6 +3025,12 @@ function resizeRenderer() {
 }
 
 function applyTransform() {
+	// Kamera LoveTalk butuh zoom/pan HASIL fit, bukan nilai sebelum model
+	// dipasang — renderLoveTalk() jalan sebelum fitModel().
+	if (ltDirty && ltModel) {
+		ltBase = { zoom: state.zoom, panX: state.panX, panY: state.panY };
+		ltDirty = false;
+	}
 	const w = el.canvasWrap.clientWidth;
 	const h = el.canvasWrap.clientHeight;
 	world.position.set(w / 2 + state.panX, h / 2 + state.panY);
@@ -3714,6 +3722,7 @@ async function loadLive2DModel(model) {
 	renderVariants(model);
 	renderAudio(model);
 	renderCtTimeline(model);
+	renderLoveTalk(model);
 
 	tl.anim = null;
 	if (!el.timeline.hidden) renderTimeline();
@@ -3766,6 +3775,7 @@ async function loadVideoModel(model) {
 	renderVariants(model);
 	renderAudio(model);
 	renderCtTimeline(model);
+	renderLoveTalk(model);
 
 	vid.addEventListener("error", () => {
 		showError(new Error("Gagal memutar video (kode " + (vid.error?.code ?? "?") + ")."));
@@ -3823,6 +3833,7 @@ async function loadImageModel(model) {
 	renderVariants(model);
 	renderAudio(model);
 	renderCtTimeline(model);
+	renderLoveTalk(model);
 	el.empty.hidden = true;
 	setActive(model.id);
 	renderHud();
@@ -4248,6 +4259,7 @@ async function load3DModel(model) {
 	renderVariants(model);
 	renderAudio(model);
 	renderCtTimeline(model);
+	renderLoveTalk(model);
 	el.empty.hidden = true;
 	setActive(model.id);
 	renderHud();
@@ -4395,6 +4407,7 @@ async function loadModelBody(model) {
 		renderVariants(model);
 		renderAudio(model, { auto: !model?.ctScene });
 		renderCtTimeline(model);
+		renderLoveTalk(model);
 
 		// Rebuild the timeline for the new skeleton. It may already be visible
 		// from a previous model (or opened before anything was loaded), in
@@ -5315,6 +5328,58 @@ function ctPlay() {
 function ctToggle() {
 	if (CT.playing) ctPause();
 	else ctPlay();
+}
+
+/**
+ * Kamera LoveTalk (CG Ark Re:Code). Tiap tombol = satu state transform dari
+ * AnimatorController asli: skala node + geseran Align_Object.
+ *
+ * shortcut: pos dipakai sebagai geseran layar dengan satu konstanta
+ * (1/unit), bukan dirakit lewat prefab kamera yang tidak ada di bundle —
+ * framing-nya mendekati aslinya, bukan sama persis. Kalau butuh presisi,
+ * ekstrak juga prefab kamera + Canvas dari bundle.
+ */
+let ltBase = null;   // {zoom, panX, panY} saat model selesai di-fit
+let ltModel = null;  // data loveTalk model yang sedang dibuka
+let ltDirty = false; // true sampai fitModel() selesai sekali
+
+/** Bangun baris tombol kamera, atau sembunyikan kalau model tak punya data. */
+function renderLoveTalk(model) {
+	const bar = el.ltBar;
+	if (!bar || !el.ltList) return;
+	const states = model?.loveTalk?.states || [];
+	ltModel = model?.loveTalk || null;
+	ltBase = null;
+	ltDirty = !!ltModel;
+	el.ltList.innerHTML = "";
+	if (!states.length) {
+		bar.hidden = true;
+		return;
+	}
+	bar.hidden = false;
+	ltBase = { zoom: state.zoom, panX: state.panX, panY: state.panY };
+	const unit = model.loveTalk.unit || 1;
+	states.forEach((s, i) => {
+		const b = document.createElement("button");
+		b.className = "btn btn-sm lt-btn";
+		b.textContent = s.name;
+		b.title = `${s.name} — skala ${s.scale?.[0] ?? 1}×`;
+		b.dataset.on = "false";
+		b.addEventListener("click", () => {
+			// Rantai: Align(pos p, skala s) -> Spine(0,-10, skala 26) -> skeleton.
+			// Skala tentang origin Align ikut menggeser node Spine, jadi
+			// konstanta 10*(s-1) muncul. Geseran memakai zoom DASAR, bukan hasil.
+			const sc = s.scale?.[0] || 1;
+			const k = ltBase.zoom / unit;
+			state.zoom = ltBase.zoom * sc;
+			state.panX = ltBase.panX + (s.pos?.[0] || 0) * k;
+			state.panY = ltBase.panY - (s.pos?.[1] || 0) * k + 10 * k * (sc - 1);
+			el.ltList.querySelectorAll(".lt-btn").forEach((x) => (x.dataset.on = "false"));
+			b.dataset.on = "true";
+			applyTransform();
+		});
+		el.ltList.appendChild(b);
+	});
 }
 
 /** Bangun dock untuk model ini, atau sembunyikan kalau tak punya data adegan. */

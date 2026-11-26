@@ -40,6 +40,8 @@ const DETAIL_FIELDS = new Set([
 	"pmaDefault", "bytes", "group", "subgroup",
 	// CherryTale: timeline fase + voice hanya dipakai setelah model dibuka.
 	"ctScene", "audio",
+	// Ark Re:Code: state kamera LoveTalk, juga hanya untuk detail.
+	"loveTalk",
 ]);
 
 /** Compact copy of one model for the library index. */

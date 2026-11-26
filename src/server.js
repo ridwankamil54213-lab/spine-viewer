@@ -1984,6 +1984,7 @@ function scanModels() {
 	// CherryTale: timeline adegan (durasi + voice) dari bundle storyshow.
 	applyCherrytaleScenes(models);
 	applyArkrecodeScenes(models);
+	applyArkrecodeLovetalk(models);
 	// Lost Sword: fold each character's unit + lobby + pet + cutscene videos
 	// into one family so the "Varian" dropdown carries them all. Videos stay in
 	// `models` (the client resolves variant ids against it) but only the family
@@ -2825,6 +2826,29 @@ function applyArkrecodeScenes(models) {
 	if (hits) console.log(`  ark scene  : ${hits} model punya timeline suara`);
 }
 
+/**
+ * Ark Re:Code CG "LoveTalk": state kamera dari AnimatorController asli
+ * (data/arkrecode-lovetalk.json, ditulis tools/extract-arkrecode-lovetalk.py).
+ * Tiap state = posisi + skala node Align_Object; viewer menerapkannya ke
+ * kontainer model, jadi tidak ada anatomi yang perlu ditebak.
+ */
+function applyArkrecodeLovetalk(models) {
+	let map;
+	try {
+		map = JSON.parse(fs.readFileSync(path.join(DATA, "arkrecode-lovetalk.json"), "utf8"));
+	} catch {
+		return;
+	}
+	let hits = 0;
+	for (const m of models) {
+		const lt = map[m.id];
+		if (!lt?.states?.length) continue;
+		m.loveTalk = lt;
+		hits++;
+	}
+	if (hits) console.log(`  ark cam   : ${hits} model punya state kamera`);
+}
+
 function applyLustyNames(models) {	let map;
 	try {
 		map = JSON.parse(fs.readFileSync(path.join(DATA, "lustyodyssey-names.json"), "utf8"));
@@ -3382,6 +3406,7 @@ function getModels({ force = false } = {}) {
 			// cache dihapus.
 			applyCherrytaleScenes(cache.models);
 			applyArkrecodeScenes(cache.models);
+			applyArkrecodeLovetalk(cache.models);
 			console.log(`[cache] memakai cache ${persisted.models.length} model`);
 			return cache.models;
 		}

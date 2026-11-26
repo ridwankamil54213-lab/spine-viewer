@@ -510,6 +510,25 @@ dock timeline, tap kanvas, sensor `S`, lensa `M`. Subtitle kosong karena teks
 aslinya tidak ada di aset. Voice dilayani dari `/arkrecode-audio` (di-gate
 auth seperti `/assets`).
 
+### CG LoveTalk: state kamera
+
+CG `Axxxx` (mis. A0016) punya dua lapis: animasi Spine biasa (sudah tampil) dan
+sebuah `AnimatorController` yang tiap state-nya menggerakkan TRANSFORM node
+Spine — itulah "kamera"-nya. `A0016` punya 4 state unik (Normal/Face/Butt/Boobs);
+state kembar dibuang.
+
+```bash
+/srv/venv-spine/bin/python tools/extract-arkrecode-lovetalk.py --only A0016
+```
+
+Keluarannya `data/arkrecode-lovetalk.json` (pos + skala per state, `unit` =
+skala node Spine 26 × skala skeleton). Viewer menampilkan baris tombol "Kamera"
+di atas transport; klik = terapkan state itu ke kontainer model.
+
+shortcut: framing-nya pakai satu konstanta (pos/unit) dan bukan prefab kamera
+asli yang tidak ada di bundle — jadi posisinya mendekati, bukan sama persis.
+Kalau butuh presisi, ekstrak juga prefab kamera + Canvas dari bundle.
+
 ## Deteksi runtime
 
 Bukan cuma `.skel` vs `.json`. `src/spine-version.cjs` membaca bytes header
@@ -1613,6 +1632,7 @@ node tools/check-stellasora.cjs   # Stella Sora: 36 Spine 4.2 + 252 Live2D, ilus
 node tools/check-updater-dashboard.cjs # 27 updater: health paralel, cache, mirror lag, UI
 node tools/check-arkrecode.cjs    # Ark Re:Code: processed_v2 signature, 18 bukan Spine, render
 node tools/check-arkrecode-scene.cjs # Ark Re:Code: timeline H-scene + voice opus
+node tools/check-arkrecode-lovetalk.cjs # Ark Re:Code: kamera CG LoveTalk (A0016)
 node tools/check-update-json.cjs  # updater: no 304/body kosong, cache scan Cat Shinobi, toast
 node tools/check-catshinobi.cjs   # Cat Shinobi: 307 nama, 186 family, 517 ilustrasi, render
 node tools/check-update-refresh.cjs # apply: model baru langsung muncul, tanpa reload
